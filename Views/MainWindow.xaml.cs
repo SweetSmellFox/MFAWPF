@@ -23,7 +23,7 @@ namespace MFAWPF.Views
         public bool IsADB { get; set; } = true;
 
         public static MainViewModel Data { get; private set; }
-        public static readonly string Version = "v1.1.2-test";
+        public static readonly string Version = "v1.1.2-beta";
         public Dictionary<string, TaskModel> TaskDictionary = new();
 
         public MainWindow()
