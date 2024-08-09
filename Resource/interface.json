@@ -1,0 +1,44 @@
+{
+  "task": [
+    {
+      "name": "启动游戏",
+      "entry": "速刷源石锭",
+      "check": true,
+      "option": [
+        {
+          "name": "客户端类型",
+          "index": 0
+        }
+      ]
+    },
+    {
+      "name": "刷源石锭",
+      "entry": "启动检测",
+      "check": true
+    }
+  ],
+  "recognizer": {},
+  "action": {},
+  "option": {
+    "客户端类型": {
+      "cases": [
+        {
+          "param": {
+            "速刷源石锭": {
+              "package": "com.hypergryph.arknights/com.u8.sdk.U8UnityContext"
+            }
+          },
+          "name": "官服"
+        },
+        {
+          "param": {
+            "速刷源石锭": {
+              "package": "com.hypergryph.arknights.bilibili/com.u8.sdk.U8UnityContext"
+            }
+          },
+          "name": "Bilibili服"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,25 @@
+﻿<Application x:Class="MFAWPF.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:MFAWPF"
+             StartupUri="/Views/MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/theme.xaml"/>
+                <!-- Base -->
+                <ResourceDictionary Source="Styles/Color.xaml"/>
+                <ResourceDictionary Source="Styles/Brush.xaml"/>
+                <ResourceDictionary Source="Styles/Geometry.xaml"/>
+                <ResourceDictionary Source="Styles/Style/MainStyle.xaml"/>
+                <ResourceDictionary Source="Styles/Geometry.xaml" />
+                <ResourceDictionary Source="Assets/Icons/Icons.xaml" />
+                <!-- Theme -->
+                <ResourceDictionary Source="Styles/Theme/LightTheme.xaml"/>
+                <!-- Primary -->
+                <ResourceDictionary Source="Styles/Primary/Primary.xaml"/>
+
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
