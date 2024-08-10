@@ -39,7 +39,7 @@ public class VersionChecker
 
             string jsonResponse = await response.Content.ReadAsStringAsync();
             JObject releaseData = JObject.Parse(jsonResponse);
-            return releaseData["name"].ToString(); // 从name字段获取版本信息
+            return releaseData["tag_name"].ToString(); // 从name字段获取版本信息
         }
     }
 
