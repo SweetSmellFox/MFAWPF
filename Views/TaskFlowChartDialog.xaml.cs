@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using MFAWPF.Controls;
 using MFAWPF.ViewModels;
 using QuickGraph;
 using GraphSharp.Controls;
-using MFAWPF.Views;
 using TextBlock = System.Windows.Controls.TextBlock;
 
 namespace MFAWPF.Views
@@ -15,24 +17,21 @@ namespace MFAWPF.Views
     {
         private bool _isDragging;
         private Point _startPoint;
-        private readonly Dictionary<string, TaskItemViewModel> _vertexTaskMapping;
-        private EditTaskDialog EditTaskDialog;
+        private Dictionary<string, TaskItemViewModel> _vertexTaskMapping;
+        private readonly EditTaskDialog _editTaskDialog;
+        private Vertex _selectedVertex; // 用于连线的源节点
 
-        public TaskFlowChartDialog(EditTaskDialog editTaskDialog, List<TaskItemViewModel> taskModels) :
-            base()
+        public TaskFlowChartDialog(EditTaskDialog editTaskDialog, List<TaskItemViewModel> taskModels) : base()
         {
             InitializeComponent();
-            _vertexTaskMapping = new Dictionary<string, TaskItemViewModel>();
-            var graph = CreateGraph(taskModels);
-            graphLayout.Graph = graph;
-            EditTaskDialog = editTaskDialog;
+            _editTaskDialog = editTaskDialog;
+
+            UpdateGraph();
         }
 
-        private QuickGraph.BidirectionalGraph<object, QuickGraph.IEdge<object>> CreateGraph(
-            List<TaskItemViewModel> tasks)
+        private QuickGraph.BidirectionalGraph<object, IEdge<object>> CreateGraph(List<TaskItemViewModel> tasks)
         {
-            var graph = new QuickGraph.BidirectionalGraph<object, QuickGraph.IEdge<object>>();
-
+            var graph = new BidirectionalGraph<object, IEdge<object>>();
             var vertexDictionary = new Dictionary<string, Vertex>();
 
             foreach (var task in tasks)
@@ -42,14 +41,13 @@ namespace MFAWPF.Views
                     var vertex = new Vertex(task.Name);
                     vertexDictionary[task.Name] = vertex;
                     graph.AddVertex(vertex);
+                    Console.WriteLine(vertex.Name);
                     _vertexTaskMapping[vertex.Name] = task;
                 }
 
                 if (task.Task != null)
                 {
                     AddEdges(graph, vertexDictionary, task.Task.next, vertexDictionary[task.Name], "Normal");
-                    // AddEdges(graph, vertexDictionary, task.Task.timeout_next, vertexDictionary[task.Name], "Timeout");
-                    // AddEdges(graph, vertexDictionary, task.Task.runout_next, vertexDictionary[task.Name], "Runout");
                 }
             }
 
@@ -112,8 +110,39 @@ namespace MFAWPF.Views
             Close();
         }
 
-        private void GraphLayout_MouseDown(object sender, MouseButtonEventArgs e)
+        private void GraphLayout_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            // if (e.ChangedButton == MouseButton.Right)
+            // {
+            //     // 右键删除节点或连线
+            //     var hitTestResult = VisualTreeHelper.HitTest(graphLayout, e.GetPosition(graphLayout));
+            //     if (hitTestResult != null && hitTestResult.VisualHit is TextBlock textBlock)
+            //     {
+            //         var taskName = textBlock.Text;
+            //
+            //         // 改进后的部分：先检查键是否存在
+            //         if (_vertexTaskMapping.TryGetValue(taskName, out var taskToRemove))
+            //         {
+            //             _editTaskDialog.Data.DataList.Remove(taskToRemove);
+            //             UpdateGraph();
+            //         }
+            //         else
+            //         {
+            //             // 键不存在的情况，处理错误或警告
+            //             MessageBox.Show($"任务 '{taskName}' 未找到。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            //         }
+            //     }
+            //     else if (hitTestResult.VisualHit is Path line)
+            //     {
+            //         var edge = line.DataContext as EdgeWithLabel;
+            //         if (edge != null)
+            //         {
+            //             var sourceTask = _vertexTaskMapping[edge.Source.ToString()];
+            //             sourceTask.Task.next.Remove(edge.Target.ToString());
+            //             UpdateGraph();
+            //         }
+            //     }
+            // }
         }
 
         private void GraphLayout_MouseMove(object sender, MouseEventArgs e)
@@ -121,7 +150,8 @@ namespace MFAWPF.Views
             if (_isDragging)
             {
                 Point currentPoint = e.GetPosition(scrollViewer);
-                scrollViewer.ScrollToHorizontalOffset(scrollViewer.HorizontalOffset - (currentPoint.X - _startPoint.X));
+                scrollViewer.ScrollToHorizontalOffset(scrollViewer.HorizontalOffset -
+                                                      (currentPoint.X - _startPoint.X));
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - (currentPoint.Y - _startPoint.Y));
                 _startPoint = currentPoint;
             }
@@ -155,31 +185,12 @@ namespace MFAWPF.Views
             }
         }
 
-        private void GraphLayout_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+        public void UpdateGraph()
         {
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                if (Keyboard.Modifiers == ModifierKeys.Control)
-                {
-                    _startPoint = e.GetPosition(scrollViewer);
-                    _isDragging = true;
-                    Mouse.Capture(graphLayout);
-                }
-                else
-                {
-                    var hitTestResult = VisualTreeHelper.HitTest(graphLayout, e.GetPosition(graphLayout));
-                    if (hitTestResult != null)
-                    {
-                        if (hitTestResult.VisualHit is TextBlock textBlock)
-                        {
-                            EditTaskDialog.Data.CurrentTask =
-                                EditTaskDialog.Data.DataList.Where(model =>
-                                        !string.IsNullOrWhiteSpace(textBlock.Text) && model.Name.Equals(textBlock.Text))
-                                    .FirstOrDefault() ?? EditTaskDialog.Data.CurrentTask;
-                        }
-                    }
-                }
-            }
+            _vertexTaskMapping = new Dictionary<string, TaskItemViewModel>();
+            var graph = CreateGraph(_editTaskDialog.Data.DataList.ToList());
+            graphLayout.Graph = graph;
+            _editTaskDialog.Data.CurrentTask = null; // 更新完图形后，清空选择以防止不必要的误操作
         }
     }
 }

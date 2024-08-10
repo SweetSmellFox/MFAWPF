@@ -159,7 +159,19 @@ public class TaskModel
 
         return this;
     }
-
+    
+    public void Merge(TaskModel other)
+    {
+        foreach (var property in typeof(TaskModel).GetProperties())
+        {
+            var otherValue = property.GetValue(other);
+            if (otherValue != null)
+            {
+                property.SetValue(this, otherValue);
+            }
+        }
+    }
+    
     public TaskModel Reset()
     {
         name = "未命名";

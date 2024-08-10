@@ -12,6 +12,11 @@ public class LoggerService
         logger.Info(message);
     }
 
+    public void LogError(Exception e)
+    {
+        logger.Error(e);
+    }
+    
     public void LogError(string message)
     {
         logger.Error(message);

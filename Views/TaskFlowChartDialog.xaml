@@ -37,7 +37,6 @@
                                               OverlapRemovalAlgorithmType="FSA"
                                               HighlightAlgorithmType="Simple"
                                               PreviewMouseDown="GraphLayout_OnPreviewMouseDown"
-                                              MouseDown="GraphLayout_MouseDown"
                                               MouseMove="GraphLayout_MouseMove"
                                               MouseUp="GraphLayout_MouseUp" />
                     </ScrollViewer>

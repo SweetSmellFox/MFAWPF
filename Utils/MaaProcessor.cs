@@ -45,7 +45,7 @@ namespace MFAWPF.Utils
         public static string ResourceBase => $"{Resource}/base";
         public static string ResourcePipelineFilePath => $"{ResourceBase}/pipeline/";
         public static string AdbConfig { get; set; }
-        public static AutoInitDictionary AutoInitDictionary { get; } = new AutoInitDictionary();
+        public static AutoInitDictionary AutoInitDictionary { get; } = new();
         private Action _action;
 
         public MaaProcessor()
@@ -60,6 +60,7 @@ namespace MFAWPF.Utils
             public string Param { get; set; }
         }
 
+
         public void Start(List<DragItemViewModel> tasks)
         {
             if (!Config.IsConnected)
@@ -67,10 +68,12 @@ namespace MFAWPF.Utils
                 Growls.Warning($"无法连接至{(MainWindow.Instance.IsADB ? "模拟器" : "窗口")}");
                 return;
             }
-
+            
             var taskAndParams = tasks.Select(task =>
             {
                 var taskModels = task.InterfaceItem.param ?? new Dictionary<string, TaskModel>();
+                if (MainWindow.Instance.TaskDictionary != null)
+                    MainWindow.Instance.TaskDictionary = MainWindow.Instance.TaskDictionary.MergeTaskModels(taskModels);
 
                 if (task.InterfaceItem.option != null)
                 {
@@ -81,8 +84,14 @@ namespace MFAWPF.Utils
                             interfaceOption.cases[selectOption.index.Value] != null &&
                             interfaceOption.cases[selectOption.index.Value].param != null)
                         {
-                            taskModels = taskModels.Concat(interfaceOption.cases[selectOption.index.Value].param)
-                                .ToDictionary(pair => pair.Key, pair => pair.Value);
+                            // taskModels = taskModels.Concat(interfaceOption.cases[selectOption.index.Value].param)
+                            //     .ToDictionary(pair => pair.Key, pair => pair.Value);
+                            if (MainWindow.Instance.TaskDictionary != null)
+                                MainWindow.Instance.TaskDictionary =
+                                    MainWindow.Instance.TaskDictionary.MergeTaskModels(interfaceOption
+                                        .cases[selectOption.index.Value].param);
+                            taskModels =
+                                taskModels.MergeTaskModels(interfaceOption.cases[selectOption.index.Value].param);
                         }
                     }
                 }
@@ -143,6 +152,7 @@ namespace MFAWPF.Utils
                                 Growls.ErrorGlobal("任务失败!");
                                 isStopped = true;
                             }
+
                             break;
                         }
                     }

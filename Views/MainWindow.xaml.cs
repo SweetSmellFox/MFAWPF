@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -23,7 +24,7 @@ namespace MFAWPF.Views
         public bool IsADB { get; set; } = true;
 
         public static MainViewModel Data { get; private set; }
-        public static readonly string Version = "v1.1.2-beta";
+        public static readonly string Version = $"v{Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
         public Dictionary<string, TaskModel> TaskDictionary = new();
 
         public MainWindow()
@@ -36,6 +37,7 @@ namespace MFAWPF.Views
             Data = DataContext as MainViewModel;
             InitializeData();
             OCRHelper.Initialize();
+            VersionChecker.CheckVersion();
             MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
         }
 

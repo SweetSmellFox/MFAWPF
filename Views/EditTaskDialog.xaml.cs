@@ -75,15 +75,17 @@ public partial class EditTaskDialog : CustomWindow
             }
 
             Data.CurrentTask.Task = Data.CurrentTask.Task;
+            _chartDialog?.UpdateGraph();
             Growl.SuccessGlobal("保存任务成功!");
         }
         else Growls.ErrorGlobal("保存任务失败!");
     }
 
+    private TaskFlowChartDialog _chartDialog;
     private void ShowChart(object sender, RoutedEventArgs e)
     {
-        TaskFlowChartDialog dialog = new TaskFlowChartDialog(this,Data.DataList.ToList());
-        dialog.Show();
+        _chartDialog = new TaskFlowChartDialog(this,Data.DataList.ToList());
+        _chartDialog.Show();
     }
     
     private string PipelineFilePath = MaaProcessor.ResourcePipelineFilePath;
@@ -280,6 +282,7 @@ public partial class EditTaskDialog : CustomWindow
             Task = new TaskModel(), IsNew = true
         });
         ScrollListBoxToBottom();
+        _chartDialog?.UpdateGraph();
     }
 
     private void TaskSelectionChanged(object sender, SelectionChangedEventArgs e)
