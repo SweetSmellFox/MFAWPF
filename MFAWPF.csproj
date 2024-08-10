@@ -58,6 +58,7 @@
         <PackageReference Include="gong-wpf-dragdrop" Version="3.2.1" />
         <PackageReference Include="GraphSharp" Version="1.1.0" />
         <PackageReference Include="HandyControls" Version="3.5.3" />
+        <PackageReference Include="LocalizationProvider" Version="8.1.2" />
         <PackageReference Include="Maa.Framework" Version="1.8.9.2" />
         <PackageReference Include="Maa.Framework.Runtimes" Version="1.8.9.16-ci.10313141234" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

@@ -8,7 +8,8 @@ public class TaskInterfaceItem
     public string? name;
     public string? entry;
     public bool? check;
-    
+    public bool? repeatable;
+    public int? repeat_count;
     [JsonConverter(typeof(MaaInterfaceSelectOptionConverter))]
     public List<MaaInterface.MaaInterfaceSelectOption>? option;
 

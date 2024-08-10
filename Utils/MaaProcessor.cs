@@ -45,6 +45,8 @@ namespace MFAWPF.Utils
         public static string ResourceBase => $"{Resource}/base";
         public static string ResourcePipelineFilePath => $"{ResourceBase}/pipeline/";
         public static string AdbConfig { get; set; }
+
+        public static List<string>? CurrentResources { get; set; }
         public static AutoInitDictionary AutoInitDictionary { get; } = new();
         private Action _action;
 
@@ -57,6 +59,7 @@ namespace MFAWPF.Utils
         {
             public string Name { get; set; }
             public string Entry { get; set; }
+            public int? Count { get; set; }
             public string Param { get; set; }
         }
 
@@ -68,7 +71,7 @@ namespace MFAWPF.Utils
                 Growls.Warning($"无法连接至{(MainWindow.Instance.IsADB ? "模拟器" : "窗口")}");
                 return;
             }
-            
+
             var taskAndParams = tasks.Select(task =>
             {
                 var taskModels = task.InterfaceItem.param ?? new Dictionary<string, TaskModel>();
@@ -121,6 +124,7 @@ namespace MFAWPF.Utils
                 {
                     Name = task.InterfaceItem?.name,
                     Entry = task.InterfaceItem?.entry,
+                    Count = task.InterfaceItem?.repeatable == true ? (task.InterfaceItem?.repeat_count ?? 1) : 1,
                     Param = taskParms
                 };
             }).ToList();
@@ -143,23 +147,26 @@ namespace MFAWPF.Utils
                 {
                     foreach (var task in taskAndParams)
                     {
-                        MainWindow.Data.AddLog($"开始任务: {task.Name}");
-                        if (!TryRunTasks(CurrentInstance, task.Entry, task.Param))
+                        for (int i = 0; i < task.Count; i++)
                         {
-                            if (!isStopped)
+                            MainWindow.Data.AddLog($"开始任务: {task.Name}");
+                            if (!TryRunTasks(CurrentInstance, task.Entry, task.Param))
                             {
-                                MainWindow.Data.AddLog($"任务出错: {task.Name}", Brushes.Red);
-                                Growls.ErrorGlobal("任务失败!");
-                                isStopped = true;
-                            }
+                                if (!isStopped)
+                                {
+                                    MainWindow.Data.AddLog($"任务出错: {task.Name}", Brushes.Red);
+                                    Growls.ErrorGlobal("任务失败!");
+                                    isStopped = true;
+                                }
 
-                            break;
+                                break;
+                            }
                         }
                     }
 
                     Stop(false);
                 }
-            });
+            }, () => Stop(false), "开始任务");
 
             TaskStack.Push(new RelayCommand(_ =>
             {
@@ -176,7 +183,7 @@ namespace MFAWPF.Utils
                     {
                         Growls.ErrorGlobal("停止任务失败");
                     }
-                });
+                }, null, "结束任务");
             }));
 
             OnTaskStackChanged();
@@ -189,14 +196,18 @@ namespace MFAWPF.Utils
             if (TaskStack.Count > 0)
             {
                 isStopped = setIsStopped;
+
                 var undoCommand = TaskStack.Pop();
                 undoCommand.Execute(null);
                 OnTaskStackChanged();
             }
             else
             {
-                if (!setIsStopped)
+                if (setIsStopped)
+                {
                     Growls.Warning("当前没有可结束的任务!");
+                    OnTaskStackChanged();
+                }
             }
         }
 
@@ -296,7 +307,7 @@ namespace MFAWPF.Utils
             LoggerService.Logger.LogInfo("正在载入资源");
             try
             {
-                maaResource = new MaaResource(ResourceBase);
+                maaResource = new MaaResource(CurrentResources);
             }
             catch (Exception e)
             {
@@ -380,11 +391,27 @@ namespace MFAWPF.Utils
                     {
                         var taskModel = MainWindow.Instance.TaskDictionary[name];
                         var converter = new BrushConverter();
-                        Brush brush = null;
-                        if (taskModel.focus_tip_color != null)
-                            brush = (Brush)converter.ConvertFromString(taskModel.focus_tip_color);
-                        if (!string.IsNullOrWhiteSpace(taskModel.focus_tip))
-                            MainWindow.Data.AddLog(HandlingStringsWithVariables(taskModel.focus_tip), brush);
+
+                        if (taskModel.focus_tip != null)
+                        {
+                            for (int i = 0; i < taskModel.focus_tip.Count; i++)
+                            {
+                                Brush brush = null;
+                                var tip = taskModel.focus_tip[i];
+                                try
+                                {
+                                    if (taskModel.focus_tip_color != null && taskModel.focus_tip_color.Count > i)
+                                        brush = converter.ConvertFromString(taskModel.focus_tip_color[i]) as Brush;
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e);
+                                    LoggerService.Logger.LogError(e);
+                                }
+
+                                MainWindow.Data.AddLog(HandlingStringsWithVariables(tip), brush);
+                            }
+                        }
                     }
                 }
             };

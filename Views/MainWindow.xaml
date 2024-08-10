@@ -1,28 +1,28 @@
 ﻿<controls:CustomWindow x:Class="MFAWPF.Views.MainWindow"
-                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                    xmlns:hc="https://handyorg.github.io/handycontrol"
-                    xmlns:controls="clr-namespace:MFAWPF.Controls"
-                    xmlns:properties="clr-namespace:MFAWPF.Styles.Properties"
-                    xmlns:viewModels="clr-namespace:MFAWPF.ViewModels"
-                    xmlns:views="clr-namespace:MFAWPF.Views"
-                    xmlns:dd="urn:gong-wpf-dragdrop"
-                    xmlns:converters="clr-namespace:MFAWPF.Utils.Converters"
-                    mc:Ignorable="d"
-                    Title="Maa框架任务管理器" Height="520" Width="800"
-                    WindowStartupLocation="CenterScreen" WindowStyle="None"
-                    Background="Transparent" AllowsTransparency="True"
-                    PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown"
-                    PreviewMouseMove="Window_PreviewMouseMove"
-                    PreviewMouseLeftButtonUp="Window_PreviewMouseLeftButtonUp"
-                    ResizeMode="CanResizeWithGrip" WindowState="Normal">
+                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                       xmlns:hc="https://handyorg.github.io/handycontrol"
+                       xmlns:controls="clr-namespace:MFAWPF.Controls"
+                       xmlns:properties="clr-namespace:MFAWPF.Styles.Properties"
+                       xmlns:viewModels="clr-namespace:MFAWPF.ViewModels"
+                       xmlns:views="clr-namespace:MFAWPF.Views"
+                       xmlns:dd="urn:gong-wpf-dragdrop"
+                       xmlns:converters="clr-namespace:MFAWPF.Utils.Converters"
+                       mc:Ignorable="d"
+                       Title="Maa框架任务管理器" Height="520" Width="800"
+                       WindowStartupLocation="CenterScreen" WindowStyle="None"
+                       Background="Transparent" AllowsTransparency="True"
+                       PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown"
+                       PreviewMouseMove="Window_PreviewMouseMove"
+                       PreviewMouseLeftButtonUp="Window_PreviewMouseLeftButtonUp"
+                       ResizeMode="CanResizeWithGrip" WindowState="Normal">
     <controls:CustomWindow.DataContext>
         <viewModels:MainViewModel />
     </controls:CustomWindow.DataContext>
     <controls:CustomWindow.Resources>
-        <converters:CustomIsEnabledConverter x:Key="CustomIsEnabledConverter"/>
+        <converters:CustomIsEnabledConverter x:Key="CustomIsEnabledConverter" />
     </controls:CustomWindow.Resources>
     <Border CornerRadius="8" Background="{StaticResource SecundaryBackgroundColor}"
             BorderBrush="{StaticResource GrayColor5}" BorderThickness="1">
@@ -85,9 +85,11 @@
                             <TabItem Header="ADB" x:Name="adbTab"></TabItem>
                             <TabItem Header="Win32" x:Name="win32Tab"></TabItem>
                         </TabControl>
-                        <ComboBox Width="250" x:Name="deviceComboBox" DisplayMemberPath="Name" Margin="4 0 0 0" IsEnabled="{Binding Idle}"
+                        <ComboBox Width="250" x:Name="deviceComboBox" DisplayMemberPath="Name" Margin="4 0 0 0"
+                                  IsEnabled="{Binding Idle}"
                                   SelectionChanged="DeviceComboBox_OnSelectionChanged" />
-                        <Button Style="{StaticResource textBoxButton}" ToolTip="刷新" Grid.Column="1" IsEnabled="{Binding Idle}"
+                        <Button Style="{StaticResource textBoxButton}" ToolTip="刷新" Grid.Column="1"
+                                IsEnabled="{Binding Idle}"
                                 Margin="6 0  6 0" Click="Refresh"
                                 Width="20" Height="20">
                             <Button.Resources>
@@ -104,7 +106,7 @@
                                   Fill="{DynamicResource GrayColor4}"
                                   MaxWidth="16" Stretch="Uniform" />
                         </Button>
-                        <RadioButton x:Name="ConnectSettingButton"  ToolTip="设置" 
+                        <RadioButton x:Name="ConnectSettingButton" ToolTip="设置"
                                      Margin="0"
                                      Padding="5,0,5,0"
                                      hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
@@ -131,7 +133,8 @@
 
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
                                                 HorizontalAlignment="Right">
-                                        <Button Style="{StaticResource textBoxButton}" ToolTip="全选" IsEnabled="{Binding Idle}"
+                                        <Button Style="{StaticResource textBoxButton}" ToolTip="全选"
+                                                IsEnabled="{Binding Idle}"
                                                 Width="15" Height="15" Margin="7 0 0 0" Click="SelectAll"
                                                 VerticalAlignment="Center" HorizontalAlignment="Right">
                                             <Button.Resources>
@@ -148,7 +151,8 @@
                                                   Fill="{DynamicResource GrayColor4}"
                                                   MaxWidth="12" Stretch="Uniform" />
                                         </Button>
-                                        <Button Style="{StaticResource textBoxButton}" ToolTip="全部不选" IsEnabled="{Binding Idle}"
+                                        <Button Style="{StaticResource textBoxButton}" ToolTip="全部不选"
+                                                IsEnabled="{Binding Idle}"
                                                 Width="15" Height="15" Margin="7 0 0 0" Click="SelectNone"
                                                 VerticalAlignment="Center" HorizontalAlignment="Right">
                                             <Button.Resources>

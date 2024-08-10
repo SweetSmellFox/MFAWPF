@@ -33,8 +33,12 @@ public class TaskModel
     public object? pre_wait_freezes { get; set; }
     public object? post_wait_freezes { get; set; }
     public bool? focus { get; set; }
-    public string? focus_tip { get; set; }
-    public string? focus_tip_color { get; set; }
+
+    [JsonConverter(typeof(SingleOrListConverter))]
+    public List<string>? focus_tip { get; set; }
+
+    [JsonConverter(typeof(SingleOrListConverter))]
+    public List<string>? focus_tip_color { get; set; }
 
     // Action-specific properties
     [JsonConverter(typeof(SingleOrListConverter))]
@@ -159,7 +163,7 @@ public class TaskModel
 
         return this;
     }
-    
+
     public void Merge(TaskModel other)
     {
         foreach (var property in typeof(TaskModel).GetProperties())
@@ -171,7 +175,7 @@ public class TaskModel
             }
         }
     }
-    
+
     public TaskModel Reset()
     {
         name = "未命名";

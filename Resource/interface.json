@@ -1,10 +1,32 @@
 {
+	 "resource": [
+        {
+            "name": "官服",
+            "path": [
+                "{PROJECT_DIR}/resource/base"
+            ]
+        },
+        {
+            "name": "Bilibili服",
+            "path": [
+                "{PROJECT_DIR}/resource/base",
+                "{PROJECT_DIR}/resource/bilibili"
+            ]
+        }
+    ],
   "task": [
     {
       "name": "启动游戏",
       "entry": "速刷源石锭",
+      "check": false
+    },
+    {
+      "name": "测试",
+      "entry": "测试输出",
       "check": true,
-      "option": [
+      "repeatable": true,
+      "repeat_count": 6,
+	  "option": [
         {
           "name": "客户端类型",
           "index": 0
@@ -14,7 +36,7 @@
     {
       "name": "刷源石锭",
       "entry": "启动检测",
-      "check": true
+      "check": false
     }
   ],
   "recognizer": {},

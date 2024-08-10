@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows;
@@ -35,6 +34,7 @@ namespace MFAWPF.Views
             _maaToolkit = new MaaToolkit(init: true);
 
             Data = DataContext as MainViewModel;
+
             InitializeData();
             OCRHelper.Initialize();
             VersionChecker.CheckVersion();
@@ -56,9 +56,10 @@ namespace MFAWPF.Views
             return LoadTask();
         }
 
+        private bool firstTask = true;
+
         private void LoadTasks(IEnumerable<TaskInterfaceItem> tasks)
         {
-            bool firstTask = true;
             foreach (var task in tasks)
             {
                 var dragItem = new DragItemViewModel(task)
@@ -67,7 +68,14 @@ namespace MFAWPF.Views
                 };
                 if (firstTask)
                 {
-                    dragItem.EnableSetting = true;
+                    // dragItem.EnableSetting = true;
+                    ConnectSettingButton.IsChecked = true;
+                    if (MaaInterface.Instance.Resources != null &&
+                        MaaInterface.Instance.Resources.Count > DataSet.GetData("ResourceIndex", 0))
+                        MaaProcessor.CurrentResources =
+                            MaaInterface.Instance.Resources[
+                                MaaInterface.Instance.Resources.Keys.ToList()[DataSet.GetData("ResourceIndex", 0)]];
+                    else MaaProcessor.CurrentResources = new List<string> { MaaProcessor.ResourceBase };
                     firstTask = false;
                 }
 
@@ -89,10 +97,20 @@ namespace MFAWPF.Views
 
         private void ToggleTaskButtonsVisibility(bool isRunning)
         {
-            startButton.Visibility = isRunning ? Visibility.Collapsed : Visibility.Visible;
-            startButton.IsEnabled = !isRunning;
-            stopButton.Visibility = isRunning ? Visibility.Visible : Visibility.Collapsed;
-            stopButton.IsEnabled = isRunning;
+            // 检查是否需要使用 Dispatcher
+            if (Dispatcher.CheckAccess())
+            {
+                // 当前线程是 UI 线程，直接执行
+                startButton.Visibility = isRunning ? Visibility.Collapsed : Visibility.Visible;
+                startButton.IsEnabled = !isRunning;
+                stopButton.Visibility = isRunning ? Visibility.Visible : Visibility.Collapsed;
+                stopButton.IsEnabled = isRunning;
+            }
+            else
+            {
+                // 如果当前线程不是 UI 线程，通过 Dispatcher 调度到 UI 线程执行
+                Dispatcher.Invoke(() => ToggleTaskButtonsVisibility(isRunning));
+            }
         }
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
@@ -115,29 +133,41 @@ namespace MFAWPF.Views
             try
             {
                 var taskDictionary = new Dictionary<string, TaskModel>();
-                var jsonFiles = Directory.GetFiles(MaaProcessor.ResourcePipelineFilePath, "*.json");
-
-                foreach (var file in jsonFiles)
+                if (MaaProcessor.CurrentResources != null)
                 {
-                    var content = File.ReadAllText(file);
-                    var taskData = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(content);
-                    foreach (var task in taskData)
+                    foreach (var resourcePath in MaaProcessor.CurrentResources)
                     {
-                        if (!taskDictionary.TryAdd(task.Key, task.Value))
+                        Console.WriteLine($"{resourcePath}/pipeline/");
+                        var jsonFiles = Directory.GetFiles($"{resourcePath}/pipeline/", "*.json");
+                        var taskDictionaryA = new Dictionary<string, TaskModel>();
+                        foreach (var file in jsonFiles)
                         {
-                            Growls.ErrorGlobal($"Pipeline文件中存在重复的任务名称:\"{task.Key}\"！");
-                            return false;
+                            var content = File.ReadAllText(file);
+                            var taskData = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(content);
+
+                            foreach (var task in taskData)
+                            {
+                                if (!taskDictionaryA.TryAdd(task.Key, task.Value))
+                                {
+                                    Growls.ErrorGlobal($"Pipeline文件中存在重复的任务名称:\"{task.Key}\"！");
+                                    return false;
+                                }
+                            }
                         }
+
+                        taskDictionary = taskDictionary.MergeTaskModels(taskDictionaryA);
                     }
                 }
 
                 PopulateTasks(taskDictionary);
+
                 return true;
             }
             catch (Exception ex)
             {
                 Growls.ErrorGlobal($"载入Pipeline文件时出现错误: {ex.Message}");
-                LoggerService.Logger.LogError(ex.ToString());
+                Console.WriteLine(ex);
+                LoggerService.Logger.LogError(ex);
                 return false;
             }
         }
@@ -273,6 +303,7 @@ namespace MFAWPF.Views
             settingPanel.Children.Clear();
             if (IsADB)
             {
+                AddResourcesOption();
                 AddSettingOption("捕获方式",
                     new List<string>
                     {
@@ -288,6 +319,7 @@ namespace MFAWPF.Views
             }
             else
             {
+                AddResourcesOption();
                 AddSettingOption("捕获方式",
                     new List<string> { "ScreencapDXGIFramePool", "ScreencapDXGIDesktopDup", "ScreencapGDI" },
                     "Win32ControlScreenCapType", 0);
@@ -296,6 +328,40 @@ namespace MFAWPF.Views
                     new List<string> { "Seize", "SendMessage" },
                     "Win32ControlTouchType", 0);
             }
+        }
+
+        private void AddResourcesOption(int defaultValue = 0)
+        {
+            var comboBox = new ComboBox()
+            {
+                SelectedIndex = DataSet.GetData("ResourceIndex", defaultValue), DisplayMemberPath = "name",
+                Style = FindResource("ComboBoxExtend") as Style,
+                Margin = new Thickness(5)
+            };
+            if (MaaInterface.Instance.resource != null)
+                comboBox.ItemsSource = MaaInterface.Instance.resource;
+            var binding = new Binding("Idle")
+            {
+                Source = Data,
+                Mode = BindingMode.OneWay
+            };
+            comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
+
+            comboBox.SetValue(InfoElement.TitleProperty, "资源");
+            comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+
+            comboBox.SelectionChanged += (sender, args) =>
+            {
+                var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+
+                if (MaaInterface.Instance.Resources != null && MaaInterface.Instance.Resources.Count > index)
+                    MaaProcessor.CurrentResources =
+                        MaaInterface.Instance.Resources[MaaInterface.Instance.Resources.Keys.ToList()[index]];
+
+                DataSet.SetData("ResourceIndex", index);
+            };
+
+            settingPanel.Children.Add(comboBox);
         }
 
         private void AddSettingOption(string title, List<string> options, string datatype, int defaultValue = 0)
@@ -331,6 +397,7 @@ namespace MFAWPF.Views
             if (dragItem.InterfaceItem != null && value)
             {
                 settingPanel.Children.Clear();
+                AddRepeatOption(dragItem);
                 if (dragItem.InterfaceItem.option != null)
                 {
                     foreach (var option in dragItem.InterfaceItem.option)
@@ -375,6 +442,40 @@ namespace MFAWPF.Views
                     comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
                     settingPanel.Children.Add(comboBox);
                 }
+            }
+        }
+
+        private void AddRepeatOption(DragItemViewModel source)
+        {
+            if (source.InterfaceItem != null && source.InterfaceItem.repeatable == true)
+            {
+                NumericUpDown numericUpDown = new NumericUpDown
+                {
+                    Value = source.InterfaceItem.repeat_count ?? 1, Style = FindResource("NumericUpDownPlus") as Style,
+                    Margin = new Thickness(5), Increment = 1, Minimum = -1, DecimalPlaces = 0
+                };
+
+                var multiBinding = new MultiBinding
+                {
+                    Converter = FindResource("CustomIsEnabledConverter") as IMultiValueConverter,
+                    Mode = BindingMode.OneWay
+                };
+
+                multiBinding.Bindings.Add(new Binding("IsCheckedWithNull") { Source = source });
+                multiBinding.Bindings.Add(new Binding("Idle") { Source = Data });
+
+                numericUpDown.SetBinding(ComboBox.IsEnabledProperty, multiBinding);
+
+                numericUpDown.Tag = source.Name;
+                numericUpDown.ValueChanged += (sender, args) =>
+                {
+                    source.InterfaceItem.repeat_count = Convert.ToInt16(numericUpDown.Value);
+                    JSONHelper.WriteToJsonFilePath(MaaProcessor.Resource, "interface", MaaInterface.Instance);
+                };
+
+                numericUpDown.SetValue(InfoElement.TitleProperty, "重复次数");
+                numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+                settingPanel.Children.Add(numericUpDown);
             }
         }
 

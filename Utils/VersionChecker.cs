@@ -14,7 +14,7 @@ public class VersionChecker
 
     public static void CheckVersion()
     {
-        TaskManager.RunTaskAsync(() => { CHECKER.CheckForUpdatesAsync(); }, "检测版本");
+        TaskManager.RunTaskAsync(() => { CHECKER.CheckForUpdatesAsync(); }, null, "检测版本");
     }
 
     public async Task CheckForUpdatesAsync(string owner = "SweetSmellFox", string repo = "MFAWPF")
@@ -47,7 +47,7 @@ public class VersionChecker
     {
         return Assembly.GetExecutingAssembly().GetName().Version.ToString();
     }
-    
+
     private bool IsNewVersionAvailable(string latestVersion, string localVersion)
     {
         try
@@ -71,13 +71,13 @@ public class VersionChecker
     private string ExtractVersionNumber(string versionString)
     {
         string[] parts = versionString.Replace(" v", " ").Split(' ');
-        
+
         foreach (var part in parts)
         {
             if (Version.TryParse(part, out _))
                 return part;
         }
-        
+
         throw new FormatException("无法解析版本号: " + versionString);
     }
 }

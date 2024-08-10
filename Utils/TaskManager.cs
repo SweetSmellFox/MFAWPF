@@ -42,7 +42,7 @@ public static class TaskManager
     /// <param name="name">任务名称</param>
     /// <param name="prompt">日志提示</param>
     public static async Task RunTaskAsync(
-        Action action,
+        Action action, Action handleError = null,
         string name = nameof(Action),
         string prompt = ">>> ",
         bool catchException = true)
@@ -56,6 +56,8 @@ public static class TaskManager
             }
             catch (Exception e)
             {
+                if (handleError != null)
+                    handleError.Invoke();
                 Console.WriteLine($"{prompt}异步任务 {name} 失败: {e.Message}");
             }
         }

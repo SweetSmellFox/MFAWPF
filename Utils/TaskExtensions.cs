@@ -6,6 +6,8 @@ public static class TaskExtensions
         this IEnumerable<KeyValuePair<TKey, TaskModel>> taskModels,
         IEnumerable<KeyValuePair<TKey, TaskModel>> additionalModels)
     {
+        if (additionalModels == null)
+            return taskModels.ToDictionary();
         return taskModels
             .Concat(additionalModels)
             .GroupBy(pair => pair.Key)
