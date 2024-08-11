@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using HandyControl.Controls;
 using HandyControl.Data;
+using HandyControl.Themes;
 using MaaFramework.Binding;
 using MFAWPF.Controls;
 using MFAWPF.Data;
@@ -32,7 +33,6 @@ namespace MFAWPF.Views
             Instance = this;
             version.Text = Version;
             _maaToolkit = new MaaToolkit(init: true);
-
             Data = DataContext as MainViewModel;
 
             InitializeData();
@@ -316,6 +316,7 @@ namespace MFAWPF.Views
                 AddSettingOption("触控模式",
                     new List<string> { "MiniTouch (默认)", "MaaTouch (实验功能)", "AdbInput (不推荐)", "AutoDetect (自动检测)" },
                     "AdbControlTouchType", 0);
+                AddThemeOption();
             }
             else
             {
@@ -327,6 +328,7 @@ namespace MFAWPF.Views
                 AddSettingOption("触控类型",
                     new List<string> { "Seize", "SendMessage" },
                     "Win32ControlTouchType", 0);
+                AddThemeOption();
             }
         }
 
@@ -364,6 +366,64 @@ namespace MFAWPF.Views
             settingPanel.Children.Add(comboBox);
         }
 
+        private void AddThemeOption(int defaultValue = 0)
+        {
+            var comboBox = new ComboBox()
+            {
+                Style = FindResource("ComboBoxExtend") as Style,
+                Margin = new Thickness(5)
+            };
+
+            comboBox.ItemsSource = new List<string> { "浅色", "深色" };
+            var binding = new Binding("Idle")
+            {
+                Source = Data,
+                Mode = BindingMode.OneWay
+            };
+            comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
+
+            comboBox.SetValue(InfoElement.TitleProperty, "颜色主题");
+            comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+
+            comboBox.SelectionChanged += (sender, args) =>
+            {
+                var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+                ThemeManager.Current.ApplicationTheme = index == 0 ? ApplicationTheme.Light : ApplicationTheme.Dark;
+                DataSet.SetData("ThemeIndex", index);
+            };
+            comboBox.SelectedIndex = DataSet.GetData("ThemeIndex", defaultValue);
+            settingPanel.Children.Add(comboBox);
+        }
+        
+        private void AddLanguageOption(int defaultValue = 0)
+        {
+            var comboBox = new ComboBox()
+            {
+                Style = FindResource("ComboBoxExtend") as Style,
+                Margin = new Thickness(5)
+            };
+
+            comboBox.ItemsSource = new List<string> { "zh-CN", "en-US" };
+            var binding = new Binding("Idle")
+            {
+                Source = Data,
+                Mode = BindingMode.OneWay
+            };
+            comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
+
+            comboBox.SetValue(InfoElement.TitleProperty, "语言(Language)");
+            comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+
+            comboBox.SelectionChanged += (sender, args) =>
+            {
+                var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+                ThemeManager.Current.ApplicationTheme = index == 0 ? ApplicationTheme.Light : ApplicationTheme.Dark;
+                DataSet.SetData("LangIndex", index);
+            };
+            
+            comboBox.SelectedIndex = DataSet.GetData("LangIndex", defaultValue);
+            settingPanel.Children.Add(comboBox);
+        }
         private void AddSettingOption(string title, List<string> options, string datatype, int defaultValue = 0)
         {
             var comboBox = new ComboBox()

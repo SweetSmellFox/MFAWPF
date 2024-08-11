@@ -5,7 +5,7 @@
                     xmlns:local="clr-namespace:MFAWPF.Views"
                     xmlns:controls="clr-namespace:MFAWPF.Controls"
                     Title="区域选择器">
-    <Border CornerRadius="10" Background="White" BorderBrush="{StaticResource GrayColor5}" BorderThickness="1"  MouseDown="Canvas_MouseDown">
+    <Border CornerRadius="10" Background="{DynamicResource WhiteColor}" BorderBrush="{StaticResource GrayColor5}" BorderThickness="1"  MouseDown="Canvas_MouseDown">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />

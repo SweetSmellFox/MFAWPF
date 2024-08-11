@@ -6,7 +6,7 @@
                     xmlns:controls="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
                     xmlns:controls1="clr-namespace:MFAWPF.Controls"
                     Title="任务流程图" Width="900" Height="810">
-    <Border CornerRadius="10" Background="White" BorderBrush="{StaticResource GrayColor5}" BorderThickness="1">
+    <Border CornerRadius="10" Background="{DynamicResource WhiteColor}" BorderBrush="{StaticResource GrayColor5}" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />

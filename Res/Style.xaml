@@ -1,0 +1,15 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:hc="https://handyorg.github.io/handycontrol">
+    <ResourceDictionary.MergedDictionaries>
+        <!-- Base -->
+        <ResourceDictionary Source="Style/Styles/Color.xaml" />
+        <ResourceDictionary Source="Style/Styles/Brush.xaml" />
+        <ResourceDictionary Source="Style/Styles/Geometry.xaml" />
+        <ResourceDictionary Source="Style/MainStyle.xaml" />
+        <ResourceDictionary Source="Style/Styles/Geometry.xaml" />
+        <!-- Primary -->
+        <ResourceDictionary Source="Primary/Primary.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

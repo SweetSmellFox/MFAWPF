@@ -11,6 +11,7 @@
         <GradientStop Color="{DynamicResource PrimaryColor}" Offset="0"/>
         <GradientStop Color="{DynamicResource DarkPrimaryColor}" Offset="1"/>
     </LinearGradientBrush>
+    
     <SolidColorBrush x:Key="DarkPrimaryBrush" Color="{DynamicResource DarkPrimaryColor}"/>
 
     <Color x:Key="TitleColor">#FF326CF3</Color>

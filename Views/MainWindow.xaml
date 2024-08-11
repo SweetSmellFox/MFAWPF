@@ -24,7 +24,7 @@
     <controls:CustomWindow.Resources>
         <converters:CustomIsEnabledConverter x:Key="CustomIsEnabledConverter" />
     </controls:CustomWindow.Resources>
-    <Border CornerRadius="8" Background="{StaticResource SecundaryBackgroundColor}"
+    <Border CornerRadius="8" Background="{DynamicResource SecundaryBackgroundColor}"
             BorderBrush="{StaticResource GrayColor5}" BorderThickness="1">
         <Grid>
 
@@ -34,7 +34,7 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <Border CornerRadius="10 10 0 0" VerticalAlignment="Top"
-                        Margin="0,5,10,0" Height="30" Background="{StaticResource MainContentBackgroundBrush}"
+                        Padding="0,2,10,0" Height="30" Background="{DynamicResource MainContentBackgroundBrush}"
                         ClipToBounds="False">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -45,10 +45,13 @@
                                    Height="20" Width="20">
 
                             </Image>
-                            <TextBlock VerticalAlignment="Center" Margin="6 4 4 0">Maa框架任务管理器</TextBlock>
+                            <TextBlock VerticalAlignment="Center" Margin="6 4 4 0"
+                                       Foreground="{DynamicResource PrimaryTextBrush}">
+                                Maa框架任务管理器
+                            </TextBlock>
                             <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}"
                                        Margin="2 4 4 0" x:Name="version">
-                                v1.0-test
+                                DEBUG
                             </TextBlock>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" FlowDirection="RightToLeft">
@@ -88,33 +91,22 @@
                         <ComboBox Width="250" x:Name="deviceComboBox" DisplayMemberPath="Name" Margin="4 0 0 0"
                                   IsEnabled="{Binding Idle}"
                                   SelectionChanged="DeviceComboBox_OnSelectionChanged" />
-                        <Button Style="{StaticResource textBoxButton}" ToolTip="刷新" Grid.Column="1"
-                                IsEnabled="{Binding Idle}"
-                                Margin="6 0  6 0" Click="Refresh"
-                                Width="20" Height="20">
-                            <Button.Resources>
-                                <Style TargetType="Button">
-                                    <Setter Property="Cursor" Value="Arrow" />
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Cursor" Value="Hand" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Resources>
-                            <Path Data="{StaticResource clear}"
-                                  Fill="{DynamicResource GrayColor4}"
-                                  MaxWidth="16" Stretch="Uniform" />
-                        </Button>
+                        <Button ToolTip="刷新" Width="20" Height="20" Margin="6 0 2 0"
+                                Style="{StaticResource textBoxButton}"
+                                Foreground="{DynamicResource GrayColor4}"
+                                Click="Refresh" IsEnabled="{Binding Idle}"
+                                Padding="0" hc:IconElement.Width="14"
+                                hc:IconElement.Geometry="{StaticResource clear}" />
                         <RadioButton x:Name="ConnectSettingButton" ToolTip="设置"
                                      Margin="0"
                                      Padding="5,0,5,0"
                                      hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
                                      hc:VisualElement.HighlightBackground="Transparent"
                                      hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
+                                     Foreground="{DynamicResource GrayColor4}"
                                      Background="Transparent"
                                      BorderThickness="0"
-                                     Foreground="{DynamicResource GrayColor4}"
+
                                      GroupName="TaskSettings" Checked="ConfigureSettingsPanel"
                                      Style="{DynamicResource RadioGroupItemSingle}" />
                     </hc:SimpleStackPanel>
@@ -133,76 +125,32 @@
 
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
                                                 HorizontalAlignment="Right">
-                                        <Button Style="{StaticResource textBoxButton}" ToolTip="全选"
-                                                IsEnabled="{Binding Idle}"
-                                                Width="15" Height="15" Margin="7 0 0 0" Click="SelectAll"
-                                                VerticalAlignment="Center" HorizontalAlignment="Right">
-                                            <Button.Resources>
-                                                <Style TargetType="Button">
-                                                    <Setter Property="Cursor" Value="Arrow" />
-                                                    <Style.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Cursor" Value="Hand" />
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Button.Resources>
-                                            <Path Data="{StaticResource SelectAllGeometry}"
-                                                  Fill="{DynamicResource GrayColor4}"
-                                                  MaxWidth="12" Stretch="Uniform" />
-                                        </Button>
-                                        <Button Style="{StaticResource textBoxButton}" ToolTip="全部不选"
-                                                IsEnabled="{Binding Idle}"
-                                                Width="15" Height="15" Margin="7 0 0 0" Click="SelectNone"
-                                                VerticalAlignment="Center" HorizontalAlignment="Right">
-                                            <Button.Resources>
-                                                <Style TargetType="Button">
-                                                    <Setter Property="Cursor" Value="Arrow" />
-                                                    <Style.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Cursor" Value="Hand" />
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Button.Resources>
-                                            <Path Data="{StaticResource SelectNoneGeometry}"
-                                                  Fill="{DynamicResource GrayColor4}"
-                                                  MaxWidth="12" Stretch="Uniform" />
-                                        </Button>
-                                        <Button Style="{StaticResource textBoxButton}" ToolTip="编辑任务"
-                                                Width="15" Height="15" Margin="7 0 0 0" Click="Edit"
-                                                VerticalAlignment="Center" HorizontalAlignment="Right">
-                                            <Button.Resources>
-                                                <Style TargetType="Button">
-                                                    <Setter Property="Cursor" Value="Arrow" />
-                                                    <Style.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Cursor" Value="Hand" />
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Button.Resources>
-                                            <Path Data="{StaticResource EditGeometry}"
-                                                  Fill="{DynamicResource GrayColor4}"
-                                                  MaxWidth="12" Stretch="Uniform" />
-                                        </Button>
-                                        <Button Style="{StaticResource textBoxButton}" ToolTip="任务设置"
-                                                Width="15" Height="15" Margin="7 0 0 0" Visibility="Collapsed"
-                                                VerticalAlignment="Center" HorizontalAlignment="Right">
-                                            <Button.Resources>
-                                                <Style TargetType="Button">
-                                                    <Setter Property="Cursor" Value="Arrow" />
-                                                    <Style.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Cursor" Value="Hand" />
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Button.Resources>
-                                            <Path Data="{StaticResource SettingsRegular}"
-                                                  Fill="{DynamicResource GrayColor4}"
-                                                  MaxWidth="12" Stretch="Uniform" />
-                                        </Button>
+                                        <Button ToolTip="全选" Width="15" Height="15" Margin="7 0 0 0"
+                                                Style="{StaticResource textBoxButton}"
+                                                Foreground="{DynamicResource GrayColor4}"
+                                                Click="SelectAll" IsEnabled="{Binding Idle}"
+                                                Padding="0"
+                                                hc:IconElement.Geometry="{StaticResource SelectAllGeometry}" />
+                                        <Button ToolTip="全部不选" Width="15" Height="15" Margin="7 0 0 0"
+                                                Style="{StaticResource textBoxButton}"
+                                                Foreground="{DynamicResource GrayColor4}"
+                                                Click="SelectNone" IsEnabled="{Binding Idle}"
+                                                Padding="0"
+                                                hc:IconElement.Geometry="{StaticResource SelectNoneGeometry}" />
+                                        <Button ToolTip="编辑任务" Width="15" Height="15" Margin="7 0 0 0"
+                                                Style="{StaticResource textBoxButton}"
+                                                Foreground="{DynamicResource GrayColor4}"
+                                                Click="Edit" IsEnabled="{Binding Idle}"
+                                                Padding="0"
+                                                hc:IconElement.Geometry="{StaticResource EditGeometry}" />
+                                        <Button ToolTip="任务设置" Width="15" Height="15" Margin="7 0 0 0"
+                                                Visibility="Collapsed"
+                                                Style="{StaticResource textBoxButton}"
+                                                Foreground="{DynamicResource GrayColor4}"
+                                                Click="Edit" IsEnabled="{Binding Idle}"
+                                                Padding="0"
+                                                hc:IconElement.Geometry="{StaticResource SettingsRegular}" />
+
                                     </StackPanel>
                                 </Grid>
 
@@ -225,7 +173,7 @@
                                             <DataTemplate>
                                                 <Grid>
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="180" />
+                                                        <ColumnDefinition Width="210" />
                                                         <ColumnDefinition />
                                                     </Grid.ColumnDefinitions>
                                                     <!--<maa:TextBlock  Text="{Binding ID}" />
@@ -241,7 +189,7 @@
                                                             <DataTemplate>
                                                                 <TextBlock Text="{Binding}"
                                                                            TextTrimming="CharacterEllipsis"
-                                                                           Width="178"
+                                                                           Width="190"
                                                                            TextWrapping="NoWrap" />
                                                             </DataTemplate>
                                                         </CheckBox.ContentTemplate>
@@ -251,13 +199,14 @@
                                                         <!--  ReSharper disable once Xaml.StaticResourceNotResolved  -->
                                                         <RadioButton
                                                             Margin="0"
-                                                            Padding="45,0,0,0"
+                                                            Padding="8,0,0,0"
                                                             hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
                                                             hc:VisualElement.HighlightBackground="Transparent"
                                                             hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
-                                                            Background="Transparent"
+                                                            Background="Transparent" Width="45"
+                                                            HorizontalContentAlignment="Left"
                                                             BorderThickness="0"
-                                                            Foreground="{DynamicResource SecondaryTextBrush}"
+                                                            Foreground="{DynamicResource GrayColor4}"
                                                             GroupName="TaskSettings"
                                                             IsChecked="{Binding EnableSetting}"
                                                             Style="{DynamicResource RadioGroupItemSingle}" />
@@ -273,70 +222,16 @@
                                         Foreground="{DynamicResource BlackColor}"
                                         FontSize="11"
                                         VerticalContentAlignment="Center" Click="Start"
-                                        Width="90"
-                                        Margin="20,8,20,8">
-
-                                        <Button.Style>
-                                            <Style TargetType="Button">
-                                                <Setter Property="Background" Value="{DynamicResource WhiteColor}" />
-                                                <Setter Property="Cursor" Value="Arrow" />
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Cursor" Value="Hand" />
-                                                        <Setter Property="Background"
-                                                                Value="{DynamicResource SecundaryGrayColor}" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border Height="30"
-                                                        CornerRadius="4"
-                                                        Background="{TemplateBinding Background}"
-                                                        BorderBrush="{StaticResource GrayColor5}"
-                                                        BorderThickness="1">
-                                                    <ContentPresenter VerticalAlignment="Center"
-                                                                      HorizontalAlignment="Center" />
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Button.Template>
+                                        Width="90" Height="30"
+                                        Margin="20,12,20,8">
                                     </Button>
                                     <Button
                                         Content="停止任务" x:Name="stopButton"
                                         Foreground="{DynamicResource BlackColor}"
                                         FontSize="11" Visibility="Collapsed"
                                         VerticalContentAlignment="Center" Click="Stop"
-                                        Width="90"
-                                        Margin="20,8,20,8">
-
-                                        <Button.Style>
-                                            <Style TargetType="Button">
-                                                <Setter Property="Background" Value="{DynamicResource WhiteColor}" />
-                                                <Setter Property="Cursor" Value="Arrow" />
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Cursor" Value="Hand" />
-                                                        <Setter Property="Background"
-                                                                Value="{DynamicResource SecundaryGrayColor}" />
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border Height="30"
-                                                        CornerRadius="4"
-                                                        Background="{TemplateBinding Background}"
-                                                        BorderBrush="{StaticResource GrayColor5}"
-                                                        BorderThickness="1">
-                                                    <ContentPresenter VerticalAlignment="Center"
-                                                                      HorizontalAlignment="Center" />
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Button.Template>
+                                        Width="90" Height="30"
+                                        Margin="20,12,20,8">
                                     </Button>
                                 </StackPanel>
 
