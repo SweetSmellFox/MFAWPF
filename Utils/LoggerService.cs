@@ -14,7 +14,7 @@ public class LoggerService
 
     public void LogError(Exception e)
     {
-        logger.Error(e);
+        logger.Error(e.ToString());
     }
     
     public void LogError(string message)

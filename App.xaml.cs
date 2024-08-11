@@ -1,10 +1,13 @@
 ﻿using System.Configuration;
 using System.Data;
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Threading;
 using MFAWPF.Utils;
 using HandyControl.Controls;
+using HandyControl.Tools;
+using WPFLocalizeExtension.Engine;
 
 namespace MFAWPF;
 
@@ -19,6 +22,11 @@ public partial class App : Application
         this.Exit += new ExitEventHandler(App_Exit);
     }
 
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+        // Thread.CurrentThread.CurrentUICulture = new CultureInfo("zh-CN");
+    }
 
     void App_Startup(object sender, StartupEventArgs e)
     {
@@ -81,7 +89,17 @@ public partial class App : Application
     {
         //task线程内未处理捕获
         Growls.Error("Task线程异常：" + e.Exception.Message);
-        LoggerService.Logger.LogError(e.ToString());
+        LoggerService.Logger.LogError(e.Exception);
+        foreach (Exception item in e.Exception.InnerExceptions)
+        {
+            Console.WriteLine("异常类型：{0}{1}来自：{2}{3}异常内容：{4}",
+                item.GetType(), Environment.NewLine, item.Source,
+                Environment.NewLine, item.Message);
+            LoggerService.Logger.LogError(string.Format("异常类型：{0}{1}来自：{2}{3}异常内容：{4}",
+                item.GetType(), Environment.NewLine, item.Source,
+                Environment.NewLine, item.Message));
+        }
+
         e.SetObserved(); //设置该异常已察觉（这样处理后就不会引起程序崩溃）
     }
 }

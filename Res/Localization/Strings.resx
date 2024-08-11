@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
+                xmlns="">
+        <xsd:element name="root" msdata:IsDataSet="true">
+            <xsd:complexType>
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" use="required" type="xsd:string"/>
+                            <xsd:attribute name="xml:space" use="required" fixed="preserve"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
+            </xsd:complexType>
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
+    </resheader>
+
+    <!-- 添加以下资源项 -->
+    <data name="AppTitle" xml:space="preserve">
+        <value>Maa框架任务管理器</value>
+    </data>
+    <data name="DebugMode" xml:space="preserve">
+        <value>DEBUG</value>
+    </data>
+    <data name="TabADB" xml:space="preserve">
+        <value>ADB</value>
+    </data>
+    <data name="TabWin32" xml:space="preserve">
+        <value>Win32</value>
+    </data>
+    <data name="TooltipRefresh" xml:space="preserve">
+        <value>刷新</value>
+    </data>
+    <data name="TooltipSettings" xml:space="preserve">
+        <value>设置</value>
+    </data>
+    <data name="TaskList" xml:space="preserve">
+        <value>任务列表：</value>
+    </data>
+    <data name="SelectAll" xml:space="preserve">
+        <value>全选</value>
+    </data>
+    <data name="DeselectAll" xml:space="preserve">
+        <value>全部不选</value>
+    </data>
+    <data name="EditTask" xml:space="preserve">
+        <value>编辑任务</value>
+    </data>
+    <data name="TaskSettings" xml:space="preserve">
+        <value>任务设置</value>
+    </data>
+    <data name="StartTask" xml:space="preserve">
+        <value>启动任务</value>
+    </data>
+    <data name="StopTask" xml:space="preserve">
+        <value>停止任务</value>
+    </data>
+    <data name="TooltipDragLabel" xml:space="preserve">
+        <value>标签顺序可拖动</value>
+    </data>
+
+
+    <data name="DuplicateTaskError" xml:space="preserve">
+  <value>Pipeline文件中存在重复的任务名称:"{0}"！</value>
+</data>
+    <data name="PipelineLoadError" xml:space="preserve">
+  <value>载入Pipeline文件时出现错误: {0}</value>
+</data>
+    <data name="TaskNotFoundError" xml:space="preserve">
+  <value>Pipeline文件中任务的{0}使用了不存在的任务:"{1}"！</value>
+</data>
+    <data name="TaskListHeader" xml:space="preserve">
+  <value>任务列表：</value>
+</data>
+    <data name="SelectAllTooltip" xml:space="preserve">
+  <value>全选</value>
+</data>
+    <data name="DeselectAllTooltip" xml:space="preserve">
+  <value>全部不选</value>
+</data>
+    <data name="EditTaskTooltip" xml:space="preserve">
+  <value>编辑任务</value>
+</data>
+    <data name="ResourceOption" xml:space="preserve">
+  <value>资源</value>
+</data>
+    <data name="ThemeOption" xml:space="preserve">
+  <value>颜色主题</value>
+</data>
+    <data name="LanguageOption" xml:space="preserve">
+  <value>语言(Language)</value>
+</data>
+    <data name="TouchModeOption" xml:space="preserve">
+  <value>触控模式</value>
+</data>
+    <data name="CaptureModeOption" xml:space="preserve">
+  <value>捕获方式</value>
+</data>
+    <data name="RepeatOption" xml:space="preserve">
+  <value>重复次数</value>
+</data>
+    <data name="WindowDetectionStarted" xml:space="preserve">
+  <value>开始搜索窗口!</value>
+</data>
+    <data name="EmulatorDetectionStarted" xml:space="preserve">
+  <value>开始搜索模拟器!</value>
+</data>
+    <data name="NoEmulatorFound" xml:space="preserve">
+  <value>未找到模拟器!</value>
+</data>
+    <data name="NoWindowFound" xml:space="preserve">
+  <value>未找到窗口!</value>
+</data>
+    <data name="WindowSelectionMessage" xml:space="preserve">
+  <value>已选择窗口:{0}</value>
+</data>
+    <data name="EmulatorSelectionMessage" xml:space="preserve">
+  <value>已选择模拟器:{0}</value>
+</data>
+    <data name="AdbTouchMode" xml:space="preserve">
+  <value>触控模式:</value>
+</data>
+    <data name="AdbCaptureMode" xml:space="preserve">
+  <value>捕获模式:</value>
+</data>
+    <data name="TaskStackError" xml:space="preserve">
+  <value>识别{0}时发生错误: {1}</value>
+</data>
+    <data name="LightColor" xml:space="preserve">
+        <value>浅色</value>
+    </data>
+    <data name="DarkColor" xml:space="preserve">
+        <value>深色</value>
+    </data>
+</root>

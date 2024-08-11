@@ -7,11 +7,14 @@
                        xmlns:controls="clr-namespace:MFAWPF.Controls"
                        xmlns:properties="clr-namespace:MFAWPF.Styles.Properties"
                        xmlns:viewModels="clr-namespace:MFAWPF.ViewModels"
-                       xmlns:views="clr-namespace:MFAWPF.Views"
                        xmlns:dd="urn:gong-wpf-dragdrop"
                        xmlns:converters="clr-namespace:MFAWPF.Utils.Converters"
+                       xmlns:lex="http://wpflocalizeextension.codeplex.com"
+                       xmlns:engine="https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension"
+                       engine:ResxLocalizationProvider.DefaultAssembly="MFAWPF"
+                       engine:ResxLocalizationProvider.DefaultDictionary="Strings"
                        mc:Ignorable="d"
-                       Title="Maa框架任务管理器" Height="520" Width="800"
+                       Title="{lex:Loc AppTitle}" Height="520" Width="800" MinWidth="400" MinHeight="200"
                        WindowStartupLocation="CenterScreen" WindowStyle="None"
                        Background="Transparent" AllowsTransparency="True"
                        PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown"
@@ -45,13 +48,12 @@
                                    Height="20" Width="20">
 
                             </Image>
-                            <TextBlock VerticalAlignment="Center" Margin="6 4 4 0"
+                            <TextBlock VerticalAlignment="Center" Margin="6 4 4 0" Text="{lex:Loc AppTitle}"
                                        Foreground="{DynamicResource PrimaryTextBrush}">
-                                Maa框架任务管理器
+
                             </TextBlock>
                             <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}"
-                                       Margin="2 4 4 0" x:Name="version">
-                                DEBUG
+                                       Margin="2 4 4 0" x:Name="version" Text="{lex:Loc DebugMode}">
                             </TextBlock>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" FlowDirection="RightToLeft">
@@ -80,24 +82,24 @@
                         <RowDefinition Height="30" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    <hc:SimpleStackPanel Orientation="Horizontal" Margin="10,0,10,0" Height="30">
+                    <hc:SimpleStackPanel Orientation="Horizontal" Margin="15,0,10,0" Height="30">
                         <TabControl TabStripPlacement="Top" Background="Transparent"
                                     SelectionChanged="TabControl_OnSelectionChanged" IsEnabled="{Binding Idle}"
                                     BorderThickness="0" x:Name="TabControl"
                                     Style="{StaticResource TabControlCapsuleSolid}">
-                            <TabItem Header="ADB" x:Name="adbTab"></TabItem>
-                            <TabItem Header="Win32" x:Name="win32Tab"></TabItem>
+                            <TabItem Header="{lex:Loc TabADB}" x:Name="adbTab"></TabItem>
+                            <TabItem Header="{lex:Loc TabWin32}" x:Name="win32Tab"></TabItem>
                         </TabControl>
                         <ComboBox Width="250" x:Name="deviceComboBox" DisplayMemberPath="Name" Margin="4 0 0 0"
                                   IsEnabled="{Binding Idle}"
                                   SelectionChanged="DeviceComboBox_OnSelectionChanged" />
-                        <Button ToolTip="刷新" Width="20" Height="20" Margin="6 0 2 0"
+                        <Button ToolTip="{lex:Loc TooltipRefresh}" Width="20" Height="20" Margin="6 0 2 0"
                                 Style="{StaticResource textBoxButton}"
                                 Foreground="{DynamicResource GrayColor4}"
                                 Click="Refresh" IsEnabled="{Binding Idle}"
                                 Padding="0" hc:IconElement.Width="14"
                                 hc:IconElement.Geometry="{StaticResource clear}" />
-                        <RadioButton x:Name="ConnectSettingButton" ToolTip="设置"
+                        <RadioButton x:Name="ConnectSettingButton" ToolTip="{lex:Loc TooltipSettings}"
                                      Margin="0"
                                      Padding="5,0,5,0"
                                      hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
@@ -110,183 +112,188 @@
                                      GroupName="TaskSettings" Checked="ConfigureSettingsPanel"
                                      Style="{DynamicResource RadioGroupItemSingle}" />
                     </hc:SimpleStackPanel>
-                    <Viewbox Grid.Row="1">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="15 0 0 0"
-                                    ClipToBounds="False">
+                    <Grid Grid.Row="1" ClipToBounds="False" HorizontalAlignment="Left" Margin="15 0 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" MaxWidth="400" />
+                            <ColumnDefinition Width="3*" MaxWidth="360" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                            <hc:SimpleStackPanel Orientation="Vertical">
-                                <Grid VerticalAlignment="Top"
-                                      Margin="0,5,5,4">
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30" />
+                                <RowDefinition />
+                                <RowDefinition Height="60" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" VerticalAlignment="Top"
+                                  Margin="0,5,5,4">
 
-                                    <TextBlock Margin="2 5 0 0" Width="55" Text="任务列表："
-                                               Foreground="{StaticResource GrayColor4}"
-                                               HorizontalAlignment="Left">
-                                    </TextBlock>
+                                <TextBlock Margin="2 5 0 0" Width="55" Text="{lex:Loc TaskList}"
+                                           Foreground="{StaticResource GrayColor4}"
+                                           HorizontalAlignment="Left">
+                                </TextBlock>
 
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
-                                                HorizontalAlignment="Right">
-                                        <Button ToolTip="全选" Width="15" Height="15" Margin="7 0 0 0"
-                                                Style="{StaticResource textBoxButton}"
-                                                Foreground="{DynamicResource GrayColor4}"
-                                                Click="SelectAll" IsEnabled="{Binding Idle}"
-                                                Padding="0"
-                                                hc:IconElement.Geometry="{StaticResource SelectAllGeometry}" />
-                                        <Button ToolTip="全部不选" Width="15" Height="15" Margin="7 0 0 0"
-                                                Style="{StaticResource textBoxButton}"
-                                                Foreground="{DynamicResource GrayColor4}"
-                                                Click="SelectNone" IsEnabled="{Binding Idle}"
-                                                Padding="0"
-                                                hc:IconElement.Geometry="{StaticResource SelectNoneGeometry}" />
-                                        <Button ToolTip="编辑任务" Width="15" Height="15" Margin="7 0 0 0"
-                                                Style="{StaticResource textBoxButton}"
-                                                Foreground="{DynamicResource GrayColor4}"
-                                                Click="Edit" IsEnabled="{Binding Idle}"
-                                                Padding="0"
-                                                hc:IconElement.Geometry="{StaticResource EditGeometry}" />
-                                        <Button ToolTip="任务设置" Width="15" Height="15" Margin="7 0 0 0"
-                                                Visibility="Collapsed"
-                                                Style="{StaticResource textBoxButton}"
-                                                Foreground="{DynamicResource GrayColor4}"
-                                                Click="Edit" IsEnabled="{Binding Idle}"
-                                                Padding="0"
-                                                hc:IconElement.Geometry="{StaticResource SettingsRegular}" />
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                            HorizontalAlignment="Right">
+                                    <Button ToolTip="{lex:Loc SelectAll}" Width="15" Height="15" Margin="7 0 0 0"
+                                            Style="{StaticResource textBoxButton}"
+                                            Foreground="{DynamicResource GrayColor4}"
+                                            Click="SelectAll" IsEnabled="{Binding Idle}"
+                                            Padding="0"
+                                            hc:IconElement.Geometry="{StaticResource SelectAllGeometry}" />
+                                    <Button ToolTip="{lex:Loc DeselectAll}" Width="15" Height="15" Margin="7 0 0 0"
+                                            Style="{StaticResource textBoxButton}"
+                                            Foreground="{DynamicResource GrayColor4}"
+                                            Click="SelectNone" IsEnabled="{Binding Idle}"
+                                            Padding="0"
+                                            hc:IconElement.Geometry="{StaticResource SelectNoneGeometry}" />
+                                    <Button ToolTip="{lex:Loc EditTask}" Width="15" Height="15" Margin="7 0 0 0"
+                                            Style="{StaticResource textBoxButton}"
+                                            Foreground="{DynamicResource GrayColor4}"
+                                            Click="Edit" IsEnabled="{Binding Idle}"
+                                            Padding="0"
+                                            hc:IconElement.Geometry="{StaticResource EditGeometry}" />
+                                    <Button ToolTip="{lex:Loc TaskSettings}" Width="15" Height="15" Margin="7 0 0 0"
+                                            Visibility="Collapsed"
+                                            Style="{StaticResource textBoxButton}"
+                                            Foreground="{DynamicResource GrayColor4}"
+                                            Click="Edit" IsEnabled="{Binding Idle}"
+                                            Padding="0"
+                                            hc:IconElement.Geometry="{StaticResource SettingsRegular}" />
 
-                                    </StackPanel>
-                                </Grid>
-
-                                <Grid Width="260" Margin="0">
-                                    <ListBox
-                                        x:Name="TaskList"
-                                        Grid.Row="0"
-                                        Width="260"
-                                        MinHeight="220" Height="366"
-                                        Margin="0,3,0,0"
-                                        HorizontalAlignment="Center"
-                                        AllowDrop="True"
-                                        dd:DragDrop.IsDragSource="{Binding Idle}"
-                                        dd:DragDrop.IsDropTarget="{Binding Idle}"
-                                        dd:DragDrop.DropHandler="{Binding DropHandler}"
-                                        BorderThickness="0"
-                                        ItemContainerStyle="{StaticResource CustomListBoxItemStyle}"
-                                        ItemsSource="{Binding TaskItemViewModels}">
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="210" />
-                                                        <ColumnDefinition />
-                                                    </Grid.ColumnDefinitions>
-                                                    <!--<maa:TextBlock  Text="{Binding ID}" />
-                                    <maa:TextBlock  Text=". " />-->
-                                                    <CheckBox
-                                                        Grid.ColumnSpan="2"
-                                                        HorizontalAlignment="Left"
-                                                        Content="{Binding Name}"
-                                                        IsChecked="{Binding IsCheckedWithNull}"
-                                                        IsHitTestVisible="{Binding ElementName=TaskList, Path=DataContext.Idle}"
-                                                        ToolTip="标签顺序可拖动">
-                                                        <CheckBox.ContentTemplate>
-                                                            <DataTemplate>
-                                                                <TextBlock Text="{Binding}"
-                                                                           TextTrimming="CharacterEllipsis"
-                                                                           Width="190"
-                                                                           TextWrapping="NoWrap" />
-                                                            </DataTemplate>
-                                                        </CheckBox.ContentTemplate>
-                                                    </CheckBox>
-                                                    <hc:ButtonGroup Grid.Column="1" HorizontalAlignment="Left"
-                                                                    ToolTip="{Binding Name}">
-                                                        <!--  ReSharper disable once Xaml.StaticResourceNotResolved  -->
-                                                        <RadioButton
-                                                            Margin="0"
-                                                            Padding="8,0,0,0"
-                                                            hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
-                                                            hc:VisualElement.HighlightBackground="Transparent"
-                                                            hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
-                                                            Background="Transparent" Width="45"
-                                                            HorizontalContentAlignment="Left"
-                                                            BorderThickness="0"
-                                                            Foreground="{DynamicResource GrayColor4}"
-                                                            GroupName="TaskSettings"
-                                                            IsChecked="{Binding EnableSetting}"
-                                                            Style="{DynamicResource RadioGroupItemSingle}" />
-                                                    </hc:ButtonGroup>
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
-                                </Grid>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Button
-                                        Content="启动任务" x:Name="startButton"
-                                        Foreground="{DynamicResource BlackColor}"
-                                        FontSize="11"
-                                        VerticalContentAlignment="Center" Click="Start"
-                                        Width="90" Height="30"
-                                        Margin="20,12,20,8">
-                                    </Button>
-                                    <Button
-                                        Content="停止任务" x:Name="stopButton"
-                                        Foreground="{DynamicResource BlackColor}"
-                                        FontSize="11" Visibility="Collapsed"
-                                        VerticalContentAlignment="Center" Click="Stop"
-                                        Width="90" Height="30"
-                                        Margin="20,12,20,8">
-                                    </Button>
                                 </StackPanel>
+                            </Grid>
 
-                            </hc:SimpleStackPanel>
-                            <hc:SimpleStackPanel Width="240" Margin="10" x:Name="settingPanel">
 
-                            </hc:SimpleStackPanel>
-                            <hc:ScrollViewer Margin="10 -0 10 10" Width="220" Height="440" VerticalAlignment="Top"
-                                             BorderBrush="LightGray" BorderThickness="1" ClipToBounds="False"
-                                             properties:AutoScroll.AutoScroll="True" VerticalContentAlignment="Top"
-                                             HorizontalScrollBarVisibility="Disabled"
-                                             IsInertiaEnabled="True"
-                                             PanningMode="VerticalOnly">
-                                <hc:ScrollViewer.RenderTransform>
-                                    <TranslateTransform Y="-8" />
-                                </hc:ScrollViewer.RenderTransform>
-                                <ItemsControl ItemsSource="{Binding Path=LogItemViewModels}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
+                            <ListBox Grid.Row="1"
+                                     x:Name="TaskList"
+                                     MinHeight="220"
+                                     Margin="2,3,2,0"
+                                     AllowDrop="True"
+                                     dd:DragDrop.IsDragSource="{Binding Idle}"
+                                     dd:DragDrop.IsDropTarget="{Binding Idle}"
+                                     dd:DragDrop.DropHandler="{Binding DropHandler}"
+                                     BorderThickness="0"
+                                     ItemContainerStyle="{StaticResource CustomListBoxItemStyle}"
+                                     ItemsSource="{Binding TaskItemViewModels}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid x:Name="ListGrid">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="45" />
+                                            </Grid.ColumnDefinitions>
+                                            <!--<maa:TextBlock  Text="{Binding ID}" />
+                                    <maa:TextBlock  Text=". " />-->
+                                            <CheckBox Grid.Column="0" 
+                                                      HorizontalAlignment="Left"
+                                                      Content="{Binding Name}"
+                                                      IsChecked="{Binding IsCheckedWithNull}"
+                                                      IsHitTestVisible="{Binding ElementName=TaskList, Path=DataContext.Idle}"
+                                                      ToolTip="{lex:Loc TooltipDragLabel}">
+                                                <CheckBox.ContentTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}"
+                                                                   TextTrimming="CharacterEllipsis"
+                                                                   Width="160"
+                                                                   TextWrapping="NoWrap" />
+                                                    </DataTemplate>
+                                                </CheckBox.ContentTemplate>
+                                            </CheckBox>
+                                            <hc:ButtonGroup Grid.Column="1" HorizontalAlignment="Left"
+                                                            ToolTip="{Binding Name}">
+                                                <!--  ReSharper disable once Xaml.StaticResourceNotResolved  -->
+                                                <RadioButton
+                                                    Margin="0"
+                                                    Padding="12,0,0,0"
+                                                    hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
+                                                    hc:VisualElement.HighlightBackground="Transparent"
+                                                    hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
+                                                    Background="Transparent" 
+                                                    HorizontalContentAlignment="Left"
+                                                    BorderThickness="0"
+                                                    Foreground="{DynamicResource GrayColor4}"
+                                                    GroupName="TaskSettings"
+                                                    IsChecked="{Binding EnableSetting}"
+                                                    Style="{DynamicResource RadioGroupItemSingle}" />
+                                            </hc:ButtonGroup>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
 
-                                                <controls:TextBlock
-                                                    Grid.Column="0"
-                                                    Margin="0,5,12,0"
-                                                    HorizontalAlignment="Left" FontSize="12"
-                                                    VerticalAlignment="Stretch"
-                                                    Foreground="{StaticResource GrayColor1}"
-                                                    Text="{Binding Time}"
-                                                    TextWrapping="Wrap" />
-                                                <controls:TextBlock
-                                                    Grid.Column="1"
-                                                    Margin="0,5"
-                                                    HorizontalAlignment="Left" FontSize="12"
-                                                    VerticalAlignment="Stretch"
-                                                    FontWeight="{Binding Weight}"
-                                                    Foreground="{Binding Color}"
-                                                    Text="{Binding Content}"
-                                                    TextWrapping="Wrap" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </hc:ScrollViewer>
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button
+                                    Content="{lex:Loc StartTask}" x:Name="startButton"
+                                    Foreground="{DynamicResource BlackColor}"
+                                    FontSize="11"
+                                    VerticalContentAlignment="Center" Click="Start"
+                                    Width="90" Height="30"
+                                    Margin="20,12,20,8">
+                                </Button>
+                                <Button
+                                    Content="{lex:Loc StopTask}" x:Name="stopButton"
+                                    Foreground="{DynamicResource BlackColor}"
+                                    FontSize="11" Visibility="Collapsed"
+                                    VerticalContentAlignment="Center" Click="Stop"
+                                    Width="90" Height="30"
+                                    Margin="20,12,20,8">
+                                </Button>
+                            </StackPanel>
 
-                        </StackPanel>
-                    </Viewbox>
+                        </Grid>
+                        <hc:SimpleStackPanel Grid.Column="1" Margin="10" x:Name="settingPanel">
+
+                        </hc:SimpleStackPanel>
+                        <hc:ScrollViewer Grid.Column="2" Margin="10 -0 10 10" Height="440"
+                                         VerticalAlignment="Top"
+                                         BorderBrush="LightGray" BorderThickness="1" ClipToBounds="False"
+                                         properties:AutoScroll.AutoScroll="True" VerticalContentAlignment="Top"
+                                         HorizontalScrollBarVisibility="Disabled"
+                                         IsInertiaEnabled="True"
+                                         PanningMode="VerticalOnly">
+                            <hc:ScrollViewer.RenderTransform>
+                                <TranslateTransform Y="-8" />
+                            </hc:ScrollViewer.RenderTransform>
+                            <ItemsControl ItemsSource="{Binding Path=LogItemViewModels}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <controls:TextBlock
+                                                Grid.Column="0"
+                                                Margin="0,5,12,0"
+                                                HorizontalAlignment="Left" FontSize="12"
+                                                VerticalAlignment="Stretch"
+                                                Foreground="{StaticResource GrayColor1}"
+                                                Text="{Binding Time}"
+                                                TextWrapping="Wrap" />
+                                            <controls:TextBlock
+                                                Grid.Column="1"
+                                                Margin="0,5"
+                                                HorizontalAlignment="Left" FontSize="12"
+                                                VerticalAlignment="Stretch"
+                                                FontWeight="{Binding Weight}"
+                                                Foreground="{Binding Color}"
+                                                Text="{Binding Content}"
+                                                TextWrapping="Wrap" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </hc:ScrollViewer>
+
+
+                    </Grid>
 
 
                 </Grid>
             </Grid>
-            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Right" Height="80"
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Right"
                           VerticalAlignment="Top"
                           Margin="0,40,0, 0">
                 <StackPanel hc:Growl.GrowlParent="True" VerticalAlignment="Top" Margin="0,0,10,10" x:Name="stackPanel"

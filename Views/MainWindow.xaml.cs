@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Windows;
@@ -13,7 +14,11 @@ using MFAWPF.Utils;
 using MFAWPF.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using WPFLocalizeExtension.Deprecated.Extensions;
+using WPFLocalizeExtension.Engine;
+using WPFLocalizeExtension.Extensions;
 using ComboBox = HandyControl.Controls.ComboBox;
+using TextBlock = System.Windows.Controls.TextBlock;
 
 namespace MFAWPF.Views
 {
@@ -68,7 +73,6 @@ namespace MFAWPF.Views
                 };
                 if (firstTask)
                 {
-                    // dragItem.EnableSetting = true;
                     ConnectSettingButton.IsChecked = true;
                     if (MaaInterface.Instance.Resources != null &&
                         MaaInterface.Instance.Resources.Count > DataSet.GetData("ResourceIndex", 0))
@@ -149,7 +153,8 @@ namespace MFAWPF.Views
                             {
                                 if (!taskDictionaryA.TryAdd(task.Key, task.Value))
                                 {
-                                    Growls.ErrorGlobal($"Pipeline文件中存在重复的任务名称:\"{task.Key}\"！");
+                                    Growls.ErrorGlobal(string.Format(
+                                        LocExtension.GetLocalizedValue<string>("DuplicateTaskError"), task.Key));
                                     return false;
                                 }
                             }
@@ -165,7 +170,8 @@ namespace MFAWPF.Views
             }
             catch (Exception ex)
             {
-                Growls.ErrorGlobal($"载入Pipeline文件时出现错误: {ex.Message}");
+                Growls.ErrorGlobal(string.Format(LocExtension.GetLocalizedValue<string>("PipelineLoadError"),
+                    ex.Message));
                 Console.WriteLine(ex);
                 LoggerService.Logger.LogError(ex);
                 return false;
@@ -200,7 +206,8 @@ namespace MFAWPF.Views
                 {
                     if (!taskDictionary.ContainsKey(task))
                     {
-                        Growls.ErrorGlobal($"Pipeline文件中任务的{name}使用了不存在的任务:\"{task}\"！");
+                        Growls.ErrorGlobal(string.Format(LocExtension.GetLocalizedValue<string>("TaskNotFoundError"),
+                            name, task));
                     }
                 }
             }
@@ -245,12 +252,14 @@ namespace MFAWPF.Views
         {
             if (deviceComboBox.SelectedItem is WindowInfo window)
             {
-                Growl.Info($"已选择窗口:{window.Name}");
+                Growl.Info(string.Format(LocExtension.GetLocalizedValue<string>("WindowSelectionMessage"),
+                    window.Name));
                 MaaProcessor.Config.Win32.HWnd = window.Handle;
             }
             else if (deviceComboBox.SelectedItem is DeviceInfo device)
             {
-                Growl.Info($"已选择模拟器:{device.Name}");
+                Growl.Info(string.Format(LocExtension.GetLocalizedValue<string>("EmulatorSelectionMessage"),
+                    device.Name));
                 MaaProcessor.Config.Adb.Adb = device.AdbPath;
                 MaaProcessor.Config.Adb.AdbAddress = device.AdbSerial;
                 MaaProcessor.Config.Adb.AdbConfig = device.AdbConfig;
@@ -267,7 +276,9 @@ namespace MFAWPF.Views
         {
             try
             {
-                Growl.Info(IsADB ? "开始搜索模拟器!" : "开始搜索窗口!");
+                Growl.Info(IsADB
+                    ? LocExtension.GetLocalizedValue<string>("EmulatorDetectionStarted")
+                    : LocExtension.GetLocalizedValue<string>("WindowDetectionStarted"));
                 MaaProcessor.Config.IsConnected = false;
                 if (IsADB)
                 {
@@ -288,12 +299,15 @@ namespace MFAWPF.Views
 
                 if (!MaaProcessor.Config.IsConnected)
                 {
-                    Growl.Info(IsADB ? "未找到模拟器!" : "未找到窗口!");
+                    Growl.Info(IsADB
+                        ? LocExtension.GetLocalizedValue<string>("NoEmulatorFound")
+                        : LocExtension.GetLocalizedValue<string>("NoWindowFound"));
                 }
             }
             catch (Exception ex)
             {
-                Growls.WarningGlobal($"{(IsADB ? "识别模拟器" : "识别窗口")}时发生错误: {ex.Message}");
+                Growls.WarningGlobal(string.Format(LocExtension.GetLocalizedValue<string>("TaskStackError"),
+                    IsADB ? "模拟器" : "窗口", ex.Message));
                 MaaProcessor.Config.IsConnected = false;
             }
         }
@@ -304,7 +318,7 @@ namespace MFAWPF.Views
             if (IsADB)
             {
                 AddResourcesOption();
-                AddSettingOption("捕获方式",
+                AddSettingOption("CaptureModeOption",
                     new List<string>
                     {
                         "ScreencapFastestLosslessWay", "ScreencapRawWithGzip", "ScreencapFastestWayCompatible",
@@ -313,22 +327,24 @@ namespace MFAWPF.Views
                     },
                     "AdbControlScreenCapType", 0);
 
-                AddSettingOption("触控模式",
+                AddSettingOption("TouchModeOption",
                     new List<string> { "MiniTouch (默认)", "MaaTouch (实验功能)", "AdbInput (不推荐)", "AutoDetect (自动检测)" },
                     "AdbControlTouchType", 0);
                 AddThemeOption();
+                AddLanguageOption();
             }
             else
             {
                 AddResourcesOption();
-                AddSettingOption("捕获方式",
+                AddSettingOption(LocExtension.GetLocalizedValue<string>("CaptureModeOption"),
                     new List<string> { "ScreencapDXGIFramePool", "ScreencapDXGIDesktopDup", "ScreencapGDI" },
                     "Win32ControlScreenCapType", 0);
 
-                AddSettingOption("触控类型",
+                AddSettingOption(LocExtension.GetLocalizedValue<string>("TouchModeOption"),
                     new List<string> { "Seize", "SendMessage" },
                     "Win32ControlTouchType", 0);
                 AddThemeOption();
+                AddLanguageOption();
             }
         }
 
@@ -349,7 +365,7 @@ namespace MFAWPF.Views
             };
             comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
 
-            comboBox.SetValue(InfoElement.TitleProperty, "资源");
+            AddLocalizedLabel(comboBox, "ResourceOption");
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
             comboBox.SelectionChanged += (sender, args) =>
@@ -373,16 +389,19 @@ namespace MFAWPF.Views
                 Style = FindResource("ComboBoxExtend") as Style,
                 Margin = new Thickness(5)
             };
-
-            comboBox.ItemsSource = new List<string> { "浅色", "深色" };
+            var light = new TextBlock();
+            AddLocalizedLabel(light, "LightColor", TextBlock.TextProperty);
+            var dark = new TextBlock();
+            AddLocalizedLabel(dark, "DarkColor", TextBlock.TextProperty);
+            comboBox.Items.Add(light);
+            comboBox.Items.Add(dark);
             var binding = new Binding("Idle")
             {
                 Source = Data,
                 Mode = BindingMode.OneWay
             };
             comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
-
-            comboBox.SetValue(InfoElement.TitleProperty, "颜色主题");
+            AddLocalizedLabel(comboBox, "ThemeOption");
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
             comboBox.SelectionChanged += (sender, args) =>
@@ -394,7 +413,7 @@ namespace MFAWPF.Views
             comboBox.SelectedIndex = DataSet.GetData("ThemeIndex", defaultValue);
             settingPanel.Children.Add(comboBox);
         }
-        
+
         private void AddLanguageOption(int defaultValue = 0)
         {
             var comboBox = new ComboBox()
@@ -403,28 +422,29 @@ namespace MFAWPF.Views
                 Margin = new Thickness(5)
             };
 
-            comboBox.ItemsSource = new List<string> { "zh-CN", "en-US" };
+            comboBox.ItemsSource = new List<string> { "zh-cn", "en-us" };
             var binding = new Binding("Idle")
             {
                 Source = Data,
                 Mode = BindingMode.OneWay
             };
             comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
-
-            comboBox.SetValue(InfoElement.TitleProperty, "语言(Language)");
+            AddLocalizedLabel(comboBox, "LanguageOption");
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
             comboBox.SelectionChanged += (sender, args) =>
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-                ThemeManager.Current.ApplicationTheme = index == 0 ? ApplicationTheme.Light : ApplicationTheme.Dark;
+                LocalizeDictionary.Instance.Culture =
+                    CultureInfo.CreateSpecificCulture((sender as ComboBox)?.SelectedValue as string);
                 DataSet.SetData("LangIndex", index);
             };
-            
+
             comboBox.SelectedIndex = DataSet.GetData("LangIndex", defaultValue);
             settingPanel.Children.Add(comboBox);
         }
-        private void AddSettingOption(string title, List<string> options, string datatype, int defaultValue = 0)
+
+        private void AddSettingOption(string titleKey, List<string> options, string datatype, int defaultValue = 0)
         {
             var comboBox = new ComboBox()
             {
@@ -440,7 +460,7 @@ namespace MFAWPF.Views
             };
             comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
 
-            comboBox.SetValue(InfoElement.TitleProperty, title);
+            AddLocalizedLabel(comboBox, titleKey);
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
             comboBox.SelectionChanged += (sender, args) =>
             {
@@ -532,8 +552,7 @@ namespace MFAWPF.Views
                     source.InterfaceItem.repeat_count = Convert.ToInt16(numericUpDown.Value);
                     JSONHelper.WriteToJsonFilePath(MaaProcessor.Resource, "interface", MaaInterface.Instance);
                 };
-
-                numericUpDown.SetValue(InfoElement.TitleProperty, "重复次数");
+                AddLocalizedLabel(numericUpDown, "RepeatOption");
                 numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
                 settingPanel.Children.Add(numericUpDown);
             }
@@ -541,6 +560,11 @@ namespace MFAWPF.Views
 
         private void Edit(object sender, RoutedEventArgs e)
         {
+            if (!MaaProcessor.Config.IsConnected)
+            {
+                Growls.Warning($"无法连接至{(IsADB ? "模拟器" : "窗口")}");
+                return;
+            }
             var editDialog = new EditTaskDialog();
             editDialog.Show();
         }
@@ -573,7 +597,8 @@ namespace MFAWPF.Views
                 MaaProcessor.Config.Adb.Touch = adbTouchType;
                 MaaProcessor.Config.Adb.ScreenCap = adbScreenCapType;
 
-                Console.WriteLine($"触控模式:{adbTouchType},捕获模式:{adbScreenCapType}");
+                Console.WriteLine(
+                    $"{LocExtension.GetLocalizedValue<string>("AdbTouchMode")}{adbTouchType},{LocExtension.GetLocalizedValue<string>("AdbCaptureMode")}{adbScreenCapType}");
             }
         }
 
@@ -617,7 +642,8 @@ namespace MFAWPF.Views
                 MaaProcessor.Config.Win32.Touch = winTouchType;
                 MaaProcessor.Config.Win32.ScreenCap = winScreenCapType;
 
-                Console.WriteLine($"触控模式:{winTouchType},捕获模式:{winScreenCapType}");
+                Console.WriteLine(
+                    $"{LocExtension.GetLocalizedValue<string>("AdbTouchMode")}{winTouchType},{LocExtension.GetLocalizedValue<string>("AdbCaptureMode")}{winScreenCapType}");
             }
         }
 
@@ -640,6 +666,15 @@ namespace MFAWPF.Views
                 1 => Win32ControllerTypes.TouchSendMessage | Win32ControllerTypes.KeySendMessage,
                 _ => 0
             };
+        }
+
+        private void AddLocalizedLabel(UIElement control, string resourceKey, DependencyProperty property = null)
+        {
+            if (property == null)
+                property = InfoElement.TitleProperty;
+            // 创建 LocTextExtension 并设置资源键
+            var locExtension = new LocTextExtension(resourceKey);
+            locExtension.SetBinding(control, property);
         }
     }
 }

@@ -1,0 +1,128 @@
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>1.3</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="AppTitle" xml:space="preserve">
+        <value>Maa Framework Task Manager</value>
+    </data>
+    <data name="DebugMode" xml:space="preserve">
+        <value>DEBUG</value>
+    </data>
+    <data name="DeselectAll" xml:space="preserve">
+        <value>Deselect All</value>
+    </data>
+    <data name="TabWin32" xml:space="preserve">
+        <value>Win32</value>
+    </data>
+    <data name="TaskList" xml:space="preserve">
+        <value>Task List:</value>
+    </data>
+    <data name="TooltipSettings" xml:space="preserve">
+        <value>Settings</value>
+    </data>
+    <data name="TooltipRefresh" xml:space="preserve">
+        <value>Refresh</value>
+    </data>
+    <data name="TabADB" xml:space="preserve">
+        <value>ADB</value>
+    </data>
+    <data name="EditTask" xml:space="preserve">
+        <value>Edit Task</value>
+    </data>
+    <data name="TaskSettings" xml:space="preserve">
+        <value>Task Settings</value>
+    </data>
+    <data name="TooltipDragLabel" xml:space="preserve">
+        <value>Drag label to reorder</value>
+    </data>
+    <data name="StartTask" xml:space="preserve">
+        <value>Start Task</value>
+    </data>
+    <data name="SelectAll" xml:space="preserve">
+        <value>Select All</value>
+    </data>
+    <data name="StopTask" xml:space="preserve">
+        <value>Stop Task</value>
+    </data>
+    <data name="DuplicateTaskError" xml:space="preserve">
+    <value>Duplicate task name found in Pipeline file: "{0}"!</value>
+  </data>
+    <data name="PipelineLoadError" xml:space="preserve">
+    <value>Error occurred while loading Pipeline file: {0}</value>
+  </data>
+    <data name="TaskNotFoundError" xml:space="preserve">
+    <value>The task "{1}" used in {0} does not exist in the Pipeline file!</value>
+  </data>
+    <data name="TaskListHeader" xml:space="preserve">
+    <value>Task List:</value>
+  </data>
+    <data name="SelectAllTooltip" xml:space="preserve">
+    <value>Select All</value>
+  </data>
+    <data name="DeselectAllTooltip" xml:space="preserve">
+    <value>Deselect All</value>
+  </data>
+    <data name="EditTaskTooltip" xml:space="preserve">
+    <value>Edit Task</value>
+  </data>
+    <data name="ResourceOption" xml:space="preserve">
+    <value>Resources</value>
+  </data>
+    <data name="ThemeOption" xml:space="preserve">
+    <value>Color Theme</value>
+  </data>
+    <data name="LanguageOption" xml:space="preserve">
+        <value>Language(语言)</value>
+    </data>
+    <data name="TouchModeOption" xml:space="preserve">
+    <value>Touch Mode</value>
+  </data>
+    <data name="CaptureModeOption" xml:space="preserve">
+    <value>Capture Mode</value>
+  </data>
+    <data name="RepeatOption" xml:space="preserve">
+    <value>Repeat Count</value>
+  </data>
+    <data name="WindowDetectionStarted" xml:space="preserve">
+    <value>Starting window search!</value>
+  </data>
+    <data name="EmulatorDetectionStarted" xml:space="preserve">
+    <value>Starting emulator search!</value>
+  </data>
+    <data name="NoEmulatorFound" xml:space="preserve">
+    <value>No emulator found!</value>
+  </data>
+    <data name="NoWindowFound" xml:space="preserve">
+    <value>No window found!</value>
+  </data>
+    <data name="WindowSelectionMessage" xml:space="preserve">
+    <value>Window selected: {0}</value>
+  </data>
+    <data name="EmulatorSelectionMessage" xml:space="preserve">
+    <value>Emulator selected: {0}</value>
+  </data>
+    <data name="AdbTouchMode" xml:space="preserve">
+    <value>Touch Mode:</value>
+  </data>
+    <data name="AdbCaptureMode" xml:space="preserve">
+    <value>Capture Mode:</value>
+  </data>
+    <data name="TaskStackError" xml:space="preserve">
+    <value>Error occurred while detecting {0}: {1}</value>
+  </data>
+    <data name="DarkColor" xml:space="preserve">
+        <value>Dark color</value>
+    </data>
+    <data name="LightColor" xml:space="preserve">
+        <value>Light Color</value>
+    </data>
+</root>

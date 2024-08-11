@@ -30,6 +30,7 @@ public class VersionChecker
     private async Task<string> GetLatestVersionFromGitHub(string owner, string repo)
     {
         string url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
+
         using (HttpClient client = new HttpClient())
         {
             client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
