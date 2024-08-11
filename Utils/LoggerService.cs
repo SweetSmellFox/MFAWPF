@@ -5,24 +5,24 @@ namespace MFAWPF.Utils;
 public class LoggerService
 {
     private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-    public static LoggerService Logger = new ();
+    private static LoggerService Logger = new ();
     
-    public void LogInfo(string message)
+    public static void LogInfo(string message)
     {
         logger.Info(message);
     }
 
-    public void LogError(Exception e)
+    public static void LogError(Exception e)
     {
         logger.Error(e.ToString());
     }
     
-    public void LogError(string message)
+    public static void LogError(string message)
     {
         logger.Error(message);
     }
 
-    public void LogWarning(string message)
+    public static void LogWarning(string message)
     {
         logger.Warn(message);
     }

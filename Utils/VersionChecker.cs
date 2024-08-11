@@ -14,18 +14,27 @@ public class VersionChecker
 
     public static void CheckVersion()
     {
-        TaskManager.RunTaskAsync(() => { CHECKER.CheckForUpdatesAsync(); }, null, "检测版本");
+        TaskManager.RunTaskAsync(() => CHECKER.CheckForUpdatesAsync(), null, "检测版本");
     }
 
     public async Task CheckForUpdatesAsync(string owner = "SweetSmellFox", string repo = "MFAWPF")
     {
-        string latestVersion = await GetLatestVersionFromGitHub(owner, repo);
-        string localVersion = GetLocalVersion();
-        if (IsNewVersionAvailable(latestVersion, localVersion))
+        try
         {
-            Growl.Info("新版本可用！最新版本: " + latestVersion);
+            string latestVersion = await GetLatestVersionFromGitHub(owner, repo);
+            string localVersion = GetLocalVersion();
+            if (IsNewVersionAvailable(latestVersion, localVersion))
+            {
+                Growl.Info("新版本可用！最新版本: " + latestVersion);
+            }
+        }
+        catch (Exception ex)
+        {
+            Growls.Error($"检查最新版时发生错误: {ex.Message}");
+            LoggerService.LogError(ex);
         }
     }
+
 
     private async Task<string> GetLatestVersionFromGitHub(string owner, string repo)
     {
@@ -35,12 +44,33 @@ public class VersionChecker
         {
             client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
 
-            HttpResponseMessage response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
 
-            string jsonResponse = await response.Content.ReadAsStringAsync();
-            JObject releaseData = JObject.Parse(jsonResponse);
-            return releaseData["tag_name"].ToString(); // 从name字段获取版本信息
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                JObject releaseData = JObject.Parse(jsonResponse);
+                return releaseData["tag_name"].ToString();
+            }
+            catch (HttpRequestException e) when (e.Message.Contains("403"))
+            {
+                Console.WriteLine("GitHub API速率限制已超出，请稍后再试。");
+                LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
+                throw new Exception("GitHub API速率限制已超出，请稍后再试。");
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine($"请求GitHub时发生错误: {e.Message}");
+                LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
+                throw new Exception("请求GitHub时发生错误。");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"处理GitHub响应时发生错误: {e.Message}");
+                LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
+                throw new Exception("处理GitHub响应时发生错误。");
+            }
         }
     }
 
@@ -64,7 +94,7 @@ public class VersionChecker
         catch (Exception ex)
         {
             Console.WriteLine(ex);
-            LoggerService.Logger.LogError(ex);
+            LoggerService.LogError(ex);
             return false;
         }
     }

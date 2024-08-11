@@ -35,7 +35,13 @@ public partial class EditTaskDialog : CustomWindow
         Data = DataContext as EditTaskDialogViewModel;
         Data.Dialog = this;
     }
-    
+
+    protected void Close(object sender, RoutedEventArgs e)
+    {
+        base.Close(sender, e);
+        MainWindow.Data.Idle = true;
+    }
+
     private void List_KeyDown(object sender, KeyEventArgs e)
     {
         if (Data.CurrentTask != null)
@@ -53,11 +59,9 @@ public partial class EditTaskDialog : CustomWindow
 
     public void Save(object sender, RoutedEventArgs e)
     {
-        if (Data.DataList.Where((t) => !string.IsNullOrWhiteSpace(t.Name) && t.Name.Equals(TaskName.Text)).ToList()
-                .Count() >
-            1)
+        if (Data.DataList.Where(t => !string.IsNullOrWhiteSpace(t.Name) && t.Name.Equals(TaskName.Text)).ToList().Count > 1)
         {
-            Growls.Error($"任务列表中已存在命名为\"{TaskName.Text}\"的任务");
+            Growls.Error(string.Format("DuplicateTaskNameError".GetLocalizationString(), TaskName.Text));
             return;
         }
 
@@ -76,25 +80,29 @@ public partial class EditTaskDialog : CustomWindow
 
             Data.CurrentTask.Task = Data.CurrentTask.Task;
             _chartDialog?.UpdateGraph();
-            Growl.SuccessGlobal("保存任务成功!");
+            Growl.SuccessGlobal("SaveSuccessMessage".GetLocalizationString());
         }
-        else Growls.ErrorGlobal("保存任务失败!");
+        else
+        {
+            Growls.ErrorGlobal("SaveFailureMessage".GetLocalizationString());
+        }
     }
 
     private TaskFlowChartDialog _chartDialog;
+
     private void ShowChart(object sender, RoutedEventArgs e)
     {
-        _chartDialog = new TaskFlowChartDialog(this,Data.DataList.ToList());
+        _chartDialog = new TaskFlowChartDialog(this, Data.DataList.ToList());
         _chartDialog.Show();
     }
-    
+
     private string PipelineFilePath = MaaProcessor.ResourcePipelineFilePath;
 
     private void Load(object sender, RoutedEventArgs e)
     {
         OpenFileDialog openFileDialog = new OpenFileDialog()
         {
-            Title = "选择 Pipeline 文件"
+            Title = "LoadPipelineTitle".GetLocalizationString()
         };
         openFileDialog.Filter = "JSON 文件 (*.json)|*.json|All files (*.*)|*.*";
         if (openFileDialog.ShowDialog() == true)
@@ -121,7 +129,7 @@ public partial class EditTaskDialog : CustomWindow
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                Growls.ErrorGlobal("Pipeline文件加载或解析失败: " + ex.Message);
+                Growls.ErrorGlobal(string.Format("LoadPipelineErrorMessage".GetLocalizationString(), ex.Message));
             }
         }
     }
@@ -183,9 +191,8 @@ public partial class EditTaskDialog : CustomWindow
             if (parentPanel != null)
             {
                 var itemToDelete = attributeButton.Attribute;
-                int index = parentPanel.Children.IndexOf(attributeButton); // Store the index of the item to be deleted
+                int index = parentPanel.Children.IndexOf(attributeButton);
                 parentPanel.Children.Remove(attributeButton);
-                // Push a command onto the undo stack that restores the item at the original position
                 Data.UndoTaskStack.Push(new RelayCommand(o => AddAttribute(itemToDelete, index)));
             }
         }
@@ -308,7 +315,7 @@ public partial class EditTaskDialog : CustomWindow
             {
                 if (!taskModels.TryAdd(taskItemViewModel.Name, taskItemViewModel.Task))
                 {
-                    Growls.WarningGlobal("任务列表中存在相同命名的任务!");
+                    Growls.WarningGlobal("SavePipelineWarning".GetLocalizationString());
                     return;
                 }
             }
@@ -329,18 +336,9 @@ public partial class EditTaskDialog : CustomWindow
             string jsonString = JsonConvert.SerializeObject(taskModels, settings);
 
             File.WriteAllText(filePath, jsonString);
-            Growl.SuccessGlobal("保存成功！");
+            Growl.SuccessGlobal("SavePipelineSuccess".GetLocalizationString());
         }
-        // if (string.IsNullOrWhiteSpace(PipelineFilePath))
-        //     PipelineFilePath = Doctor.ResourcePipelineFilePath;
-        // string jsonString = JsonConvert.SerializeObject(taskModels, settings);
-        // string directory = $"{PipelineFilePath}/{PipelineFileName.Text}";
-        // if (!Directory.Exists($"{PipelineFilePath}/"))
-        //     Directory.CreateDirectory($"{PipelineFilePath}/");
-        // directory = System.IO.Path.GetFullPath(directory);
-        // 将 JSON 字符串写入文件
     }
-
     private void OnSearchTask(object? sender, FunctionEventArgs<string> e)
     {
         var searchText = e.Info.ToLower();
@@ -438,7 +436,7 @@ public partial class EditTaskDialog : CustomWindow
                     }
                     else
                     {
-                        Growls.ErrorGlobal("目前剪贴板中数据不可转换为文本");
+                        Growls.ErrorGlobal("ClipboardDataError".GetLocalizationString());
                     }
                 }
             }
@@ -485,7 +483,7 @@ public partial class EditTaskDialog : CustomWindow
                     }
                     else
                     {
-                        Growls.ErrorGlobal("目前剪贴板中数据不可转换为文本");
+                        Growls.ErrorGlobal("ClipboardDataError".GetLocalizationString());
                     }
                 }
             }
@@ -533,10 +531,9 @@ public partial class EditTaskDialog : CustomWindow
         }
         else
         {
-            Growls.ErrorGlobal("目前剪贴板中数据不可转换为文本");
+            Growls.ErrorGlobal("ClipboardDataError".GetLocalizationString());
         }
     }
-
     private void SelectionRegion(object sender, RoutedEventArgs e)
     {
         MainWindow.Instance.ConnectToMAA();
@@ -546,10 +543,6 @@ public partial class EditTaskDialog : CustomWindow
             SelectionRegionDialog imageDialog = new SelectionRegionDialog(image);
             if (imageDialog.ShowDialog() == true)
             {
-                // Console.WriteLine(string.Join(",", imageDialog.Output));
-                // Console.WriteLine(MoneyTask.MoneyRecognizer.ReadTextFromBitmapImage(image, imageDialog.Output[0],
-                //     imageDialog.Output[1],
-                //     imageDialog.Output[2], imageDialog.Output[3]));
                 if (Data.CurrentTask != null)
                 {
                     if (imageDialog.IsRoi)
@@ -599,24 +592,6 @@ public partial class EditTaskDialog : CustomWindow
                             });
                         }
                     }
-
-                    // if (Data.CurrentTask.Task.roi == null)
-                    //     Data.CurrentTask.Task.roi = imageDialog.Output;
-                    // else
-                    // {
-                    //     if (Data.CurrentTask.Task.roi is List<int> li)
-                    //     {
-                    //         Data.CurrentTask.Task.roi = new List<List<int>>() { li, imageDialog.Output };
-                    //     }
-                    //     else if (Data.CurrentTask.Task.roi is List<List<int>> lli)
-                    //     {
-                    //         lli.Add(imageDialog.Output);
-                    //     }
-                    // }
-                    //
-                    // Data.CurrentTask.Task.target = imageDialog.Output;
-                    //
-                    // Data.CurrentTask = Data.CurrentTask;
                 }
             }
         }
@@ -660,12 +635,6 @@ public partial class EditTaskDialog : CustomWindow
                             };
                         }
                     }
-                    // if (Data.CurrentTask.Task.template == null)
-                    //     Data.CurrentTask.Task.template = new List<string>() { imageDialog.Output };
-                    // else
-                    //     Data.CurrentTask.Task.template.Add(imageDialog.Output);
-                    //
-                    // Data.CurrentTask = Data.CurrentTask;
                 }
             }
         }
@@ -713,10 +682,6 @@ public partial class EditTaskDialog : CustomWindow
                             Key = "end", Value = imageDialog.OutputEnd
                         };
                     }
-                    // Data.CurrentTask.Task.begin = imageDialog.OutputBegin;
-                    // Data.CurrentTask.Task.end = imageDialog.OutputEnd;
-                    //
-                    // Data.CurrentTask = Data.CurrentTask;
                 }
             }
         }
@@ -764,26 +729,10 @@ public partial class EditTaskDialog : CustomWindow
                             Key = "lower", Value = imageDialog.OutputLower
                         };
                     }
-                    // Data.CurrentTask.Task.upper = imageDialog.OutputUpper;
-                    // Data.CurrentTask.Task.lower = imageDialog.OutputLower;
-                    //
-                    // Data.CurrentTask = Data.CurrentTask;
                 }
             }
         }
     }
-
-    private const string DiffEntry = "OCR";
-
-    private const string DiffParam = $$"""
-                                       {
-                                           "{{DiffEntry}}": {
-                                               "recognition": "OCR",
-                                               "roi": []
-                                           }
-                                       }
-                                       """;
-
     private void RecognitionText(object sender, RoutedEventArgs e)
     {
         MainWindow.Instance.ConnectToMAA();
@@ -824,9 +773,6 @@ public partial class EditTaskDialog : CustomWindow
                             };
                         }
                     }
-
-
-                    //
                 }
             }
         }

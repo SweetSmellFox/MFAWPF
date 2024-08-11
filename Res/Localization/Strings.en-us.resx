@@ -125,4 +125,103 @@
     <data name="LightColor" xml:space="preserve">
         <value>Light Color</value>
     </data>
+    <data name="EditTaskDialog_Title" xml:space="preserve">
+    <value>Task Editor</value>
+  </data>
+    <data name="Cut" xml:space="preserve">
+    <value>Cut</value>
+  </data>
+    <data name="Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+    <data name="PasteAbove" xml:space="preserve">
+    <value>Paste Above</value>
+  </data>
+    <data name="PasteBelow" xml:space="preserve">
+    <value>Paste Below</value>
+  </data>
+    <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+    <data name="Paste" xml:space="preserve">
+    <value>Paste</value>
+  </data>
+    <data name="EditTaskDialog_Header" xml:space="preserve">
+    <value>Task Editor</value>
+  </data>
+    <data name="EditTaskDialog_PipelineFileName_Placeholder" xml:space="preserve">
+    <value>Pipeline File Name</value>
+  </data>
+    <data name="EditTaskDialog_Load_Tooltip" xml:space="preserve">
+    <value>Load Pipeline File</value>
+  </data>
+    <data name="EditTaskDialog_SavePipeline_Tooltip" xml:space="preserve">
+    <value>Save Pipeline File</value>
+  </data>
+    <data name="EditTaskDialog_TaskList_Label" xml:space="preserve">
+    <value>Task List:</value>
+  </data>
+    <data name="EditTaskDialog_AddTask_Tooltip" xml:space="preserve">
+    <value>Add Task</value>
+  </data>
+    <data name="EditTaskDialog_ClearTask_Tooltip" xml:space="preserve">
+    <value>Clear Tasks</value>
+  </data>
+    <data name="EditTaskDialog_TaskName_Title" xml:space="preserve">
+    <value>Task Name:</value>
+  </data>
+    <data name="EditTaskDialog_RecognitionText_Tooltip" xml:space="preserve">
+    <value>Text Recognition</value>
+  </data>
+    <data name="EditTaskDialog_ColorExtraction_Tooltip" xml:space="preserve">
+    <value>Color Extraction</value>
+  </data>
+    <data name="EditTaskDialog_Swipe_Tooltip" xml:space="preserve">
+    <value>Swipe</value>
+  </data>
+    <data name="EditTaskDialog_Screenshot_Tooltip" xml:space="preserve">
+    <value>Take Screenshot</value>
+  </data>
+    <data name="EditTaskDialog_SelectionRegion_Tooltip" xml:space="preserve">
+    <value>Select Region</value>
+  </data>
+    <data name="EditTaskDialog_AddAttribute_Tooltip" xml:space="preserve">
+    <value>Add Attribute</value>
+  </data>
+    <data name="EditTaskDialog_ClearAttribute_Tooltip" xml:space="preserve">
+    <value>Clear Attributes</value>
+  </data>
+    <data name="EditTaskDialog_SaveTask_Button" xml:space="preserve">
+    <value>Save Task</value>
+  </data>
+  <data name="EditTaskDialog_ShowChart_Button" xml:space="preserve">
+    <value>Flowchart</value>
+  </data>
+    <data name="Quit" xml:space="preserve">
+    <value>Quit</value>
+  </data>
+    <data name="SaveSuccessMessage" xml:space="preserve">
+    <value>Task saved successfully!</value>
+  </data>
+    <data name="SaveFailureMessage" xml:space="preserve">
+    <value>Failed to save task!</value>
+  </data>
+    <data name="DuplicateTaskNameError" xml:space="preserve">
+    <value>A task with the name "{0}" already exists in the task list.</value>
+  </data>
+    <data name="LoadPipelineTitle" xml:space="preserve">
+    <value>Select Pipeline File</value>
+  </data>
+    <data name="LoadPipelineErrorMessage" xml:space="preserve">
+    <value>Failed to load or parse the pipeline file: {0}</value>
+  </data>
+    <data name="SavePipelineSuccess" xml:space="preserve">
+    <value>Saved successfully!</value>
+  </data>
+    <data name="SavePipelineWarning" xml:space="preserve">
+    <value>There are tasks with duplicate names in the task list!</value>
+  </data>
+    <data name="ClipboardDataError" xml:space="preserve">
+    <value>The data currently in the clipboard cannot be converted to text.</value>
+  </data>
 </root>

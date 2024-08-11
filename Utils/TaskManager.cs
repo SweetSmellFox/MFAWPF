@@ -50,16 +50,18 @@ public static class TaskManager
         Console.WriteLine($"异步任务 {name} 开始.");
         if (catchException)
         {
-            try
+            var task = Task.Run(action);
+            task.ContinueWith(t =>
             {
-                await Task.Run(action);
-            }
-            catch (Exception e)
-            {
-                if (handleError != null)
-                    handleError.Invoke();
-                Console.WriteLine($"{prompt}异步任务 {name} 失败: {e.Message}");
-            }
+                if (t.Exception != null)
+                {
+                    if (handleError != null)
+                        handleError.Invoke();
+                    
+                    Console.WriteLine($"{prompt}异步任务 {name} 失败: {t.Exception.GetBaseException().Message}");
+                    LoggerService.LogError(t.Exception.GetBaseException());
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted);
         }
         else await Task.Run(action);
 

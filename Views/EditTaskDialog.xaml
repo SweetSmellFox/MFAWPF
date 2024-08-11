@@ -9,27 +9,25 @@
                        xmlns:controls="clr-namespace:MFAWPF.Controls"
                        xmlns:utils="clr-namespace:MFAWPF.Utils"
                        xmlns:dd="urn:gong-wpf-dragdrop"
+                       xmlns:lex="http://wpflocalizeextension.codeplex.com"
                        mc:Ignorable="d"
-                       Title="任务编辑器" Height="500" Width="730">
-    <controls:CustomWindow.Clip>
-        <RectangleGeometry RadiusX="10" RadiusY="10" Rect="0,0,730,500" />
-    </controls:CustomWindow.Clip>
+                       Title="{lex:Loc EditTaskDialog_Title}" Height="500" Width="730">
     <controls:CustomWindow.DataContext>
         <models:EditTaskDialogViewModel />
     </controls:CustomWindow.DataContext>
     <controls:CustomWindow.Resources>
-
         <ContextMenu x:Key="TaskMenu">
-            <MenuItem Header="剪切" Click="Cut" />
-            <MenuItem Header="复制" Click="Copy" />
-            <MenuItem Header="粘贴到上方" Click="PasteAbove" />
-            <MenuItem Header="粘贴到下方" Click="PasteBelow" />
-            <MenuItem Header="删除" Click="Delete" />
+            <MenuItem Header="{lex:Loc Cut}" Click="Cut" />
+            <MenuItem Header="{lex:Loc Copy}" Click="Copy" />
+            <MenuItem Header="{lex:Loc PasteAbove}" Click="PasteAbove" />
+            <MenuItem Header="{lex:Loc PasteBelow}" Click="PasteBelow" />
+            <MenuItem Header="{lex:Loc Delete}" Click="Delete" />
         </ContextMenu>
         <ContextMenu x:Key="AttributeMenu">
-            <MenuItem Header="粘贴" Click="Paste" />
+            <MenuItem Header="{lex:Loc Paste}" Click="Paste" />
         </ContextMenu>
     </controls:CustomWindow.Resources>
+
     <Border
         CornerRadius="10"
         Background="{DynamicResource SecundaryBackgroundColor}" BorderBrush="{DynamicResource GrayColor5}"
@@ -39,7 +37,8 @@
             <Border CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"
                     ClipToBounds="False">
                 <Grid Height="34">
-                    <TextBlock Text="任务编辑器" VerticalAlignment="Center" Foreground="{DynamicResource BlackColor}"
+                    <TextBlock Text="{lex:Loc EditTaskDialog_Header}" VerticalAlignment="Center"
+                               Foreground="{DynamicResource BlackColor}"
                                FontWeight="Bold" FontSize="17" HorizontalAlignment="Center"
                                Margin="0 0 0 0" />
                     <Button Width="22" Height="22" Click="Close" Style="{StaticResource ButtonIcon}"
@@ -52,59 +51,50 @@
             <hc:SimpleStackPanel Orientation="Horizontal">
                 <hc:SimpleStackPanel Margin="10 0 0 0" Width="320">
                     <hc:SimpleStackPanel Orientation="Horizontal" Margin="4">
-
-
-                        <hc:TextBox VerticalAlignment="Center" Margin=" 0 0 4 0 " Width="230"
+                        <hc:TextBox VerticalAlignment="Center" Margin="0 0 4 0" Width="230"
                                     hc:InfoElement.TitleWidth="50"
-                                    x:Name="PipelineFileName" hc:InfoElement.Placeholder="Pipeline文件名称" />
-                        <Button ToolTip="导入Pipeline文件" hc:TipElement.Placement="Top" Click="Load" Margin="0 0 4 0 ">
+                                    x:Name="PipelineFileName" hc:InfoElement.ShowClearButton="True"
+                                    hc:InfoElement.Placeholder="{lex:Loc EditTaskDialog_PipelineFileName_Placeholder}" />
+                        <Button ToolTip="{lex:Loc EditTaskDialog_Load_Tooltip}" hc:TipElement.Placement="Top"
+                                Click="Load" Margin="0 0 4 0">
                             <Button.Content>
-
                                 <Path Width="15" Data="{StaticResource LoadGeometry}"
                                       Fill="{DynamicResource GrayColor4}"
                                       MaxWidth="15" Stretch="Uniform" />
-
-                                <!-- <icon:PackIconMaterial Kind="Close" -->
-                                <!--                        Width="12" -->
-                                <!--                        Foreground="{DynamicResource GrayColor4}" /> -->
                             </Button.Content>
                         </Button>
-                        <Button ToolTip="保存Pipeline文件" hc:TipElement.Placement="Top" Click="Save_Pipeline">
+                        <Button ToolTip="{lex:Loc EditTaskDialog_SavePipeline_Tooltip}" hc:TipElement.Placement="Top"
+                                Click="Save_Pipeline">
                             <Button.Content>
-
                                 <Path Width="15" Data="{StaticResource SaveGeometry}"
                                       Fill="{DynamicResource GrayColor4}"
                                       MaxWidth="15" Stretch="Uniform" />
-
-                                <!-- <icon:PackIconMaterial Kind="Close" -->
-                                <!--                        Width="12" -->
-                                <!--                        Foreground="{DynamicResource GrayColor4}" /> -->
                             </Button.Content>
                         </Button>
                     </hc:SimpleStackPanel>
-                    <hc:SearchBar Style="{StaticResource SearchBarPlus}" hc:InfoElement.Placeholder="请输入任务名称"
+                    <hc:SearchBar Style="{StaticResource SearchBarPlus}"
+                                  hc:InfoElement.Placeholder="{lex:Loc EditTaskDialog_TaskName_Title}"
                                   Margin="4" SearchStarted="OnSearchTask"
                                   IsRealTime="True"
                                   Tag="{Binding ElementName=ListBoxDemo}">
                     </hc:SearchBar>
 
-                    <Grid VerticalAlignment="Top"
-                          Margin="0,5,10,4">
-
-                        <TextBlock Margin="5 0 0 0" Width="55" Text="任务列表："
+                    <Grid VerticalAlignment="Top" Margin="0,5,10,4">
+                        <TextBlock Margin="5 0 0 0" Width="55"
+                                   Text="{lex:Loc EditTaskDialog_TaskList_Label}"
                                    Foreground="{StaticResource GrayColor4}"
                                    HorizontalAlignment="Left">
                         </TextBlock>
 
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                            <Button ToolTip="添加任务" Width="15" Height="15"
+                            <Button ToolTip="{lex:Loc EditTaskDialog_AddTask_Tooltip}" Width="15" Height="15"
                                     Style="{StaticResource textBoxButton}"
                                     Foreground="{DynamicResource GrayColor4}"
-                                    Click="AddTask" 
+                                    Click="AddTask"
                                     Padding="0" hc:IconElement.Width="12"
                                     hc:IconElement.Height="12"
                                     hc:IconElement.Geometry="{StaticResource AddGeometry}" />
-                            <Button ToolTip="清空任务" Width="15" Height="15"
+                            <Button ToolTip="{lex:Loc EditTaskDialog_ClearTask_Tooltip}" Width="15" Height="15"
                                     Style="{StaticResource textBoxButton}"
                                     Foreground="{DynamicResource GrayColor4}"
                                     Click="ClearTask"
@@ -151,92 +141,72 @@
                             </ListBox>
 
                         </Grid>
-
-
                     </Border>
                 </hc:SimpleStackPanel>
                 <hc:SimpleStackPanel Orientation="Vertical" Margin="15 10 15 0" Width="360">
-
-                    <!-- <hc:TextBox x:Name="txtContent" -->
-                    <!--             FontSize="13" -->
-                    <!--             FontWeight="Medium" -->
-                    <!--             Foreground="{DynamicResource PrimaryTextBrush}" -->
-                    <!--             BorderBrush="{DynamicResource GrayColor4}" -->
-                    <!--             BorderThickness="0,0,0,2" KeyDown="CheckEnter" -->
-                    <!--             Height="128" HorizontalScrollBarVisibility="Auto" -->
-                    <!--             VerticalContentAlignment="Center" -->
-                    <!--             Margin="0,5,0,0" /> -->
-                    <!-- <hc:TextBox Style="{StaticResource TextBoxBaseStyle}" hc:InfoElement.Placeholder="请输入干员名称" Margin="4" -->
-                    <!--               Tag="{Binding ElementName=ListBoxDemo}"> -->
-                    <!-- </hc:TextBox> -->
-                    <!-- <hc:TextBox Margin="4" hc:InfoElement.TitleWidth="70" hc:InfoElement.Placeholder="请输入干员名称" -->
-                    <!--             hc:InfoElement.Necessary="True" x:Name="OperatorName" -->
-                    <!--             Style="{StaticResource TextBoxExtend}"/> -->
-
-
                     <hc:TextBox VerticalAlignment="Center" Margin=" 0 0 0 4" Width="350"
-                                hc:InfoElement.TitlePlacement="Left" hc:InfoElement.Title="任务名称: "
-                                x:Name="TaskName" hc:InfoElement.Placeholder="任务名称" />
-                    <Grid VerticalAlignment="Top"
-                          Margin="0,5,10,4">
+                                hc:InfoElement.TitlePlacement="Left"
+                                hc:InfoElement.Title="{lex:Loc EditTaskDialog_TaskName_Title}"
+                                x:Name="TaskName" hc:InfoElement.Placeholder="{lex:Loc EditTaskDialog_TaskName_Title}" />
+                    <Grid VerticalAlignment="Top" Margin="0,5,10,4">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Margin="5 0 0 0" Text="属性：" Foreground="{StaticResource GrayColor4}">
+                        <TextBlock Margin="5 0 0 0" Text="{lex:Loc EditTaskDialog_TaskList_Label}"
+                                   Foreground="{StaticResource GrayColor4}">
                         </TextBlock>
 
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                            <Button ToolTip="文字识别" Width="15" Height="15"
+                            <Button ToolTip="{lex:Loc EditTaskDialog_RecognitionText_Tooltip}" Width="15" Height="15"
                                     Style="{StaticResource textBoxButton}"
                                     Foreground="{DynamicResource GrayColor4}"
-                                    Click="RecognitionText" 
+                                    Click="RecognitionText"
                                     Padding="0" hc:IconElement.Width="12" Margin="2 0 2 0"
                                     hc:IconElement.Height="12"
                                     hc:IconElement.Geometry="{StaticResource RecognitionTextGeometry}" />
-                            <Button ToolTip="取色" Width="15" Height="15"
+                            <Button ToolTip="{lex:Loc EditTaskDialog_ColorExtraction_Tooltip}" Width="15" Height="15"
                                     Style="{StaticResource textBoxButton}"
                                     Foreground="{DynamicResource GrayColor4}"
-                                    Click="ColorExtraction" 
+                                    Click="ColorExtraction"
                                     Padding="0" Margin="2 0  2 0" hc:IconElement.Width="12"
                                     hc:IconElement.Height="12"
                                     hc:IconElement.Geometry="{StaticResource ColorExtractionGeometry}" />
-                            <Button ToolTip="滑动" Width="15" Height="15"
+                            <Button ToolTip="{lex:Loc EditTaskDialog_Swipe_Tooltip}" Width="15" Height="15"
                                     Style="{StaticResource textBoxButton}"
                                     Foreground="{DynamicResource GrayColor4}"
-                                    Click="Swipe" 
+                                    Click="Swipe"
                                     Padding="0" Margin="2 0  2 0" hc:IconElement.Width="12"
                                     hc:IconElement.Height="12"
                                     hc:IconElement.Geometry="{StaticResource SwipeGeometry}" />
-                            <Button ToolTip="裁剪图片" Width="15" Height="15"
+                            <Button ToolTip="{lex:Loc EditTaskDialog_Screenshot_Tooltip}" Width="15" Height="15"
                                     Style="{StaticResource textBoxButton}"
                                     Foreground="{DynamicResource GrayColor4}"
-                                    Click="Screenshot" 
+                                    Click="Screenshot"
                                     Padding="0" Margin="2 0  2 0" hc:IconElement.Width="12"
                                     hc:IconElement.Height="12"
                                     hc:IconElement.Geometry="{StaticResource ScreenshotsGeometry}" />
-                            <Button ToolTip="选择区域" Width="15" Height="15"
+                            <Button ToolTip="{lex:Loc EditTaskDialog_SelectionRegion_Tooltip}" Width="15" Height="15"
                                     Style="{StaticResource textBoxButton}"
                                     Foreground="{DynamicResource GrayColor4}"
-                                    Click="SelectionRegion" 
+                                    Click="SelectionRegion"
                                     Padding="0" Margin="2 0  2 0" hc:IconElement.Width="12"
                                     hc:IconElement.Height="12"
                                     hc:IconElement.Geometry="{StaticResource SelectionRegionGeometry}" />
-                            <Button ToolTip="添加属性" Width="15" Height="15"
+                            <Button ToolTip="{lex:Loc EditTaskDialog_AddAttribute_Tooltip}" Width="15" Height="15"
                                     Style="{StaticResource textBoxButton}"
                                     Foreground="{DynamicResource GrayColor4}"
-                                    Click="AddAttribute" 
+                                    Click="AddAttribute"
                                     Padding="0" Margin="2 0  2 0" hc:IconElement.Width="12"
                                     hc:IconElement.Height="12"
                                     hc:IconElement.Geometry="{StaticResource AddGeometry}" />
-                            <Button ToolTip="清空属性" Width="15" Height="15"
+                            <Button ToolTip="{lex:Loc EditTaskDialog_ClearAttribute_Tooltip}" Width="15" Height="15"
                                     Style="{StaticResource textBoxButton}"
                                     Foreground="{DynamicResource GrayColor4}"
-                                    Click="ClearAttribute" 
+                                    Click="ClearAttribute"
                                     Padding="0" Margin="2 0  2 0" hc:IconElement.Width="12"
                                     hc:IconElement.Height="12"
                                     hc:IconElement.Geometry="{StaticResource clear}" />
-
                         </StackPanel>
                     </Grid>
                     <Border Height="320" Background="{DynamicResource WhiteColor}" CornerRadius="8" Margin="0 4 4 0"
@@ -257,7 +227,7 @@
                     <hc:SimpleStackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 13 0 0">
                         <Button
                             BorderThickness="0"
-                            Content="保存任务" Click="Save"
+                            Content="{lex:Loc EditTaskDialog_SaveTask_Button}" Click="Save"
                             Foreground="White"
                             FontSize="11"
                             VerticalContentAlignment="Center"
@@ -291,7 +261,7 @@
                         </Button>
                         <Button
                             Click="ShowChart"
-                            Content="显示流程图"
+                            Content="{lex:Loc EditTaskDialog_ShowChart_Button}"
                             Foreground="{DynamicResource BlackColor}"
                             FontSize="11"
                             VerticalContentAlignment="Center"
@@ -300,7 +270,7 @@
                         </Button>
                         <Button
                             Click="Close"
-                            Content="退出"
+                            Content="{lex:Loc Quit}"
                             Foreground="{DynamicResource BlackColor}"
                             FontSize="11"
                             VerticalContentAlignment="Center"
@@ -312,89 +282,4 @@
             </hc:SimpleStackPanel>
         </hc:SimpleStackPanel>
     </Border>
-    <!-- <Grid> -->
-    <!--     <StackPanel Orientation="Horizontal"> -->
-    <!--         ~1~ Search Bar @1@ -->
-    <!--         <StackPanel Width="300"> -->
-    <!--             <hc:SearchBar x:Name="searchBar"  Margin="5" /> -->
-    <!--             <ListBox x:Name="taskListBox" Margin="5" AllowDrop="True" -->
-    <!--                    -->
-    <!--                      Drop="TaskListBox_Drop" Height="300" -->
-    <!--                      PreviewMouseLeftButtonDown="TaskListBox_MouseLeftButtonDown" -->
-    <!--                      PreviewMouseMove="TaskListBox_MouseMove" /> -->
-    <!--         </StackPanel> -->
-    <!--         ~1~ Main Content @1@ -->
-    <!-- -->
-    <!--         ~1~ Properties Panel @1@ -->
-    <!--         <StackPanel x:Name="propertiesPanel" Margin="5" VerticalAlignment="Top" Width="300"> -->
-    <!--             ~1~ Recognition ComboBox @1@ -->
-    <!--             ~1~ <ComboBox x:Name="recognitionComboBox" Margin="0,0,0,5" SelectionChanged="PropertyChanged"> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="DirectHit" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="TemplateMatch" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="FeatureMatch" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="ColorMatch" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="OCR" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="NeuralNetworkClassify" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="NeuralNetworkDetect" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="Custom" /> @1@ -->
-    <!--             ~1~ </ComboBox> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ Action ComboBox @2@ @1@ -->
-    <!--             ~1~ <ComboBox x:Name="actionComboBox" Margin="0,0,0,5" SelectionChanged="PropertyChanged"> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="DoNothing" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="Click" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="Swipe" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="Key" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="Text" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="StartApp" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="StopApp" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="StopTask" /> @1@ -->
-    <!--             ~1~     <ComboBoxItem Content="Custom" /> @1@ -->
-    <!--             ~1~ </ComboBox> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ Target TextBox @2@ @1@ -->
-    <!--             ~1~ <TextBox x:Name="targetTextBox" Margin="0,0,0,5" TextChanged="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ Target Offset TextBox @2@ @1@ -->
-    <!--             ~1~ <TextBox x:Name="targetOffsetTextBox" Margin="0,0,0,5" TextChanged="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ Begin TextBox @2@ @1@ -->
-    <!--             ~1~ <TextBox x:Name="beginTextBox" Margin="0,0,0,5" TextChanged="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ End TextBox @2@ @1@ -->
-    <!--             ~1~ <TextBox x:Name="endTextBox" Margin="0,0,0,5" TextChanged="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ Duration NumericUpDown @2@ @1@ -->
-    <!--             ~1~ <TextBox x:Name="durationTextBox" Margin="0,0,0,5" TextChanged="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ Key TextBox @2@ @1@ -->
-    <!--             ~1~ <TextBox x:Name="keyTextBox" Margin="0,0,0,5" TextChanged="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ Input TextBox @2@ @1@ -->
-    <!--             ~1~ <TextBox x:Name="inputTextBox" Margin="0,0,0,5" TextChanged="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ Package TextBox @2@ @1@ -->
-    <!--             ~1~ <TextBox x:Name="packageTextBox" Margin="0,0,0,5" TextChanged="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ Custom Action TextBox @2@ @1@ -->
-    <!--             ~1~ <TextBox x:Name="customActionTextBox" Margin="0,0,0,5" TextChanged="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ Custom Action Param TextBox @2@ @1@ -->
-    <!--             ~1~ <TextBox x:Name="customActionParamTextBox" Margin="0,0,0,5" TextChanged="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ CheckBox for IsSub @2@ @1@ -->
-    <!--             ~1~ <CheckBox x:Name="isSubCheckBox" Margin="0,0,0,5" Content="Is Sub Task" Checked="PropertyChanged" @1@ -->
-    <!--             ~1~           Unchecked="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ CheckBox for Inverse @2@ @1@ -->
-    <!--             ~1~ <CheckBox x:Name="inverseCheckBox" Margin="0,0,0,5" Content="Inverse" Checked="PropertyChanged" @1@ -->
-    <!--             ~1~           Unchecked="PropertyChanged" /> @1@ -->
-    <!--             ~1~ @1@ -->
-    <!--             ~1~ ~2~ CheckBox for Enabled @2@ @1@ -->
-    <!--             ~1~ <CheckBox x:Name="enabledCheckBox" Margin="0,0,0,5" Content="Enabled" Checked="PropertyChanged" @1@ -->
-    <!--             ~1~           Unchecked="PropertyChanged" /> @1@ -->
-    <!--         </StackPanel> -->
-    <!-- -->
-    <!--     </StackPanel> -->
-    <!-- </Grid> -->
 </controls:CustomWindow>

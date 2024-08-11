@@ -173,7 +173,7 @@ namespace MFAWPF.Views
                 Growls.ErrorGlobal(string.Format(LocExtension.GetLocalizedValue<string>("PipelineLoadError"),
                     ex.Message));
                 Console.WriteLine(ex);
-                LoggerService.Logger.LogError(ex);
+                LoggerService.LogError(ex);
                 return false;
             }
         }
@@ -365,7 +365,7 @@ namespace MFAWPF.Views
             };
             comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
 
-            AddLocalizedLabel(comboBox, "ResourceOption");
+            comboBox.BindLocalization("ResourceOption");
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
             comboBox.SelectionChanged += (sender, args) =>
@@ -390,9 +390,9 @@ namespace MFAWPF.Views
                 Margin = new Thickness(5)
             };
             var light = new TextBlock();
-            AddLocalizedLabel(light, "LightColor", TextBlock.TextProperty);
+            light.BindLocalization("LightColor", TextBlock.TextProperty);
             var dark = new TextBlock();
-            AddLocalizedLabel(dark, "DarkColor", TextBlock.TextProperty);
+            dark.BindLocalization("DarkColor", TextBlock.TextProperty);
             comboBox.Items.Add(light);
             comboBox.Items.Add(dark);
             var binding = new Binding("Idle")
@@ -401,7 +401,7 @@ namespace MFAWPF.Views
                 Mode = BindingMode.OneWay
             };
             comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
-            AddLocalizedLabel(comboBox, "ThemeOption");
+            comboBox.BindLocalization("ThemeOption");
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
             comboBox.SelectionChanged += (sender, args) =>
@@ -429,7 +429,7 @@ namespace MFAWPF.Views
                 Mode = BindingMode.OneWay
             };
             comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
-            AddLocalizedLabel(comboBox, "LanguageOption");
+            comboBox.BindLocalization("LanguageOption");
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
             comboBox.SelectionChanged += (sender, args) =>
@@ -460,7 +460,7 @@ namespace MFAWPF.Views
             };
             comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
 
-            AddLocalizedLabel(comboBox, titleKey);
+            comboBox.BindLocalization(titleKey);
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
             comboBox.SelectionChanged += (sender, args) =>
             {
@@ -552,7 +552,7 @@ namespace MFAWPF.Views
                     source.InterfaceItem.repeat_count = Convert.ToInt16(numericUpDown.Value);
                     JSONHelper.WriteToJsonFilePath(MaaProcessor.Resource, "interface", MaaInterface.Instance);
                 };
-                AddLocalizedLabel(numericUpDown, "RepeatOption");
+                numericUpDown.BindLocalization("RepeatOption");
                 numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
                 settingPanel.Children.Add(numericUpDown);
             }
@@ -565,8 +565,10 @@ namespace MFAWPF.Views
                 Growls.Warning($"无法连接至{(IsADB ? "模拟器" : "窗口")}");
                 return;
             }
+
             var editDialog = new EditTaskDialog();
             editDialog.Show();
+            Data.Idle = false;
         }
 
         private void SelectAll(object sender, RoutedEventArgs e)
@@ -666,15 +668,6 @@ namespace MFAWPF.Views
                 1 => Win32ControllerTypes.TouchSendMessage | Win32ControllerTypes.KeySendMessage,
                 _ => 0
             };
-        }
-
-        private void AddLocalizedLabel(UIElement control, string resourceKey, DependencyProperty property = null)
-        {
-            if (property == null)
-                property = InfoElement.TitleProperty;
-            // 创建 LocTextExtension 并设置资源键
-            var locExtension = new LocTextExtension(resourceKey);
-            locExtension.SetBinding(control, property);
         }
     }
 }

@@ -131,7 +131,7 @@ namespace MFAWPF.Utils
 
             CurrentInstance = null;
 
-            TaskManager.RunTaskAsync(() =>
+            TaskManager.RunTaskAsync( () =>
             {
                 MainWindow.Data.Idle = false;
                 MainWindow.Data.AddLog($"正在连接至{(MainWindow.Instance.IsADB ? "模拟器" : "窗口")}......");
@@ -139,7 +139,7 @@ namespace MFAWPF.Utils
                 if (!CurrentInstance.Initialized)
                 {
                     Growls.ErrorGlobal("初始化MAA实例失败，发生连接错误或资源文件损坏，请参阅日志.");
-                    LoggerService.Logger.LogWarning("初始化MAA实例失败!");
+                    LoggerService.LogWarning("初始化MAA实例失败!");
                     MainWindow.Data.AddLog("MAA实例初始化失败");
                     Stop(false);
                 }
@@ -304,7 +304,7 @@ namespace MFAWPF.Utils
         {
             AutoInitDictionary.Clear();
             MaaResource maaResource;
-            LoggerService.Logger.LogInfo("正在载入资源");
+            LoggerService.LogInfo("正在载入资源");
             try
             {
                 maaResource = new MaaResource(CurrentResources);
@@ -316,12 +316,12 @@ namespace MFAWPF.Utils
                 OnTaskStackChanged();
                 MainWindow.Data.Idle = true;
                 Growls.ErrorGlobal("资源加载失败！");
-                LoggerService.Logger.LogError(e.ToString());
+                LoggerService.LogError(e.ToString());
                 return null;
             }
 
-            LoggerService.Logger.LogInfo("载入资源成功");
-            LoggerService.Logger.LogInfo("正在初始化控制器");
+            LoggerService.LogInfo("载入资源成功");
+            LoggerService.LogInfo("正在初始化控制器");
             IMaaController<nint> controller;
             try
             {
@@ -352,12 +352,12 @@ namespace MFAWPF.Utils
                 OnTaskStackChanged();
                 MainWindow.Data.Idle = true;
                 Growls.ErrorGlobal($"连接{(MainWindow.Instance.IsADB ? "模拟器" : "窗口")}时发生错误！");
-                LoggerService.Logger.LogWarning("初始化控制器时发生错误！");
-                LoggerService.Logger.LogError(e.ToString());
+                LoggerService.LogWarning("初始化控制器时发生错误！");
+                LoggerService.LogError(e.ToString());
                 return null;
             }
 
-            LoggerService.Logger.LogInfo("初始化控制器成功");
+            LoggerService.LogInfo("初始化控制器成功");
             CurrentInstance = new MaaInstance
             {
                 Controller = controller,
@@ -367,14 +367,14 @@ namespace MFAWPF.Utils
 
             CurrentInstance.Register(new MoneyRecognizer());
             CurrentInstance.Register(new MoneyDetectRecognizer());
-            LoggerService.Logger.LogInfo("正在注册自定义识别器");
+            LoggerService.LogInfo("正在注册自定义识别器");
             foreach (var VARIABLE in MaaInterface.Instance.CustomRecognizerExecutors)
             {
                 Console.WriteLine($"注册自定义Recognizer:{VARIABLE.Name}");
                 CurrentInstance.Toolkit.ExecAgent.Register(CurrentInstance, VARIABLE);
             }
 
-            LoggerService.Logger.LogInfo("正在注册自定义行动");
+            LoggerService.LogInfo("正在注册自定义行动");
             foreach (var VARIABLE in MaaInterface.Instance.CustomActionExecutors)
             {
                 Console.WriteLine($"注册自定义Action:{VARIABLE.Name}");
@@ -406,7 +406,7 @@ namespace MFAWPF.Utils
                                 catch (Exception e)
                                 {
                                     Console.WriteLine(e);
-                                    LoggerService.Logger.LogError(e);
+                                    LoggerService.LogError(e);
                                 }
 
                                 MainWindow.Data.AddLog(HandlingStringsWithVariables(tip), brush);

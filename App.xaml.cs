@@ -56,7 +56,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             //此时程序出现严重异常，将强制结束退出
-            LoggerService.Logger.LogError(ex.ToString());
+            LoggerService.LogError(ex.ToString());
             Growls.Error("UI线程发生致命错误！");
         }
     }
@@ -73,12 +73,12 @@ public partial class App : Application
         if (e.ExceptionObject is Exception ex)
         {
             Console.WriteLine(ex);
-            LoggerService.Logger.LogError(ex.ToString());
+            LoggerService.LogError(ex.ToString());
             sbEx.Append((ex).Message);
         }
         else
         {
-            LoggerService.Logger.LogError(e.ToString());
+            LoggerService.LogError(e.ToString());
             sbEx.Append(e.ExceptionObject);
         }
 
@@ -89,13 +89,13 @@ public partial class App : Application
     {
         //task线程内未处理捕获
         Growls.Error("Task线程异常：" + e.Exception.Message);
-        LoggerService.Logger.LogError(e.Exception);
+        LoggerService.LogError(e.Exception);
         foreach (Exception item in e.Exception.InnerExceptions)
         {
             Console.WriteLine("异常类型：{0}{1}来自：{2}{3}异常内容：{4}",
                 item.GetType(), Environment.NewLine, item.Source,
                 Environment.NewLine, item.Message);
-            LoggerService.Logger.LogError(string.Format("异常类型：{0}{1}来自：{2}{3}异常内容：{4}",
+            LoggerService.LogError(string.Format("异常类型：{0}{1}来自：{2}{3}异常内容：{4}",
                 item.GetType(), Environment.NewLine, item.Source,
                 Environment.NewLine, item.Message));
         }

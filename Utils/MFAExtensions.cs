@@ -1,6 +1,11 @@
-﻿namespace MFAWPF.Utils;
+﻿using System.Windows;
+using HandyControl.Controls;
+using WPFLocalizeExtension.Deprecated.Extensions;
+using WPFLocalizeExtension.Extensions;
 
-public static class TaskExtensions
+namespace MFAWPF.Utils;
+
+public static class MFAExtensions
 {
     public static Dictionary<TKey, TaskModel> MergeTaskModels<TKey>(
         this IEnumerable<KeyValuePair<TKey, TaskModel>> taskModels,
@@ -24,5 +29,18 @@ public static class TaskExtensions
                     return mergedModel;
                 }
             );
+    }
+
+    public static void BindLocalization(this UIElement control, string resourceKey, DependencyProperty property = null)
+    {
+        if (property == null)
+            property = InfoElement.TitleProperty;
+        var locExtension = new LocTextExtension(resourceKey);
+        locExtension.SetBinding(control, property);
+    }
+    
+    public static string GetLocalizationString(this string key)
+    {
+        return LocExtension.GetLocalizedValue<string>(key);
     }
 }

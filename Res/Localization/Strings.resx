@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root"
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+                id="root"
                 xmlns="">
         <xsd:element name="root" msdata:IsDataSet="true">
             <xsd:complexType>
@@ -152,4 +153,104 @@
     <data name="DarkColor" xml:space="preserve">
         <value>深色</value>
     </data>
+    <data name="EditTaskDialog_Title" xml:space="preserve">
+    <value>任务编辑器</value>
+  </data>
+    <data name="Cut" xml:space="preserve">
+    <value>剪切</value>
+  </data>
+    <data name="Copy" xml:space="preserve">
+    <value>复制</value>
+  </data>
+    <data name="PasteAbove" xml:space="preserve">
+    <value>粘贴到上方</value>
+  </data>
+    <data name="PasteBelow" xml:space="preserve">
+    <value>粘贴到下方</value>
+  </data>
+    <data name="Delete" xml:space="preserve">
+    <value>删除</value>
+  </data>
+    <data name="Paste" xml:space="preserve">
+    <value>粘贴</value>
+  </data>
+    <data name="EditTaskDialog_Header" xml:space="preserve">
+    <value>任务编辑器</value>
+  </data>
+    <data name="EditTaskDialog_PipelineFileName_Placeholder" xml:space="preserve">
+    <value>Pipeline文件名称</value>
+  </data>
+    <data name="EditTaskDialog_Load_Tooltip" xml:space="preserve">
+    <value>导入Pipeline文件</value>
+  </data>
+    <data name="EditTaskDialog_SavePipeline_Tooltip" xml:space="preserve">
+    <value>保存Pipeline文件</value>
+  </data>
+    <data name="EditTaskDialog_TaskList_Label" xml:space="preserve">
+    <value>任务列表：</value>
+  </data>
+    <data name="EditTaskDialog_AddTask_Tooltip" xml:space="preserve">
+    <value>添加任务</value>
+  </data>
+    <data name="EditTaskDialog_ClearTask_Tooltip" xml:space="preserve">
+    <value>清空任务</value>
+  </data>
+    <data name="EditTaskDialog_TaskName_Title" xml:space="preserve">
+    <value>任务名称:</value>
+  </data>
+    <data name="EditTaskDialog_RecognitionText_Tooltip" xml:space="preserve">
+    <value>文字识别</value>
+  </data>
+    <data name="EditTaskDialog_ColorExtraction_Tooltip" xml:space="preserve">
+    <value>取色</value>
+  </data>
+    <data name="EditTaskDialog_Swipe_Tooltip" xml:space="preserve">
+    <value>滑动</value>
+  </data>
+    <data name="EditTaskDialog_Screenshot_Tooltip" xml:space="preserve">
+    <value>裁剪图片</value>
+  </data>
+    <data name="EditTaskDialog_SelectionRegion_Tooltip" xml:space="preserve">
+    <value>选择区域</value>
+  </data>
+    <data name="EditTaskDialog_AddAttribute_Tooltip" xml:space="preserve">
+    <value>添加属性</value>
+  </data>
+    <data name="EditTaskDialog_ClearAttribute_Tooltip" xml:space="preserve">
+    <value>清空属性</value>
+  </data>
+    <data name="EditTaskDialog_SaveTask_Button" xml:space="preserve">
+    <value>保存任务</value>
+  </data>
+    <data name="EditTaskDialog_ShowChart_Button" xml:space="preserve">
+    <value>显示流程图</value>
+  </data>
+    <data name="Quit" xml:space="preserve">
+    <value>退出</value>
+  </data>
+    <data name="SaveSuccessMessage" xml:space="preserve">
+    <value>保存任务成功!</value>
+</data>
+    <data name="SaveFailureMessage" xml:space="preserve">
+    <value>保存任务失败!</value>
+</data>
+    <data name="DuplicateTaskNameError" xml:space="preserve">
+    <value>任务列表中已存在命名为"{0}"的任务</value>
+</data>
+    <data name="LoadPipelineTitle" xml:space="preserve">
+    <value>选择 Pipeline 文件</value>
+</data>
+    <data name="LoadPipelineErrorMessage" xml:space="preserve">
+    <value>Pipeline文件加载或解析失败: {0}</value>
+</data>
+    <data name="SavePipelineSuccess" xml:space="preserve">
+    <value>保存成功！</value>
+</data>
+    <data name="SavePipelineWarning" xml:space="preserve">
+    <value>任务列表中存在相同命名的任务!</value>
+</data>
+    <data name="ClipboardDataError" xml:space="preserve">
+    <value>目前剪贴板中数据不可转换为文本</value>
+</data>
+
 </root>
