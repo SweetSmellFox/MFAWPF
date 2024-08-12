@@ -43,7 +43,12 @@ public static class MFAExtensions
     {
         return LocExtension.GetLocalizedValue<string>(key);
     }
-
+    public static string GetLocalizedFormattedString(this string key, params object[] args)
+    {
+        string localizedString = LocTextExtension.GetLocalizedValue<string>(key) as string ?? key;
+        return string.Format(localizedString, args);
+    }
+    
     public static string FormatWith(this string format, params object?[] args)
     {
         return string.Format(format, args);

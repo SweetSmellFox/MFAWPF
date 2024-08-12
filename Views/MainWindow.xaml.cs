@@ -306,7 +306,7 @@ namespace MFAWPF.Views
             catch (Exception ex)
             {
                 Growls.WarningGlobal(string.Format(LocExtension.GetLocalizedValue<string>("TaskStackError"),
-                    IsADB ? "模拟器" : "窗口", ex.Message));
+                    IsADB ? "Simulator".GetLocalizationString() : "Window".GetLocalizationString(), ex.Message));
                 MaaProcessor.Config.IsConnected = false;
             }
         }
@@ -433,8 +433,8 @@ namespace MFAWPF.Views
             comboBox.SelectionChanged += (sender, args) =>
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-                LocalizeDictionary.Instance.Culture =
-                    CultureInfo.CreateSpecificCulture((sender as ComboBox)?.SelectedValue as string);
+                LanguageManager.ChangeLanguage(
+                    CultureInfo.CreateSpecificCulture((sender as ComboBox)?.SelectedValue as string));
                 DataSet.SetData("LangIndex", index);
             };
 

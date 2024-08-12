@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using HandyControl.Controls;
+using HandyControl.Tools.Extension;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Messages;
@@ -68,7 +69,9 @@ namespace MFAWPF.Utils
             if (!Config.IsConnected)
             {
                 Growls.Warning("Warning_CannotConnect".GetLocalizationString()
-                    .FormatWith(MainWindow.Instance.IsADB ? "Simulator".GetLocalizationString() : "Window".GetLocalizationString()));
+                    .FormatWith(MainWindow.Instance.IsADB
+                        ? "Simulator".GetLocalizationString()
+                        : "Window".GetLocalizationString()));
                 return;
             }
 
@@ -86,15 +89,16 @@ namespace MFAWPF.Utils
 
             TaskManager.RunTaskAsync(async () =>
             {
-                MainWindow.Data.AddLog("ConnectingTo".GetLocalizationString()
-                    .FormatWith(MainWindow.Instance.IsADB ? "Simulator".GetLocalizationString() : "Window".GetLocalizationString()));
+                MainWindow.Data.AddLogByKey("ConnectingTo", null, MainWindow.Instance.IsADB
+                    ? "Window"
+                    : "Simulator");
                 var instance = await Task.Run(() => GetCurrentInstance(), token);
 
                 if (instance == null || !instance.Initialized)
                 {
                     Growls.ErrorGlobal("InitInstanceFailed".GetLocalizationString());
                     LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
-                    MainWindow.Data.AddLog("InstanceInitFailedLog".GetLocalizationString());
+                    MainWindow.Data.AddLogByKey("InstanceInitFailedLog");
                     Stop(false);
                     return;
                 }
@@ -102,7 +106,7 @@ namespace MFAWPF.Utils
                 bool run = await ExecuteTasks(token);
                 if (run)
                     Stop(_isStopped);
-            }, null, "TaskStart".GetLocalizationString());
+            }, null, "启动任务");
         }
 
         public void Stop(bool setIsStopped = true)
@@ -113,7 +117,7 @@ namespace MFAWPF.Utils
                 _cancellationTokenSource.Cancel();
                 TaskManager.RunTaskAsync(() =>
                 {
-                    MainWindow.Data.AddLog("Stopping".GetLocalizationString());
+                    MainWindow.Data.AddLogByKey("Stopping");
                     if (_currentInstance == null || _currentInstance?.Abort() == true)
                     {
                         DisplayTaskCompletionMessage();
@@ -123,7 +127,7 @@ namespace MFAWPF.Utils
                     {
                         Growls.ErrorGlobal("StoppingFailed".GetLocalizationString());
                     }
-                }, null, "TaskStopped".GetLocalizationString());
+                }, null, "停止任务");
                 TaskQueue.Clear();
                 OnTaskQueueChanged();
                 _cancellationTokenSource = null;
@@ -211,7 +215,7 @@ namespace MFAWPF.Utils
                     if (TaskQueue.Count > 0)
                     {
                         var taskA = TaskQueue.Peek();
-                        MainWindow.Data.AddLog("TaskStart".GetLocalizationString().FormatWith(taskA.Name));
+                        MainWindow.Data.AddLogByKey("TaskStart", null, taskA.Name);
                         if (!TryRunTasks(_currentInstance, taskA.Entry, taskA.Param))
                         {
                             if (_isStopped) return false;
@@ -233,12 +237,12 @@ namespace MFAWPF.Utils
             if (_isStopped)
             {
                 Growl.Info("TaskStopped".GetLocalizationString());
-                MainWindow.Data.AddLog("TaskAbandoned".GetLocalizationString());
+                MainWindow.Data.AddLogByKey("TaskAbandoned");
             }
             else
             {
                 Growl.Info("TaskCompleted".GetLocalizationString());
-                MainWindow.Data.AddLog("TaskAllCompleted".GetLocalizationString());
+                MainWindow.Data.AddLogByKey("TaskAllCompleted");
             }
         }
 
@@ -335,7 +339,7 @@ namespace MFAWPF.Utils
                 HandleInitializationError(e, "LoadResourcesFailed".GetLocalizationString());
                 return null;
             }
-            
+
             LoggerService.LogInfo("Resources initialized successfully".GetLocalizationString());
             LoggerService.LogInfo("LoadingController".GetLocalizationString());
             IMaaController<nint> controller;
@@ -347,7 +351,9 @@ namespace MFAWPF.Utils
             {
                 HandleInitializationError(e,
                     "ConnectingSimulatorOrWindow".GetLocalizationString()
-                        .FormatWith(MainWindow.Instance.IsADB ? "Simulator" : "Window"), true,
+                        .FormatWith(MainWindow.Instance.IsADB
+                            ? "Simulator".GetLocalizationString()
+                            : "Window".GetLocalizationString()), true,
                     "InitControllerFailed".GetLocalizationString());
                 return null;
             }

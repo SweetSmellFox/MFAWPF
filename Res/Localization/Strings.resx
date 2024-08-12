@@ -249,6 +249,12 @@
     <data name="Warning_CannotConnect" xml:space="preserve">
     <value>无法连接至{0}</value>
 </data>
+    <data name="Simulator" xml:space="preserve">
+    <value>模拟器</value>
+</data>
+    <data name="Window" xml:space="preserve">
+    <value>窗口</value>
+</data>
     <data name="ConnectingTo" xml:space="preserve">
     <value>正在连接至{0}......</value>
 </data>

@@ -15,7 +15,8 @@ public class MainViewModel : ObservableObject
 {
     public ObservableCollection<LogItemViewModel> LogItemViewModels { get; } = new();
 
-    public void AddLog(string content, Brush color = null, string weight = "Regular", bool showTime = true)
+    public void AddLog(string content, Brush color = null, string weight = "Regular",
+        bool showTime = true)
     {
         if (color == null)
             color = Brushes.Gray;
@@ -29,19 +30,20 @@ public class MainViewModel : ObservableObject
         });
     }
 
-    // public void AddLogBinding(string key, Brush color = null, string weight = "Regular", bool showTime = true)
-    // {
-    //     if (color == null)
-    //         color = Brushes.Gray;
-    //     Task.Run(() =>
-    //     {
-    //         Application.Current.Dispatcher.Invoke(() =>
-    //         {
-    //             LogItemViewModels.Add(new LogItemViewModel(content, color, weight, "HH':'mm':'ss",
-    //                 showTime: showTime));
-    //         });
-    //     });
-    // }
+    public void AddLogByKey(string key, Brush color = null, params string[] formatArgsKeys)
+    {
+        if (color == null)
+            color = Brushes.Gray;
+        Task.Run(() =>
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                LogItemViewModels.Add(new LogItemViewModel(key, color, "Regular", true, "HH':'mm':'ss",
+                    true, formatArgsKeys));
+            });
+        });
+    }
+    
     public ManualObservableCollection<TaskItemViewModel> Items { get; set; } =
         new();
 

@@ -218,9 +218,6 @@
     <data name="ClipboardDataError" xml:space="preserve">
     <value>The data currently in the clipboard cannot be converted to text.</value>
   </data>
-    <data name="Warning_CannotConnect" xml:space="preserve">
-    <value>Cannot connect to {0}</value>
-</data>
     <data name="ConnectingTo" xml:space="preserve">
     <value>Connecting to {0}......</value>
 </data>
@@ -287,5 +284,13 @@
     <data name="RegisterCustomAction" xml:space="preserve">
     <value>Register custom action: {0}</value>
 </data>
-
+    <data name="Simulator" xml:space="preserve">
+        <value>Simulator</value>
+    </data>
+    <data name="Window" xml:space="preserve">
+        <value>Window</value>
+    </data>
+    <data name="Warning_CannotConnect" xml:space="preserve">
+        <value>Unable to connect to {0}</value>
+    </data>
 </root>
