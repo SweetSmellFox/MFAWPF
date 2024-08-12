@@ -335,11 +335,11 @@ namespace MFAWPF.Views
             else
             {
                 AddResourcesOption();
-                AddSettingOption(LocExtension.GetLocalizedValue<string>("CaptureModeOption"),
+                AddSettingOption("CaptureModeOption",
                     new List<string> { "ScreencapDXGIFramePool", "ScreencapDXGIDesktopDup", "ScreencapGDI" },
                     "Win32ControlScreenCapType", 0);
 
-                AddSettingOption(LocExtension.GetLocalizedValue<string>("TouchModeOption"),
+                AddSettingOption("TouchModeOption",
                     new List<string> { "Seize", "SendMessage" },
                     "Win32ControlTouchType", 0);
                 AddThemeOption();

@@ -14,9 +14,6 @@
     <data name="AppTitle" xml:space="preserve">
         <value>Maa Framework Task Manager</value>
     </data>
-    <data name="DebugMode" xml:space="preserve">
-        <value>DEBUG</value>
-    </data>
     <data name="DeselectAll" xml:space="preserve">
         <value>Deselect All</value>
     </data>

@@ -54,7 +54,7 @@
 
                             </TextBlock>
                             <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}"
-                                       Margin="2 4 4 0" x:Name="version" Text="{lex:Loc DebugMode}">
+                                       Margin="2 4 4 0" x:Name="version" Text="Debug">
                             </TextBlock>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" FlowDirection="RightToLeft">
