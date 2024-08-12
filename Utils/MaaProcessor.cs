@@ -90,8 +90,8 @@ namespace MFAWPF.Utils
             TaskManager.RunTaskAsync(async () =>
             {
                 MainWindow.Data.AddLogByKey("ConnectingTo", null, MainWindow.Instance.IsADB
-                    ? "Window"
-                    : "Simulator");
+                    ? "Simulator"
+                    : "Window");
                 var instance = await Task.Run(() => GetCurrentInstance(), token);
 
                 if (instance == null || !instance.Initialized)
