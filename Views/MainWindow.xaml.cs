@@ -89,7 +89,7 @@ namespace MFAWPF.Views
 
         private void OnTaskStackChanged(object sender, EventArgs e)
         {
-            if (MaaProcessor.Instance.TaskStack.Count > 0)
+            if (MaaProcessor.Instance.TaskQueue.Count > 0)
             {
                 ToggleTaskButtonsVisibility(isRunning: true);
             }
@@ -141,7 +141,6 @@ namespace MFAWPF.Views
                 {
                     foreach (var resourcePath in MaaProcessor.CurrentResources)
                     {
-                        Console.WriteLine($"{resourcePath}/pipeline/");
                         var jsonFiles = Directory.GetFiles($"{resourcePath}/pipeline/", "*.json");
                         var taskDictionaryA = new Dictionary<string, TaskModel>();
                         foreach (var file in jsonFiles)
@@ -241,7 +240,7 @@ namespace MFAWPF.Views
             }
             else AutoDetectDevice();
 
-            MaaProcessor.Instance.CurrentInstance = null;
+            MaaProcessor.Instance.SetCurrentInstance(null);
             if (ConnectSettingButton.IsChecked == true)
             {
                 ConfigureSettingsPanel();
@@ -375,7 +374,6 @@ namespace MFAWPF.Views
                 if (MaaInterface.Instance.Resources != null && MaaInterface.Instance.Resources.Count > index)
                     MaaProcessor.CurrentResources =
                         MaaInterface.Instance.Resources[MaaInterface.Instance.Resources.Keys.ToList()[index]];
-
                 DataSet.SetData("ResourceIndex", index);
             };
 
@@ -466,7 +464,7 @@ namespace MFAWPF.Views
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
                 DataSet.SetData(datatype, index);
-                MaaProcessor.Instance.CurrentInstance = null;
+                MaaProcessor.Instance.SetCurrentInstance(null);
             };
 
             settingPanel.Children.Add(comboBox);
@@ -478,6 +476,7 @@ namespace MFAWPF.Views
             {
                 settingPanel.Children.Clear();
                 AddRepeatOption(dragItem);
+
                 if (dragItem.InterfaceItem.option != null)
                 {
                     foreach (var option in dragItem.InterfaceItem.option)
@@ -517,7 +516,6 @@ namespace MFAWPF.Views
                         option.index = comboBox.SelectedIndex;
                         JSONHelper.WriteToJsonFilePath(MaaProcessor.Resource, "interface", MaaInterface.Instance);
                     };
-
                     comboBox.SetValue(InfoElement.TitleProperty, option.name);
                     comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
                     settingPanel.Children.Add(comboBox);

@@ -68,9 +68,6 @@
     <data name="SelectAllTooltip" xml:space="preserve">
     <value>Select All</value>
   </data>
-    <data name="DeselectAllTooltip" xml:space="preserve">
-    <value>Deselect All</value>
-  </data>
     <data name="EditTaskTooltip" xml:space="preserve">
     <value>Edit Task</value>
   </data>
@@ -224,4 +221,74 @@
     <data name="ClipboardDataError" xml:space="preserve">
     <value>The data currently in the clipboard cannot be converted to text.</value>
   </data>
+    <data name="Warning_CannotConnect" xml:space="preserve">
+    <value>Cannot connect to {0}</value>
+</data>
+    <data name="ConnectingTo" xml:space="preserve">
+    <value>Connecting to {0}......</value>
+</data>
+    <data name="InitInstanceFailed" xml:space="preserve">
+    <value>Failed to initialize MAA instance, a connection error or resource file corruption occurred, please refer to the logs.</value>
+</data>
+    <data name="InstanceInitFailedLog" xml:space="preserve">
+    <value>MAA instance initialization failed</value>
+</data>
+    <data name="TaskStart" xml:space="preserve">
+    <value>Starting task: {0}</value>
+</data>
+    <data name="Stopping" xml:space="preserve">
+    <value>Stopping......</value>
+</data>
+    <data name="TaskStopped" xml:space="preserve">
+    <value>Task has been stopped</value>
+</data>
+    <data name="TaskAbandoned" xml:space="preserve">
+    <value>Task has been abandoned</value>
+</data>
+    <data name="TaskCompleted" xml:space="preserve">
+    <value>Task has been completed</value>
+</data>
+    <data name="TaskAllCompleted" xml:space="preserve">
+    <value>All tasks have been completed</value>
+</data>
+    <data name="StoppingFailed" xml:space="preserve">
+    <value>Failed to stop the task</value>
+</data>
+    <data name="NoTaskToStop" xml:space="preserve">
+    <value>There is no task to stop!</value>
+</data>
+    <data name="LoadingResources" xml:space="preserve">
+    <value>Loading resources</value>
+</data>
+    <data name="LoadResourcesFailed" xml:space="preserve">
+    <value>Failed to load resources!</value>
+</data>
+    <data name="InitResourcesSuccess" xml:space="preserve">
+    <value>Resources initialized successfully</value>
+</data>
+    <data name="LoadingController" xml:space="preserve">
+    <value>Initializing the controller</value>
+</data>
+    <data name="ConnectingSimulatorOrWindow" xml:space="preserve">
+    <value>Error connecting to {0}!</value>
+</data>
+    <data name="InitControllerFailed" xml:space="preserve">
+    <value>Error initializing controller!</value>
+</data>
+    <data name="InitControllerSuccess" xml:space="preserve">
+    <value>Controller initialized successfully</value>
+</data>
+    <data name="RegisteringCustomRecognizer" xml:space="preserve">
+    <value>Registering custom recognizer</value>
+</data>
+    <data name="RegisteringCustomAction" xml:space="preserve">
+    <value>Registering custom action</value>
+</data>
+    <data name="RegisterCustomRecognizer" xml:space="preserve">
+    <value>Register custom recognizer: {0}</value>
+</data>
+    <data name="RegisterCustomAction" xml:space="preserve">
+    <value>Register custom action: {0}</value>
+</data>
+
 </root>

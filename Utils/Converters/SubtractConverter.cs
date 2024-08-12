@@ -1,0 +1,21 @@
+﻿using System.Globalization;
+using System.Windows.Data;
+
+namespace MFAWPF.Utils.Converters;
+
+public class SubtractConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is double originalWidth && parameter is string parameterString && double.TryParse(parameterString, out double subtractValue))
+        {
+            return originalWidth - subtractValue;
+        }
+        return value;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return null;
+    }
+}

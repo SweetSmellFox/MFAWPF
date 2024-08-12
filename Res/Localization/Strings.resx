@@ -96,9 +96,6 @@
     <data name="SelectAllTooltip" xml:space="preserve">
   <value>全选</value>
 </data>
-    <data name="DeselectAllTooltip" xml:space="preserve">
-  <value>全部不选</value>
-</data>
     <data name="EditTaskTooltip" xml:space="preserve">
   <value>编辑任务</value>
 </data>
@@ -251,6 +248,75 @@
 </data>
     <data name="ClipboardDataError" xml:space="preserve">
     <value>目前剪贴板中数据不可转换为文本</value>
+</data>
+    <data name="Warning_CannotConnect" xml:space="preserve">
+    <value>无法连接至{0}</value>
+</data>
+    <data name="ConnectingTo" xml:space="preserve">
+    <value>正在连接至{0}......</value>
+</data>
+    <data name="InitInstanceFailed" xml:space="preserve">
+    <value>初始化MAA实例失败，发生连接错误或资源文件损坏，请参阅日志.</value>
+</data>
+    <data name="InstanceInitFailedLog" xml:space="preserve">
+    <value>MAA实例初始化失败</value>
+</data>
+    <data name="TaskStart" xml:space="preserve">
+    <value>开始任务: {0}</value>
+</data>
+    <data name="Stopping" xml:space="preserve">
+    <value>正在停止......</value>
+</data>
+    <data name="TaskStopped" xml:space="preserve">
+    <value>任务已中止</value>
+</data>
+    <data name="TaskAbandoned" xml:space="preserve">
+    <value>已放弃本次任务</value>
+</data>
+    <data name="TaskCompleted" xml:space="preserve">
+    <value>任务已完成</value>
+</data>
+    <data name="TaskAllCompleted" xml:space="preserve">
+    <value>已完成全部任务</value>
+</data>
+    <data name="StoppingFailed" xml:space="preserve">
+    <value>停止任务失败</value>
+</data>
+    <data name="NoTaskToStop" xml:space="preserve">
+    <value>当前没有可结束的任务!</value>
+</data>
+    <data name="LoadingResources" xml:space="preserve">
+    <value>正在载入资源</value>
+</data>
+    <data name="LoadResourcesFailed" xml:space="preserve">
+    <value>资源加载失败！</value>
+</data>
+    <data name="InitResourcesSuccess" xml:space="preserve">
+    <value>载入资源成功</value>
+</data>
+    <data name="LoadingController" xml:space="preserve">
+    <value>正在初始化控制器</value>
+</data>
+    <data name="ConnectingSimulatorOrWindow" xml:space="preserve">
+    <value>连接{0}时发生错误！</value>
+</data>
+    <data name="InitControllerFailed" xml:space="preserve">
+    <value>初始化控制器时发生错误！</value>
+</data>
+    <data name="InitControllerSuccess" xml:space="preserve">
+    <value>初始化控制器成功</value>
+</data>
+    <data name="RegisteringCustomRecognizer" xml:space="preserve">
+    <value>正在注册自定义识别器</value>
+</data>
+    <data name="RegisteringCustomAction" xml:space="preserve">
+    <value>正在注册自定义行动</value>
+</data>
+    <data name="RegisterCustomRecognizer" xml:space="preserve">
+    <value>注册自定义Recognizer:{0}</value>
+</data>
+    <data name="RegisterCustomAction" xml:space="preserve">
+    <value>注册自定义Action:{0}</value>
 </data>
 
 </root>

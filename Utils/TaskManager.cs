@@ -51,13 +51,13 @@ public static class TaskManager
         if (catchException)
         {
             var task = Task.Run(action);
-            task.ContinueWith(t =>
+            await task.ContinueWith(t =>
             {
                 if (t.Exception != null)
                 {
                     if (handleError != null)
                         handleError.Invoke();
-                    
+
                     Console.WriteLine($"{prompt}异步任务 {name} 失败: {t.Exception.GetBaseException().Message}");
                     LoggerService.LogError(t.Exception.GetBaseException());
                 }

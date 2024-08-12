@@ -38,9 +38,14 @@ public static class MFAExtensions
         var locExtension = new LocTextExtension(resourceKey);
         locExtension.SetBinding(control, property);
     }
-    
+
     public static string GetLocalizationString(this string key)
     {
         return LocExtension.GetLocalizedValue<string>(key);
+    }
+
+    public static string FormatWith(this string format, params object?[] args)
+    {
+        return string.Format(format, args);
     }
 }

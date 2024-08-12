@@ -50,7 +50,7 @@ public class OCRHelper
             },
             Name = "AppendOCR",
         };
-        var job = MaaProcessor.Instance.CurrentInstance
+        var job = MaaProcessor.Instance.GetCurrentInstance()
             .AppendRecognition(taskItemViewModel.Name, taskItemViewModel.ToString());
         if (job.Wait() == MaaJobStatus.Success)
         {
@@ -103,12 +103,12 @@ public class OCRHelper
         {
             Growls.ErrorGlobal("识别失败！");
         }
-        
+
         Console.WriteLine($"识别结果: {result}");
 
         return result;
     }
-    
+
     // public static string ReadTextFromBitmapImage(BitmapImage bitmapImage, int x, int y, int width, int height)
     // {
     //     string tempFilePath = Path.GetTempFileName() + ".png";

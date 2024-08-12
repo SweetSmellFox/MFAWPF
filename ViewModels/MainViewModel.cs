@@ -29,6 +29,19 @@ public class MainViewModel : ObservableObject
         });
     }
 
+    // public void AddLogBinding(string key, Brush color = null, string weight = "Regular", bool showTime = true)
+    // {
+    //     if (color == null)
+    //         color = Brushes.Gray;
+    //     Task.Run(() =>
+    //     {
+    //         Application.Current.Dispatcher.Invoke(() =>
+    //         {
+    //             LogItemViewModels.Add(new LogItemViewModel(content, color, weight, "HH':'mm':'ss",
+    //                 showTime: showTime));
+    //         });
+    //     });
+    // }
     public ManualObservableCollection<TaskItemViewModel> Items { get; set; } =
         new();
 
