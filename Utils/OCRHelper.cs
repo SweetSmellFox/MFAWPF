@@ -29,8 +29,6 @@ public class OCRHelper
         public string? text;
     }
 
-    private static List<string> _keys;
-
     public static void Initialize()
     {
     }
@@ -50,14 +48,14 @@ public class OCRHelper
             },
             Name = "AppendOCR",
         };
-        var job = MaaProcessor.Instance.GetCurrentInstance()
+        var job = MaaProcessor.Instance?.GetCurrentInstance()?
             .AppendRecognition(taskItemViewModel.Name, taskItemViewModel.ToString());
-        if (job.Wait() == MaaJobStatus.Success)
+        if (job != null && job.Wait() == MaaJobStatus.Success)
         {
-            RecognitionQuery query =
-                JsonConvert.DeserializeObject<OCRHelper.RecognitionQuery>(job.QueryRecognitionDetail()
-                    .Detail);
-            if (!string.IsNullOrWhiteSpace(query.best.text))
+            RecognitionQuery? query =
+                JsonConvert.DeserializeObject<RecognitionQuery>(job.QueryRecognitionDetail()?
+                    .Detail ?? string.Empty);
+            if (!string.IsNullOrWhiteSpace(query?.best?.text))
                 result = query.best.text;
         }
         else
@@ -91,12 +89,12 @@ public class OCRHelper
         {
             X = x, Y = y, Width = width, Height = height
         }, outDetail);
-        string json = outDetail.ToString();
+        string? json = outDetail.ToString();
         if (!string.IsNullOrWhiteSpace(json))
         {
-            RecognitionQuery query =
+            RecognitionQuery? query =
                 JsonConvert.DeserializeObject<RecognitionQuery>(json);
-            if (query.best != null && !string.IsNullOrWhiteSpace(query.best.text))
+            if (query?.best != null && !string.IsNullOrWhiteSpace(query.best?.text))
                 result = query.best.text;
         }
         else

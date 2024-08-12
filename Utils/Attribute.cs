@@ -5,8 +5,8 @@ namespace MFAWPF.Utils;
 
 public class Attribute
 {
-    public string Key { get; set; }
-    [JsonConverter(typeof(AutoConverter))] public object Value { get; set; }
+    public string? Key { get; set; }
+    [JsonConverter(typeof(AutoConverter))] public object? Value { get; set; }
 
     public Attribute(string key, object value)
     {

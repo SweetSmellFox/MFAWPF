@@ -13,7 +13,7 @@ public static class JSONHelper
     /// <param name="fileName"></param>
     /// <returns></returns>
     ///    //序列化到文件
-    public static T ReadFromConfigJsonFile<T>(string file, T defaultS = default(T))
+    public static T? ReadFromConfigJsonFile<T>(string file, T? defaultS = default)
     {
         // 从文件中读取 JSON 字符串
         string directory = $"{AppDomain.CurrentDomain.BaseDirectory}/config/{file}.json";
@@ -23,15 +23,17 @@ public static class JSONHelper
             if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}/config"))
                 Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}/config");
             string jsonString = File.ReadAllText(directory);
-            T result = JsonConvert.DeserializeObject<T>(jsonString);
-            return result == null ? defaultS : result;
+            T? result = JsonConvert.DeserializeObject<T>(jsonString) ?? defaultS;
+            return result;
         }
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
+            LoggerService.LogError(e);
             return defaultS;
         }
     }
+
 
     public static void WriteToConfigJsonFile(string file, object content)
     {
@@ -45,7 +47,7 @@ public static class JSONHelper
         File.WriteAllText(directory, jsonString);
     }
 
-    public static T ReadFromJsonFile<T>(string file, T defaultS = default(T))
+    public static T? ReadFromJsonFile<T>(string file, T? defaultS = default)
     {
         string directory = $"{AppDomain.CurrentDomain.BaseDirectory}/{file}.json";
         try
@@ -53,12 +55,12 @@ public static class JSONHelper
             if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}"))
                 Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}");
             string jsonString = File.ReadAllText(directory);
-            T result = JsonConvert.DeserializeObject<T>(jsonString);
-            return result == null ? defaultS : result;
+            return JsonConvert.DeserializeObject<T>(jsonString) ?? defaultS;
         }
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
+            LoggerService.LogError(e);
             return defaultS;
         }
     }
@@ -81,7 +83,7 @@ public static class JSONHelper
         File.WriteAllText(directory, jsonString);
     }
 
-    public static T ReadFromJsonFilePath<T>(string path, string file, T defaultS = default(T))
+    public static T? ReadFromJsonFilePath<T>(string path, string file, T? defaultS = default)
     {
         if (string.IsNullOrWhiteSpace(path))
             path = AppDomain.CurrentDomain.BaseDirectory;
@@ -91,8 +93,7 @@ public static class JSONHelper
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
             string jsonString = File.ReadAllText(directory);
-            T result = JsonConvert.DeserializeObject<T>(jsonString);
-            return result == null ? defaultS : result;
+            return JsonConvert.DeserializeObject<T>(jsonString) ?? defaultS ;
         }
         catch (Exception e)
         {
@@ -101,7 +102,7 @@ public static class JSONHelper
         }
     }
 
-    public static void WriteToJsonFilePath(string path, string file, object content)
+    public static void WriteToJsonFilePath(string path, string file, object? content)
     {
         if (string.IsNullOrWhiteSpace(path))
             path = AppDomain.CurrentDomain.BaseDirectory;

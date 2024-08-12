@@ -27,11 +27,11 @@ public class AttributeButton : Button
 
     public bool IsSelected
     {
-        get { return (bool)GetValue(IsSelectedProperty); }
-        set { SetValue(IsSelectedProperty, value); }
+        get => (bool)GetValue(IsSelectedProperty);
+        set => SetValue(IsSelectedProperty, value);
     }
 
-    public CustomWindow WindowParent { get; set; }
+    public CustomWindow? WindowParent { get; set; }
 
     static string ConvertListToString(List<List<int>> listOfLists)
     {
@@ -53,7 +53,7 @@ public class AttributeButton : Button
             }
             else if (e.NewValue is Attribute attribute)
             {
-                if (string.IsNullOrWhiteSpace(attribute.Value.ToString()))
+                if (string.IsNullOrWhiteSpace(attribute.Value?.ToString()))
                 {
                     var parentPanel = button.Parent as Panel;
                     if (parentPanel != null)
@@ -106,10 +106,7 @@ public class AttributeButton : Button
 
     public AttributeButton()
     {
-
-        this.Click += (s, e) => { IsSelected = !IsSelected; };
+        Click += (s, e) => { IsSelected = !IsSelected; };
         Style = FindResource("AttributeButtonStyle") as Style;
-
     }
-  
 }

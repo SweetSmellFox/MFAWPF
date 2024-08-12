@@ -46,8 +46,8 @@ public class MoneyRecognizer : IMaaCustomRecognizer
     public bool Analyze(in IMaaSyncContext syncContext, IMaaImageBuffer image, string taskName,
         string customRecognitionParam, in IMaaRectBuffer outBox, in IMaaStringBuffer outDetail)
     {
-        MaaImageBuffer imageBuffer = image as MaaImageBuffer;
-        string text = OCRHelper.ReadTextFromMAASyncContext(syncContext, imageBuffer, 578,
+        MaaImageBuffer? imageBuffer = image as MaaImageBuffer;
+        string text = OCRHelper.ReadTextFromMAASyncContext(syncContext, imageBuffer ?? new MaaImageBuffer(), 578,
             342,
             131,
             57);
@@ -62,6 +62,7 @@ public class MoneyRecognizer : IMaaCustomRecognizer
         while (true)
         {
             syncContext.Click(980, 495);
+            imageBuffer ??= new MaaImageBuffer();
             syncContext.Screencap(imageBuffer);
             r1 = syncContext.RunRecognizer(imageBuffer, DiffEntry1, DiffParam1, new MaaRectBuffer()
             {

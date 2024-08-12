@@ -15,15 +15,15 @@ namespace MFAWPF.ViewModels;
 
 public class EditTaskDialogViewModel : ObservableObject
 {
-    private ObservableCollection<TaskItemViewModel> dataList;
+    private ObservableCollection<TaskItemViewModel>? dataList;
 
-    public ObservableCollection<TaskItemViewModel> DataList
+    public ObservableCollection<TaskItemViewModel>? DataList
     {
         get => dataList;
         set => SetProperty(ref dataList, value);
     }
 
-    private int selectedIndex;
+    private int selectedIndex = 0;
 
     public int SelectedIndex
     {
@@ -32,9 +32,9 @@ public class EditTaskDialogViewModel : ObservableObject
             SetProperty(ref selectedIndex, value);
     }
 
-    public EditTaskDialog Dialog;
-    public Stack<ICommand> UndoStack = new();
-    public Stack<ICommand> UndoTaskStack = new();
+    public EditTaskDialog? Dialog;
+    public readonly Stack<ICommand> UndoStack = new();
+    public readonly Stack<ICommand> UndoTaskStack = new();
 
     public ICommand CopyCommand { get; set; }
     public ICommand PasteCommand { get; set; }
@@ -72,22 +72,21 @@ public class EditTaskDialogViewModel : ObservableObject
         return operators;
     }
 
-    private TaskItemViewModel _currentTask;
+    private TaskItemViewModel? _currentTask;
 
-    public TaskItemViewModel CurrentTask
+    public TaskItemViewModel? CurrentTask
     {
         get => _currentTask;
         set
         {
-            if (value != null && value.Task != null)
+            if (value?.Task != null && Dialog != null)
             {
-                Dialog.TaskName.Text = value.Task?.name;
+                Dialog.TaskName.Text = value.Task.name ?? string.Empty;
                 Dialog.Parts.Children.Clear();
-                foreach (var VARIABLE in value.Task?.ToAttributeList())
-                {
+                foreach (var VARIABLE in value.Task.ToAttributeList() ?? Enumerable.Empty<Attribute>())
                     Dialog.AddAttribute(VARIABLE);
-                }
             }
+
 
             SetProperty(ref _currentTask, value);
         }
@@ -109,17 +108,19 @@ public class EditTaskDialogViewModel : ObservableObject
 
     private void Paste(object parameter)
     {
-        if (CurrentTask != null)
+        if (CurrentTask != null && Dialog != null)
         {
             int index = Dialog.ListBoxDemo.Items.IndexOf(CurrentTask);
-            IDataObject iData = Clipboard.GetDataObject();
-            if (iData.GetDataPresent(DataFormats.Text))
+            IDataObject? iData = Clipboard.GetDataObject();
+            if (iData?.GetDataPresent(DataFormats.Text) == true)
             {
                 try
                 {
-                    Dictionary<string, TaskModel> taskModels =
+                    Dictionary<string, TaskModel>? taskModels =
                         JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(
                             (string)iData.GetData(DataFormats.Text));
+                    if (taskModels == null || taskModels.Count == 0)
+                        return;
                     foreach (var VARIABLE in taskModels)
                     {
                         VARIABLE.Value.name = VARIABLE.Key;
@@ -128,7 +129,7 @@ public class EditTaskDialogViewModel : ObservableObject
                             Name = VARIABLE.Key, Task = VARIABLE.Value
                         };
                         DataList?.Insert(index + 1, newItem);
-                        UndoStack.Push(new RelayCommand(o => DataList.Remove(newItem)));
+                        UndoStack?.Push(new RelayCommand(o => DataList?.Remove(newItem)));
                     }
                 }
                 catch (Exception exception)
@@ -155,24 +156,23 @@ public class EditTaskDialogViewModel : ObservableObject
 
     private void Save(object parameter)
     {
-        Dialog.Save_Pipeline(null, null);
+        Dialog?.Save_Pipeline(null, null);
     }
 
     private void Delete(object parameter)
     {
-        if (CurrentTask != null)
+        if (CurrentTask != null && DataList != null)
         {
             var itemToDelete = CurrentTask;
-            int index = DataList.IndexOf(itemToDelete); // Store the index of the item to be deleted
+            int index = DataList.IndexOf(itemToDelete);
             DataList.Remove(itemToDelete);
-            // Push a command onto the undo stack that restores the item at the original position
             UndoStack.Push(new RelayCommand(o => DataList.Insert(index, itemToDelete)));
         }
     }
 
-    private AttributeButton _selectedAttribute;
+    private AttributeButton? _selectedAttribute;
 
-    public AttributeButton SelectedAttribute
+    public AttributeButton? SelectedAttribute
     {
         get => _selectedAttribute;
         set => SetProperty(ref _selectedAttribute, value);
@@ -180,7 +180,7 @@ public class EditTaskDialogViewModel : ObservableObject
 
     private void SaveTask(object parameter)
     {
-        Dialog.Save(null, null);
+        Dialog?.Save(null, null);
     }
 
     private void CopyTask(object parameter)
@@ -214,8 +214,9 @@ public class EditTaskDialogViewModel : ObservableObject
                 var attribute =
                     JsonConvert.DeserializeObject<Attribute>(
                         (string)iData.GetData(DataFormats.Text));
-                AttributeButton button = Dialog.AddAttribute(attribute);
-                UndoTaskStack.Push(new RelayCommand(o => Dialog.Parts.Children.Remove(button)));
+                AttributeButton? button = Dialog?.AddAttribute(attribute);
+                if (button != null)
+                    UndoTaskStack.Push(new RelayCommand(o => Dialog?.Parts.Children.Remove(button)));
             }
             catch (Exception exception)
             {
@@ -239,11 +240,13 @@ public class EditTaskDialogViewModel : ObservableObject
         if (SelectedAttribute != null)
         {
             var itemToDelete = SelectedAttribute.Attribute;
-            var itemPanel = SelectedAttribute.Parent as Panel;
-            int index = itemPanel.Children.IndexOf(SelectedAttribute); // Store the index of the item to be deleted
-            itemPanel.Children.Remove(SelectedAttribute);
-            // Push a command onto the undo stack that restores the item at the original position
-            UndoTaskStack.Push(new RelayCommand(o => Dialog.AddAttribute(itemToDelete, index)));
+
+            if (SelectedAttribute.Parent is Panel itemPanel)
+            {
+                int index = itemPanel.Children.IndexOf(SelectedAttribute);
+                itemPanel.Children.Remove(SelectedAttribute);
+                UndoTaskStack.Push(new RelayCommand(o => Dialog?.AddAttribute(itemToDelete, index)));
+            }
         }
     }
 

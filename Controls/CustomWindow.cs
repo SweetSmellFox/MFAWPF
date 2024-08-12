@@ -20,7 +20,7 @@ public partial class CustomWindow : Window
         WindowStartupLocation = WindowStartupLocation.CenterScreen;
     }
 
-    protected void Close(object sender, RoutedEventArgs e)
+    protected virtual void Close(object sender, RoutedEventArgs e)
     {
         this.Close();
     }

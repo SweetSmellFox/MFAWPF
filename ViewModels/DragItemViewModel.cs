@@ -15,11 +15,11 @@ public class DragItemViewModel : ObservableObject
     public DragItemViewModel(TaskInterfaceItem interfaceItem)
     {
         InterfaceItem = interfaceItem;
-        Name = interfaceItem.name;
+        Name = interfaceItem.name ?? "未命名";
     }
 
 
-    private string _name;
+    private string _name = string.Empty;
 
     /// <summary>
     /// Gets or sets the name.
@@ -69,21 +69,19 @@ public class DragItemViewModel : ObservableObject
         set
         {
             SetProperty(ref _enableSetting, value);
-            MainWindow.Instance.SetOption(this, value);
+            MainWindow.Instance?.SetOption(this, value);
         }
     }
 
-    private TaskInterfaceItem _interfaceItem;
+    private TaskInterfaceItem? _interfaceItem;
 
-    public TaskInterfaceItem InterfaceItem
+    public TaskInterfaceItem? InterfaceItem
     {
         get => _interfaceItem;
         set
         {
-            if (_interfaceItem != null)
-            {
+            if (_interfaceItem != null && _interfaceItem.name != null)
                 Name = _interfaceItem.name;
-            }
 
             SetProperty(ref _interfaceItem, value);
         }

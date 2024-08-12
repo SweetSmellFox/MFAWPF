@@ -17,11 +17,11 @@ namespace MFAWPF.Views
     {
         private bool _isDragging;
         private Point _startPoint;
-        private Dictionary<string, TaskItemViewModel> _vertexTaskMapping;
+        private Dictionary<string, TaskItemViewModel>? _vertexTaskMapping;
         private readonly EditTaskDialog _editTaskDialog;
-        private Vertex _selectedVertex; // 用于连线的源节点
+        private Vertex? _selectedVertex; // 用于连线的源节点
 
-        public TaskFlowChartDialog(EditTaskDialog editTaskDialog, List<TaskItemViewModel> taskModels) : base()
+        public TaskFlowChartDialog(EditTaskDialog editTaskDialog) : base()
         {
             InitializeComponent();
             _editTaskDialog = editTaskDialog;
@@ -29,14 +29,15 @@ namespace MFAWPF.Views
             UpdateGraph();
         }
 
-        private QuickGraph.BidirectionalGraph<object, IEdge<object>> CreateGraph(List<TaskItemViewModel> tasks)
+        private BidirectionalGraph<object, IEdge<object>> CreateGraph(List<TaskItemViewModel>? tasks)
         {
             var graph = new BidirectionalGraph<object, IEdge<object>>();
             var vertexDictionary = new Dictionary<string, Vertex>();
-
+            if (tasks == null || tasks.Count == 0)
+                return graph;
             foreach (var task in tasks)
             {
-                if (!vertexDictionary.ContainsKey(task.Name))
+                if (_vertexTaskMapping != null && !vertexDictionary.ContainsKey(task.Name))
                 {
                     var vertex = new Vertex(task.Name);
                     vertexDictionary[task.Name] = vertex;
@@ -45,7 +46,7 @@ namespace MFAWPF.Views
                     _vertexTaskMapping[vertex.Name] = task;
                 }
 
-                if (task.Task != null)
+                if (task.Task != null && task.Task?.next != null)
                 {
                     AddEdges(graph, vertexDictionary, task.Task.next, vertexDictionary[task.Name], "Normal");
                 }
@@ -105,7 +106,7 @@ namespace MFAWPF.Views
             }
         }
 
-        private void Close(object sender, RoutedEventArgs e)
+        protected override void Close(object sender, RoutedEventArgs e)
         {
             Close();
         }
@@ -188,9 +189,10 @@ namespace MFAWPF.Views
         public void UpdateGraph()
         {
             _vertexTaskMapping = new Dictionary<string, TaskItemViewModel>();
-            var graph = CreateGraph(_editTaskDialog.Data.DataList.ToList());
+            var graph = CreateGraph(_editTaskDialog?.Data?.DataList?.ToList());
             graphLayout.Graph = graph;
-            _editTaskDialog.Data.CurrentTask = null; // 更新完图形后，清空选择以防止不必要的误操作
+            if (_editTaskDialog?.Data != null)
+                _editTaskDialog.Data.CurrentTask = null; // 更新完图形后，清空选择以防止不必要的误操作
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -23,10 +24,10 @@ namespace MFAWPF.Utils
 {
     public class MaaProcessor
     {
-        private static MaaProcessor _instance;
-        private CancellationTokenSource _cancellationTokenSource;
+        private static MaaProcessor? _instance;
+        private CancellationTokenSource? _cancellationTokenSource;
         private bool _isStopped;
-        private MaaInstance _currentInstance;
+        private MaaInstance? _currentInstance;
 
         public static string Resource => AppDomain.CurrentDomain.BaseDirectory + "Resource";
         public static string ModelResource => $"{Resource}/model/";
@@ -38,12 +39,12 @@ namespace MFAWPF.Utils
         public Queue<TaskAndParam> TaskQueue { get; } = new();
         public static int Money { get; set; }
         public static int AllMoney { get; set; }
-        public static Config Config { get; } = new Config();
-        public static string AdbConfig { get; set; }
+        public static Config Config { get; } = new ();
+        public static string AdbConfig { get; set; } = string.Empty;
         public static List<string>? CurrentResources { get; set; }
         public static AutoInitDictionary AutoInitDictionary { get; } = new();
 
-        public event EventHandler TaskStackChanged;
+        public event EventHandler? TaskStackChanged;
 
         public static MaaProcessor Instance
         {
@@ -58,23 +59,24 @@ namespace MFAWPF.Utils
 
         public class TaskAndParam
         {
-            public string Name { get; set; }
-            public string Entry { get; set; }
+            public string? Name { get; set; }
+            public string? Entry { get; set; }
             public int? Count { get; set; }
-            public string Param { get; set; }
+            public string? Param { get; set; }
         }
 
-        public void Start(List<DragItemViewModel> tasks)
+        public void Start(List<DragItemViewModel>? tasks)
         {
             if (!Config.IsConnected)
             {
                 Growls.Warning("Warning_CannotConnect".GetLocalizationString()
-                    .FormatWith(MainWindow.Instance.IsADB
+                    .FormatWith(MainWindow.Instance?.IsADB == true
                         ? "Simulator".GetLocalizationString()
                         : "Window".GetLocalizationString()));
                 return;
             }
 
+            tasks ??= new List<DragItemViewModel>();
             var taskAndParams = tasks.Select(CreateTaskAndParam).ToList();
 
             foreach (var task in taskAndParams)
@@ -82,14 +84,15 @@ namespace MFAWPF.Utils
             OnTaskQueueChanged();
 
             SetCurrentInstance(null);
-            MainWindow.Data.Idle = false;
+            if (MainWindow.Data != null)
+                MainWindow.Data.Idle = false;
 
             _cancellationTokenSource = new CancellationTokenSource();
             var token = _cancellationTokenSource.Token;
 
             TaskManager.RunTaskAsync(async () =>
             {
-                MainWindow.Data.AddLogByKey("ConnectingTo", null, MainWindow.Instance.IsADB
+                MainWindow.Data?.AddLogByKey("ConnectingTo", null, MainWindow.Instance?.IsADB == true
                     ? "Simulator"
                     : "Window");
                 var instance = await Task.Run(() => GetCurrentInstance(), token);
@@ -98,7 +101,7 @@ namespace MFAWPF.Utils
                 {
                     Growls.ErrorGlobal("InitInstanceFailed".GetLocalizationString());
                     LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
-                    MainWindow.Data.AddLogByKey("InstanceInitFailedLog");
+                    MainWindow.Data?.AddLogByKey("InstanceInitFailedLog");
                     Stop(false);
                     return;
                 }
@@ -114,14 +117,15 @@ namespace MFAWPF.Utils
             if (_cancellationTokenSource != null)
             {
                 _isStopped = setIsStopped;
-                _cancellationTokenSource.Cancel();
+                _cancellationTokenSource?.Cancel();
                 TaskManager.RunTaskAsync(() =>
                 {
-                    MainWindow.Data.AddLogByKey("Stopping");
+                    MainWindow.Data?.AddLogByKey("Stopping");
                     if (_currentInstance == null || _currentInstance?.Abort() == true)
                     {
                         DisplayTaskCompletionMessage();
-                        MainWindow.Data.Idle = true;
+                        if (MainWindow.Data != null)
+                            MainWindow.Data.Idle = true;
                     }
                     else
                     {
@@ -145,7 +149,7 @@ namespace MFAWPF.Utils
 
         private TaskAndParam CreateTaskAndParam(DragItemViewModel task)
         {
-            var taskModels = task.InterfaceItem.param ?? new Dictionary<string, TaskModel>();
+            var taskModels = task.InterfaceItem?.param ?? new Dictionary<string, TaskModel>();
 
             UpdateTaskDictionary(ref taskModels, task.InterfaceItem?.option);
 
@@ -163,15 +167,16 @@ namespace MFAWPF.Utils
         private void UpdateTaskDictionary(ref Dictionary<string, TaskModel> taskModels,
             List<MaaInterface.MaaInterfaceSelectOption>? options)
         {
-            if (MainWindow.Instance.TaskDictionary != null)
+            if (MainWindow.Instance?.TaskDictionary != null)
                 MainWindow.Instance.TaskDictionary = MainWindow.Instance.TaskDictionary.MergeTaskModels(taskModels);
 
             if (options == null) return;
 
             foreach (var selectOption in options)
             {
-                if (MaaInterface.Instance.option.TryGetValue(selectOption.name, out var interfaceOption) &&
-                    selectOption.index != null &&
+                if (MaaInterface.Instance?.option?.TryGetValue(selectOption.name ?? string.Empty,
+                        out var interfaceOption) == true && MainWindow.Instance != null &&
+                    selectOption.index != null && interfaceOption?.cases != null &&
                     interfaceOption.cases[selectOption.index.Value] != null &&
                     interfaceOption.cases[selectOption.index.Value].param != null)
                 {
@@ -215,7 +220,7 @@ namespace MFAWPF.Utils
                     if (TaskQueue.Count > 0)
                     {
                         var taskA = TaskQueue.Peek();
-                        MainWindow.Data.AddLogByKey("TaskStart", null, taskA.Name);
+                        MainWindow.Data?.AddLogByKey("TaskStart", null, taskA.Name ?? string.Empty);
                         if (!TryRunTasks(_currentInstance, taskA.Entry, taskA.Param))
                         {
                             if (_isStopped) return false;
@@ -237,12 +242,12 @@ namespace MFAWPF.Utils
             if (_isStopped)
             {
                 Growl.Info("TaskStopped".GetLocalizationString());
-                MainWindow.Data.AddLogByKey("TaskAbandoned");
+                MainWindow.Data?.AddLogByKey("TaskAbandoned");
             }
             else
             {
                 Growl.Info("TaskCompleted".GetLocalizationString());
-                MainWindow.Data.AddLogByKey("TaskAllCompleted");
+                MainWindow.Data?.AddLogByKey("TaskAllCompleted");
             }
         }
 
@@ -251,12 +256,12 @@ namespace MFAWPF.Utils
             TaskStackChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public MaaInstance GetCurrentInstance()
+        public MaaInstance? GetCurrentInstance()
         {
             return _currentInstance ??= InitializeMaaInstance();
         }
 
-        public void SetCurrentInstance(MaaInstance instance)
+        public void SetCurrentInstance(MaaInstance? instance)
         {
             _currentInstance = instance;
         }
@@ -324,7 +329,7 @@ namespace MFAWPF.Utils
             }
         }
 
-        private MaaInstance InitializeMaaInstance()
+        private MaaInstance? InitializeMaaInstance()
         {
             AutoInitDictionary.Clear();
 
@@ -332,7 +337,7 @@ namespace MFAWPF.Utils
             MaaResource maaResource;
             try
             {
-                maaResource = new MaaResource(CurrentResources);
+                maaResource = new MaaResource(CurrentResources ?? Array.Empty<string>().ToList());
             }
             catch (Exception e)
             {
@@ -351,7 +356,7 @@ namespace MFAWPF.Utils
             {
                 HandleInitializationError(e,
                     "ConnectingSimulatorOrWindow".GetLocalizationString()
-                        .FormatWith(MainWindow.Instance.IsADB
+                        .FormatWith(MainWindow.Instance?.IsADB == true
                             ? "Simulator".GetLocalizationString()
                             : "Window".GetLocalizationString()), true,
                     "InitControllerFailed".GetLocalizationString());
@@ -374,7 +379,7 @@ namespace MFAWPF.Utils
 
         private IMaaController<nint> InitializeController()
         {
-            return MainWindow.Instance.IsADB
+            return MainWindow.Instance?.IsADB == true
                 ? new MaaAdbController(
                     Config.Adb.Adb,
                     Config.Adb.AdbAddress,
@@ -392,7 +397,9 @@ namespace MFAWPF.Utils
 
         private void RegisterCustomRecognizersAndActions(MaaInstance instance)
         {
+            if (MaaInterface.Instance == null) return;
             LoggerService.LogInfo("RegisteringCustomRecognizer".GetLocalizationString());
+
             foreach (var recognizer in MaaInterface.Instance.CustomRecognizerExecutors)
             {
                 Console.WriteLine($"RegisterCustomRecognizer".GetLocalizationString().FormatWith(recognizer.Name));
@@ -409,10 +416,10 @@ namespace MFAWPF.Utils
             instance.Callback += (sender, args) =>
             {
                 var jObject = JObject.Parse(args.Details);
-                string name = jObject["name"]?.ToString();
-                if (args.Message.Equals(MaaMsg.Task.Focus.Completed))
+                string name = jObject["name"]?.ToString() ?? string.Empty;
+                if (args.Message?.Equals(MaaMsg.Task.Focus.Completed) == true)
                 {
-                    if (MainWindow.Instance.TaskDictionary.TryGetValue(name, out var taskModel))
+                    if (MainWindow.Instance?.TaskDictionary.TryGetValue(name, out var taskModel) == true)
                     {
                         DisplayFocusTip(taskModel);
                     }
@@ -428,7 +435,7 @@ namespace MFAWPF.Utils
             {
                 for (int i = 0; i < taskModel.focus_tip.Count; i++)
                 {
-                    Brush brush = null;
+                    Brush? brush = null;
                     var tip = taskModel.focus_tip[i];
                     try
                     {
@@ -441,7 +448,7 @@ namespace MFAWPF.Utils
                         LoggerService.LogError(e);
                     }
 
-                    MainWindow.Data.AddLog(HandleStringsWithVariables(tip), brush);
+                    MainWindow.Data?.AddLog(HandleStringsWithVariables(tip), brush);
                 }
             }
         }
@@ -452,16 +459,17 @@ namespace MFAWPF.Utils
             Console.WriteLine(e);
             TaskQueue.Clear();
             OnTaskQueueChanged();
-            MainWindow.Data.Idle = true;
+            if (MainWindow.Data != null)
+                MainWindow.Data.Idle = true;
             Growls.ErrorGlobal(message);
             if (hasWarning)
                 LoggerService.LogWarning(waringMessage);
             LoggerService.LogError(e.ToString());
         }
 
-        public BitmapImage GetBitmapImage()
+        public BitmapImage? GetBitmapImage()
         {
-            using var buffer = GetImage(_currentInstance.Controller);
+            using var buffer = GetImage(_currentInstance?.Controller);
             if (buffer == null) return null;
 
             var encodedDataHandle = buffer.GetEncodedData(out var size);
@@ -495,18 +503,24 @@ namespace MFAWPF.Utils
             return bitmapImage;
         }
 
-        private bool TryRunTasks(MaaInstance maa, string task, string taskParams)
+        private bool TryRunTasks(MaaInstance? maa, string? task, string? taskParams)
         {
+            if (maa == null || task == null) return false;
+            if (string.IsNullOrWhiteSpace(taskParams)) taskParams = "{}";
             return maa.AppendTask(task, taskParams).Wait() == MaaJobStatus.Success;
         }
 
-        private static MaaImageBuffer GetImage(IMaaController maaController)
+        private static MaaImageBuffer GetImage(IMaaController? maaController)
         {
-            var status = maaController.Screencap().Wait();
-            if (status != MaaJobStatus.Success)
-                return null;
             var buffer = new MaaImageBuffer();
-            return maaController.GetImage(buffer) ? buffer : null;
+            if (maaController == null)
+                return buffer;
+            var status = maaController.Screencap().Wait();
+
+            if (status != MaaJobStatus.Success)
+                return buffer;
+            maaController.GetImage(buffer);
+            return buffer;
         }
     }
 }

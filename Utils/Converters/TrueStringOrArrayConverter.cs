@@ -12,7 +12,8 @@ public class TrueStringOrArrayConverter : JsonConverter
         return objectType == typeof(object);
     }
 
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+        JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
 
@@ -28,14 +29,14 @@ public class TrueStringOrArrayConverter : JsonConverter
 
         if (token.Type == JTokenType.Array)
         {
-            List<int> list = token.ToObject<List<int>>();
+            List<int>? list = token.ToObject<List<int>>();
             return list;
         }
 
         throw new JsonSerializationException("Invalid JSON format for TrueStringOrArrayConverter.");
     }
 
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         if (value is bool booleanValue)
         {

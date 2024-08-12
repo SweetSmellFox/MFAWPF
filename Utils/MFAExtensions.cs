@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using HandyControl.Controls;
 using WPFLocalizeExtension.Deprecated.Extensions;
+using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Extensions;
 
 namespace MFAWPF.Utils;
@@ -8,12 +9,12 @@ namespace MFAWPF.Utils;
 public static class MFAExtensions
 {
     public static Dictionary<TKey, TaskModel> MergeTaskModels<TKey>(
-        this IEnumerable<KeyValuePair<TKey, TaskModel>> taskModels,
-        IEnumerable<KeyValuePair<TKey, TaskModel>> additionalModels)
+        this IEnumerable<KeyValuePair<TKey, TaskModel>>? taskModels,
+        IEnumerable<KeyValuePair<TKey, TaskModel>>? additionalModels) where TKey : notnull
     {
         if (additionalModels == null)
-            return taskModels.ToDictionary();
-        return taskModels
+            return taskModels?.ToDictionary() ?? new Dictionary<TKey, TaskModel>();
+        return taskModels?
             .Concat(additionalModels)
             .GroupBy(pair => pair.Key)
             .ToDictionary(
@@ -28,10 +29,10 @@ public static class MFAExtensions
 
                     return mergedModel;
                 }
-            );
+            ) ?? new Dictionary<TKey, TaskModel>();
     }
 
-    public static void BindLocalization(this UIElement control, string resourceKey, DependencyProperty property = null)
+    public static void BindLocalization(this UIElement control, string resourceKey, DependencyProperty? property = null)
     {
         if (property == null)
             property = InfoElement.TitleProperty;
@@ -39,16 +40,21 @@ public static class MFAExtensions
         locExtension.SetBinding(control, property);
     }
 
-    public static string GetLocalizationString(this string key)
+    public static string GetLocalizationString(this string? key)
     {
-        return LocExtension.GetLocalizedValue<string>(key);
+        if (string.IsNullOrWhiteSpace(key))
+            return string.Empty;
+        return LocalizeDictionary.Instance.GetLocalizedObject(key, null, null) as string ?? string.Empty;
     }
-    public static string GetLocalizedFormattedString(this string key, params object[] args)
+
+    public static string GetLocalizedFormattedString(this string? key, params object[] args)
     {
-        string localizedString = LocTextExtension.GetLocalizedValue<string>(key) as string ?? key;
+        if (string.IsNullOrWhiteSpace(key))
+            return string.Empty;
+        string localizedString = LocalizeDictionary.Instance.GetLocalizedObject(key, null, null) as string ?? key;
         return string.Format(localizedString, args);
     }
-    
+
     public static string FormatWith(this string format, params object?[] args)
     {
         return string.Format(format, args);

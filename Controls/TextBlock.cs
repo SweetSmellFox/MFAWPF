@@ -55,8 +55,7 @@ namespace MFAWPF.Controls
             set
             {
                 SetValue(ForegroundKeyProperty, value);
-                var brush = MainWindow.Instance.FindResource(value) as Brush;
-                Console.WriteLine(brush.ToString());
+                var brush = MainWindow.Instance?.FindResource(value) as Brush;
                 SetResourceReference(ForegroundProperty, brush);
                 // if (Application.Current.Resources.Contains(value))
                 // {

@@ -18,8 +18,9 @@ namespace MFAWPF.Controls
     {
         private const string SearchTextBox = "PART_SearchTextBox";
         private bool ignoreTextChanging;
-        private System.Windows.Controls.TextBox _searchTextBox;
-        private object _selectedItem;
+        private TextBox? _searchTextBox;
+        private object?
+            _selectedItem;
         private bool isApplyingTemplate;
         private bool isSelectionChanging;
 
@@ -27,7 +28,7 @@ namespace MFAWPF.Controls
             .Register("DataList", typeof(Collection<TaskItemViewModel>), typeof(SAutoCompleteTextBox),
                 new FrameworkPropertyMetadata(null));
 
-        public Collection<TaskItemViewModel> DataList
+        public Collection<TaskItemViewModel>? DataList
         {
             get => GetValue(DataListProperty) as Collection<TaskItemViewModel>;
             set
@@ -37,9 +38,9 @@ namespace MFAWPF.Controls
             }
         }
 
-        private void OnDataList(object value)
+        private void OnDataList(object? value)
         {
-            this.SetResourceReference(ItemsSourceProperty, value);
+            SetResourceReference(ItemsSourceProperty, value);
         }
 
         static SAutoCompleteTextBox()
@@ -50,7 +51,7 @@ namespace MFAWPF.Controls
                     OnTextChanged));
         }
 
-        public System.Windows.Controls.TextBox GetTextBox()
+        public TextBox? GetTextBox()
         {
             return _searchTextBox;
         }
@@ -62,13 +63,16 @@ namespace MFAWPF.Controls
 
         private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (((SAutoCompleteTextBox)d).GetTextBox() == null)
+            if (d is SAutoCompleteTextBox sAutoCompleteTextBox && e.NewValue != null)
             {
-                return;
+                var textBox = sAutoCompleteTextBox.GetTextBox();
+                if (textBox != null)
+                {
+                    textBox.Text = e.NewValue.ToString() ?? string.Empty;
+                }
             }
-
-            ((SAutoCompleteTextBox)d).GetTextBox().Text = e.NewValue.ToString();
         }
+
 
         public override void OnApplyTemplate()
         {
@@ -90,7 +94,7 @@ namespace MFAWPF.Controls
                 }
 
                 // 调用 ComboBox 的 OnApplyTemplate 方法
-                MethodInfo baseMethod =
+                MethodInfo? baseMethod =
                     typeof(ComboBox).GetMethod("OnApplyTemplate", BindingFlags.Instance | BindingFlags.Public);
                 if (baseMethod != null && baseMethod.DeclaringType == typeof(ComboBox))
                 {
@@ -128,14 +132,14 @@ namespace MFAWPF.Controls
                 isSelectionChanging = true;
 
                 // 调用 ComboBox 的 OnSelectionChanged 方法
-                MethodInfo baseMethod =
+                MethodInfo? baseMethod =
                     typeof(ComboBox).GetMethod("OnSelectionChanged", BindingFlags.Instance | BindingFlags.NonPublic);
                 if (baseMethod != null && baseMethod.DeclaringType == typeof(ComboBox))
                 {
                     baseMethod.Invoke(this, new object[] { e });
                 }
 
-                if (e.AddedItems.Count > 0)
+                if (e.AddedItems != null && e.AddedItems.Count > 0 && e.AddedItems[0] != null)
                 {
                     _selectedItem = e.AddedItems[0];
                     UpdateTextBoxBySelectedItem(_selectedItem);
@@ -167,14 +171,14 @@ namespace MFAWPF.Controls
                     return;
                 }
 
-                Text = _searchTextBox.Text;
+                Text = _searchTextBox?.Text ?? string.Empty;
 
                 if (DataList != null)
                 {
                     ItemsSource = DataList.Where(t => t.Name.ToLower().Contains(Text.ToLower()));
                 }
 
-                if (_searchTextBox.IsFocused)
+                if (_searchTextBox?.IsFocused == true)
                 {
                     SetCurrentValue(IsDropDownOpenProperty, true);
                 }
@@ -249,7 +253,7 @@ namespace MFAWPF.Controls
             }
         }
 
-        private void UpdateTextBoxBySelectedItem(object selectedItem)
+        private void UpdateTextBoxBySelectedItem(object? selectedItem)
         {
             try
             {

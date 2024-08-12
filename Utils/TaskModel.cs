@@ -50,7 +50,7 @@ public class TaskModel
     public string? model { get; set; }
 
     [JsonConverter(typeof(TrueStringOrArrayConverter))]
-    public object target { get; set; }
+    public object? target { get; set; }
 
     public List<int>? target_offset { get; set; }
 
@@ -153,11 +153,12 @@ public class TaskModel
     {
         foreach (var attribute in attributes)
         {
-            PropertyInfo? propInfo =
-                this.GetType().GetProperty(attribute.Key, BindingFlags.Public | BindingFlags.Instance);
-            if (propInfo != null && propInfo.CanWrite)
+            if (attribute.Key != null)
             {
-                propInfo.SetValue(this, attribute.Value);
+                PropertyInfo? propInfo =
+                    GetType().GetProperty(attribute.Key, BindingFlags.Public | BindingFlags.Instance);
+                if (propInfo != null && propInfo.CanWrite)
+                    propInfo.SetValue(this, attribute.Value);
             }
         }
 

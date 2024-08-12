@@ -11,11 +11,10 @@ namespace MFAWPF.Views
 {
     public partial class RecognitionTextDialog : CustomWindow
     {
-        public string ImgPath { get; set; }
         private Point _startPoint;
-        private Rectangle _selectionRectangle;
-        public List<int> Output { get; set; }
-        public List<int> OutputRoi { get; set; }
+        private Rectangle? _selectionRectangle;
+        public List<int>? Output { get; set; }
+        public List<int>? OutputRoi { get; set; }
 
         public RecognitionTextDialog(BitmapImage bitmapImage) : base()
         {
@@ -161,17 +160,19 @@ namespace MFAWPF.Views
             var h = (int)(_selectionRectangle.Height / _scaleRatio);
 
             Output = new() { x, y, w, h };
-            var bitmapImage = image.Source as BitmapImage;
-            var roiX = Math.Max(x - 5, 0);
-            var roiY = Math.Max(y - 5, 0);
-            var roiW = Math.Min(w + 10, bitmapImage.PixelWidth - roiX);
-            var roiH = Math.Min(h + 10, bitmapImage.PixelHeight - roiY);
-            OutputRoi = new List<int> { (int)roiX, (int)roiY, (int)roiW, (int)roiH };
+            if (image.Source is BitmapImage bitmapImage)
+            {
+                var roiX = Math.Max(x - 5, 0);
+                var roiY = Math.Max(y - 5, 0);
+                var roiW = Math.Min(w + 10, bitmapImage.PixelWidth - roiX);
+                var roiH = Math.Min(h + 10, bitmapImage.PixelHeight - roiY);
+                OutputRoi = new List<int> { (int)roiX, (int)roiY, (int)roiW, (int)roiH };
+            }
             DialogResult = true;
             Close();
         }
 
-        private void Close(object sender, RoutedEventArgs e)
+        protected override void Close(object sender, RoutedEventArgs e)
         {
             Close();
         }

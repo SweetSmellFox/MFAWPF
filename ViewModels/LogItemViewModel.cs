@@ -8,10 +8,10 @@ namespace MFAWPF.ViewModels
 {
     public class LogItemViewModel : ObservableObject
     {
-        private readonly string[] _formatArgsKeys;
+        private readonly string[]? _formatArgsKeys;
 
         public LogItemViewModel(string resourceKey, Brush color, string weight = "Regular", bool useKey = false,
-            string dateFormat = "MM'-'dd'  'HH':'mm':'ss", bool showTime = true, params string[] formatArgsKeys)
+            string dateFormat = "MM'-'dd'  'HH':'mm':'ss", bool showTime = true, params string[]? formatArgsKeys)
         {
             _resourceKey = resourceKey;
 
@@ -44,9 +44,9 @@ namespace MFAWPF.ViewModels
             Content = content;
         }
 
-        private string _time;
+        private string? _time;
 
-        public string Time
+        public string? Time
         {
             get => _time;
             set => SetProperty(ref _time, value);
@@ -60,23 +60,23 @@ namespace MFAWPF.ViewModels
             set => SetProperty(ref _showTime, value);
         }
 
-        private string _content;
+        private string? _content;
 
-        public string Content
+        public string? Content
         {
             get => _content;
             set => SetProperty(ref _content, value);
         }
 
-        private Brush _color;
+        private Brush? _color;
 
-        public Brush Color
+        public Brush? Color
         {
             get => _color;
             set => SetProperty(ref _color, value);
         }
 
-        private string _weight;
+        private string _weight = "Regular";
 
         public string Weight
         {
@@ -84,9 +84,9 @@ namespace MFAWPF.ViewModels
             set => SetProperty(ref _weight, value);
         }
 
-        private string _resourceKey;
+        private string? _resourceKey;
 
-        public string ResourceKey
+        public string? ResourceKey
         {
             get => _resourceKey;
             set
@@ -113,7 +113,7 @@ namespace MFAWPF.ViewModels
             }
         }
 
-        private void OnLanguageChanged(object sender, EventArgs e)
+        private void OnLanguageChanged(object? sender, EventArgs e)
         {
             UpdateContent();
         }

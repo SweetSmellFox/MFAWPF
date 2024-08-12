@@ -19,10 +19,9 @@ namespace MFAWPF.Views;
 
 public partial class SelectionRegionDialog : CustomWindow
 {
-    public string ImgPath { get; set; }
     private Point _startPoint;
-    private Rectangle _selectionRectangle;
-    public List<int> Output { get; set; }
+    private Rectangle? _selectionRectangle;
+    public List<int>? Output { get; set; }
     public bool IsRoi { get; set; }
 
     public SelectionRegionDialog(BitmapImage bitmapImage) :
@@ -180,7 +179,7 @@ public partial class SelectionRegionDialog : CustomWindow
         Close();
     }
 
-    private void Close(object sender, RoutedEventArgs e)
+    protected override void Close(object sender, RoutedEventArgs e)
     {
         Close();
     }

@@ -10,7 +10,7 @@ public class SingleOrNestedListConverter : JsonConverter
         return objectType == typeof(List<int>) || objectType == typeof(List<List<int>>);
     }
 
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
 
@@ -32,7 +32,7 @@ public class SingleOrNestedListConverter : JsonConverter
         throw new JsonSerializationException("Invalid JSON format for SingleOrNestedListConverter.");
     }
 
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         if (value is List<List<int>> nestedList)
         {

@@ -25,47 +25,53 @@ namespace MFAWPF.Views;
 public partial class EditTaskDialog : CustomWindow
 {
     private List<TaskModel> tasks;
-    private TaskModel selectedTask;
-    public EditTaskDialogViewModel Data;
+    public EditTaskDialogViewModel? Data;
 
     public EditTaskDialog() : base()
     {
         InitializeComponent();
         tasks = new List<TaskModel>();
         Data = DataContext as EditTaskDialogViewModel;
-        Data.Dialog = this;
+        if (Data != null)
+            Data.Dialog = this;
     }
 
-    protected void Close(object sender, RoutedEventArgs e)
+    protected override void Close(object sender, RoutedEventArgs e)
     {
         base.Close(sender, e);
-        MainWindow.Data.Idle = true;
+        if (MainWindow.Data != null)
+            MainWindow.Data.Idle = true;
     }
 
     private void List_KeyDown(object sender, KeyEventArgs e)
     {
-        if (Data.CurrentTask != null)
+        if (Data is { CurrentTask: not null, DataList: not null })
         {
             if (e.Key == Key.Delete)
             {
                 var itemToDelete = Data.CurrentTask;
-                int index = Data.DataList.IndexOf(itemToDelete); // Store the index of the item to be deleted
-                Data.DataList.Remove(itemToDelete);
-                // Push a command onto the undo stack that restores the item at the original position
-                Data.UndoStack.Push(new RelayCommand(o => Data.DataList.Insert(index, itemToDelete)));
+                int index = Data.DataList?.IndexOf(itemToDelete) ?? -1;
+                if (index != -1)
+                {
+                    Data?.DataList?.Remove(itemToDelete);
+                    Data?.UndoStack?.Push(new RelayCommand(o => Data?.DataList?.Insert(index, itemToDelete)));
+                }
             }
         }
     }
 
-    public void Save(object sender, RoutedEventArgs e)
+    public void Save(object? sender, RoutedEventArgs? e)
     {
-        if (Data.DataList.Where(t => !string.IsNullOrWhiteSpace(t.Name) && t.Name.Equals(TaskName.Text)).ToList().Count > 1)
+        if (Data?.DataList != null && Data.DataList
+                .Where(t => !string.IsNullOrWhiteSpace(t.Name) && t.Name.Equals(TaskName.Text))
+                .ToList()
+                .Count > 1)
         {
             Growls.Error(string.Format("DuplicateTaskNameError".GetLocalizationString(), TaskName.Text));
             return;
         }
 
-        if (Data.CurrentTask != null)
+        if (Data?.CurrentTask?.Task != null)
         {
             Data.CurrentTask.Task.Reset();
             Data.CurrentTask.Task.name = TaskName.Text;
@@ -88,11 +94,11 @@ public partial class EditTaskDialog : CustomWindow
         }
     }
 
-    private TaskFlowChartDialog _chartDialog;
+    private TaskFlowChartDialog? _chartDialog;
 
     private void ShowChart(object sender, RoutedEventArgs e)
     {
-        _chartDialog = new TaskFlowChartDialog(this, Data.DataList.ToList());
+        _chartDialog = new TaskFlowChartDialog(this);
         _chartDialog.Show();
     }
 
@@ -113,14 +119,16 @@ public partial class EditTaskDialog : CustomWindow
             PipelineFileName.Text = fileName;
             try
             {
-                string jsonText = File.ReadAllText(filePath);
-                Dictionary<string, TaskModel> taskDictionary =
+                string? jsonText = File.ReadAllText(filePath);
+                Dictionary<string, TaskModel>? taskDictionary =
                     JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(jsonText);
-                Data?.DataList.Clear();
+                Data?.DataList?.Clear();
+                if (taskDictionary == null || taskDictionary.Count == 0)
+                    return;
                 foreach (var VARIABLE in taskDictionary)
                 {
                     VARIABLE.Value.name = VARIABLE.Key;
-                    Data?.DataList.Add(new TaskItemViewModel()
+                    Data?.DataList?.Add(new TaskItemViewModel()
                     {
                         Task = VARIABLE.Value
                     });
@@ -134,13 +142,13 @@ public partial class EditTaskDialog : CustomWindow
         }
     }
 
-    public AttributeButton GetAttribute(string key)
+    public AttributeButton? GetAttribute(string key)
     {
         foreach (var VARIABLE in Parts.Children)
         {
             if (VARIABLE is AttributeButton button)
             {
-                if (button.Attribute != null && button.Attribute.Key.Equals(key))
+                if (button.Attribute != null && button.Attribute.Key?.Equals(key) == true)
                     return button;
             }
         }
@@ -154,7 +162,7 @@ public partial class EditTaskDialog : CustomWindow
         {
             if (VARIABLE is AttributeButton button)
             {
-                if (button.Attribute != null && button.Attribute.Key.Equals(key))
+                if (button.Attribute != null && button.Attribute.Key?.Equals(key) == true)
                     Parts.Children.Remove(button);
             }
         }
@@ -162,9 +170,9 @@ public partial class EditTaskDialog : CustomWindow
 
     private void CopyAttribute(object sender, RoutedEventArgs e)
     {
-        MenuItem menuItem = sender as MenuItem;
-        ContextMenu contextMenu = menuItem.Parent as ContextMenu;
-        if (contextMenu.PlacementTarget is AttributeButton attributeButton)
+        MenuItem? menuItem = sender as MenuItem;
+        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
+        if (contextMenu?.PlacementTarget is AttributeButton attributeButton)
         {
             if (attributeButton != null && attributeButton.Attribute != null)
             {
@@ -183,9 +191,9 @@ public partial class EditTaskDialog : CustomWindow
 
     private void DeleteAttribute(object sender, RoutedEventArgs e)
     {
-        MenuItem menuItem = sender as MenuItem;
-        ContextMenu contextMenu = menuItem.Parent as ContextMenu;
-        if (contextMenu.PlacementTarget is AttributeButton attributeButton)
+        MenuItem? menuItem = sender as MenuItem;
+        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
+        if (contextMenu?.PlacementTarget is AttributeButton attributeButton)
         {
             var parentPanel = attributeButton.Parent as Panel;
             if (parentPanel != null)
@@ -193,7 +201,7 @@ public partial class EditTaskDialog : CustomWindow
                 var itemToDelete = attributeButton.Attribute;
                 int index = parentPanel.Children.IndexOf(attributeButton);
                 parentPanel.Children.Remove(attributeButton);
-                Data.UndoTaskStack.Push(new RelayCommand(o => AddAttribute(itemToDelete, index)));
+                Data?.UndoTaskStack?.Push(new RelayCommand(o => AddAttribute(itemToDelete, index)));
             }
         }
     }
@@ -201,10 +209,10 @@ public partial class EditTaskDialog : CustomWindow
 
     private void EditAttribute(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem menuItem)
+        if (sender is MenuItem menuItem && menuItem.Parent != null)
         {
-            ContextMenu contextMenu = menuItem.Parent as ContextMenu;
-            if (contextMenu.PlacementTarget is AttributeButton attributeButton)
+            ContextMenu? contextMenu = menuItem.Parent as ContextMenu;
+            if (contextMenu?.PlacementTarget is AttributeButton attributeButton)
             {
                 var editDialog = new EditAttributeDialog(attributeButton.WindowParent, attributeButton.Attribute, true);
                 if (editDialog.ShowDialog() == true)
@@ -223,8 +231,13 @@ public partial class EditTaskDialog : CustomWindow
         }
     }
 
-    public AttributeButton AddAttribute(Attribute attribute, int index = -1)
+    public AttributeButton AddAttribute(Attribute? attribute, int index = -1)
     {
+        if (attribute == null)
+            attribute = new Attribute()
+            {
+                Key = "OCR", Value = ""
+            };
         AttributeButton newButton = new AttributeButton()
         {
             Margin = new Thickness(4),
@@ -232,7 +245,9 @@ public partial class EditTaskDialog : CustomWindow
         };
         newButton.Click += (sender, args) =>
         {
-            AttributeButton button = sender as AttributeButton;
+            AttributeButton? button = sender as AttributeButton;
+            if (Data == null)
+                return;
             if (Data.SelectedAttribute != null)
                 Data.SelectedAttribute.IsSelected = false;
             if (button != null && button.IsSelected)
@@ -284,7 +299,7 @@ public partial class EditTaskDialog : CustomWindow
 
     private void AddTask(object sender, RoutedEventArgs e)
     {
-        Data?.DataList.Add(new TaskItemViewModel()
+        Data?.DataList?.Add(new TaskItemViewModel()
         {
             Task = new TaskModel(), IsNew = true
         });
@@ -294,13 +309,14 @@ public partial class EditTaskDialog : CustomWindow
 
     private void TaskSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        TaskItemViewModel taskItemViewModel = ListBoxDemo.SelectedValue as TaskItemViewModel;
+        TaskItemViewModel? taskItemViewModel = ListBoxDemo.SelectedValue as TaskItemViewModel;
         if (taskItemViewModel != null)
             taskItemViewModel.IsNew = false;
-        Data.CurrentTask = taskItemViewModel;
+        if (Data != null)
+            Data.CurrentTask = taskItemViewModel;
     }
 
-    public void Save_Pipeline(object sender, RoutedEventArgs e)
+    public void Save_Pipeline(object? sender, RoutedEventArgs? e)
     {
         var settings = new JsonSerializerSettings
         {
@@ -313,7 +329,8 @@ public partial class EditTaskDialog : CustomWindow
         {
             if (VARIABLE is TaskItemViewModel taskItemViewModel)
             {
-                if (!taskModels.TryAdd(taskItemViewModel.Name, taskItemViewModel.Task))
+                if (taskItemViewModel.Task != null &&
+                    !taskModels.TryAdd(taskItemViewModel.Name, taskItemViewModel.Task))
                 {
                     Growls.WarningGlobal("SavePipelineWarning".GetLocalizationString());
                     return;
@@ -339,14 +356,15 @@ public partial class EditTaskDialog : CustomWindow
             Growl.SuccessGlobal("SavePipelineSuccess".GetLocalizationString());
         }
     }
+
     private void OnSearchTask(object? sender, FunctionEventArgs<string> e)
     {
-        var searchText = e.Info.ToLower();
-        var filteredTasks = Data.DataList.Where(t =>
-            t.Task.name != null && t.Task.name.ToLower().Contains(searchText) ||
-            t.Task.recognition != null && t.Task.recognition.ToLower().Contains(searchText) ||
-            t.Task.action != null && t.Task.action.ToLower().Contains(searchText) ||
-            t.Task.next != null && t.Task.next.Any(n => n.ToLower().Contains(searchText))
+        var searchText = e.Info?.ToLower() ?? string.Empty;
+        var filteredTasks = Data?.DataList?.Where(t =>
+            t.Task?.name != null && t.Task.name.ToLower().Contains(searchText) ||
+            t.Task?.recognition != null && t.Task.recognition.ToLower().Contains(searchText) ||
+            t.Task?.action != null && t.Task.action.ToLower().Contains(searchText) ||
+            t.Task?.next != null && t.Task.next.Any(n => n.ToLower().Contains(searchText))
         ).ToList();
 
         ListBoxDemo.ItemsSource = filteredTasks;
@@ -354,7 +372,7 @@ public partial class EditTaskDialog : CustomWindow
 
     private void ClearTask(object sender, RoutedEventArgs e)
     {
-        Data.DataList.Clear();
+        Data?.DataList?.Clear();
     }
 
     private void ClearAttribute(object sender, RoutedEventArgs e)
@@ -364,20 +382,20 @@ public partial class EditTaskDialog : CustomWindow
 
     private void Cut(object sender, RoutedEventArgs e)
     {
-        MenuItem menuItem = sender as MenuItem;
-        ContextMenu contextMenu = menuItem.Parent as ContextMenu;
-        if (contextMenu.PlacementTarget is ListBoxItem item)
+        MenuItem? menuItem = sender as MenuItem;
+        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
+        if (contextMenu?.PlacementTarget is ListBoxItem item)
         {
             if (item.DataContext is TaskItemViewModel taskItemViewModel)
             {
                 Clipboard.SetDataObject(taskItemViewModel.ToString());
-                ListBox listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
+                ListBox? listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
                 if (listBox != null)
                 {
                     // 获取选中项的索引
-                    int index = listBox.Items.IndexOf(item.DataContext);
-                    Data.DataList.RemoveAt(index);
-                    Data.UndoStack.Push(new RelayCommand(o => Data.DataList.Insert(index, taskItemViewModel)));
+                    var index = listBox.Items.IndexOf(item.DataContext);
+                    Data?.DataList?.RemoveAt(index);
+                    Data?.UndoStack?.Push(new RelayCommand(o => Data?.DataList?.Insert(index, taskItemViewModel)));
                 }
             }
         }
@@ -385,9 +403,9 @@ public partial class EditTaskDialog : CustomWindow
 
     private void Copy(object sender, RoutedEventArgs e)
     {
-        MenuItem menuItem = sender as MenuItem;
-        ContextMenu contextMenu = menuItem.Parent as ContextMenu;
-        if (contextMenu.PlacementTarget is ListBoxItem item)
+        MenuItem? menuItem = sender as MenuItem;
+        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
+        if (contextMenu?.PlacementTarget is ListBoxItem item)
         {
             if (item.DataContext is TaskItemViewModel taskItemViewModel)
             {
@@ -398,13 +416,13 @@ public partial class EditTaskDialog : CustomWindow
 
     private void PasteAbove(object sender, RoutedEventArgs e)
     {
-        MenuItem menuItem = sender as MenuItem;
-        ContextMenu contextMenu = menuItem.Parent as ContextMenu;
-        if (contextMenu.PlacementTarget is ListBoxItem item)
+        MenuItem? menuItem = sender as MenuItem;
+        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
+        if (contextMenu?.PlacementTarget is ListBoxItem item)
         {
             if (item.DataContext is TaskItemViewModel taskItemViewModel)
             {
-                ListBox listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
+                ListBox? listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
                 if (listBox != null)
                 {
                     // 获取选中项的索引
@@ -414,9 +432,11 @@ public partial class EditTaskDialog : CustomWindow
                     {
                         try
                         {
-                            Dictionary<string, TaskModel> taskModels =
+                            Dictionary<string, TaskModel>? taskModels =
                                 JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(
                                     (string)iData.GetData(DataFormats.Text));
+                            if (taskModels == null || taskModels.Count == 0)
+                                return;
                             foreach (var VARIABLE in taskModels)
                             {
                                 VARIABLE.Value.name = VARIABLE.Key;
@@ -424,8 +444,8 @@ public partial class EditTaskDialog : CustomWindow
                                 {
                                     Name = VARIABLE.Key, Task = VARIABLE.Value
                                 };
-                                Data.DataList?.Insert(index, newItem);
-                                Data.UndoStack.Push(new RelayCommand(o => Data.DataList.Remove(newItem)));
+                                Data?.DataList?.Insert(index, newItem);
+                                Data?.UndoStack?.Push(new RelayCommand(o => Data?.DataList?.Remove(newItem)));
                             }
                         }
                         catch (Exception exception)
@@ -445,13 +465,13 @@ public partial class EditTaskDialog : CustomWindow
 
     private void PasteBelow(object sender, RoutedEventArgs e)
     {
-        MenuItem menuItem = sender as MenuItem;
-        ContextMenu contextMenu = menuItem.Parent as ContextMenu;
-        if (contextMenu.PlacementTarget is ListBoxItem item)
+        MenuItem? menuItem = sender as MenuItem;
+        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
+        if (contextMenu?.PlacementTarget is ListBoxItem item)
         {
             if (item.DataContext is TaskItemViewModel taskItemViewModel)
             {
-                ListBox listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
+                ListBox? listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
                 if (listBox != null)
                 {
                     // 获取选中项的索引
@@ -461,9 +481,11 @@ public partial class EditTaskDialog : CustomWindow
                     {
                         try
                         {
-                            Dictionary<string, TaskModel> taskModels =
+                            Dictionary<string, TaskModel>? taskModels =
                                 JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(
                                     (string)iData.GetData(DataFormats.Text));
+                            if (taskModels == null || taskModels.Count == 0)
+                                return;
                             foreach (var VARIABLE in taskModels)
                             {
                                 VARIABLE.Value.name = VARIABLE.Key;
@@ -471,8 +493,8 @@ public partial class EditTaskDialog : CustomWindow
                                 {
                                     Name = VARIABLE.Key, Task = VARIABLE.Value
                                 };
-                                Data.DataList?.Insert(index + 1, newItem);
-                                Data.UndoStack.Push(new RelayCommand(o => Data.DataList.Remove(newItem)));
+                                Data?.DataList?.Insert(index + 1, newItem);
+                                Data?.UndoStack?.Push(new RelayCommand(o => Data?.DataList?.Remove(newItem)));
                             }
                         }
                         catch (Exception exception)
@@ -492,19 +514,19 @@ public partial class EditTaskDialog : CustomWindow
 
     private void Delete(object sender, RoutedEventArgs e)
     {
-        MenuItem menuItem = sender as MenuItem;
-        ContextMenu contextMenu = menuItem.Parent as ContextMenu;
-        if (contextMenu.PlacementTarget is ListBoxItem item)
+        MenuItem? menuItem = sender as MenuItem;
+        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
+        if (contextMenu?.PlacementTarget is ListBoxItem item)
         {
             if (item.DataContext is TaskItemViewModel taskItemViewModel)
             {
-                ListBox listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
+                ListBox? listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
                 if (listBox != null)
                 {
                     // 获取选中项的索引
                     int index = listBox.Items.IndexOf(item.DataContext);
-                    Data.DataList.RemoveAt(index);
-                    Data.UndoStack.Push(new RelayCommand(o => Data.DataList.Insert(index, taskItemViewModel)));
+                    Data?.DataList?.RemoveAt(index);
+                    Data?.UndoStack?.Push(new RelayCommand(o => Data?.DataList?.Insert(index, taskItemViewModel)));
                 }
             }
         }
@@ -521,7 +543,7 @@ public partial class EditTaskDialog : CustomWindow
                     JsonConvert.DeserializeObject<Attribute>(
                         (string)iData.GetData(DataFormats.Text));
                 AttributeButton button = AddAttribute(attribute);
-                Data.UndoTaskStack.Push(new RelayCommand(o => Parts.Children.Remove(button)));
+                Data?.UndoTaskStack?.Push(new RelayCommand(o => Parts.Children.Remove(button)));
             }
             catch (Exception exception)
             {
@@ -534,16 +556,17 @@ public partial class EditTaskDialog : CustomWindow
             Growls.ErrorGlobal("ClipboardDataError".GetLocalizationString());
         }
     }
+
     private void SelectionRegion(object sender, RoutedEventArgs e)
     {
-        MainWindow.Instance.ConnectToMAA();
+        MainWindow.Instance?.ConnectToMAA();
         var image = MaaProcessor.Instance.GetBitmapImage();
         if (image != null)
         {
             SelectionRegionDialog imageDialog = new SelectionRegionDialog(image);
             if (imageDialog.ShowDialog() == true)
             {
-                if (Data.CurrentTask != null)
+                if (Data?.CurrentTask != null)
                 {
                     if (imageDialog.IsRoi)
                     {
@@ -559,14 +582,26 @@ public partial class EditTaskDialog : CustomWindow
                         {
                             if (attribute.Attribute.Value is List<int> li)
                             {
-                                attribute.Attribute = new Attribute()
+                                if (imageDialog.Output == null)
                                 {
-                                    Key = "roi", Value = new List<List<int>>() { li, imageDialog.Output }
-                                };
+                                    attribute.Attribute = new Attribute()
+                                    {
+                                        Key = "roi", Value = new List<List<int>>() { li }
+                                    };
+                                }
+                                else
+                                {
+                                    attribute.Attribute = new Attribute()
+                                    {
+                                        Key = "roi", Value = new List<List<int>>() { li, imageDialog.Output }
+                                    };
+                                }
                             }
                             else if (attribute.Attribute.Value is List<List<int>> lli)
                             {
-                                lli.Add(imageDialog.Output);
+                                if (imageDialog.Output != null)
+                                    lli.Add(imageDialog.Output);
+                                
                                 attribute.Attribute = new Attribute()
                                 {
                                     Key = "roi", Value = lli
@@ -599,7 +634,7 @@ public partial class EditTaskDialog : CustomWindow
 
     private void Screenshot(object sender, RoutedEventArgs e)
     {
-        MainWindow.Instance.ConnectToMAA();
+        MainWindow.Instance?.ConnectToMAA();
         var image = MaaProcessor.Instance.GetBitmapImage();
         if (image != null)
         {
@@ -607,10 +642,10 @@ public partial class EditTaskDialog : CustomWindow
             if (imageDialog.ShowDialog() == true)
             {
                 Console.WriteLine(imageDialog.Output);
-                if (Data.CurrentTask != null)
+                if (Data?.CurrentTask != null)
                 {
                     var attribute = GetAttribute("template");
-                    if (attribute == null)
+                    if (attribute == null && imageDialog.Output != null)
                     {
                         AddAttribute(new Attribute()
                         {
@@ -619,16 +654,27 @@ public partial class EditTaskDialog : CustomWindow
                     }
                     else
                     {
-                        if (attribute.Attribute.Value is string s)
+                        if (attribute?.Attribute.Value is string s)
                         {
-                            attribute.Attribute = new Attribute()
+                            if (imageDialog.Output == null)
                             {
-                                Key = "template", Value = new List<string>() { s, imageDialog.Output }
-                            };
+                                attribute.Attribute = new Attribute()
+                                {
+                                    Key = "template", Value = new List<string>() { s }
+                                };
+                            }
+                            else
+                            {
+                                attribute.Attribute = new Attribute()
+                                {
+                                    Key = "template", Value = new List<string>() { s, imageDialog.Output }
+                                };
+                            }
                         }
-                        else if (attribute.Attribute.Value is List<string> ls)
+                        else if (attribute?.Attribute.Value is List<string> ls)
                         {
-                            ls.Add(imageDialog.Output);
+                            if (imageDialog.Output != null)
+                                ls.Add(imageDialog.Output);
                             attribute.Attribute = new Attribute()
                             {
                                 Key = "template", Value = ls
@@ -642,14 +688,14 @@ public partial class EditTaskDialog : CustomWindow
 
     private void Swipe(object sender, RoutedEventArgs e)
     {
-        MainWindow.Instance.ConnectToMAA();
+        MainWindow.Instance?.ConnectToMAA();
         var image = MaaProcessor.Instance.GetBitmapImage();
         if (image != null)
         {
             SwipeDialog imageDialog = new SwipeDialog(image);
             if (imageDialog.ShowDialog() == true)
             {
-                if (Data.CurrentTask != null)
+                if (Data?.CurrentTask != null)
                 {
                     var begin = GetAttribute("begin");
                     if (begin == null)
@@ -689,14 +735,14 @@ public partial class EditTaskDialog : CustomWindow
 
     private void ColorExtraction(object sender, RoutedEventArgs e)
     {
-        MainWindow.Instance.ConnectToMAA();
+        MainWindow.Instance?.ConnectToMAA();
         var image = MaaProcessor.Instance.GetBitmapImage();
         if (image != null)
         {
             ColorExtractionDialog imageDialog = new ColorExtractionDialog(image);
             if (imageDialog.ShowDialog() == true)
             {
-                if (Data.CurrentTask != null)
+                if (Data?.CurrentTask != null)
                 {
                     var upper = GetAttribute("upper");
                     if (upper == null)
@@ -733,16 +779,17 @@ public partial class EditTaskDialog : CustomWindow
             }
         }
     }
+
     private void RecognitionText(object sender, RoutedEventArgs e)
     {
-        MainWindow.Instance.ConnectToMAA();
+        MainWindow.Instance?.ConnectToMAA();
         var image = MaaProcessor.Instance.GetBitmapImage();
         if (image != null)
         {
             RecognitionTextDialog imageDialog = new RecognitionTextDialog(image);
             if (imageDialog.ShowDialog() == true)
             {
-                if (Data.CurrentTask != null)
+                if (Data?.CurrentTask != null && imageDialog.Output != null)
                 {
                     var attribute = GetAttribute("expected");
                     string text = OCRHelper.ReadTextFromMAARecognition(

@@ -24,6 +24,11 @@
         <PublisherName>SweetFox</PublisherName>
         <SuiteName>MFAWPF</SuiteName>
     </PropertyGroup>
+	
+    <!-- Ignore Warings -->
+  <PropertyGroup>
+    <NoWarn>NU1602;NU1701;CS0169;CS0612;CS0618;CS1998;CS4014</NoWarn>
+  </PropertyGroup>
   
     <!-- Version -->
     <PropertyGroup>
@@ -116,11 +121,6 @@
             <SubType>Designer</SubType>
         </Page>
         <Page Update="Views\TaskFlowChartDialog.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>Wpf</XamlRuntime>
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="Views\ConnectSettingDialog.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>
             <SubType>Designer</SubType>

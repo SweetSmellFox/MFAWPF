@@ -19,12 +19,11 @@ namespace MFAWPF.Views;
 
 public partial class CropImageDialog : CustomWindow
 {
-    public string ImgPath { get; set; }
     private Point _startPoint;
-    private Rectangle _selectionRectangle;
+    private Rectangle? _selectionRectangle;
 
-    public string Output { get; set; }
-    public List<int> OutputRoi { get; set; }
+    public string? Output { get; set; }
+    public List<int>? OutputRoi { get; set; }
 
     public CropImageDialog(BitmapImage bitmapImage) :
         base()
@@ -181,6 +180,7 @@ public partial class CropImageDialog : CustomWindow
     {
         // 创建BitmapImage对象
         var bitmapImage = image.Source as BitmapImage;
+        if (bitmapImage == null) return;
         var roiX = Math.Max(x - 5, 0);
         var roiY = Math.Max(y - 5, 0);
         var roiW = Math.Min(width + 10, bitmapImage.PixelWidth - roiX);
@@ -240,7 +240,7 @@ public partial class CropImageDialog : CustomWindow
         }
     }
 
-    private void Close(object sender, RoutedEventArgs e)
+    protected override void Close(object sender, RoutedEventArgs e)
     {
         Close();
     }

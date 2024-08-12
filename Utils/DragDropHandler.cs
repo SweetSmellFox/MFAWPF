@@ -69,9 +69,13 @@ public class DragDropHandler : IDropTarget
             {
                 List<TaskInterfaceItem> tasks = new();
                 foreach (var VARIABLE in dragItemViewModels)
-                    tasks.Add(VARIABLE.InterfaceItem);
+                {
+                    if (VARIABLE.InterfaceItem != null)
+                        tasks.Add(VARIABLE.InterfaceItem);
+                }
 
-                MaaInterface.Instance.task = tasks;
+                if (MaaInterface.Instance != null)
+                    MaaInterface.Instance.task = tasks;
                 // 保存当前的 ItemsSource 到 JSON
                 JSONHelper.WriteToJsonFilePath(MaaProcessor.Resource, "interface", MaaInterface.Instance);
             }

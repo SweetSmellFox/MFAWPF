@@ -15,7 +15,7 @@ public class MainViewModel : ObservableObject
 {
     public ObservableCollection<LogItemViewModel> LogItemViewModels { get; } = new();
 
-    public void AddLog(string content, Brush color = null, string weight = "Regular",
+    public void AddLog(string content, Brush? color = null, string weight = "Regular",
         bool showTime = true)
     {
         if (color == null)
@@ -30,7 +30,7 @@ public class MainViewModel : ObservableObject
         });
     }
 
-    public void AddLogByKey(string key, Brush color = null, params string[] formatArgsKeys)
+    public void AddLogByKey(string key, Brush? color = null, params string[]? formatArgsKeys)
     {
         if (color == null)
             color = Brushes.Gray;

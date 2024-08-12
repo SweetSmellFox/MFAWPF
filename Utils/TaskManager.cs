@@ -28,6 +28,7 @@ public static class TaskManager
             catch (Exception e)
             {
                 Growls.Error($"{prompt}任务 {name} 失败.");
+                LoggerService.LogError(e.ToString());
             }
         }
         else action();
@@ -42,7 +43,7 @@ public static class TaskManager
     /// <param name="name">任务名称</param>
     /// <param name="prompt">日志提示</param>
     public static async Task RunTaskAsync(
-        Action action, Action handleError = null,
+        Action action, Action? handleError = null,
         string name = nameof(Action),
         string prompt = ">>> ",
         bool catchException = true)

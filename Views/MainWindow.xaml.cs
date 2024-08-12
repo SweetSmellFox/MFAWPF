@@ -24,12 +24,15 @@ namespace MFAWPF.Views
 {
     public partial class MainWindow : CustomWindow
     {
-        public static MainWindow Instance { get; private set; }
+        public static MainWindow? Instance { get; private set; }
         private readonly MaaToolkit _maaToolkit;
         public bool IsADB { get; set; } = true;
 
-        public static MainViewModel Data { get; private set; }
-        public static readonly string Version = $"v{Assembly.GetExecutingAssembly().GetName().Version.ToString()}";
+        public static MainViewModel? Data { get; private set; }
+
+        public static readonly string Version =
+            $"v{Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "DEBUG"}";
+
         public Dictionary<string, TaskModel> TaskDictionary = new();
 
         public MainWindow()
@@ -53,8 +56,8 @@ namespace MFAWPF.Views
                 JSONHelper.ReadFromJsonFilePath(MaaProcessor.Resource, "interface", new MaaInterface());
             if (MaaInterface.Instance != null)
             {
-                Data.TaskItemViewModels.Clear();
-                LoadTasks(MaaInterface.Instance.task);
+                Data?.TaskItemViewModels.Clear();
+                LoadTasks(MaaInterface.Instance.task ?? new List<TaskInterfaceItem>());
             }
 
             ConnectToMAA();
@@ -74,7 +77,7 @@ namespace MFAWPF.Views
                 if (firstTask)
                 {
                     ConnectSettingButton.IsChecked = true;
-                    if (MaaInterface.Instance.Resources != null &&
+                    if (MaaInterface.Instance?.Resources != null &&
                         MaaInterface.Instance.Resources.Count > DataSet.GetData("ResourceIndex", 0))
                         MaaProcessor.CurrentResources =
                             MaaInterface.Instance.Resources[
@@ -83,11 +86,11 @@ namespace MFAWPF.Views
                     firstTask = false;
                 }
 
-                Data.TaskItemViewModels.Add(dragItem);
+                Data?.TaskItemViewModels.Add(dragItem);
             }
         }
 
-        private void OnTaskStackChanged(object sender, EventArgs e)
+        private void OnTaskStackChanged(object? sender, EventArgs e)
         {
             if (MaaProcessor.Instance.TaskQueue.Count > 0)
             {
@@ -147,7 +150,8 @@ namespace MFAWPF.Views
                         {
                             var content = File.ReadAllText(file);
                             var taskData = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(content);
-
+                            if (taskData == null || taskData.Count == 0)
+                                break;
                             foreach (var task in taskData)
                             {
                                 if (!taskDictionaryA.TryAdd(task.Key, task.Value))
@@ -184,7 +188,7 @@ namespace MFAWPF.Views
             {
                 task.Value.name = task.Key;
                 ValidateTaskLinks(taskDictionary, task);
-                Data.SourceItems.Add(new TaskItemViewModel { Task = task.Value });
+                Data?.SourceItems.Add(new TaskItemViewModel { Task = task.Value });
             }
         }
 
@@ -196,7 +200,7 @@ namespace MFAWPF.Views
             ValidateNextTasks(taskDictionary, task.Value.timeout_next, "timeout_next");
         }
 
-        private void ValidateNextTasks(Dictionary<string, TaskModel> taskDictionary, object nextTasks,
+        private void ValidateNextTasks(Dictionary<string, TaskModel> taskDictionary, object? nextTasks,
             string name = "next")
         {
             if (nextTasks is List<string> tasks)
@@ -217,7 +221,7 @@ namespace MFAWPF.Views
             if (InitializeData())
             {
                 MaaProcessor.Money = 0;
-                var tasks = Data.TaskItemViewModels.ToList().FindAll(task => task.IsChecked == true);
+                var tasks = Data?.TaskItemViewModels.ToList().FindAll(task => task.IsChecked);
                 ConnectToMAA();
                 MaaProcessor.Instance.Start(tasks);
             }
@@ -234,9 +238,13 @@ namespace MFAWPF.Views
 
             if ("adb".Equals(MaaProcessor.Config.Adb.Adb) && DataSet.TryGetData<JObject>("Adb", out var jObject))
             {
-                deviceComboBox.ItemsSource = new List<DeviceInfo> { jObject.ToObject<DeviceInfo>() };
-                deviceComboBox.SelectedIndex = 0;
-                MaaProcessor.Config.IsConnected = true;
+                var device = jObject?.ToObject<DeviceInfo>();
+                if (device != null)
+                {
+                    deviceComboBox.ItemsSource = new List<DeviceInfo> { device };
+                    deviceComboBox.SelectedIndex = 0;
+                    MaaProcessor.Config.IsConnected = true;
+                }
             }
             else AutoDetectDevice();
 
@@ -311,7 +319,7 @@ namespace MFAWPF.Views
             }
         }
 
-        private void ConfigureSettingsPanel(object sender = null, RoutedEventArgs e = null)
+        private void ConfigureSettingsPanel(object? sender = null, RoutedEventArgs? e = null)
         {
             settingPanel.Children.Clear();
             if (IsADB)
@@ -355,7 +363,7 @@ namespace MFAWPF.Views
                 Style = FindResource("ComboBoxExtend") as Style,
                 Margin = new Thickness(5)
             };
-            if (MaaInterface.Instance.resource != null)
+            if (MaaInterface.Instance?.resource != null)
                 comboBox.ItemsSource = MaaInterface.Instance.resource;
             var binding = new Binding("Idle")
             {
@@ -371,7 +379,7 @@ namespace MFAWPF.Views
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
 
-                if (MaaInterface.Instance.Resources != null && MaaInterface.Instance.Resources.Count > index)
+                if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > index)
                     MaaProcessor.CurrentResources =
                         MaaInterface.Instance.Resources[MaaInterface.Instance.Resources.Keys.ToList()[index]];
                 DataSet.SetData("ResourceIndex", index);
@@ -420,7 +428,7 @@ namespace MFAWPF.Views
                 Margin = new Thickness(5)
             };
 
-            comboBox.ItemsSource = new List<string> { "zh-cn", "en-us" };
+            comboBox.ItemsSource = new List<string> { "简体中文", "English" };
             var binding = new Binding("Idle")
             {
                 Source = Data,
@@ -434,7 +442,7 @@ namespace MFAWPF.Views
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
                 LanguageManager.ChangeLanguage(
-                    CultureInfo.CreateSpecificCulture((sender as ComboBox)?.SelectedValue as string));
+                    CultureInfo.CreateSpecificCulture(index == 0 ? "zh-cn" : "en-us"));
                 DataSet.SetData("LangIndex", index);
             };
 
@@ -487,7 +495,7 @@ namespace MFAWPF.Views
 
         private void AddOption(MaaInterface.MaaInterfaceSelectOption option, DragItemViewModel source)
         {
-            if (MaaInterface.Instance != null && MaaInterface.Instance.option != null)
+            if (MaaInterface.Instance != null && MaaInterface.Instance.option != null && option.name != null)
             {
                 if (MaaInterface.Instance.option.TryGetValue(option.name, out var interfaceOption))
                 {
@@ -566,17 +574,20 @@ namespace MFAWPF.Views
 
             var editDialog = new EditTaskDialog();
             editDialog.Show();
+            if (Data != null)
             Data.Idle = false;
         }
 
         private void SelectAll(object sender, RoutedEventArgs e)
         {
+            if (Data == null) return;
             foreach (var task in Data.TaskItemViewModels)
                 task.IsChecked = true;
         }
 
         private void SelectNone(object sender, RoutedEventArgs e)
         {
+            if (Data == null) return;
             foreach (var task in Data.TaskItemViewModels)
                 task.IsChecked = false;
         }

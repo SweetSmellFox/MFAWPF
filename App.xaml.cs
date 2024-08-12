@@ -78,14 +78,14 @@ public partial class App : Application
         }
         else
         {
-            LoggerService.LogError(e.ToString());
+            LoggerService.LogError(e.ExceptionObject);
             sbEx.Append(e.ExceptionObject);
         }
 
         Growls.Error(sbEx.ToString());
     }
 
-    void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+    void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         //task线程内未处理捕获
         Growls.Error("Task线程异常：" + e.Exception.Message);

@@ -21,15 +21,15 @@ namespace MFAWPF.Views;
 public partial class EditAttributeDialog : CustomWindow
 {
     public Attribute Attribute { get; private set; }
-    public bool IsEdit = true;
-    private UIElement Control;
-    private CustomWindow Parent;
+    private bool IsEdit = true;
+    private UIElement? Control;
+    private CustomWindow? ParentDialog;
 
-    public EditAttributeDialog(CustomWindow parent, Attribute attribute = null, bool isEdit = false) :
+    public EditAttributeDialog(CustomWindow? parentDialog, Attribute? attribute = null, bool isEdit = false) :
         base()
     {
         InitializeComponent();
-        Parent = parent;
+        ParentDialog = parentDialog;
         IsEdit = isEdit;
         Attribute = new Attribute()
         {
@@ -90,25 +90,29 @@ public partial class EditAttributeDialog : CustomWindow
 
 
         typeComboBox.ItemsSource = Types;
-        typeComboBox.SelectedValue = attribute.Key;
-        SwitchByType(attribute.Key, attribute.Value);
+        if (attribute?.Key != null)
+        {
+            typeComboBox.SelectedValue = attribute.Key;
+            SwitchByType(attribute.Key, attribute.Value);
+        }
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
         Attribute.Key = typeComboBox.SelectedValue.ToString();
-        ReadValue(Attribute.Key);
-        this.DialogResult = true;
-        this.Close();
+        if (Attribute.Key != null)
+            ReadValue(Attribute.Key);
+        DialogResult = true;
+        Close();
     }
 
     private void Cancel_Click(object sender, RoutedEventArgs e)
     {
-        this.DialogResult = false;
-        this.Close();
+        DialogResult = false;
+        Close();
     }
 
-    private void SwitchString(object defaultValue)
+    private void SwitchString(object? defaultValue)
     {
         AttributePanel.Children.Clear();
 
@@ -140,7 +144,7 @@ public partial class EditAttributeDialog : CustomWindow
         AttributePanel.Children.Add(Control);
     }
 
-    private void SwitchBool(object defaultValue)
+    private void SwitchBool(object? defaultValue)
     {
         AttributePanel.Children.Clear();
         // 创建一个新的 Grid
@@ -178,7 +182,7 @@ public partial class EditAttributeDialog : CustomWindow
         AttributePanel.Children.Add(Control);
     }
 
-    private void SwitchCombo(string key, object defaultValue)
+    private void SwitchCombo(string key, object? defaultValue)
     {
         AttributePanel.Children.Clear();
 
@@ -264,7 +268,7 @@ public partial class EditAttributeDialog : CustomWindow
         AttributePanel.Children.Add(comboBox);
     }
 
-    private void SwitchAutoList(object defaultValue)
+    private void SwitchAutoList(object? defaultValue)
     {
         AttributePanel.Children.Clear();
 
@@ -335,7 +339,7 @@ public partial class EditAttributeDialog : CustomWindow
         border.Child = scrollViewer;
 
         AttributePanel.Children.Add(border);
-        
+
         if (defaultValue is bool b)
         {
             if (b)
@@ -362,7 +366,7 @@ public partial class EditAttributeDialog : CustomWindow
         }
     }
 
-    private void SwitchList(object defaultValue)
+    private void SwitchList(object? defaultValue)
     {
         AttributePanel.Children.Clear();
 
@@ -465,46 +469,7 @@ public partial class EditAttributeDialog : CustomWindow
         }
     }
 
-    private UIElement draggedItem;
-
-    private void StackPanel_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        draggedItem = sender as UIElement;
-    }
-
-    private void StackPanel_PreviewMouseMove(object sender, MouseEventArgs e)
-    {
-        if (e.LeftButton == MouseButtonState.Pressed && draggedItem != null)
-        {
-            DragDrop.DoDragDrop(draggedItem, draggedItem, DragDropEffects.Move);
-        }
-    }
-
-    private void StackPanel_Drop(object sender, DragEventArgs e)
-    {
-        var droppedData = e.Data.GetData(typeof(UIElement)) as UIElement;
-        var target = e.OriginalSource as UIElement;
-
-        if (droppedData != null && target != null)
-        {
-            var dropTargetParent = VisualTreeHelper.GetParent(target) as StackPanel;
-            var dropDataParent = VisualTreeHelper.GetParent(droppedData) as StackPanel;
-
-            if (dropTargetParent == dropDataParent && dropTargetParent != null)
-            {
-                int removeIndex = dropDataParent.Children.IndexOf(droppedData);
-                int targetIndex = dropTargetParent.Children.IndexOf(target);
-
-                if (removeIndex != targetIndex)
-                {
-                    dropDataParent.Children.Remove(droppedData);
-                    dropTargetParent.Children.Insert(targetIndex, droppedData);
-                }
-            }
-        }
-    }
-
-    private void SwitchListList(object defaultValue)
+    private void SwitchListList(object? defaultValue)
     {
         AttributePanel.Children.Clear();
 
@@ -591,7 +556,7 @@ public partial class EditAttributeDialog : CustomWindow
         }
     }
 
-    private void SwitchByType(string selectedType, object defaultValue)
+    private void SwitchByType(string selectedType, object? defaultValue)
     {
         if (selectedType != null)
         {
@@ -832,6 +797,7 @@ public partial class EditAttributeDialog : CustomWindow
                             Attribute.Value = 0;
                         }
                     }
+
                     break;
                 //double
                 case "ratio":
@@ -941,7 +907,7 @@ public partial class EditAttributeDialog : CustomWindow
         SwitchByType(selectedType, null);
     }
 
-    private T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+    private T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
     {
         for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
         {
@@ -950,7 +916,8 @@ public partial class EditAttributeDialog : CustomWindow
             {
                 return t;
             }
-            else
+
+            if (child != null)
             {
                 var result = FindVisualChild<T>(child);
                 if (result != null)
@@ -968,7 +935,7 @@ public partial class EditAttributeDialog : CustomWindow
         AddAutoAttribute(sender);
     }
 
-    private void AddAutoAttribute(object sender, object content = null)
+    private void AddAutoAttribute(object sender, object? content = null)
     {
         if (sender is Button button)
         {
@@ -977,17 +944,17 @@ public partial class EditAttributeDialog : CustomWindow
             StackPanel rootkPanel = (StackPanel)VisualTreeHelper.GetParent(grid);
 
             // 找到 ScrollViewer
-            ScrollViewer scrollViewer = FindVisualChild<ScrollViewer>(rootkPanel);
+            ScrollViewer? scrollViewer = FindVisualChild<ScrollViewer>(rootkPanel);
             if (scrollViewer != null)
             {
                 // 找到 ScrollViewer 内部的 StackPanel
-                StackPanel stackPanel = FindVisualChild<StackPanel>(scrollViewer);
+                StackPanel? stackPanel = FindVisualChild<StackPanel>(scrollViewer);
                 AddAutoAttribute(stackPanel, content);
             }
         }
     }
 
-    private void AddAutoAttribute(Panel panel, object content)
+    private void AddAutoAttribute(Panel? panel, object? content)
     {
         if (panel != null)
         {
@@ -995,12 +962,13 @@ public partial class EditAttributeDialog : CustomWindow
             MenuItem deleteItem = new MenuItem { Header = "删除" };
             deleteItem.Click += DeleteAttribute;
             contextMenu.Items.Add(deleteItem);
-            EditTaskDialog taskDialog = Parent as EditTaskDialog;
-
+            EditTaskDialog? taskDialog = ParentDialog as EditTaskDialog;
+            if (taskDialog == null)
+                return;
             SAutoCompleteTextBox newTextBox = new SAutoCompleteTextBox
             {
                 Margin = new Thickness(5, 2, 5, 2), DisplayMemberPath = "Name",
-                DataList = taskDialog.Data.DataList, ItemsSource = taskDialog.Data.DataList
+                DataList = taskDialog.Data?.DataList, ItemsSource = taskDialog.Data?.DataList
             };
             if (content != null)
                 newTextBox.Text = content.ToString();
@@ -1011,7 +979,7 @@ public partial class EditAttributeDialog : CustomWindow
     }
 
 
-    private void AddAttribute(Panel panel, object content)
+    private void AddAttribute(Panel? panel, object? content)
     {
         if (panel != null)
         {
@@ -1031,7 +999,7 @@ public partial class EditAttributeDialog : CustomWindow
         }
     }
 
-    private void AddAttribute(object sender, object content = null)
+    private void AddAttribute(object sender, object? content = null)
     {
         if (sender is Button button)
         {
@@ -1040,11 +1008,11 @@ public partial class EditAttributeDialog : CustomWindow
             StackPanel rootkPanel = (StackPanel)VisualTreeHelper.GetParent(grid);
 
             // 找到 ScrollViewer
-            ScrollViewer scrollViewer = FindVisualChild<ScrollViewer>(rootkPanel);
+            ScrollViewer? scrollViewer = FindVisualChild<ScrollViewer>(rootkPanel);
             if (scrollViewer != null)
             {
                 // 找到 ScrollViewer 内部的 StackPanel
-                StackPanel stackPanel = FindVisualChild<StackPanel>(scrollViewer);
+                StackPanel? stackPanel = FindVisualChild<StackPanel>(scrollViewer);
                 AddAttribute(stackPanel, content);
             }
         }
@@ -1057,9 +1025,9 @@ public partial class EditAttributeDialog : CustomWindow
 
     private void DeleteAttribute(object sender, RoutedEventArgs e)
     {
-        MenuItem menuItem = sender as MenuItem;
-        ContextMenu contextMenu = menuItem.Parent as ContextMenu;
-        if (contextMenu.PlacementTarget is Control control)
+        MenuItem? menuItem = sender as MenuItem;
+        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
+        if (contextMenu?.PlacementTarget is Control control)
         {
             var parentPanel = control.Parent as Panel;
             if (parentPanel != null)

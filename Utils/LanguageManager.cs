@@ -6,7 +6,7 @@ namespace MFAWPF.Utils;
 
 public class LanguageManager
 {
-    public static event EventHandler LanguageChanged;
+    public static event EventHandler? LanguageChanged;
 
     public static void ChangeLanguage(CultureInfo newCulture)
     {

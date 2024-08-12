@@ -51,7 +51,7 @@ public class VersionChecker
 
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 JObject releaseData = JObject.Parse(jsonResponse);
-                return releaseData["tag_name"].ToString();
+                return releaseData["tag_name"]?.ToString() ?? string.Empty;
             }
             catch (HttpRequestException e) when (e.Message.Contains("403"))
             {
@@ -76,7 +76,7 @@ public class VersionChecker
 
     private string GetLocalVersion()
     {
-        return Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        return Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "DEBUG";
     }
 
     private bool IsNewVersionAvailable(string latestVersion, string localVersion)

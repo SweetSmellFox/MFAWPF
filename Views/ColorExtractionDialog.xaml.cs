@@ -19,19 +19,19 @@ namespace MFAWPF.Views;
 
 public partial class ColorExtractionDialog : CustomWindow
 {
-    public string ImgPath { get; set; }
     private Point _startPoint;
-    private Rectangle _selectionRectangle;
-    public List<int> OutputRoi { get; set; }
-    public List<int> OutputUpper { get; set; }
-    public List<int> OutputLower { get; set; }
+    private Rectangle? _selectionRectangle;
+    public List<int>? OutputRoi { get; set; }
+    public List<int>? OutputUpper { get; set; }
+    public List<int>? OutputLower { get; set; }
+
     public ColorExtractionDialog(BitmapImage bitmapImage) :
         base()
     {
         InitializeComponent();
         UpdateImage(bitmapImage);
     }
-    
+
     private double _scaleRatio;
 
     private void UpdateImage(BitmapImage _imageSource)
@@ -57,7 +57,7 @@ public partial class ColorExtractionDialog : CustomWindow
         Width = image.Width + 20;
         Height = image.Height + 100;
     }
-    
+
     private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
     {
         var position = e.GetPosition(image);
@@ -125,7 +125,7 @@ public partial class ColorExtractionDialog : CustomWindow
             y = 0;
             h = _startPoint.Y;
         }
-        
+
         if (x + w > SelectionCanvas.ActualWidth)
         {
             w = SelectionCanvas.ActualWidth - x;
@@ -177,6 +177,8 @@ public partial class ColorExtractionDialog : CustomWindow
     {
         // 创建BitmapImage对象
         var bitmapImage = image.Source as BitmapImage;
+        if (bitmapImage == null)
+            return;
         var roiX = Math.Max(x - 5, 0);
         var roiY = Math.Max(y - 5, 0);
         var roiW = Math.Min(width + 10, bitmapImage.PixelWidth - roiX);
@@ -184,7 +186,7 @@ public partial class ColorExtractionDialog : CustomWindow
         var writeableBitmap = new WriteableBitmap(bitmapImage);
 
         OutputRoi = new List<int> { (int)roiX, (int)roiY, (int)roiW, (int)roiH };
-        
+
         var croppedBitmap = new CroppedBitmap(writeableBitmap, new Int32Rect((int)x, (int)y, (int)width, (int)height));
 
         var pixels = new byte[(int)width * (int)height * 4];
@@ -215,7 +217,7 @@ public partial class ColorExtractionDialog : CustomWindow
         // 输出颜色上下限值
     }
 
-    private void Close(object sender, RoutedEventArgs e)
+    protected override void Close(object sender, RoutedEventArgs e)
     {
         Close();
     }

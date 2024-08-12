@@ -27,17 +27,18 @@ public class TaskItemViewModel : ObservableObject
         set => SetProperty(ref _isNew, value);
     }
 
-    private TaskModel _task;
+    private TaskModel? _task;
 
     /// <summary>
     /// Gets or sets the time.
     /// </summary>
-    public TaskModel Task
+    public TaskModel? Task
     {
         get => _task;
         set
         {
-            Name = value.name;
+            if (value != null)
+                Name = value.name;
             SetProperty(ref _task, value);
         }
     }
@@ -51,7 +52,8 @@ public class TaskItemViewModel : ObservableObject
             DefaultValueHandling = DefaultValueHandling.Ignore
         };
         Dictionary<string, TaskModel> taskModels = new Dictionary<string, TaskModel>();
-        taskModels.Add(Name, Task);
+        if (Task != null)
+            taskModels.Add(Name, Task);
         return JsonConvert.SerializeObject(taskModels, settings);
     }
 }

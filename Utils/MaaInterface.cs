@@ -58,7 +58,7 @@ namespace MFAWPF.Utils
         public Dictionary<string, CustomExecutor>? action { get; set; }
         public Dictionary<string, MaaInterfaceOption>? option { get; set; }
 
-        private static MaaInterface _instance;
+        private static MaaInterface? _instance;
 
         [JsonIgnore] public List<MaaCustomRecognizerExecutor> CustomRecognizerExecutors { get; } = new();
 
@@ -67,20 +67,20 @@ namespace MFAWPF.Utils
         [JsonIgnore] public Dictionary<string, List<string>> Resources { get; } = new();
 
         // 替换单个字符串中的 "{PROJECT_DIR}" 为指定的替换值
-        public static string ReplacePlaceholder(string input, string replacement)
+        public static string ReplacePlaceholder(string? input, string replacement)
         {
-            return string.IsNullOrEmpty(input) ? input : input.Replace("{PROJECT_DIR}", replacement);
+            return string.IsNullOrEmpty(input) ? string.Empty : input.Replace("{PROJECT_DIR}", replacement);
         }
 
         // 替换字符串列表中的每个字符串中的 "{PROJECT_DIR}"
-        public static List<string> ReplacePlaceholder(List<string> inputs, string replacement)
+        public static List<string> ReplacePlaceholder(List<string>? inputs, string replacement)
         {
             if (inputs == null) return new List<string>();
 
             return inputs.ConvertAll(input => ReplacePlaceholder(input, replacement));
         }
 
-        public static MaaInterface Instance
+        public static MaaInterface? Instance
         {
             get => _instance;
             set
@@ -88,15 +88,15 @@ namespace MFAWPF.Utils
                 _instance = value;
                 if (value == null) return;
 
-                _instance.CustomRecognizerExecutors.Clear();
-                _instance.CustomActionExecutors.Clear();
-                _instance.Resources.Clear();
+                _instance?.CustomRecognizerExecutors.Clear();
+                _instance?.CustomActionExecutors.Clear();
+                _instance?.Resources.Clear();
 
                 if (value.recognizer != null)
                 {
                     foreach (var customExecutor in value.recognizer)
                     {
-                        _instance.CustomRecognizerExecutors.Add(new MaaCustomRecognizerExecutor
+                        _instance?.CustomRecognizerExecutors.Add(new MaaCustomRecognizerExecutor
                         {
                             Name = customExecutor.Key,
                             Path = ReplacePlaceholder(customExecutor.Value.exec_path, MaaProcessor.Resource),
@@ -109,7 +109,7 @@ namespace MFAWPF.Utils
                 {
                     foreach (var customExecutor in value.action)
                     {
-                        _instance.CustomActionExecutors.Add(new MaaCustomActionExecutor
+                        _instance?.CustomActionExecutors.Add(new MaaCustomActionExecutor
                         {
                             Name = customExecutor.Key,
                             Path = ReplacePlaceholder(customExecutor.Value.exec_path, MaaProcessor.Resource),
@@ -124,7 +124,8 @@ namespace MFAWPF.Utils
                     {
                         var paths = ReplacePlaceholder(customResource.path ?? new List<string>(),
                             AppDomain.CurrentDomain.BaseDirectory);
-                        _instance.Resources[customResource.name ?? string.Empty] = paths;
+                        if (_instance != null)
+                            _instance.Resources[customResource.name ?? string.Empty] = paths;
                     }
                 }
             }

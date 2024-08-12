@@ -6,25 +6,20 @@ namespace MFAWPF.Data
 {
     public class DataSet
     {
-        public static Dictionary<string, object> Data = new();
+        public static Dictionary<string, object>? Data = new();
 
         public static void SetData(string key, object value)
         {
-            if (Data.ContainsKey(key))
-            {
-                Data[key] = value;
-            }
-            else
-            {
-                Data.Add(key, value);
-            }
+            if (Data == null) return;
+            Data[key] = value; // 如果 key 不存在，将自动添加条目；如果存在，将更新值
 
             JSONHelper.WriteToConfigJsonFile("config", Data);
         }
 
-        public static bool TryGetData<T>(string key, out T value)
+
+        public static bool TryGetData<T>(string key, out T? value)
         {
-            if (Data.TryGetValue(key, out var data))
+            if (Data?.TryGetValue(key, out var data) == true)
             {
                 try
                 {
@@ -34,6 +29,7 @@ namespace MFAWPF.Data
                         value = (T)(object)Convert.ToInt32((long)data); // Safe conversion
                         return true;
                     }
+
                     if (data is T t)
                     {
                         value = t;
@@ -53,7 +49,7 @@ namespace MFAWPF.Data
 
         public static T GetData<T>(string key, T defaultValue)
         {
-            if (Data.TryGetValue(key, out var data))
+            if (Data?.TryGetValue(key, out var data) == true)
             {
                 try
                 {

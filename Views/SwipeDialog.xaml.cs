@@ -19,16 +19,14 @@ namespace MFAWPF.Views;
 
 public partial class SwipeDialog : CustomWindow
 {
-    public string ImgPath { get; set; }
-
     private Point _startPoint;
     private Point _endPoint;
-    private Line _arrowLine;
-    private Polygon _arrowHead;
+    private Line? _arrowLine;
+    private Polygon? _arrowHead;
     public Point StartPoint { get; private set; }
     public Point EndPoint { get; private set; }
-    public List<int> OutputBegin { get; set; }
-    public List<int> OutputEnd { get; set; }
+    public List<int>? OutputBegin { get; set; }
+    public List<int>? OutputEnd { get; set; }
 
     public SwipeDialog(BitmapImage bitmapImage) :
         base()
@@ -170,13 +168,13 @@ public partial class SwipeDialog : CustomWindow
         var p1 = new Point(end.X - arrowLength * cos + arrowWidth * sin, end.Y - arrowLength * sin - arrowWidth * cos);
         var p2 = new Point(end.X - arrowLength * cos - arrowWidth * sin, end.Y - arrowLength * sin + arrowWidth * cos);
 
-        _arrowHead.Points.Clear();
-        _arrowHead.Points.Add(end);
-        _arrowHead.Points.Add(p1);
-        _arrowHead.Points.Add(p2);
+        _arrowHead?.Points.Clear();
+        _arrowHead?.Points.Add(end);
+        _arrowHead?.Points.Add(p1);
+        _arrowHead?.Points.Add(p2);
     }
 
-    private void Close(object sender, RoutedEventArgs e)
+    protected override void Close(object sender, RoutedEventArgs e)
     {
         Close();
     }

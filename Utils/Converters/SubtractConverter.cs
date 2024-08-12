@@ -16,6 +16,6 @@ public class SubtractConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        return null;
+        throw new Exception("Type not exists!");
     }
 }

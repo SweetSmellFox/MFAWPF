@@ -10,7 +10,7 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
         return objectType == typeof(object);
     }
 
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override  object? ReadJson(JsonReader reader, Type objectType,  object? existingValue, JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
         switch (token.Type)
@@ -39,7 +39,7 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
         throw new JsonSerializationException("Invalid JSON format for MaaInterfaceSelectOptionConverter.");
     }
 
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         JArray array = new JArray();
 

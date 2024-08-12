@@ -10,7 +10,7 @@ public class SingleOrListConverter : JsonConverter
         return objectType == typeof(List<string>);
     }
 
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
         if (token.Type == JTokenType.String)
@@ -20,10 +20,10 @@ public class SingleOrListConverter : JsonConverter
         return token.ToObject<List<string>>();
     }
 
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        List<string> list = (List<string>)value;
-        if (list.Count == 1)
+        List<string>? list = value as List<string>;
+        if (list?.Count == 1)
         {
             writer.WriteValue(list[0]);
         }
