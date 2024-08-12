@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Utils;
 using MFAWPF.Views;
 
@@ -80,10 +81,24 @@ public class DragItemViewModel : ObservableObject
         get => _interfaceItem;
         set
         {
-            if (_interfaceItem != null && _interfaceItem.name != null)
-                Name = _interfaceItem.name;
+            if (_interfaceItem != null)
+            {
+                if (_interfaceItem.name != null)
+                    Name = _interfaceItem.name;
+                if ((_interfaceItem.option == null || _interfaceItem.option?.Count == 0) &&
+                    _interfaceItem.repeatable == false)
+                    SettingVisibility = Visibility.Hidden;
+            }
 
             SetProperty(ref _interfaceItem, value);
         }
+    }
+
+    private Visibility _visibility = Visibility.Visible;
+
+    public Visibility SettingVisibility
+    {
+        get => _visibility;
+        set => SetProperty(ref _visibility, value);
     }
 }

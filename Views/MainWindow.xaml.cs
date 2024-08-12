@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Themes;
@@ -18,6 +20,7 @@ using WPFLocalizeExtension.Deprecated.Extensions;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Extensions;
 using ComboBox = HandyControl.Controls.ComboBox;
+using ScrollViewer = HandyControl.Controls.ScrollViewer;
 using TextBlock = System.Windows.Controls.TextBlock;
 
 namespace MFAWPF.Views
@@ -72,8 +75,12 @@ namespace MFAWPF.Views
             {
                 var dragItem = new DragItemViewModel(task)
                 {
-                    IsCheckedWithNull = task.check ?? false
+                    IsCheckedWithNull = task.check ?? false,
+                    SettingVisibility = task.repeatable == true || task.option?.Count > 0
+                        ? Visibility.Visible
+                        : Visibility.Hidden
                 };
+
                 if (firstTask)
                 {
                     ConnectSettingButton.IsChecked = true;
@@ -133,6 +140,26 @@ namespace MFAWPF.Views
         private void btnMinimize_Click(object sender, RoutedEventArgs e)
         {
             WindowState = WindowState.Minimized;
+        }
+
+        private void TaskList_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var scrollViewer = FindVisualParent<ScrollViewer>((DependencyObject)sender);
+
+            if (scrollViewer != null)
+            {
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - e.Delta / 3);
+                e.Handled = true;
+            }
+        }
+
+        private T? FindVisualParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            var parentObject = VisualTreeHelper.GetParent(child);
+            if (parentObject == null) return null;
+
+            var parent = parentObject as T;
+            return parent ?? FindVisualParent<T>(parentObject);
         }
 
         private bool LoadTask()
@@ -575,7 +602,7 @@ namespace MFAWPF.Views
             var editDialog = new EditTaskDialog();
             editDialog.Show();
             if (Data != null)
-            Data.Idle = false;
+                Data.Idle = false;
         }
 
         private void SelectAll(object sender, RoutedEventArgs e)

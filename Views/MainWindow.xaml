@@ -14,7 +14,7 @@
                        engine:ResxLocalizationProvider.DefaultAssembly="MFAWPF"
                        engine:ResxLocalizationProvider.DefaultDictionary="Strings"
                        mc:Ignorable="d"
-                       Title="{lex:Loc AppTitle}" Height="520" Width="800" MinWidth="400" MinHeight="210"
+                       Title="{lex:Loc AppTitle}" Height="520" Width="800" MinWidth="400" MinHeight="205"
                        WindowStartupLocation="CenterScreen" WindowStyle="None"
                        Background="Transparent" AllowsTransparency="True"
                        PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown"
@@ -134,7 +134,7 @@
                                            HorizontalAlignment="Left">
                                 </TextBlock>
 
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="2 2 0 0"
                                             HorizontalAlignment="Right">
                                     <Button ToolTip="{lex:Loc SelectAll}" Width="15" Height="15" Margin="7 0 0 0"
                                             Style="{StaticResource textBoxButton}"
@@ -165,69 +165,74 @@
                                 </StackPanel>
                             </Grid>
 
+                            <hc:ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
 
-                            <ListBox Grid.Row="1" ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                     x:Name="TaskList"
-                                     MinHeight="220"
-                                     Margin="2,3,2,0"
-                                     AllowDrop="True"
-                                     dd:DragDrop.IsDragSource="{Binding Idle}"
-                                     dd:DragDrop.IsDropTarget="{Binding Idle}"
-                                     dd:DragDrop.DropHandler="{Binding DropHandler}"
-                                     BorderThickness="0"
-                                     ItemContainerStyle="{StaticResource CustomListBoxItemStyle}"
-                                     ItemsSource="{Binding TaskItemViewModels}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid x:Name="ListGrid">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition />
-                                                <ColumnDefinition Width="45" />
-                                            </Grid.ColumnDefinitions>
+                                             PanningMode="VerticalOnly">
+                                <ListBox ScrollViewer.CanContentScroll="True"
+                                         PreviewMouseWheel="TaskList_OnPreviewMouseWheel"
+                                         x:Name="TaskList"
+                                         MinHeight="220"
+                                         Margin="2,3,2,0"
+                                         AllowDrop="True"
+                                         dd:DragDrop.IsDragSource="{Binding Idle}"
+                                         dd:DragDrop.IsDropTarget="{Binding Idle}"
+                                         dd:DragDrop.DropHandler="{Binding DropHandler}"
+                                         BorderThickness="0"
+                                         ItemContainerStyle="{StaticResource CustomListBoxItemStyle}"
+                                         ItemsSource="{Binding TaskItemViewModels}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid x:Name="ListGrid">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition Width="45" />
+                                                </Grid.ColumnDefinitions>
 
-                                            <CheckBox Grid.Column="0"
-                                                      HorizontalAlignment="Left"
-                                                      Content="{Binding Name}"
-                                                      IsChecked="{Binding IsCheckedWithNull}"
-                                                      IsHitTestVisible="{Binding ElementName=TaskList, Path=DataContext.Idle}"
-                                                      ToolTip="{lex:Loc TooltipDragLabel}">
-                                                <CheckBox.ContentTemplate>
-                                                    <DataTemplate>
-                                                        <TextBlock Text="{Binding}"
-                                                                   TextTrimming="CharacterEllipsis"
+                                                <CheckBox Grid.Column="0"
+                                                          HorizontalAlignment="Left"
+                                                          Content="{Binding Name}"
+                                                          IsChecked="{Binding IsCheckedWithNull}"
+                                                          IsHitTestVisible="{Binding ElementName=TaskList, Path=DataContext.Idle}"
+                                                          ToolTip="{lex:Loc TooltipDragLabel}">
+                                                    <CheckBox.ContentTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding}"
+                                                                       TextTrimming="CharacterEllipsis"
 
-                                                                   TextWrapping="NoWrap">
-                                                            <TextBlock.Width>
-                                                                <Binding Path="ActualWidth"
-                                                                         RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}"
-                                                                         Converter="{StaticResource SubtractConverter}"
-                                                                         ConverterParameter="70" />
-                                                            </TextBlock.Width>
-                                                        </TextBlock>
-                                                    </DataTemplate>
-                                                </CheckBox.ContentTemplate>
-                                            </CheckBox>
-                                            <hc:ButtonGroup Grid.Column="1" HorizontalAlignment="Left"
-                                                            ToolTip="{Binding Name}">
-                                                <!--  ReSharper disable once Xaml.StaticResourceNotResolved  -->
-                                                <RadioButton
-                                                    Margin="0"
-                                                    Padding="15,0,0,0"
-                                                    hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
-                                                    hc:VisualElement.HighlightBackground="Transparent"
-                                                    hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
-                                                    Background="Transparent"
-                                                    HorizontalContentAlignment="Left"
-                                                    BorderThickness="0"
-                                                    Foreground="{DynamicResource GrayColor4}"
-                                                    GroupName="TaskSettings"
-                                                    IsChecked="{Binding EnableSetting}"
-                                                    Style="{DynamicResource RadioGroupItemSingle}" />
-                                            </hc:ButtonGroup>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                                                                       TextWrapping="NoWrap">
+                                                                <TextBlock.Width>
+                                                                    <Binding Path="ActualWidth"
+                                                                             RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}"
+                                                                             Converter="{StaticResource SubtractConverter}"
+                                                                             ConverterParameter="70" />
+                                                                </TextBlock.Width>
+                                                            </TextBlock>
+                                                        </DataTemplate>
+                                                    </CheckBox.ContentTemplate>
+                                                </CheckBox>
+                                                <hc:ButtonGroup Grid.Column="1" HorizontalAlignment="Left" Visibility="{Binding SettingVisibility}"
+                                                                ToolTip="{Binding Name}">
+                                                    <!--  ReSharper disable once Xaml.StaticResourceNotResolved  -->
+                                                    <RadioButton
+                                                        Margin="0"
+                                                        Padding="15,0,0,0"
+                                                        hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
+                                                        hc:VisualElement.HighlightBackground="Transparent"
+                                                        hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
+                                                        Background="Transparent"
+                                                        HorizontalContentAlignment="Left"
+                                                        BorderThickness="0" 
+                                                        Foreground="{DynamicResource GrayColor4}"
+                                                        GroupName="TaskSettings"
+                                                        IsChecked="{Binding EnableSetting}"
+                                                        Style="{DynamicResource RadioGroupItemSingle}" />
+                                                </hc:ButtonGroup>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </hc:ScrollViewer>
+
 
                             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
                                 <Button
@@ -250,8 +255,10 @@
 
                         </Grid>
                         <ScrollViewer Margin="10" Grid.Column="1" x:Name="CS">
-                            <StackPanel Grid.Column="2" Orientation="Vertical" x:Name="settingPanel">
-
+                            <StackPanel Orientation="Vertical" x:Name="settingPanel">
+                                <StackPanel.RenderTransform>
+                                    <TranslateTransform Y="-5" />
+                                </StackPanel.RenderTransform>
                             </StackPanel>
                         </ScrollViewer>
 
