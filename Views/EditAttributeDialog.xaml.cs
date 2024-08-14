@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -10,6 +11,7 @@ using MFAWPF.ViewModels;
 using HandyControl.Controls;
 using HandyControl.Data;
 using Newtonsoft.Json;
+using WPFLocalizeExtension.Extensions;
 using Attribute = MFAWPF.Utils.Attribute;
 using ComboBox = HandyControl.Controls.ComboBox;
 using ScrollViewer = System.Windows.Controls.ScrollViewer;
@@ -29,72 +31,72 @@ public partial class EditAttributeDialog : CustomWindow
         base()
     {
         InitializeComponent();
-        ParentDialog = parentDialog;
-        IsEdit = isEdit;
-        Attribute = new Attribute()
-        {
-            Key = attribute?.Key, Value = attribute?.Value
-        };
-        save_Button.Content = IsEdit ? "保存" : "添加";
-        var Types = new List<string>()
-        {
-            "recognition",
-            "action",
-            "next",
-            "is_sub",
-            "inverse",
-            "enabled",
-            "timeout",
-            "timeout_next",
-            "times_limit",
-            "runout_next",
-            "pre_delay",
-            "post_delay",
-            "pre_wait_freezes",
-            "post_wait_freezes",
-            "focus",
-            "focus_tip",
-            "focus_tip_color",
-            "expected",
-            "only_rec",
-            "labels",
-            "model",
-            "target",
-            "target_offset",
-            "begin",
-            "begin_offset",
-            "end",
-            "end_offset",
-            "duration",
-            "key",
-            "input_text",
-            "package",
-            "custom_recognition",
-            "custom_recognition_param",
-            "custom_action",
-            "custom_action_param",
-            "order_by",
-            "index",
-            "method",
-            "count",
-            "green_mask",
-            "detector",
-            "ratio",
-            "template",
-            "roi",
-            "threshold",
-            "lower",
-            "upper",
-            "connected"
-        };
-
-
-        typeComboBox.ItemsSource = Types;
-        if (attribute?.Key != null)
-        {
-            typeComboBox.SelectedValue = attribute.Key;
-            SwitchByType(attribute.Key, attribute.Value);
-        }
+        // ParentDialog = parentDialog;
+        // IsEdit = isEdit;
+        // Attribute = new Attribute()
+        // {
+        //     Key = attribute?.Key, Value = attribute?.Value
+        // };
+        // save_Button.Content = IsEdit ? "保存" : "添加";
+        // var Types = new List<string>()
+        // {
+        //     "recognition",
+        //     "action",
+        //     "next",
+        //     "is_sub",
+        //     "inverse",
+        //     "enabled",
+        //     "timeout",
+        //     "timeout_next",
+        //     "times_limit",
+        //     "runout_next",
+        //     "pre_delay",
+        //     "post_delay",
+        //     "pre_wait_freezes",
+        //     "post_wait_freezes",
+        //     "focus",
+        //     "focus_tip",
+        //     "focus_tip_color",
+        //     "expected",
+        //     "only_rec",
+        //     "labels",
+        //     "model",
+        //     "target",
+        //     "target_offset",
+        //     "begin",
+        //     "begin_offset",
+        //     "end",
+        //     "end_offset",
+        //     "duration",
+        //     "key",
+        //     "input_text",
+        //     "package",
+        //     "custom_recognition",
+        //     "custom_recognition_param",
+        //     "custom_action",
+        //     "custom_action_param",
+        //     "order_by",
+        //     "index",
+        //     "method",
+        //     "count",
+        //     "green_mask",
+        //     "detector",
+        //     "ratio",
+        //     "template",
+        //     "roi",
+        //     "threshold",
+        //     "lower",
+        //     "upper",
+        //     "connected"
+        // };
+        //
+        //
+        // typeComboBox.ItemsSource = Types;
+        // if (attribute?.Key != null)
+        // {
+        //     typeComboBox.SelectedValue = attribute.Key;
+        //     SwitchByType(attribute.Key, attribute.Value);
+        // }
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
@@ -289,32 +291,24 @@ public partial class EditAttributeDialog : CustomWindow
 
         Button button = new Button
         {
-            Style = (Style)Application.Current.Resources["textBoxButton"],
-            ToolTip = "添加属性",
+            Style = FindResource("textBoxButton") as Style,
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Right,
-            Width = 15,
+            Width = 15, Padding = new Thickness(0),
             Height = 15
         };
-
-        Path path = new Path
+        button.BindLocalization("Add", Button.ToolTipProperty);
+        Binding foregroundBinding = new Binding
         {
-            Data = (Geometry)Application.Current.Resources["AddGeometry"],
-            Fill = (Brush)Application.Current.Resources["GrayColor4"],
-            MaxWidth = 12,
-            Stretch = Stretch.Uniform
+            Source = Application.Current.Resources,
+            Path = new PropertyPath("GrayColor4")
         };
-
-        button.Resources = new ResourceDictionary();
-        Style buttonStyle = new Style(typeof(Button));
-        buttonStyle.Setters.Add(new Setter(Button.CursorProperty, Cursors.Arrow));
-        Trigger trigger = new Trigger { Property = UIElement.IsMouseOverProperty, Value = true };
-        trigger.Setters.Add(new Setter(Button.CursorProperty, Cursors.Hand));
-        buttonStyle.Triggers.Add(trigger);
-        button.Resources.Add(typeof(Button), buttonStyle);
-
-        button.Content = path;
-        button.Click += AddAutoAttribute;
+        button.SetBinding(Button.ForegroundProperty, foregroundBinding);
+        
+        var selectAllGeometry = (Geometry)FindResource("AddGeometry");
+        IconElement.SetGeometry(button, selectAllGeometry);
+        
+        button.Click += AddAttribute;
         dynamicGrid.Children.Add(textBlock);
         dynamicGrid.Children.Add(button);
 
@@ -387,31 +381,23 @@ public partial class EditAttributeDialog : CustomWindow
 
         Button button = new Button
         {
-            Style = (Style)Application.Current.Resources["textBoxButton"],
-            ToolTip = "添加属性",
+            Style = FindResource("textBoxButton") as Style,
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Right,
-            Width = 15,
+            Width = 15, Padding = new Thickness(0),
             Height = 15
         };
-
-        Path path = new Path
+        button.BindLocalization("Add", Button.ToolTipProperty);
+        Binding foregroundBinding = new Binding
         {
-            Data = (Geometry)Application.Current.Resources["AddGeometry"],
-            Fill = (Brush)Application.Current.Resources["GrayColor4"],
-            MaxWidth = 12,
-            Stretch = Stretch.Uniform
+            Source = Application.Current.Resources,
+            Path = new PropertyPath("GrayColor4")
         };
-
-        button.Resources = new ResourceDictionary();
-        Style buttonStyle = new Style(typeof(Button));
-        buttonStyle.Setters.Add(new Setter(Button.CursorProperty, Cursors.Arrow));
-        Trigger trigger = new Trigger { Property = UIElement.IsMouseOverProperty, Value = true };
-        trigger.Setters.Add(new Setter(Button.CursorProperty, Cursors.Hand));
-        buttonStyle.Triggers.Add(trigger);
-        button.Resources.Add(typeof(Button), buttonStyle);
-
-        button.Content = path;
+        button.SetBinding(Button.ForegroundProperty, foregroundBinding);
+        
+        var selectAllGeometry = (Geometry)FindResource("AddGeometry");
+        IconElement.SetGeometry(button, selectAllGeometry);
+        
         button.Click += AddAttribute;
         dynamicGrid.Children.Add(textBlock);
         dynamicGrid.Children.Add(button);
@@ -436,12 +422,6 @@ public partial class EditAttributeDialog : CustomWindow
         border.Child = scrollViewer;
 
         AttributePanel.Children.Add(border);
-
-        // // Set up drag-and-drop handlers
-        // stackPanel.PreviewMouseLeftButtonDown += StackPanel_PreviewMouseLeftButtonDown;
-        // stackPanel.PreviewMouseMove += StackPanel_PreviewMouseMove;
-        // stackPanel.AllowDrop = true;
-        // stackPanel.Drop += StackPanel_Drop;
 
         if (defaultValue is bool b)
         {
@@ -490,31 +470,23 @@ public partial class EditAttributeDialog : CustomWindow
 
         Button button = new Button
         {
-            Style = (Style)Application.Current.Resources["textBoxButton"],
-            ToolTip = "添加属性",
+            Style = FindResource("textBoxButton") as Style,
             VerticalAlignment = VerticalAlignment.Center,
             HorizontalAlignment = HorizontalAlignment.Right,
-            Width = 15,
+            Width = 15, Padding = new Thickness(0),
             Height = 15
         };
-
-        Path path = new Path
+        button.BindLocalization("Add", Button.ToolTipProperty);
+        Binding foregroundBinding = new Binding
         {
-            Data = (Geometry)Application.Current.Resources["AddGeometry"],
-            Fill = (Brush)Application.Current.Resources["GrayColor4"],
-            MaxWidth = 12,
-            Stretch = Stretch.Uniform
+            Source = Application.Current.Resources,
+            Path = new PropertyPath("GrayColor4")
         };
-
-        button.Resources = new ResourceDictionary();
-        Style buttonStyle = new Style(typeof(Button));
-        buttonStyle.Setters.Add(new Setter(Button.CursorProperty, Cursors.Arrow));
-        Trigger trigger = new Trigger { Property = UIElement.IsMouseOverProperty, Value = true };
-        trigger.Setters.Add(new Setter(Button.CursorProperty, Cursors.Hand));
-        buttonStyle.Triggers.Add(trigger);
-        button.Resources.Add(typeof(Button), buttonStyle);
-
-        button.Content = path;
+        button.SetBinding(Button.ForegroundProperty, foregroundBinding);
+        
+        var selectAllGeometry = (Geometry)FindResource("AddGeometry");
+        IconElement.SetGeometry(button, selectAllGeometry);
+        
         button.Click += AddAttribute;
         dynamicGrid.Children.Add(textBlock);
         dynamicGrid.Children.Add(button);

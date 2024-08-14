@@ -6,7 +6,7 @@
                     xmlns:controls="clr-namespace:MFAWPF.Controls"
                     Title="滑动获取器">
 
-    <Border CornerRadius="10" Background="{DynamicResource WhiteColor}"  BorderBrush="{StaticResource GrayColor5}" BorderThickness="1"  MouseDown="Canvas_MouseDown">
+    <Border CornerRadius="10" Background="{DynamicResource WhiteColor}"  BorderBrush="{DynamicResource GrayColor5}" BorderThickness="1"  MouseDown="Canvas_MouseDown">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
@@ -14,7 +14,7 @@
                 <RowDefinition Height="60" />
             </Grid.RowDefinitions>
 
-            <Border CornerRadius="10 10 0 0" Background="{StaticResource MainContentBackgroundBrush}"
+            <Border CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"
                     ClipToBounds="False">
                 <Grid Height="34">
                     <TextBlock Text="滑动获取器" VerticalAlignment="Center"  x:Name="TitleText"

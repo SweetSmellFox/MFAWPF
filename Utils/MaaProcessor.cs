@@ -39,7 +39,7 @@ namespace MFAWPF.Utils
         public Queue<TaskAndParam> TaskQueue { get; } = new();
         public static int Money { get; set; }
         public static int AllMoney { get; set; }
-        public static Config Config { get; } = new ();
+        public static Config Config { get; } = new();
         public static string AdbConfig { get; set; } = string.Empty;
         public static List<string>? CurrentResources { get; set; }
         public static AutoInitDictionary AutoInitDictionary { get; } = new();
@@ -469,7 +469,7 @@ namespace MFAWPF.Utils
 
         public BitmapImage? GetBitmapImage()
         {
-            using var buffer = GetImage(_currentInstance?.Controller);
+            using var buffer = GetImage(GetCurrentInstance()?.Controller);
             if (buffer == null) return null;
 
             var encodedDataHandle = buffer.GetEncodedData(out var size);
@@ -516,7 +516,7 @@ namespace MFAWPF.Utils
             if (maaController == null)
                 return buffer;
             var status = maaController.Screencap().Wait();
-
+            Console.WriteLine(status);
             if (status != MaaJobStatus.Success)
                 return buffer;
             maaController.GetImage(buffer);

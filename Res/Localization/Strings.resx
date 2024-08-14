@@ -217,8 +217,8 @@
     <value>保存任务</value>
   </data>
     <data name="EditTaskDialog_ShowChart_Button" xml:space="preserve">
-    <value>显示流程图</value>
-  </data>
+        <value>流程图</value>
+    </data>
     <data name="Quit" xml:space="preserve">
     <value>退出</value>
   </data>
@@ -321,5 +321,7 @@
     <data name="RegisterCustomAction" xml:space="preserve">
     <value>注册自定义Action:{0}</value>
 </data>
-
+    <data name="Add" xml:space="preserve">
+        <value>添加</value>
+    </data>
 </root>

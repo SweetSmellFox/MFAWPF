@@ -9,7 +9,7 @@
                        xmlns:viewModels="clr-namespace:MFAWPF.ViewModels"
                        xmlns:dd="urn:gong-wpf-dragdrop"
                        xmlns:converters="clr-namespace:MFAWPF.Utils.Converters"
-                       xmlns:lex="http://wpflocalizeextension.codeplex.com"
+                       xmlns:lex="http://wpflocalizeextension.codeplex.com" IsResizable="True"
                        xmlns:engine="https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension"
                        engine:ResxLocalizationProvider.DefaultAssembly="MFAWPF"
                        engine:ResxLocalizationProvider.DefaultDictionary="Strings"
@@ -20,7 +20,7 @@
                        PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown"
                        PreviewMouseMove="Window_PreviewMouseMove"
                        PreviewMouseLeftButtonUp="Window_PreviewMouseLeftButtonUp"
-                       ResizeMode="CanResizeWithGrip" WindowState="Normal">
+                       WindowState="Normal">
     <controls:CustomWindow.DataContext>
         <viewModels:MainViewModel />
     </controls:CustomWindow.DataContext>
@@ -210,7 +210,8 @@
                                                         </DataTemplate>
                                                     </CheckBox.ContentTemplate>
                                                 </CheckBox>
-                                                <hc:ButtonGroup Grid.Column="1" HorizontalAlignment="Left" Visibility="{Binding SettingVisibility}"
+                                                <hc:ButtonGroup Grid.Column="1" HorizontalAlignment="Left"
+                                                                Visibility="{Binding SettingVisibility}"
                                                                 ToolTip="{Binding Name}">
                                                     <!--  ReSharper disable once Xaml.StaticResourceNotResolved  -->
                                                     <RadioButton
@@ -221,7 +222,7 @@
                                                         hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
                                                         Background="Transparent"
                                                         HorizontalContentAlignment="Left"
-                                                        BorderThickness="0" 
+                                                        BorderThickness="0"
                                                         Foreground="{DynamicResource GrayColor4}"
                                                         GroupName="TaskSettings"
                                                         IsChecked="{Binding EnableSetting}"

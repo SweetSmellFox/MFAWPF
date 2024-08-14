@@ -4,13 +4,13 @@
                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                        xmlns:hc="https://handyorg.github.io/handycontrol"
-                       xmlns:local="clr-namespace:MFAWPF.Views"
+                       xmlns:local="clr-namespace:MFAWPF.Views" IsResizable="True"
                        xmlns:models="clr-namespace:MFAWPF.ViewModels"
                        xmlns:controls="clr-namespace:MFAWPF.Controls"
                        xmlns:utils="clr-namespace:MFAWPF.Utils"
                        xmlns:dd="urn:gong-wpf-dragdrop"
                        xmlns:lex="http://wpflocalizeextension.codeplex.com"
-                       mc:Ignorable="d"
+                       mc:Ignorable="d"  MinHeight="230" MinWidth="450"
                        Title="{lex:Loc EditTaskDialog_Title}" Height="500" Width="730">
     <controls:CustomWindow.DataContext>
         <models:EditTaskDialogViewModel />
@@ -32,9 +32,14 @@
         CornerRadius="10"
         Background="{DynamicResource SecundaryBackgroundColor}" BorderBrush="{DynamicResource GrayColor5}"
         BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35" />
+                <RowDefinition />
+                <RowDefinition Height="15" />
+            </Grid.RowDefinitions>
 
-        <hc:SimpleStackPanel>
-            <Border CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"
+            <Border Grid.Row="0" CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"
                     ClipToBounds="False">
                 <Grid Height="34">
                     <TextBlock Text="{lex:Loc EditTaskDialog_Header}" VerticalAlignment="Center"
@@ -48,22 +53,40 @@
                 </Grid>
             </Border>
 
-            <hc:SimpleStackPanel Orientation="Horizontal">
-                <hc:SimpleStackPanel Margin="10 0 0 0" Width="320">
-                    <hc:SimpleStackPanel Orientation="Horizontal" Margin="4">
-                        <hc:TextBox VerticalAlignment="Center" Margin="0 0 4 0" Width="230"
+            <Grid Grid.Row="1" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="7*" MinWidth="200" />
+                    <ColumnDefinition Width="7*" MinWidth="200" />
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="0" Margin="10 0 0 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="40" />
+                        <RowDefinition Height="30" />
+                        <RowDefinition MinHeight="50" />
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="40" />
+                        </Grid.ColumnDefinitions>
+                        <hc:TextBox Grid.Column="0" VerticalAlignment="Center"
                                     hc:InfoElement.TitleWidth="50"
                                     x:Name="PipelineFileName" hc:InfoElement.ShowClearButton="True"
                                     hc:InfoElement.Placeholder="{lex:Loc EditTaskDialog_PipelineFileName_Placeholder}" />
-                        <Button ToolTip="{lex:Loc EditTaskDialog_Load_Tooltip}" hc:TipElement.Placement="Top"
-                                Click="Load" Margin="0 0 4 0">
+                        <Button Grid.Column="1" ToolTip="{lex:Loc EditTaskDialog_Load_Tooltip}"
+                                hc:TipElement.Placement="Top"
+                                Click="Load">
                             <Button.Content>
                                 <Path Width="15" Data="{StaticResource LoadGeometry}"
                                       Fill="{DynamicResource GrayColor4}"
                                       MaxWidth="15" Stretch="Uniform" />
                             </Button.Content>
                         </Button>
-                        <Button ToolTip="{lex:Loc EditTaskDialog_SavePipeline_Tooltip}" hc:TipElement.Placement="Top"
+                        <Button Grid.Column="2" ToolTip="{lex:Loc EditTaskDialog_SavePipeline_Tooltip}"
+                                hc:TipElement.Placement="Top"
                                 Click="Save_Pipeline">
                             <Button.Content>
                                 <Path Width="15" Data="{StaticResource SaveGeometry}"
@@ -71,16 +94,16 @@
                                       MaxWidth="15" Stretch="Uniform" />
                             </Button.Content>
                         </Button>
-                    </hc:SimpleStackPanel>
-                    <hc:SearchBar Style="{StaticResource SearchBarPlus}"
+                    </Grid>
+                    <hc:SearchBar Grid.Row="1" Style="{StaticResource SearchBarPlus}"
                                   hc:InfoElement.Placeholder="{lex:Loc EditTaskDialog_TaskName_Title}"
                                   Margin="4" SearchStarted="OnSearchTask"
                                   IsRealTime="True"
                                   Tag="{Binding ElementName=ListBoxDemo}">
                     </hc:SearchBar>
 
-                    <Grid VerticalAlignment="Top" Margin="0,5,10,4">
-                        <TextBlock Margin="5 0 0 0" Width="55"
+                    <Grid Grid.Row="2" VerticalAlignment="Top" Margin="0,5,10,4">
+                        <TextBlock Margin="5 0 0 0"
                                    Text="{lex:Loc EditTaskDialog_TaskList_Label}"
                                    Foreground="{StaticResource GrayColor4}"
                                    HorizontalAlignment="Left">
@@ -104,51 +127,53 @@
                         </StackPanel>
                     </Grid>
 
-                    <Border Height="330" CornerRadius="8" Margin="4 5 4 0">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <ListBox Name="ListBoxDemo" Margin="5" BorderThickness="0"
-                                     AllowDrop="True"
-                                     dd:DragDrop.IsDragSource="True"
-                                     dd:DragDrop.IsDropTarget="True"
-                                     KeyDown="List_KeyDown"
-                                     SelectionMode="Single" SelectionChanged="TaskSelectionChanged"
-                                     SelectedIndex="{Binding SelectedIndex}" ItemsSource="{Binding DataList}">
-                                <ListBox.InputBindings>
-                                    <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyCommand}" />
-                                    <KeyBinding Key="V" Modifiers="Control" Command="{Binding PasteCommand}" />
-                                    <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}" />
-                                    <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}" />
-                                    <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" />
-                                </ListBox.InputBindings>
-                                <ListBox.ItemContainerStyle>
-                                    <Style TargetType="ListBoxItem"
-                                           BasedOn="{StaticResource ListBoxItemBaseTransparent}">
-                                        <Setter Property="Cursor" Value="Hand" />
-                                        <Setter Property="ContextMenu" Value="{StaticResource TaskMenu}" />
-                                    </Style>
-                                </ListBox.ItemContainerStyle>
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Margin="6,0,0,0" Text="{Binding Name}"
-                                                       ContextMenu="{StaticResource TaskMenu}" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                    <Border Grid.Row="3" CornerRadius="8" Margin="4 0 4 0">
 
-                        </Grid>
+                        <ListBox Name="ListBoxDemo" Margin="5 0 5 0" BorderThickness="0"
+                                 AllowDrop="True"
+                                 dd:DragDrop.IsDragSource="True"
+                                 dd:DragDrop.IsDropTarget="True"
+                                 KeyDown="List_KeyDown"
+                                 SelectionMode="Single" SelectionChanged="TaskSelectionChanged"
+                                 SelectedIndex="{Binding SelectedIndex}" ItemsSource="{Binding DataList}">
+                            <ListBox.InputBindings>
+                                <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyCommand}" />
+                                <KeyBinding Key="V" Modifiers="Control" Command="{Binding PasteCommand}" />
+                                <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}" />
+                                <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}" />
+                                <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" />
+                            </ListBox.InputBindings>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem"
+                                       BasedOn="{StaticResource ListBoxItemBaseTransparent}">
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="ContextMenu" Value="{StaticResource TaskMenu}" />
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Margin="6,0,0,0" Text="{Binding Name}"
+                                                   ContextMenu="{StaticResource TaskMenu}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
                     </Border>
-                </hc:SimpleStackPanel>
-                <hc:SimpleStackPanel Orientation="Vertical" Margin="15 10 15 0" Width="360">
-                    <hc:TextBox VerticalAlignment="Center" Margin=" 0 0 0 4" Width="350"
+                </Grid>
+                <Grid Grid.Column="1"  Margin="15 10 15 0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="32" />
+                        <RowDefinition Height="25" />
+                        <RowDefinition Height="*" MinHeight="50" />
+                        <RowDefinition Height="50" />
+                    </Grid.RowDefinitions>
+                    <hc:TextBox Grid.Row="0" VerticalAlignment="Center" Margin=" 0 0 0 4"
                                 hc:InfoElement.TitlePlacement="Left"
                                 hc:InfoElement.Title="{lex:Loc EditTaskDialog_TaskName_Title}"
                                 x:Name="TaskName" hc:InfoElement.Placeholder="{lex:Loc EditTaskDialog_TaskName_Title}" />
-                    <Grid VerticalAlignment="Top" Margin="0,5,10,4">
+                    <Grid Grid.Row="1"  VerticalAlignment="Top" Margin="0,5,10,4">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
@@ -209,7 +234,7 @@
                                     hc:IconElement.Geometry="{StaticResource clear}" />
                         </StackPanel>
                     </Grid>
-                    <Border Height="320" Background="{DynamicResource WhiteColor}" CornerRadius="8" Margin="0 4 4 0"
+                    <Border Grid.Row="2" Background="{DynamicResource WhiteColor}" CornerRadius="8" Margin="2 4 2 0"
                             Padding="4"
                             ContextMenu="{StaticResource AttributeMenu}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -224,15 +249,20 @@
                             </WrapPanel>
                         </ScrollViewer>
                     </Border>
-                    <hc:SimpleStackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 13 0 0">
-                        <Button
-                            BorderThickness="0"
-                            Content="{lex:Loc EditTaskDialog_SaveTask_Button}" Click="Save"
-                            Foreground="White"
-                            FontSize="11"
-                            VerticalContentAlignment="Center"
-                            Width="90"
-                            Margin="0,0,0,0">
+                    <Grid Grid.Row="3"  Margin="0 13 0 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" HorizontalAlignment="Stretch"
+                                BorderThickness="0"
+                                Content="{lex:Loc EditTaskDialog_SaveTask_Button}" Click="Save"
+                                Foreground="White"
+                                FontSize="11"
+                                VerticalContentAlignment="Center"
+                                Margin="10,0,5,0">
 
                             <Button.Style>
                                 <Style TargetType="Button">
@@ -259,27 +289,27 @@
                                 </ControlTemplate>
                             </Button.Template>
                         </Button>
-                        <Button
-                            Click="ShowChart"
-                            Content="{lex:Loc EditTaskDialog_ShowChart_Button}"
-                            Foreground="{DynamicResource BlackColor}"
-                            FontSize="11"
-                            VerticalContentAlignment="Center"
-                            Width="90" Height="30"
-                            Margin="20,0,10,0">
+                        <Button Grid.Column="1"
+                                Click="ShowChart"
+                                Content="{lex:Loc EditTaskDialog_ShowChart_Button}"
+                                Foreground="{DynamicResource BlackColor}"
+                                FontSize="11" HorizontalAlignment="Stretch"
+                                VerticalContentAlignment="Center"
+                                Height="30"
+                                Margin="5,0,5,0">
                         </Button>
-                        <Button
-                            Click="Close"
-                            Content="{lex:Loc Quit}"
-                            Foreground="{DynamicResource BlackColor}"
-                            FontSize="11"
-                            VerticalContentAlignment="Center"
-                            Width="90" Height="30"
-                            Margin="10,0,10,0">
+                        <Button Grid.Column="2" HorizontalAlignment="Stretch"
+                                Click="Close"
+                                Content="{lex:Loc Quit}"
+                                Foreground="{DynamicResource BlackColor}"
+                                FontSize="11"
+                                VerticalContentAlignment="Center"
+                                Height="30"
+                                Margin="5,0,10,0">
                         </Button>
-                    </hc:SimpleStackPanel>
-                </hc:SimpleStackPanel>
-            </hc:SimpleStackPanel>
-        </hc:SimpleStackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
     </Border>
 </controls:CustomWindow>

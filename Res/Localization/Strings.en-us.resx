@@ -293,4 +293,7 @@
     <data name="Warning_CannotConnect" xml:space="preserve">
         <value>Unable to connect to {0}</value>
     </data>
+    <data name="Add" xml:space="preserve">
+        <value>Add</value>
+    </data>
 </root>

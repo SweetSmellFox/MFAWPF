@@ -2,11 +2,11 @@
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:hc="https://handyorg.github.io/handycontrol"
-                    xmlns:local="clr-namespace:MFAWPF.Views"
+                    xmlns:local="clr-namespace:MFAWPF.Views" IsResizable="True"
                     xmlns:controls="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
                     xmlns:controls1="clr-namespace:MFAWPF.Controls"
                     Title="任务流程图" Width="900" Height="810">
-    <Border CornerRadius="10" Background="{DynamicResource WhiteColor}" BorderBrush="{StaticResource GrayColor5}" BorderThickness="1">
+    <Border CornerRadius="10" Background="{DynamicResource WhiteColor}" BorderBrush="{DynamicResource GrayColor5}" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
@@ -14,7 +14,7 @@
                 <RowDefinition Height="60" />
             </Grid.RowDefinitions>
 
-            <Border CornerRadius="10 10 0 0" Background="{StaticResource MainContentBackgroundBrush}"
+            <Border CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"
                     ClipToBounds="False">
                 <Grid Height="34">
                     <TextBlock Text="任务流程图" VerticalAlignment="Center"  x:Name="TitleText"
