@@ -29,7 +29,7 @@
         <converters:CustomIsEnabledConverter x:Key="CustomIsEnabledConverter" />
     </controls:CustomWindow.Resources>
     <Border CornerRadius="8" Background="{DynamicResource SecundaryBackgroundColor}"
-            BorderBrush="{StaticResource GrayColor5}" BorderThickness="1">
+            BorderBrush="{DynamicResource GrayColor10}" BorderThickness="1">
         <Grid>
 
             <Grid Grid.Column="0">

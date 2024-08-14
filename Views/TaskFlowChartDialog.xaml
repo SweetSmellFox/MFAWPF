@@ -5,8 +5,9 @@
                     xmlns:local="clr-namespace:MFAWPF.Views" IsResizable="True"
                     xmlns:controls="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
                     xmlns:controls1="clr-namespace:MFAWPF.Controls"
-                    Title="任务流程图" Width="900" Height="810">
-    <Border CornerRadius="10" Background="{DynamicResource WhiteColor}" BorderBrush="{DynamicResource GrayColor5}" BorderThickness="1">
+                    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+                    Title="{lex:Loc WorkflowDiagramTitle}" Width="900" Height="810">
+    <Border CornerRadius="10" Background="{DynamicResource WhiteColor}" BorderBrush="{DynamicResource GrayColor10}" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
@@ -17,7 +18,7 @@
             <Border CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"
                     ClipToBounds="False">
                 <Grid Height="34">
-                    <TextBlock Text="任务流程图" VerticalAlignment="Center"  x:Name="TitleText"
+                    <TextBlock Text="{lex:Loc WorkflowDiagramTitle}" VerticalAlignment="Center"  x:Name="TitleText"
                                Foreground="{StaticResource BlackColor}"
                                FontWeight="Bold" FontSize="17" HorizontalAlignment="Center"
                                Margin="0 0 0 0" />
@@ -45,7 +46,7 @@
             <StackPanel Grid.Row="2" HorizontalAlignment="Center" Orientation="Horizontal" Margin=" 0 10 0 0">
                 <Button x:Name="SaveButton"
                         BorderThickness="0"
-                        Content="关闭" Click="Close"
+                        Content="{lex:Loc ButtonClose}" Click="Close"
                         Foreground="White"
                         FontSize="11"
                         VerticalContentAlignment="Center"

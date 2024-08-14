@@ -30,7 +30,7 @@
 
     <Border
         CornerRadius="10"
-        Background="{DynamicResource SecundaryBackgroundColor}" BorderBrush="{DynamicResource GrayColor5}"
+        Background="{DynamicResource SecundaryBackgroundColor}" BorderBrush="{DynamicResource GrayColor10}"
         BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>

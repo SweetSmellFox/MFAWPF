@@ -31,72 +31,71 @@ public partial class EditAttributeDialog : CustomWindow
         base()
     {
         InitializeComponent();
-        // ParentDialog = parentDialog;
-        // IsEdit = isEdit;
-        // Attribute = new Attribute()
-        // {
-        //     Key = attribute?.Key, Value = attribute?.Value
-        // };
-        // save_Button.Content = IsEdit ? "保存" : "添加";
-        // var Types = new List<string>()
-        // {
-        //     "recognition",
-        //     "action",
-        //     "next",
-        //     "is_sub",
-        //     "inverse",
-        //     "enabled",
-        //     "timeout",
-        //     "timeout_next",
-        //     "times_limit",
-        //     "runout_next",
-        //     "pre_delay",
-        //     "post_delay",
-        //     "pre_wait_freezes",
-        //     "post_wait_freezes",
-        //     "focus",
-        //     "focus_tip",
-        //     "focus_tip_color",
-        //     "expected",
-        //     "only_rec",
-        //     "labels",
-        //     "model",
-        //     "target",
-        //     "target_offset",
-        //     "begin",
-        //     "begin_offset",
-        //     "end",
-        //     "end_offset",
-        //     "duration",
-        //     "key",
-        //     "input_text",
-        //     "package",
-        //     "custom_recognition",
-        //     "custom_recognition_param",
-        //     "custom_action",
-        //     "custom_action_param",
-        //     "order_by",
-        //     "index",
-        //     "method",
-        //     "count",
-        //     "green_mask",
-        //     "detector",
-        //     "ratio",
-        //     "template",
-        //     "roi",
-        //     "threshold",
-        //     "lower",
-        //     "upper",
-        //     "connected"
-        // };
-        //
-        //
-        // typeComboBox.ItemsSource = Types;
-        // if (attribute?.Key != null)
-        // {
-        //     typeComboBox.SelectedValue = attribute.Key;
-        //     SwitchByType(attribute.Key, attribute.Value);
-        // }
+        ParentDialog = parentDialog;
+        IsEdit = isEdit;
+        Attribute = new Attribute()
+        {
+            Key = attribute?.Key, Value = attribute?.Value
+        };
+        var Types = new List<string>()
+        {
+            "recognition",
+            "action",
+            "next",
+            "is_sub",
+            "inverse",
+            "enabled",
+            "timeout",
+            "timeout_next",
+            "times_limit",
+            "runout_next",
+            "pre_delay",
+            "post_delay",
+            "pre_wait_freezes",
+            "post_wait_freezes",
+            "focus",
+            "focus_tip",
+            "focus_tip_color",
+            "expected",
+            "only_rec",
+            "labels",
+            "model",
+            "target",
+            "target_offset",
+            "begin",
+            "begin_offset",
+            "end",
+            "end_offset",
+            "duration",
+            "key",
+            "input_text",
+            "package",
+            "custom_recognition",
+            "custom_recognition_param",
+            "custom_action",
+            "custom_action_param",
+            "order_by",
+            "index",
+            "method",
+            "count",
+            "green_mask",
+            "detector",
+            "ratio",
+            "template",
+            "roi",
+            "threshold",
+            "lower",
+            "upper",
+            "connected"
+        };
+        
+        
+        typeComboBox.ItemsSource = Types;
+        if (attribute?.Key != null)
+        {
+            typeComboBox.SelectedValue = attribute.Key;
+            SwitchByType(attribute.Key, attribute.Value);
+        }
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)

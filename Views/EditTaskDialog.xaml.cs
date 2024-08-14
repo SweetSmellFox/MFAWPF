@@ -22,12 +22,12 @@ using Path = System.Windows.Shapes.Path;
 
 namespace MFAWPF.Views;
 
-public partial class EditTaskDialog : CustomWindow
+public partial class EditTaskDialog 
 {
     private List<TaskModel> tasks;
     public EditTaskDialogViewModel? Data;
 
-    public EditTaskDialog() : base()
+    public EditTaskDialog() 
     {
         InitializeComponent();
         tasks = new List<TaskModel>();
@@ -38,9 +38,9 @@ public partial class EditTaskDialog : CustomWindow
 
     protected override void Close(object sender, RoutedEventArgs e)
     {
-        base.Close(sender, e);
         if (MainWindow.Data != null)
             MainWindow.Data.Idle = true;
+        base.Close(sender, e);
     }
 
     private void List_KeyDown(object sender, KeyEventArgs e)

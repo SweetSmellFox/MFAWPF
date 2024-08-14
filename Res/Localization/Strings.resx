@@ -90,9 +90,6 @@
     <data name="TaskListHeader" xml:space="preserve">
   <value>任务列表：</value>
 </data>
-    <data name="SelectAllTooltip" xml:space="preserve">
-  <value>全选</value>
-</data>
     <data name="EditTaskTooltip" xml:space="preserve">
   <value>编辑任务</value>
 </data>
@@ -321,7 +318,41 @@
     <data name="RegisterCustomAction" xml:space="preserve">
     <value>注册自定义Action:{0}</value>
 </data>
-    <data name="Add" xml:space="preserve">
+    <data name="EditAttributeDialogTitle" xml:space="preserve">
+    <value>属性编辑器</value>
+</data>
+    <data name="LabelPropertyType" xml:space="preserve">
+    <value>属性类型:</value>
+</data>
+    <data name="ButtonSave" xml:space="preserve">
+    <value>保存</value>
+</data>
+    <data name="ButtonCancel" xml:space="preserve">
+    <value>取消</value>
+</data>
+    <data name="ButtonClose" xml:space="preserve">
+    <value>关闭</value>
+</data>
+    <data name="ButtonAdd" xml:space="preserve">
         <value>添加</value>
     </data>
+    <data name="ColorPickerTitle" xml:space="preserve">
+    <value>取色器</value>
+</data>
+    <data name="ImageBrowserTitle" xml:space="preserve">
+    <value>图片浏览器</value>
+</data>
+    <data name="TextRecognizerTitle" xml:space="preserve">
+    <value>文字识别器</value>
+</data>
+    <data name="RegionSelectorTitle" xml:space="preserve">
+    <value>区域选择器</value>
+</data>
+    <data name="SliderControlTitle" xml:space="preserve">
+    <value>滑动获取器</value>
+</data>
+    <data name="WorkflowDiagramTitle" xml:space="preserve">
+    <value>任务流程图</value>
+</data>
+
 </root>

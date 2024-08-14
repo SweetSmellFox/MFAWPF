@@ -62,9 +62,6 @@
     <data name="TaskListHeader" xml:space="preserve">
     <value>Task List:</value>
   </data>
-    <data name="SelectAllTooltip" xml:space="preserve">
-    <value>Select All</value>
-  </data>
     <data name="EditTaskTooltip" xml:space="preserve">
     <value>Edit Task</value>
   </data>
@@ -293,7 +290,41 @@
     <data name="Warning_CannotConnect" xml:space="preserve">
         <value>Unable to connect to {0}</value>
     </data>
-    <data name="Add" xml:space="preserve">
+    <data name="EditAttributeDialogTitle" xml:space="preserve">
+    <value>Attribute Editor</value>
+</data>
+    <data name="LabelPropertyType" xml:space="preserve">
+    <value>Property Type:</value>
+</data>
+    <data name="ButtonSave" xml:space="preserve">
+    <value>Save</value>
+</data>
+    <data name="ButtonCancel" xml:space="preserve">
+    <value>Cancel</value>
+</data>
+    <data name="ButtonAdd" xml:space="preserve">
         <value>Add</value>
     </data>
+    <data name="ButtonClose" xml:space="preserve">
+    <value>Close</value>
+</data>
+    <data name="ColorPickerTitle" xml:space="preserve">
+    <value>Color Picker</value>
+</data>
+    <data name="ImageBrowserTitle" xml:space="preserve">
+    <value>Image Browser</value>
+</data>
+    <data name="TextRecognizerTitle" xml:space="preserve">
+    <value>Text Recognizer</value>
+</data>
+    <data name="RegionSelectorTitle" xml:space="preserve">
+    <value>Region Selector</value>
+</data>
+    <data name="SliderControlTitle" xml:space="preserve">
+    <value>Slider Control</value>
+</data>
+    <data name="WorkflowDiagramTitle" xml:space="preserve">
+    <value>Workflow Diagram</value>
+</data>
+
 </root>
