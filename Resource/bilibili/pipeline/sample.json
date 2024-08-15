@@ -1,6 +1,0 @@
-{
-  "速刷源石锭": {
-    "action": "StartApp",
-	"package": "com.hypergryph.arknights.bilibili/com.u8.sdk.U8UnityContext"
-  }
-}
