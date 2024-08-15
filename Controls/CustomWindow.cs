@@ -10,11 +10,21 @@ public class CustomWindow : Window
     Point _pressedPosition;
     bool _isDragMoved = false;
 
-    // 定义一个依赖属性来控制四周缩放
+
     public static readonly DependencyProperty IsResizableProperty =
         DependencyProperty.Register(nameof(IsResizable), typeof(bool), typeof(CustomWindow),
             new PropertyMetadata(false));
 
+    public static readonly DependencyProperty DragHandleNameProperty =
+        DependencyProperty.Register(nameof(DragHandleName), typeof(string), typeof(CustomWindow),
+            new PropertyMetadata("TitleBar"));
+    
+    public string DragHandleName
+    {
+        get => (string)GetValue(DragHandleNameProperty);
+        set => SetValue(DragHandleNameProperty, value);
+    }
+    
     public bool IsResizable
     {
         get => (bool)GetValue(IsResizableProperty);
@@ -99,12 +109,12 @@ public class CustomWindow : Window
     {
         _pressedPosition = e.GetPosition(this);
     }
-
+    
     protected void Window_PreviewMouseMove(object sender, MouseEventArgs e)
     {
         if (Mouse.LeftButton == MouseButtonState.Pressed && _pressedPosition != e.GetPosition(this))
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (FindName(DragHandleName) is UIElement element && IsPointInElement(e.GetPosition(this), element))
             {
                 _isDragMoved = true;
                 DragMove();
@@ -119,5 +129,16 @@ public class CustomWindow : Window
             _isDragMoved = false;
             e.Handled = true;
         }
+    }
+
+    private bool IsPointInElement(Point point, UIElement element)
+    {
+        if (element == null) return false;
+
+        var transform = element.TransformToVisual(this);
+        var elementPoint = transform.Transform(new Point(0, 0));
+        var elementRect = new Rect(elementPoint, new Size(element.RenderSize.Width, element.RenderSize.Height));
+
+        return elementRect.Contains(point);
     }
 }

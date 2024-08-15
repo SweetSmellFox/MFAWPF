@@ -14,7 +14,7 @@
                 <RowDefinition Height="60" />
             </Grid.RowDefinitions>
 
-            <Border CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"
+            <Border CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"  x:Name="TitleBar"
                     ClipToBounds="False">
                 <Grid Height="34">
                     <TextBlock Text="{lex:Loc RegionSelectorTitle}" VerticalAlignment="Center"  x:Name="TitleText" IsHitTestVisible="False"
@@ -51,7 +51,7 @@
                 </hc:ComboBox>
                 <Button x:Name="SaveButton"
                         BorderThickness="0"
-                        Content="lex:Loc ButtonSave}" Click="SaveButton_Click"
+                        Content="{lex:Loc ButtonSave}" Click="SaveButton_Click"
                         Foreground="White"
                         FontSize="11"
                         VerticalContentAlignment="Center"

@@ -17,9 +17,6 @@
                        Title="{lex:Loc AppTitle}" Height="520" Width="800" MinWidth="400" MinHeight="205"
                        WindowStartupLocation="CenterScreen" WindowStyle="None"
                        Background="Transparent" AllowsTransparency="True"
-                       PreviewMouseLeftButtonDown="Window_PreviewMouseLeftButtonDown"
-                       PreviewMouseMove="Window_PreviewMouseMove"
-                       PreviewMouseLeftButtonUp="Window_PreviewMouseLeftButtonUp"
                        WindowState="Normal">
     <controls:CustomWindow.DataContext>
         <viewModels:MainViewModel />
@@ -37,7 +34,7 @@
                     <RowDefinition Height="40" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <Border CornerRadius="10 10 0 0" VerticalAlignment="Top"
+                <Border CornerRadius="10 10 0 0" VerticalAlignment="Top" x:Name="TitleBar"
                         Padding="0,2,10,0" Height="30" Background="{DynamicResource MainContentBackgroundBrush}"
                         ClipToBounds="False">
                     <Grid>

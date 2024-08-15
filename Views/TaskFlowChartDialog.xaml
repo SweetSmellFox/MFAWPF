@@ -15,7 +15,7 @@
                 <RowDefinition Height="60" />
             </Grid.RowDefinitions>
 
-            <Border CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"
+            <Border CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"  x:Name="TitleBar"
                     ClipToBounds="False">
                 <Grid Height="34">
                     <TextBlock Text="{lex:Loc WorkflowDiagramTitle}" VerticalAlignment="Center"  x:Name="TitleText"
