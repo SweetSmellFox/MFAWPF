@@ -82,6 +82,33 @@
     <ItemGroup>
         <Content Include=".github\workflows\Release.yml" />
         <Content Include="MFAWPF.sln" />
+        <Content Include="MFAWPF.sln.DotSettings.user" />
+        <Content Include="obj\MFAWPF.csproj.nuget.dgspec.json" />
+        <Content Include="obj\MFAWPF_d535xxy5_wpftmp.csproj.nuget.dgspec.json" />
+        <Content Include="obj\MFAWPF_d535xxy5_wpftmp.csproj.nuget.g.props" />
+        <Content Include="obj\MFAWPF_d535xxy5_wpftmp.csproj.nuget.g.targets" />
+        <Content Include="obj\MFAWPF_iuf0hbkg_wpftmp.csproj.nuget.dgspec.json" />
+        <Content Include="obj\MFAWPF_iuf0hbkg_wpftmp.csproj.nuget.g.props" />
+        <Content Include="obj\MFAWPF_iuf0hbkg_wpftmp.csproj.nuget.g.targets" />
+        <Content Include="obj\MFAWPF_pcne4eok_wpftmp.csproj.nuget.dgspec.json" />
+        <Content Include="obj\MFAWPF_pcne4eok_wpftmp.csproj.nuget.g.props" />
+        <Content Include="obj\MFAWPF_pcne4eok_wpftmp.csproj.nuget.g.targets" />
+        <Content Include="obj\MFAWPF_qbnclnsq_wpftmp.csproj.nuget.dgspec.json" />
+        <Content Include="obj\MFAWPF_qbnclnsq_wpftmp.csproj.nuget.g.props" />
+        <Content Include="obj\MFAWPF_qbnclnsq_wpftmp.csproj.nuget.g.targets" />
+        <Content Include="obj\MFAWPF_rd143yte_wpftmp.csproj.nuget.dgspec.json" />
+        <Content Include="obj\MFAWPF_rd143yte_wpftmp.csproj.nuget.g.props" />
+        <Content Include="obj\MFAWPF_rd143yte_wpftmp.csproj.nuget.g.targets" />
+        <Content Include="obj\MFAWPF_vehp5vnm_wpftmp.csproj.nuget.dgspec.json" />
+        <Content Include="obj\MFAWPF_vehp5vnm_wpftmp.csproj.nuget.g.props" />
+        <Content Include="obj\MFAWPF_vehp5vnm_wpftmp.csproj.nuget.g.targets" />
+        <Content Include="obj\project.assets.json" />
+        <Content Include="obj\project.packagespec.json" />
+        <Content Include="obj\rider.project.model.nuget.info" />
+        <Content Include="obj\rider.project.restore.info" />
+        <Content Include="obj\x64\Release\MFAWPF.csproj.FileListAbsolute.txt" />
+        <Content Include="obj\x64\Release\MFAWPF.csproj.Up2Date" />
+        <Content Include="obj\x64\Release\MFAWPF.sourcelink.json" />
         <Content Include="Resource\**\*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
@@ -160,5 +187,6 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Strings.resx</DependentUpon>
       </Compile>
+      <Compile Include="obj\x64\Release\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs" />
     </ItemGroup>
 </Project>
