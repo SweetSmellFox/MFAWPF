@@ -83,7 +83,42 @@
         <Content Include=".github\workflows\Release.yml" />
         <Content Include="MFAWPF.sln" />
         <Content Include="MFAWPF.sln.DotSettings.user" />
+        <Content Include="obj\Debug\apphost.exe" />
+        <Content Include="obj\Debug\Assets\Icons\Icons.baml" />
+        <Content Include="obj\Debug\MFAWPF.AssemblyInfoInputs.cache" />
+        <Content Include="obj\Debug\MFAWPF.assets.cache" />
+        <Content Include="obj\Debug\MFAWPF.csproj.AssemblyReference.cache" />
+        <Content Include="obj\Debug\MFAWPF.csproj.CoreCompileInputs.cache" />
+        <Content Include="obj\Debug\MFAWPF.csproj.FileListAbsolute.txt" />
+        <Content Include="obj\Debug\MFAWPF.csproj.Up2Date" />
+        <Content Include="obj\Debug\MFAWPF.dll" />
+        <Content Include="obj\Debug\MFAWPF.g.resources" />
+        <Content Include="obj\Debug\MFAWPF.GeneratedMSBuildEditorConfig.editorconfig" />
+        <Content Include="obj\Debug\MFAWPF.genruntimeconfig.cache" />
+        <Content Include="obj\Debug\MFAWPF.pdb" />
+        <Content Include="obj\Debug\MFAWPF_MarkupCompile.cache" />
+        <Content Include="obj\Debug\MFAWPF_MarkupCompile.lref" />
+        <Content Include="obj\Debug\refint\MFAWPF.dll" />
+        <Content Include="obj\Debug\ref\MFAWPF.dll" />
+        <Content Include="obj\Debug\Res\Primary\Magenta.baml" />
+        <Content Include="obj\Debug\Res\Primary\Primary.baml" />
+        <Content Include="obj\Debug\Res\Style.baml" />
+        <Content Include="obj\Debug\Res\Style\Styles\Brush.baml" />
+        <Content Include="obj\Debug\Res\Style\Styles\Color.baml" />
+        <Content Include="obj\Debug\Res\Style\Styles\Geometry.baml" />
+        <Content Include="obj\Debug\Res\Theme.baml" />
+        <Content Include="obj\Debug\Res\Theme\DarkTheme.baml" />
+        <Content Include="obj\Debug\Res\Theme\LightTheme.baml" />
+        <Content Include="obj\Debug\Styles\Brush.baml" />
+        <Content Include="obj\Debug\Styles\Color.baml" />
+        <Content Include="obj\Debug\Styles\Geometry.baml" />
+        <Content Include="obj\Debug\Styles\Primary\Magenta.baml" />
+        <Content Include="obj\Debug\Styles\Primary\Primary.baml" />
+        <Content Include="obj\Debug\Styles\Theme\DarkTheme.baml" />
+        <Content Include="obj\Debug\Styles\Theme\LightTheme.baml" />
         <Content Include="obj\MFAWPF.csproj.nuget.dgspec.json" />
+        <Content Include="obj\MFAWPF.csproj.nuget.g.props" />
+        <Content Include="obj\MFAWPF.csproj.nuget.g.targets" />
         <Content Include="obj\MFAWPF_d535xxy5_wpftmp.csproj.nuget.dgspec.json" />
         <Content Include="obj\MFAWPF_d535xxy5_wpftmp.csproj.nuget.g.props" />
         <Content Include="obj\MFAWPF_d535xxy5_wpftmp.csproj.nuget.g.targets" />
@@ -103,7 +138,54 @@
         <Content Include="obj\MFAWPF_vehp5vnm_wpftmp.csproj.nuget.g.props" />
         <Content Include="obj\MFAWPF_vehp5vnm_wpftmp.csproj.nuget.g.targets" />
         <Content Include="obj\project.assets.json" />
+        <Content Include="obj\project.nuget.cache" />
         <Content Include="obj\project.packagespec.json" />
+        <Content Include="obj\Release\App.baml" />
+        <Content Include="obj\Release\apphost.exe" />
+        <Content Include="obj\Release\en-us\MFAWPF.resources.dll" />
+        <Content Include="obj\Release\MFAWPF.AssemblyInfoInputs.cache" />
+        <Content Include="obj\Release\MFAWPF.assets.cache" />
+        <Content Include="obj\Release\MFAWPF.csproj.AssemblyReference.cache" />
+        <Content Include="obj\Release\MFAWPF.csproj.CoreCompileInputs.cache" />
+        <Content Include="obj\Release\MFAWPF.csproj.FileListAbsolute.txt" />
+        <Content Include="obj\Release\MFAWPF.csproj.GenerateResource.cache" />
+        <Content Include="obj\Release\MFAWPF.csproj.Up2Date" />
+        <Content Include="obj\Release\MFAWPF.deps.json" />
+        <Content Include="obj\Release\MFAWPF.dll" />
+        <Content Include="obj\Release\MFAWPF.g.resources" />
+        <Content Include="obj\Release\MFAWPF.genbundle.cache" />
+        <Content Include="obj\Release\MFAWPF.GeneratedMSBuildEditorConfig.editorconfig" />
+        <Content Include="obj\Release\MFAWPF.genpublishdeps.cache" />
+        <Content Include="obj\Release\MFAWPF.genruntimeconfig.cache" />
+        <Content Include="obj\Release\MFAWPF.pdb" />
+        <Content Include="obj\Release\MFAWPF.Res.Localization.Strings.en-us.resources" />
+        <Content Include="obj\Release\MFAWPF.Res.Localization.Strings.resources" />
+        <Content Include="obj\Release\MFAWPF.sourcelink.json" />
+        <Content Include="obj\Release\MFAWPF_MarkupCompile.cache" />
+        <Content Include="obj\Release\MFAWPF_MarkupCompile.lref" />
+        <Content Include="obj\Release\PublishOutputs.6baedafc1c.txt" />
+        <Content Include="obj\Release\PublishOutputs.76af6159db.txt" />
+        <Content Include="obj\Release\refint\MFAWPF.dll" />
+        <Content Include="obj\Release\ref\MFAWPF.dll" />
+        <Content Include="obj\Release\Res\Primary\Magenta.baml" />
+        <Content Include="obj\Release\Res\Primary\Primary.baml" />
+        <Content Include="obj\Release\Res\Style.baml" />
+        <Content Include="obj\Release\Res\Style\MainStyle.baml" />
+        <Content Include="obj\Release\Res\Style\Styles\Brush.baml" />
+        <Content Include="obj\Release\Res\Style\Styles\Color.baml" />
+        <Content Include="obj\Release\Res\Style\Styles\Geometry.baml" />
+        <Content Include="obj\Release\Res\Theme.baml" />
+        <Content Include="obj\Release\Res\Theme\DarkTheme.baml" />
+        <Content Include="obj\Release\Res\Theme\LightTheme.baml" />
+        <Content Include="obj\Release\Views\ColorExtractionDialog.baml" />
+        <Content Include="obj\Release\Views\CropImageDialog.baml" />
+        <Content Include="obj\Release\Views\EditAttributeDialog.baml" />
+        <Content Include="obj\Release\Views\EditTaskDialog.baml" />
+        <Content Include="obj\Release\Views\MainWindow.baml" />
+        <Content Include="obj\Release\Views\RecognitionTextDialog.baml" />
+        <Content Include="obj\Release\Views\SelectionRegionDialog.baml" />
+        <Content Include="obj\Release\Views\SwipeDialog.baml" />
+        <Content Include="obj\Release\Views\TaskFlowChartDialog.baml" />
         <Content Include="obj\rider.project.model.nuget.info" />
         <Content Include="obj\rider.project.restore.info" />
         <Content Include="obj\x64\Release\MFAWPF.csproj.FileListAbsolute.txt" />
@@ -172,6 +254,11 @@
 
     <ItemGroup>
         <Folder Include="docs\" />
+        <Folder Include="obj\Debug\Styles\Style\" />
+        <Folder Include="obj\Release\Assets\Icons\" />
+        <Folder Include="obj\Release\Styles\Primary\" />
+        <Folder Include="obj\Release\Styles\Style\" />
+        <Folder Include="obj\Release\Styles\Theme\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -187,6 +274,51 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Strings.resx</DependentUpon>
       </Compile>
+      <Compile Include="obj\Debug\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs" />
+      <Compile Include="obj\Debug\App.g.cs" />
+      <Compile Include="obj\Debug\App.g.i.cs" />
+      <Compile Include="obj\Debug\GeneratedInternalTypeHelper.g.cs" />
+      <Compile Include="obj\Debug\GeneratedInternalTypeHelper.g.i.cs" />
+      <Compile Include="obj\Debug\MFAWPF.AssemblyInfo.cs" />
+      <Compile Include="obj\Debug\MFAWPF.GlobalUsings.g.cs" />
+      <Compile Include="obj\Debug\MFAWPF_Content.g.cs" />
+      <Compile Include="obj\Debug\MFAWPF_Content.g.i.cs" />
+      <Compile Include="obj\Debug\Views\ColorExtractionDialog.g.cs" />
+      <Compile Include="obj\Debug\Views\ColorExtractionDialog.g.i.cs" />
+      <Compile Include="obj\Debug\Views\ConnectSettingDialog.g.cs" />
+      <Compile Include="obj\Debug\Views\ConnectSettingDialog.g.i.cs" />
+      <Compile Include="obj\Debug\Views\CropImageDialog.g.cs" />
+      <Compile Include="obj\Debug\Views\CropImageDialog.g.i.cs" />
+      <Compile Include="obj\Debug\Views\EditAttributeDialog.g.cs" />
+      <Compile Include="obj\Debug\Views\EditAttributeDialog.g.i.cs" />
+      <Compile Include="obj\Debug\Views\EditTaskDialog.g.cs" />
+      <Compile Include="obj\Debug\Views\EditTaskDialog.g.i.cs" />
+      <Compile Include="obj\Debug\Views\MainWindow.g.cs" />
+      <Compile Include="obj\Debug\Views\MainWindow.g.i.cs" />
+      <Compile Include="obj\Debug\Views\RecognitionTextDialog.g.cs" />
+      <Compile Include="obj\Debug\Views\RecognitionTextDialog.g.i.cs" />
+      <Compile Include="obj\Debug\Views\SelectionRegionDialog.g.cs" />
+      <Compile Include="obj\Debug\Views\SelectionRegionDialog.g.i.cs" />
+      <Compile Include="obj\Debug\Views\SwipeDialog.g.cs" />
+      <Compile Include="obj\Debug\Views\SwipeDialog.g.i.cs" />
+      <Compile Include="obj\Debug\Views\TaskFlowChartDialog.g.cs" />
+      <Compile Include="obj\Debug\Views\TaskFlowChartDialog.g.i.cs" />
+      <Compile Include="obj\Release\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs" />
+      <Compile Include="obj\Release\App.g.cs" />
+      <Compile Include="obj\Release\en-us\MFAWPF.resources.cs" />
+      <Compile Include="obj\Release\GeneratedInternalTypeHelper.g.cs" />
+      <Compile Include="obj\Release\MFAWPF.AssemblyInfo.cs" />
+      <Compile Include="obj\Release\MFAWPF.GlobalUsings.g.cs" />
+      <Compile Include="obj\Release\MFAWPF_Content.g.cs" />
+      <Compile Include="obj\Release\Views\ColorExtractionDialog.g.cs" />
+      <Compile Include="obj\Release\Views\CropImageDialog.g.cs" />
+      <Compile Include="obj\Release\Views\EditAttributeDialog.g.cs" />
+      <Compile Include="obj\Release\Views\EditTaskDialog.g.cs" />
+      <Compile Include="obj\Release\Views\MainWindow.g.cs" />
+      <Compile Include="obj\Release\Views\RecognitionTextDialog.g.cs" />
+      <Compile Include="obj\Release\Views\SelectionRegionDialog.g.cs" />
+      <Compile Include="obj\Release\Views\SwipeDialog.g.cs" />
+      <Compile Include="obj\Release\Views\TaskFlowChartDialog.g.cs" />
       <Compile Include="obj\x64\Release\.NETCoreApp,Version=v8.0.AssemblyAttributes.cs" />
     </ItemGroup>
 </Project>
