@@ -196,8 +196,31 @@ namespace MFAWPF.Views
 
                 if (taskDictionary.Count == 0)
                 {
-                    File.Create($"{MaaProcessor.ResourceBase}/pipeline/sample.json");
-                    File.WriteAllText($"{MaaProcessor.ResourceBase}/pipeline/sample.json", "{}");
+                    string directoryPath = Path.GetDirectoryName($"MaaProcessor.ResourceBase}}/pipeline");
+                    if (!Directory.Exists(directoryPath))
+                    {
+                        try
+                        {
+                            Directory.CreateDirectory(directoryPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"创建目录时发生错误: {ex.Message}");
+                            LoggerService.LogError(ex);
+                        }
+                    }
+                    if (!File.Exists($"{MaaProcessor.ResourceBase}/pipeline/sample.json"))
+                    {
+                        try
+                        {
+                            File.WriteAllText($"{MaaProcessor.ResourceBase}/pipeline/sample.json", "{}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"创建文件时发生错误: {ex.Message}");
+                            LoggerService.LogError(ex);
+                        }
+                    }
                 }
 
                 PopulateTasks(taskDictionary);
