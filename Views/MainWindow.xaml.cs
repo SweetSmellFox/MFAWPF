@@ -194,6 +194,12 @@ namespace MFAWPF.Views
                     }
                 }
 
+                if (taskDictionary.Count == 0)
+                {
+                    File.Create($"{MaaProcessor.ResourceBase}/pipeline/sample.json");
+                    File.WriteAllText($"{MaaProcessor.ResourceBase}/pipeline/sample.json", "{}");
+                }
+
                 PopulateTasks(taskDictionary);
 
                 return true;

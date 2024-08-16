@@ -36,12 +36,13 @@
         <ApplicationVersion>1.1.0</ApplicationVersion>
         <Version>1.1</Version>
         <FileVersion>0.0.1</FileVersion>
-        <AssemblyVersion>1.1.3.4</AssemblyVersion>
+        <AssemblyVersion>1.1.3.5</AssemblyVersion>
         <InformationalVersion>0.0.1</InformationalVersion>
     </PropertyGroup>
   
     <!-- Build and Publish -->
     <PropertyGroup>
+        <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	    <OutputPath>..\bin\$(Platform)\$(Configuration)\</OutputPath>
         <PublishReadyToRun>false</PublishReadyToRun>
         <PublishSingleFile>true</PublishSingleFile>
@@ -64,7 +65,7 @@
         <PackageReference Include="GraphSharp" Version="1.1.0" />
         <PackageReference Include="HandyControls" Version="3.5.3" />
         <PackageReference Include="Maa.Framework" Version="1.8.9.2" />
-        <PackageReference Include="Maa.Framework.Runtimes" Version="1.8.9.16-ci.10313141234" />
+        <PackageReference Include="Maa.Framework.Runtimes" Version="1.8.9" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="NLog" Version="5.3.2" />
         <PackageReference Include="NLog.Config" Version="4.7.15" />
@@ -79,6 +80,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include=".github\workflows\Release.yml" />
+        <Content Include="MFAWPF.sln" />
         <Content Include="Resource\**\*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
@@ -142,7 +145,6 @@
 
     <ItemGroup>
         <Folder Include="docs\" />
-        <Folder Include="Resource\base\image\" />
     </ItemGroup>
 
     <ItemGroup>
