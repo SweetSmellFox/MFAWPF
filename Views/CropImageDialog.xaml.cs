@@ -240,7 +240,7 @@ public partial class CropImageDialog : CustomWindow
         }
     }
 
-    protected override void Close(object sender, RoutedEventArgs e)
+    protected override void Close(object? sender, RoutedEventArgs? e)
     {
         Close();
     }

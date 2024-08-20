@@ -11,6 +11,7 @@
                        xmlns:converters="clr-namespace:MFAWPF.Utils.Converters"
                        xmlns:lex="http://wpflocalizeextension.codeplex.com" IsResizable="True"
                        xmlns:engine="https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension"
+                       xmlns:utils="clr-namespace:MFAWPF.Utils"
                        engine:ResxLocalizationProvider.DefaultAssembly="MFAWPF"
                        engine:ResxLocalizationProvider.DefaultDictionary="Strings"
                        mc:Ignorable="d"
@@ -24,6 +25,28 @@
     <controls:CustomWindow.Resources>
         <converters:SubtractConverter x:Key="SubtractConverter" />
         <converters:CustomIsEnabledConverter x:Key="CustomIsEnabledConverter" />
+        <DataTemplate x:Key="DeviceInfoTemplate">
+            <TextBlock>
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0} ({1})">
+                        <Binding Path="Name"/>
+                        <Binding Path="AdbSerial"/>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </DataTemplate>
+        <!-- DataTemplate for WindowInfo -->
+        <DataTemplate x:Key="WindowInfoTemplate">
+            <TextBlock Text="{Binding Name}"/>
+        </DataTemplate>
+
+        <!-- DataTemplateSelector -->
+        <utils:DeviceWindowTemplateSelector x:Key="DeviceWindowTemplateSelector"
+                                            DeviceInfoTemplate="{StaticResource DeviceInfoTemplate}"
+                                            WindowInfoTemplate="{StaticResource WindowInfoTemplate}"/>
+        <ContextMenu x:Key="TaskMenu">
+            <MenuItem Header="{lex:Loc Delete}" Click="Delete" />
+        </ContextMenu>
     </controls:CustomWindow.Resources>
     <Border CornerRadius="8" Background="{DynamicResource SecundaryBackgroundColor}"
             BorderBrush="{DynamicResource GrayColor10}" BorderThickness="1">
@@ -42,7 +65,7 @@
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10 0 0 0 ">
-                            <Image VerticalAlignment="Center" DockPanel.Dock="Left" Source="/../Assets/Icons/logo.ico"
+                            <Image VerticalAlignment="Center" DockPanel.Dock="Left" Source="/logo.ico" x:Name="logo"
                                    Height="20" Width="20">
 
                             </Image>
@@ -52,6 +75,20 @@
                             </TextBlock>
                             <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}"
                                        Margin="2 4 4 0" x:Name="version" Text="Debug">
+                            </TextBlock>
+                            <TextBlock VerticalAlignment="Center" Margin="6 4 4 0" Text="{lex:Loc ResourceName}" x:Name="resourceNameText" Visibility="Collapsed"
+                                       Foreground="{DynamicResource PrimaryTextBrush}">
+
+                            </TextBlock>
+                            <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}" Visibility="Collapsed"
+                                       Margin="2 4 4 0" x:Name="resourceName" Text="Debug">
+                            </TextBlock>
+                            <TextBlock VerticalAlignment="Center" Margin="6 4 4 0" Text="{lex:Loc ResourceVersion}" x:Name="resourceVersionText" Visibility="Collapsed"
+                                       Foreground="{DynamicResource PrimaryTextBrush}">
+
+                            </TextBlock>
+                            <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}" Visibility="Collapsed"
+                                       Margin="2 4 4 0" x:Name="resourceVersion" Text="Debug">
                             </TextBlock>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" FlowDirection="RightToLeft">
@@ -88,8 +125,8 @@
                             <TabItem Header="{lex:Loc TabADB}" x:Name="adbTab"></TabItem>
                             <TabItem Header="{lex:Loc TabWin32}" x:Name="win32Tab"></TabItem>
                         </TabControl>
-                        <ComboBox Width="250" x:Name="deviceComboBox" DisplayMemberPath="Name" Margin="4 0 0 0"
-                                  IsEnabled="{Binding Idle}"
+                        <ComboBox Width="250" x:Name="deviceComboBox"  Margin="4 0 0 0"
+                                  IsEnabled="{Binding Idle}" ItemTemplateSelector="{StaticResource DeviceWindowTemplateSelector}"
                                   SelectionChanged="DeviceComboBox_OnSelectionChanged" />
                         <Button ToolTip="{lex:Loc TooltipRefresh}" Width="20" Height="20" Margin="6 0 2 0"
                                 Style="{StaticResource textBoxButton}"
@@ -152,6 +189,12 @@
                                             Padding="0"
                                             hc:IconElement.Geometry="{StaticResource EditGeometry}" />
                                     <Button ToolTip="{lex:Loc TaskSettings}" Width="15" Height="15" Margin="7 0 0 0"
+                                            Style="{StaticResource textBoxButton}"
+                                            Foreground="{DynamicResource GrayColor4}"
+                                            Click="Add" IsEnabled="{Binding Idle}"
+                                            Padding="0"
+                                            hc:IconElement.Geometry="{StaticResource AddRegularGeometry}" />
+                                    <Button ToolTip="{lex:Loc TaskSettings}" Width="15" Height="15" Margin="7 0 0 0"
                                             Visibility="Collapsed"
                                             Style="{StaticResource textBoxButton}"
                                             Foreground="{DynamicResource GrayColor4}"
@@ -179,7 +222,7 @@
                                          ItemsSource="{Binding TaskItemViewModels}">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid x:Name="ListGrid">
+                                            <Grid x:Name="ListGrid"  ContextMenu="{StaticResource TaskMenu}"> 
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition />
                                                     <ColumnDefinition Width="45" />

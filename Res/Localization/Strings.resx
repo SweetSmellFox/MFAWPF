@@ -354,5 +354,22 @@
     <data name="WorkflowDiagramTitle" xml:space="preserve">
     <value>任务流程图</value>
 </data>
-
+    <data name="AddAbove" xml:space="preserve">
+        <value>添加至上方</value>
+    </data>
+    <data name="AddBelow" xml:space="preserve">
+        <value>添加至下方</value>
+    </data>
+    <data name="Task" xml:space="preserve">
+        <value>任务</value>
+    </data>
+    <data name="EnterTaskName" xml:space="preserve">
+        <value>请输入任务名称</value>
+    </data>
+    <data name="ResourceName" xml:space="preserve">
+        <value>资源名称</value>
+    </data>
+    <data name="ResourceVersion" xml:space="preserve">
+        <value>资源版本</value>
+    </data>
 </root>

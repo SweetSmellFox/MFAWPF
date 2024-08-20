@@ -36,7 +36,7 @@ public partial class EditTaskDialog
             Data.Dialog = this;
     }
 
-    protected override void Close(object sender, RoutedEventArgs e)
+    protected override void Close(object? sender, RoutedEventArgs? e)
     {
         if (MainWindow.Data != null)
             MainWindow.Data.Idle = true;

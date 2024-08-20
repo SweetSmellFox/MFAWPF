@@ -337,6 +337,7 @@ namespace MFAWPF.Utils
             MaaResource maaResource;
             try
             {
+                Console.WriteLine(string.Join(",", CurrentResources ?? Array.Empty<string>().ToList()));
                 maaResource = new MaaResource(CurrentResources ?? Array.Empty<string>().ToList());
             }
             catch (Exception e)

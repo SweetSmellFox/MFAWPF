@@ -326,5 +326,22 @@
     <data name="WorkflowDiagramTitle" xml:space="preserve">
     <value>Workflow Diagram</value>
 </data>
-
+    <data name="AddAbove" xml:space="preserve">
+        <value>Add Above</value>
+    </data>
+    <data name="AddBelow" xml:space="preserve">
+        <value>Add below</value>
+    </data>
+    <data name="Task" xml:space="preserve">
+        <value>Tasks</value>
+    </data>
+    <data name="EnterTaskName" xml:space="preserve">
+        <value>Please enter a task name</value>
+    </data>
+    <data name="ResourceVersion" xml:space="preserve">
+        <value>Resource Version</value>
+    </data>
+    <data name="ResourceName" xml:space="preserve">
+        <value>Resource Name</value>
+    </data>
 </root>

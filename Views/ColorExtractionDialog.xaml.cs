@@ -217,7 +217,7 @@ public partial class ColorExtractionDialog : CustomWindow
         // 输出颜色上下限值
     }
 
-    protected override void Close(object sender, RoutedEventArgs e)
+    protected override void Close(object? sender, RoutedEventArgs? e)
     {
         Close();
     }

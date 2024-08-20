@@ -1,5 +1,6 @@
 ﻿using MaaFramework.Binding.Custom;
 using MFAWPF.Utils.Converters;
+using MFAWPF.Views;
 using Newtonsoft.Json;
 
 namespace MFAWPF.Utils
@@ -51,6 +52,15 @@ namespace MFAWPF.Utils
             [JsonConverter(typeof(SingleOrListConverter))]
             public List<string>? path { get; set; }
         }
+
+        public class MaaResourceVersion
+        {
+            public string? name { get; set; }
+
+            public string? version { get; set; }
+        }
+
+        public MaaResourceVersion? version { get; set; }
 
         public List<MaaCustomResource>? resource { get; set; }
         public List<TaskInterfaceItem>? task { get; set; }
@@ -127,6 +137,14 @@ namespace MFAWPF.Utils
                         if (_instance != null)
                             _instance.Resources[customResource.name ?? string.Empty] = paths;
                     }
+                }
+
+                if (value.version != null)
+                {
+                    if (value.version.name != null)
+                        MainWindow.Instance?.ShowResourceName(value.version.name);
+                    if (value.version.version != null)
+                        MainWindow.Instance?.ShowResourceVersion(value.version.version);
                 }
             }
         }

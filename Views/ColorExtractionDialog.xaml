@@ -7,7 +7,7 @@
                     xmlns:lex="http://wpflocalizeextension.codeplex.com"
                     Title="{lex:Loc ColorPickerTitle}"
                    >
-    <Border CornerRadius="10" Background="{DynamicResource WhiteColor}" BorderBrush="{DynamicResource GrayColor5}" BorderThickness="1"  MouseDown="Canvas_MouseDown">
+    <Border CornerRadius="10" Background="{DynamicResource WhiteColor}" BorderBrush="{DynamicResource GrayColor10}" BorderThickness="1"  MouseDown="Canvas_MouseDown">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
@@ -107,7 +107,7 @@
                             <Border Height="30"
                                     CornerRadius="4"
                                     Background="{TemplateBinding Background}"
-                                    BorderBrush="{StaticResource GrayColor5}"
+                                    BorderBrush="{DynamicResource GrayColor5}"
                                     BorderThickness="1">
                                 <ContentPresenter VerticalAlignment="Center"
                                                   HorizontalAlignment="Center" />

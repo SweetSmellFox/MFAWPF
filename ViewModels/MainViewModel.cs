@@ -43,14 +43,14 @@ public class MainViewModel : ObservableObject
             });
         });
     }
-    
-    public ManualObservableCollection<TaskItemViewModel> Items { get; set; } =
-        new();
 
     public ManualObservableCollection<TaskItemViewModel> SourceItems { get; set; } =
         new();
 
-    public ObservableCollection<DragItemViewModel> TaskItemViewModels { get; private set; } =
+    public ObservableCollection<DragItemViewModel> TaskItemViewModels { get; set; } =
+        new();
+
+    public ObservableCollection<DragItemViewModel> TasksSource { get; private set; } =
         new();
 
     private bool _idle = true;

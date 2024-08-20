@@ -107,7 +107,7 @@
                             <Border Height="30"
                                     CornerRadius="4"
                                     Background="{TemplateBinding Background}"
-                                    BorderBrush="{StaticResource GrayColor5}"
+                                    BorderBrush="{DynamicResource GrayColor5}"
                                     BorderThickness="1">
                                 <ContentPresenter VerticalAlignment="Center"
                                                   HorizontalAlignment="Center" />

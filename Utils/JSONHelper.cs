@@ -35,10 +35,17 @@ public static class JSONHelper
     }
 
 
-    public static void WriteToConfigJsonFile(string file, object content)
+    public static void WriteToConfigJsonFile(string file, object? content)
     {
+        if (content == null) return;
+        var settings = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        };
         // var dir = Directory.GetCurrentDirectory();
-        string jsonString = JsonConvert.SerializeObject(content, Newtonsoft.Json.Formatting.Indented);
+        string jsonString = JsonConvert.SerializeObject(content, settings);
         string directory = $"{AppDomain.CurrentDomain.BaseDirectory}/config/{file}.json";
         if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}/config"))
             Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}/config");

@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -6,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Themes;
@@ -25,7 +27,7 @@ using TextBlock = System.Windows.Controls.TextBlock;
 
 namespace MFAWPF.Views
 {
-    public partial class MainWindow : CustomWindow
+    public partial class MainWindow
     {
         public static MainWindow? Instance { get; private set; }
         private readonly MaaToolkit _maaToolkit;
@@ -50,6 +52,20 @@ namespace MFAWPF.Views
             OCRHelper.Initialize();
             VersionChecker.CheckVersion();
             MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
+
+            SetIconFromExeDirectory();
+        }
+
+        private void SetIconFromExeDirectory()
+        {
+            string exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string iconPath = Path.Combine(exeDirectory, "logo.ico");
+
+            if (File.Exists(iconPath))
+            {
+                Icon = new BitmapImage(new Uri(iconPath));
+                logo.Source = Icon;
+            }
         }
 
         private bool InitializeData()
@@ -59,13 +75,14 @@ namespace MFAWPF.Views
                 JSONHelper.ReadFromJsonFilePath(MaaProcessor.Resource, "interface", new MaaInterface());
             if (MaaInterface.Instance != null)
             {
-                Data?.TaskItemViewModels.Clear();
+                Data?.TasksSource.Clear();
                 LoadTasks(MaaInterface.Instance.task ?? new List<TaskInterfaceItem>());
             }
 
             ConnectToMAA();
             return LoadTask();
         }
+
 
         private bool firstTask = true;
 
@@ -93,7 +110,18 @@ namespace MFAWPF.Views
                     firstTask = false;
                 }
 
-                Data?.TaskItemViewModels.Add(dragItem);
+                Data?.TasksSource.Add(dragItem);
+            }
+
+            if (Data?.TaskItemViewModels.Count == 0)
+            {
+                Data.TaskItemViewModels.AddRange(DataSet.GetData("tasks",
+                    new List<DragItemViewModel>()));
+                if (Data.TaskItemViewModels.Count == 0 && Data.TasksSource != null && Data.TasksSource.Count != 0)
+                {
+                    foreach (var VARIABLE in Data.TasksSource)
+                        Data.TaskItemViewModels.Add(VARIABLE);
+                }
             }
         }
 
@@ -196,8 +224,8 @@ namespace MFAWPF.Views
 
                 if (taskDictionary.Count == 0)
                 {
-                    string directoryPath = Path.GetDirectoryName($"MaaProcessor.ResourceBase}}/pipeline");
-                    if (!Directory.Exists(directoryPath))
+                    string? directoryPath = Path.GetDirectoryName($"MaaProcessor.ResourceBase}}/pipeline");
+                    if (!string.IsNullOrWhiteSpace(directoryPath) && !Directory.Exists(directoryPath))
                     {
                         try
                         {
@@ -209,6 +237,7 @@ namespace MFAWPF.Views
                             LoggerService.LogError(ex);
                         }
                     }
+
                     if (!File.Exists($"{MaaProcessor.ResourceBase}/pipeline/sample.json"))
                     {
                         try
@@ -540,7 +569,6 @@ namespace MFAWPF.Views
             {
                 settingPanel.Children.Clear();
                 AddRepeatOption(dragItem);
-
                 if (dragItem.InterfaceItem.option != null)
                 {
                     foreach (var option in dragItem.InterfaceItem.option)
@@ -578,7 +606,8 @@ namespace MFAWPF.Views
                     comboBox.SelectionChanged += (sender, args) =>
                     {
                         option.index = comboBox.SelectedIndex;
-                        JSONHelper.WriteToJsonFilePath(MaaProcessor.Resource, "interface", MaaInterface.Instance);
+
+                        DataSet.SetData("tasks", Data?.TaskItemViewModels.ToList());
                     };
                     comboBox.SetValue(InfoElement.TitleProperty, option.name);
                     comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
@@ -646,6 +675,19 @@ namespace MFAWPF.Views
             if (Data == null) return;
             foreach (var task in Data.TaskItemViewModels)
                 task.IsChecked = false;
+        }
+
+        private void Add(object sender, RoutedEventArgs e)
+        {
+            if (Data != null)
+                Data.Idle = false;
+            var addTaskDialog = new AddTaskDialog(Data?.TasksSource);
+            addTaskDialog.ShowDialog();
+            if (addTaskDialog.OutputContent != null)
+            {
+                Data?.TaskItemViewModels.Add(addTaskDialog.OutputContent.Clone());
+                DataSet.SetData("tasks", Data?.TaskItemViewModels.ToList());
+            }
         }
 
         public void ConnectToMAA()
@@ -733,6 +775,46 @@ namespace MFAWPF.Views
                 1 => Win32ControllerTypes.TouchSendMessage | Win32ControllerTypes.KeySendMessage,
                 _ => 0
             };
+        }
+
+        private void Delete(object sender, RoutedEventArgs e)
+        {
+            MenuItem? menuItem = sender as MenuItem;
+            ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
+            if (contextMenu?.PlacementTarget is Grid item)
+            {
+                if (item.DataContext is DragItemViewModel taskItemViewModel && Data != null)
+                {
+                    // 获取选中项的索引
+                    int index = Data.TaskItemViewModels.IndexOf(taskItemViewModel);
+                    Data.TaskItemViewModels?.RemoveAt(index);
+                    DataSet.SetData("tasks", Data?.TaskItemViewModels);
+                }
+            }
+        }
+
+        public void ShowResourceName(string name)
+        {
+            if (Dispatcher.CheckAccess())
+            {
+                resourceName.Visibility = Visibility.Visible;
+                resourceNameText.Visibility = Visibility.Visible;
+                resourceName.Text = name;
+            }
+            else
+                Dispatcher.Invoke(() => ShowResourceName(name));
+        }
+
+        public void ShowResourceVersion(string version)
+        {
+            if (Dispatcher.CheckAccess())
+            {
+                resourceVersion.Visibility = Visibility.Visible;
+                resourceVersionText.Visibility = Visibility.Visible;
+                resourceVersion.Text = version;
+            }
+            else
+                Dispatcher.Invoke(() => ShowResourceVersion(version));
         }
     }
 }

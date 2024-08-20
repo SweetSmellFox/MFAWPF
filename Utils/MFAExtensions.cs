@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
 using HandyControl.Controls;
 using WPFLocalizeExtension.Deprecated.Extensions;
 using WPFLocalizeExtension.Engine;
@@ -58,5 +59,13 @@ public static class MFAExtensions
     public static string FormatWith(this string format, params object?[] args)
     {
         return string.Format(format, args);
+    }
+    
+    public static void AddRange<T>(this ObservableCollection<T>? collection, IEnumerable<T>? items)
+    {
+        if (collection == null || items == null)
+            return;
+        foreach (var item in items)
+            collection.Add(item);
     }
 }

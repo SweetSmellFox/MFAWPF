@@ -18,13 +18,13 @@ public class CustomWindow : Window
     public static readonly DependencyProperty DragHandleNameProperty =
         DependencyProperty.Register(nameof(DragHandleName), typeof(string), typeof(CustomWindow),
             new PropertyMetadata("TitleBar"));
-    
+
     public string DragHandleName
     {
         get => (string)GetValue(DragHandleNameProperty);
         set => SetValue(DragHandleNameProperty, value);
     }
-    
+
     public bool IsResizable
     {
         get => (bool)GetValue(IsResizableProperty);
@@ -100,16 +100,16 @@ public class CustomWindow : Window
         return IntPtr.Zero;
     }
 
-    protected virtual void Close(object sender, RoutedEventArgs e)
+    protected virtual void Close(object? sender = null, RoutedEventArgs? e = null)
     {
-        Close();
+        base.Close();
     }
 
     protected void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         _pressedPosition = e.GetPosition(this);
     }
-    
+
     protected void Window_PreviewMouseMove(object sender, MouseEventArgs e)
     {
         if (Mouse.LeftButton == MouseButtonState.Pressed && _pressedPosition != e.GetPosition(this))
