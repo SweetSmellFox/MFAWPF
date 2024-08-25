@@ -1,17 +1,25 @@
 # MFAWPF
+
 ## 基本介绍
 
 - 本项目是一个基于WPF框架开发的用户界面，旨在提供类似于MaaPiCli的功能
 
 ## 说明
+
 ### 使用需求
 - .NET8运行库
 - 一个基于maaframework的非集成项目
   
 ### 如何使用
+
 #### 自动安装
 
+- 下载项目中workflows/install.yml并修改```项目名称```和```MAAxxx```
+- 将修改后的install.yml替换MAA项目模板.github/workflows/install.yml
+- 推送新版本
+
 #### 手动安装
+
 - 下载最新发行版并解压
 - 将maafw项目中assets/resource中所有内容复制到MFAWPS/Resource中
 - 将maafw项目中assets/interface.json文件复制到MFAWPS/Resource中
@@ -90,7 +98,7 @@
 ### v1.0
 
 - [x] Pipeline的GUI编辑界面
-- [ ] Support EN
+- [x] Support EN
 
 ### v1.2
 
