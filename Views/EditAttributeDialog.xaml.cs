@@ -88,8 +88,8 @@ public partial class EditAttributeDialog : CustomWindow
             "upper",
             "connected"
         };
-        
-        
+
+
         typeComboBox.ItemsSource = Types;
         if (attribute?.Key != null)
         {
@@ -303,11 +303,11 @@ public partial class EditAttributeDialog : CustomWindow
             Path = new PropertyPath("GrayColor4")
         };
         button.SetBinding(Button.ForegroundProperty, foregroundBinding);
-        
+
         var selectAllGeometry = (Geometry)FindResource("AddGeometry");
         IconElement.SetGeometry(button, selectAllGeometry);
-        
-        button.Click += AddAttribute;
+
+        button.Click += AddAutoAttribute;
         dynamicGrid.Children.Add(textBlock);
         dynamicGrid.Children.Add(button);
 
@@ -393,10 +393,10 @@ public partial class EditAttributeDialog : CustomWindow
             Path = new PropertyPath("GrayColor4")
         };
         button.SetBinding(Button.ForegroundProperty, foregroundBinding);
-        
+
         var selectAllGeometry = (Geometry)FindResource("AddGeometry");
         IconElement.SetGeometry(button, selectAllGeometry);
-        
+
         button.Click += AddAttribute;
         dynamicGrid.Children.Add(textBlock);
         dynamicGrid.Children.Add(button);
@@ -482,10 +482,10 @@ public partial class EditAttributeDialog : CustomWindow
             Path = new PropertyPath("GrayColor4")
         };
         button.SetBinding(Button.ForegroundProperty, foregroundBinding);
-        
+
         var selectAllGeometry = (Geometry)FindResource("AddGeometry");
         IconElement.SetGeometry(button, selectAllGeometry);
-        
+
         button.Click += AddAttribute;
         dynamicGrid.Children.Add(textBlock);
         dynamicGrid.Children.Add(button);
@@ -617,6 +617,7 @@ public partial class EditAttributeDialog : CustomWindow
                 case "next":
                 case "timeout_next":
                 case "runout_next":
+
                     if (Control is StackPanel p0)
                     {
                         List<string> list = new List<string>();
@@ -629,6 +630,7 @@ public partial class EditAttributeDialog : CustomWindow
                             }
                         }
 
+                        Console.WriteLine(string.Join(",", list));
                         Attribute.Value = list;
                     }
 

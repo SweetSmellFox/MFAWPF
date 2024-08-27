@@ -146,6 +146,17 @@
 
                                      GroupName="TaskSettings" Checked="ConfigureSettingsPanel"
                                      Style="{DynamicResource RadioGroupItemSingle}" />
+                        <RadioButton ToolTip="{lex:Loc About}"
+                                     Margin="0"
+                                     Padding="5,0,5,0"
+                                     hc:IconElement.Geometry="{StaticResource AboutGeometry}"
+                                     hc:VisualElement.HighlightBackground="Transparent"
+                                     hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
+                                     Foreground="{DynamicResource GrayColor4}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     GroupName="TaskSettings" Checked="About"
+                                     Style="{DynamicResource RadioGroupItemSingle}" />
                     </hc:SimpleStackPanel>
                     <Grid Grid.Row="1" ClipToBounds="False" Margin="15 0 0 0">
                         <Grid.ColumnDefinitions>
@@ -300,6 +311,7 @@
                                 <StackPanel.RenderTransform>
                                     <TranslateTransform Y="-5" />
                                 </StackPanel.RenderTransform>
+                          
                             </StackPanel>
                         </ScrollViewer>
 

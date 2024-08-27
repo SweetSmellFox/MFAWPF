@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using HandyControl.Controls;
 using HandyControl.Data;
+using HandyControl.Interactivity;
 using HandyControl.Themes;
 using MaaFramework.Binding;
 using MFAWPF.Controls;
@@ -438,6 +439,18 @@ namespace MFAWPF.Views
                 AddThemeOption();
                 AddLanguageOption();
             }
+        }
+
+        private void About(object? sender = null, RoutedEventArgs? e = null)
+        {
+            settingPanel.Children.Clear();
+            settingPanel.Children.Add(new Shield
+            {
+                Status = "MFAWPF", Subject = "Github", Margin = new Thickness(0, 10, 0, 10),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Command = ControlCommands.OpenLink,
+                CommandParameter = "https://github.com/SweetSmellFox/MFAWPF"
+            });
         }
 
         private void AddResourcesOption(int defaultValue = 0)
