@@ -347,4 +347,7 @@
     <data name="About" xml:space="preserve">
         <value>About</value>
     </data>
+    <data name="ScreenshotTime" xml:space="preserve">
+        <value>Screenshot time: {0}ms({1})</value>
+    </data>
 </root>

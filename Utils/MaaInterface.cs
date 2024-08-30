@@ -26,7 +26,7 @@ namespace MFAWPF.Utils
 
         public class MaaInterfaceOption
         {
-            public string name { get; set; } = string.Empty;
+            [JsonIgnore] public string name { get; set; } = string.Empty;
             public List<MaaInterfaceOptionCase>? cases { get; set; }
         }
 

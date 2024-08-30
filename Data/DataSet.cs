@@ -30,6 +30,12 @@ namespace MFAWPF.Data
                         value = (T)(object)Convert.ToInt32((long)data); // Safe conversion
                         return true;
                     }
+                    if (data is JArray jArray)
+                    {
+                        // 将 JArray 转换为目标类型
+                        value = jArray.ToObject<T>(); 
+                        return true;
+                    }
 
                     if (data is T t)
                     {
@@ -37,10 +43,11 @@ namespace MFAWPF.Data
                         return true;
                     }
                 }
-                catch
+                catch (Exception e)
                 {
                     Console.WriteLine("在进行类型转换时发生错误！");
-                    // Handle conversion errors
+                    LoggerService.LogError("在进行类型转换时发生错误!");
+                    LoggerService.LogError(e);
                 }
             }
 
@@ -75,7 +82,6 @@ namespace MFAWPF.Data
                     Console.WriteLine("在进行类型转换时发生错误！");
                     LoggerService.LogError("在进行类型转换时发生错误!");
                     LoggerService.LogError(e);
-                    // Handle conversion errors
                 }
             }
             return defaultValue;

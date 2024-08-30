@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using MFAWPF.Views;
 using Newtonsoft.Json;
 
 namespace MFAWPF.Utils;
@@ -90,7 +91,7 @@ public static class JSONHelper
         File.WriteAllText(directory, jsonString);
     }
 
-    public static T? ReadFromJsonFilePath<T>(string path, string file, T? defaultS = default)
+    public static T? ReadFromJsonFilePath<T>(string path, string file, T? defaultS = default, Action action = null)
     {
         if (string.IsNullOrWhiteSpace(path))
             path = AppDomain.CurrentDomain.BaseDirectory;
@@ -100,11 +101,15 @@ public static class JSONHelper
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
             string jsonString = File.ReadAllText(directory);
-            return JsonConvert.DeserializeObject<T>(jsonString) ?? defaultS ;
+            return JsonConvert.DeserializeObject<T>(jsonString) ?? defaultS;
         }
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
+            LoggerService.LogError(e);
+            Growls.Error(e.Message);
+            if (action == null)
+                action.Invoke();
             return defaultS;
         }
     }

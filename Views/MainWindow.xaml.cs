@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
@@ -52,6 +53,7 @@ namespace MFAWPF.Views
             InitializeData();
             OCRHelper.Initialize();
             VersionChecker.CheckVersion();
+            ShowEditButton();
             MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
 
             SetIconFromExeDirectory();
@@ -72,8 +74,63 @@ namespace MFAWPF.Views
         private bool InitializeData()
         {
             DataSet.Data = JSONHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
+            if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json"))
+            {
+                try
+                {
+                    File.WriteAllText($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json",
+                        JsonConvert.SerializeObject(new MaaInterface()
+                        {
+                            version = new MaaInterface.MaaResourceVersion()
+                            {
+                                name = "Debug", version = "1.0"
+                            },
+                            task = new List<TaskInterfaceItem>(),
+                            resource = new List<MaaInterface.MaaCustomResource>
+                            {
+                                new()
+                                {
+                                    name = "默认", path = new List<string> { "{PROJECT_DIR}/resource/base" }
+                                }
+                            },
+                            recognizer = new Dictionary<string, MaaInterface.CustomExecutor>(),
+                            action = new Dictionary<string, MaaInterface.CustomExecutor>(),
+                            option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
+                            {
+                                {
+                                    "测试", new MaaInterface.MaaInterfaceOption()
+                                    {
+                                        cases = new List<MaaInterface.MaaInterfaceOptionCase>
+                                        {
+                                            new()
+                                            {
+                                                name = "测试1", param = new Dictionary<string, TaskModel>()
+                                            },
+                                            new()
+                                            {
+                                                name = "测试2", param = new Dictionary<string, TaskModel>()
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }, new JsonSerializerSettings()
+                        {
+                            Formatting = Formatting.Indented,
+                            NullValueHandling = NullValueHandling.Ignore,
+                            DefaultValueHandling = DefaultValueHandling.Include
+                        }));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"创建文件时发生错误: {ex.Message}");
+                    LoggerService.LogError(ex);
+                }
+            }
+
             MaaInterface.Instance =
-                JSONHelper.ReadFromJsonFilePath(MaaProcessor.Resource, "interface", new MaaInterface());
+                JSONHelper.ReadFromJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface", new MaaInterface(),
+                    () => { });
             if (MaaInterface.Instance != null)
             {
                 Data?.TasksSource.Clear();
@@ -116,7 +173,7 @@ namespace MFAWPF.Views
 
             if (Data?.TaskItemViewModels.Count == 0)
             {
-                Data.TaskItemViewModels.AddRange(DataSet.GetData("tasks",
+                Data.TaskItemViewModels.AddRange(DataSet.GetData("Tasks",
                     new List<DragItemViewModel>()));
                 if (Data.TaskItemViewModels.Count == 0 && Data.TasksSource != null && Data.TasksSource.Count != 0)
                 {
@@ -154,6 +211,12 @@ namespace MFAWPF.Views
                 // 如果当前线程不是 UI 线程，通过 Dispatcher 调度到 UI 线程执行
                 Dispatcher.Invoke(() => ToggleTaskButtonsVisibility(isRunning));
             }
+        }
+
+        private void Close()
+        {
+            base.Close();
+            Application.Current.Shutdown();
         }
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
@@ -223,9 +286,10 @@ namespace MFAWPF.Views
                     }
                 }
 
+                Console.WriteLine(taskDictionary.Count);
                 if (taskDictionary.Count == 0)
                 {
-                    string? directoryPath = Path.GetDirectoryName($"MaaProcessor.ResourceBase}}/pipeline");
+                    string? directoryPath = Path.GetDirectoryName($"{MaaProcessor.ResourceBase}/pipeline");
                     if (!string.IsNullOrWhiteSpace(directoryPath) && !Directory.Exists(directoryPath))
                     {
                         try
@@ -243,7 +307,21 @@ namespace MFAWPF.Views
                     {
                         try
                         {
-                            File.WriteAllText($"{MaaProcessor.ResourceBase}/pipeline/sample.json", "{}");
+                            File.WriteAllText($"{MaaProcessor.ResourceBase}/pipeline/sample.json",
+                                JsonConvert.SerializeObject(new Dictionary<string, TaskModel>
+                                {
+                                    {
+                                        "MFAWPF", new TaskModel()
+                                        {
+                                            action = "DoNothing"
+                                        }
+                                    }
+                                }, new JsonSerializerSettings()
+                                {
+                                    Formatting = Formatting.Indented,
+                                    NullValueHandling = NullValueHandling.Ignore,
+                                    DefaultValueHandling = DefaultValueHandling.Ignore
+                                }));
                         }
                         catch (Exception ex)
                         {
@@ -461,8 +539,7 @@ namespace MFAWPF.Views
                 Style = FindResource("ComboBoxExtend") as Style,
                 Margin = new Thickness(5)
             };
-            if (MaaInterface.Instance?.resource != null)
-                comboBox.ItemsSource = MaaInterface.Instance.resource;
+
             var binding = new Binding("Idle")
             {
                 Source = Data,
@@ -473,6 +550,8 @@ namespace MFAWPF.Views
             comboBox.BindLocalization("ResourceOption");
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
+            if (MaaInterface.Instance?.resource != null)
+                comboBox.ItemsSource = MaaInterface.Instance.resource;
             comboBox.SelectionChanged += (sender, args) =>
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
@@ -620,7 +699,7 @@ namespace MFAWPF.Views
                     {
                         option.index = comboBox.SelectedIndex;
 
-                        DataSet.SetData("tasks", Data?.TaskItemViewModels.ToList());
+                        DataSet.SetData("Tasks", Data?.TaskItemViewModels.ToList());
                     };
                     comboBox.SetValue(InfoElement.TitleProperty, option.name);
                     comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
@@ -654,7 +733,8 @@ namespace MFAWPF.Views
                 numericUpDown.ValueChanged += (sender, args) =>
                 {
                     source.InterfaceItem.repeat_count = Convert.ToInt16(numericUpDown.Value);
-                    JSONHelper.WriteToJsonFilePath(MaaProcessor.Resource, "interface", MaaInterface.Instance);
+                    JSONHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
+                        MaaInterface.Instance);
                 };
                 numericUpDown.BindLocalization("RepeatOption");
                 numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
@@ -699,7 +779,7 @@ namespace MFAWPF.Views
             if (addTaskDialog.OutputContent != null)
             {
                 Data?.TaskItemViewModels.Add(addTaskDialog.OutputContent.Clone());
-                DataSet.SetData("tasks", Data?.TaskItemViewModels.ToList());
+                DataSet.SetData("Tasks", Data?.TaskItemViewModels.ToList());
             }
         }
 
@@ -722,6 +802,13 @@ namespace MFAWPF.Views
                 Console.WriteLine(
                     $"{LocExtension.GetLocalizedValue<string>("AdbTouchMode")}{adbTouchType},{LocExtension.GetLocalizedValue<string>("AdbCaptureMode")}{adbScreenCapType}");
             }
+        }
+
+        public string ScreenshotType()
+        {
+            if (IsADB)
+                return ConfigureAdbScreenCapTypes().ToString();
+            return ConfigureWin32ScreenCapTypes().ToString();
         }
 
         private AdbControllerTypes ConfigureAdbControllerTypes()
@@ -801,7 +888,7 @@ namespace MFAWPF.Views
                     // 获取选中项的索引
                     int index = Data.TaskItemViewModels.IndexOf(taskItemViewModel);
                     Data.TaskItemViewModels?.RemoveAt(index);
-                    DataSet.SetData("tasks", Data?.TaskItemViewModels);
+                    DataSet.SetData("Tasks", Data?.TaskItemViewModels);
                 }
             }
         }
@@ -828,6 +915,19 @@ namespace MFAWPF.Views
             }
             else
                 Dispatcher.Invoke(() => ShowResourceVersion(version));
+        }
+
+        public void ShowEditButton()
+        {
+            if (Dispatcher.CheckAccess())
+            {
+                bool value = DataSet.GetData("EnableEdit", true);
+                if (!value)
+                    EditButton.Visibility = Visibility.Collapsed;
+                DataSet.SetData("EnableEdit", value);
+            }
+            else
+                Dispatcher.Invoke(ShowEditButton);
         }
     }
 }

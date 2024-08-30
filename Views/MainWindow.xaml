@@ -193,13 +193,13 @@
                                             Click="SelectNone" IsEnabled="{Binding Idle}"
                                             Padding="0"
                                             hc:IconElement.Geometry="{StaticResource SelectNoneGeometry}" />
-                                    <Button ToolTip="{lex:Loc EditTask}" Width="15" Height="15" Margin="7 0 0 0"
+                                    <Button ToolTip="{lex:Loc EditTask}" Width="15" Height="15" Margin="7 0 0 0" x:Name="EditButton"
                                             Style="{StaticResource textBoxButton}"
                                             Foreground="{DynamicResource GrayColor4}"
                                             Click="Edit" IsEnabled="{Binding Idle}"
                                             Padding="0"
                                             hc:IconElement.Geometry="{StaticResource EditGeometry}" />
-                                    <Button ToolTip="{lex:Loc TaskSettings}" Width="15" Height="15" Margin="7 0 0 0"
+                                    <Button ToolTip="{lex:Loc EditTaskDialog_AddTask_Tooltip}" Width="15" Height="15" Margin="7 0 0 0"
                                             Style="{StaticResource textBoxButton}"
                                             Foreground="{DynamicResource GrayColor4}"
                                             Click="Add" IsEnabled="{Binding Idle}"

@@ -208,8 +208,34 @@ namespace MFAWPF.Utils
             }
         }
 
+        static void MeasureExecutionTime(Action methodToMeasure)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            methodToMeasure();
+
+            stopwatch.Stop();
+            long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+
+            MainWindow.Data?.AddLogByKey("ScreenshotTime", null, elapsedMilliseconds.ToString(),
+                MainWindow.Instance?.ScreenshotType());
+        }
+
+        static async Task MeasureExecutionTimeAsync(Func<Task> methodToMeasure)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            await methodToMeasure();
+
+            stopwatch.Stop();
+            long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+
+            MainWindow.Data?.AddLogByKey("ScreenshotTime", null, elapsedMilliseconds.ToString(),MainWindow.Instance?.ScreenshotType());
+        }
+
         private async Task<bool> ExecuteTasks(CancellationToken token)
         {
+            MeasureExecutionTime(() => _currentInstance.Controller.Screencap().Wait());
             while (TaskQueue.Count > 0)
             {
                 if (token.IsCancellationRequested) return false;

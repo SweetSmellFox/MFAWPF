@@ -623,7 +623,12 @@ public partial class EditAttributeDialog : CustomWindow
                         List<string> list = new List<string>();
                         foreach (var VARIABLE in p0.Children)
                         {
-                            if (VARIABLE is SAutoCompleteTextBox textBox)
+                            if (VARIABLE is SAutoCompleteTextBox sAutoCompleteTextBox)
+                            {
+                                if (!string.IsNullOrEmpty(sAutoCompleteTextBox.Text))
+                                    list.Add(sAutoCompleteTextBox.Text);
+                            }
+                            else if (VARIABLE is TextBox textBox)
                             {
                                 if (!string.IsNullOrEmpty(textBox.Text))
                                     list.Add(textBox.Text);
@@ -743,16 +748,7 @@ public partial class EditAttributeDialog : CustomWindow
                 case "post_delay":
                 case "duration":
                     if (Control is TextBox t1)
-                    {
-                        if (uint.TryParse(t1.Text, out var ui))
-                        {
-                            Attribute.Value = ui;
-                        }
-                        else
-                        {
-                            Attribute.Value = 0;
-                        }
-                    }
+                        Attribute.Value = uint.TryParse(t1.Text, out var ui) ? ui : 0;
 
                     break;
                 //int
@@ -760,33 +756,14 @@ public partial class EditAttributeDialog : CustomWindow
                 case "method":
                 case "count":
                     if (Control is TextBox t2)
-                    {
-                        if (int.TryParse(t2.Text, out var i))
-                        {
-                            Attribute.Value = i;
-                        }
-                        else
-                        {
-                            Attribute.Value = 0;
-                        }
-                    }
-
+                        Attribute.Value = int.TryParse(t2.Text, out var i) ? i : 0;
+                    
                     break;
                 //double
                 case "ratio":
                 case "threshold":
                     if (Control is TextBox t3)
-                    {
-                        if (double.TryParse(t3.Text, out var d))
-                        {
-                            Attribute.Value = d;
-                        }
-                        else
-                        {
-                            Attribute.Value = 0;
-                        }
-                    }
-
+                        Attribute.Value = double.TryParse(t3.Text, out var d) ? d : 0;
                     break;
                 //coombo
                 case "recognition":
