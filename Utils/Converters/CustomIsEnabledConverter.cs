@@ -7,10 +7,10 @@ public class CustomIsEnabledConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        if (values.Length == 2 && values[0] is bool? && values[1] is bool idle)
+        if (values is [bool isChecked, bool idle])
         {
-            bool isChecked = (values[0] as bool?).GetValueOrDefault(false);
-            return (isChecked && idle) || !isChecked;
+            bool isCheckedValue = isChecked;
+            return (isCheckedValue && idle) || !isCheckedValue;
         }
 
         return false;

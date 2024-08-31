@@ -25,15 +25,16 @@ namespace MFAWPF.Data
                 try
                 {
                     // Handle conversion between int and long
-                    if (data is long && typeof(T) == typeof(int))
+                    if (data is long longValue && typeof(T) == typeof(int))
                     {
-                        value = (T)(object)Convert.ToInt32((long)data); // Safe conversion
+                        value = (T)(object)Convert.ToInt32(longValue); // Safe conversion
                         return true;
                     }
+
                     if (data is JArray jArray)
                     {
                         // 将 JArray 转换为目标类型
-                        value = jArray.ToObject<T>(); 
+                        value = jArray.ToObject<T>();
                         return true;
                     }
 
@@ -61,17 +62,17 @@ namespace MFAWPF.Data
             {
                 try
                 {
-                    if (data is long && typeof(T) == typeof(int))
+                    if (data is long longValue && typeof(T) == typeof(int))
                     {
-                        return (T)(object)Convert.ToInt32((long)data); 
+                        return (T)(object)Convert.ToInt32(longValue);
                     }
-                    
+
                     if (data is JArray jArray)
                     {
                         // 将 JArray 转换为目标类型
                         return jArray.ToObject<T>();
                     }
-                    
+
                     if (data is T t)
                     {
                         return t;
@@ -84,6 +85,7 @@ namespace MFAWPF.Data
                     LoggerService.LogError(e);
                 }
             }
+
             return defaultValue;
         }
     }

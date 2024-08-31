@@ -83,7 +83,7 @@ namespace MFAWPF.Utils
                 TaskQueue.Enqueue(task);
             OnTaskQueueChanged();
 
-            SetCurrentInstance(null);
+            SetCurrentInstance();
             if (MainWindow.Data != null)
                 MainWindow.Data.Idle = false;
 
@@ -95,7 +95,7 @@ namespace MFAWPF.Utils
                 MainWindow.Data?.AddLogByKey("ConnectingTo", null, MainWindow.Instance?.IsADB == true
                     ? "Simulator"
                     : "Window");
-                var instance = await Task.Run(() => GetCurrentInstance(), token);
+                var instance = await Task.Run(GetCurrentInstance, token);
 
                 if (instance == null || !instance.Initialized)
                 {
@@ -218,7 +218,7 @@ namespace MFAWPF.Utils
             long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
             MainWindow.Data?.AddLogByKey("ScreenshotTime", null, elapsedMilliseconds.ToString(),
-                MainWindow.Instance?.ScreenshotType());
+                MainWindow.Instance?.ScreenshotType() ?? string.Empty);
         }
 
         static async Task MeasureExecutionTimeAsync(Func<Task> methodToMeasure)
@@ -230,12 +230,13 @@ namespace MFAWPF.Utils
             stopwatch.Stop();
             long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-            MainWindow.Data?.AddLogByKey("ScreenshotTime", null, elapsedMilliseconds.ToString(),MainWindow.Instance?.ScreenshotType());
+            MainWindow.Data?.AddLogByKey("ScreenshotTime", null, elapsedMilliseconds.ToString(),
+                MainWindow.Instance?.ScreenshotType() ?? string.Empty);
         }
 
         private async Task<bool> ExecuteTasks(CancellationToken token)
         {
-            MeasureExecutionTime(() => _currentInstance.Controller.Screencap().Wait());
+            MeasureExecutionTime(() => _currentInstance?.Controller.Screencap().Wait());
             while (TaskQueue.Count > 0)
             {
                 if (token.IsCancellationRequested) return false;
@@ -287,7 +288,7 @@ namespace MFAWPF.Utils
             return _currentInstance ??= InitializeMaaInstance();
         }
 
-        public void SetCurrentInstance(MaaInstance? instance)
+        public void SetCurrentInstance(MaaInstance? instance = null)
         {
             _currentInstance = instance;
         }
@@ -303,7 +304,7 @@ namespace MFAWPF.Utils
                     var suffix = match.Groups[3].Value;
                     var operation = match.Groups[4].Value;
 
-                    int value = AutoInitDictionary.ContainsKey(counterKey) ? AutoInitDictionary[counterKey] : 0;
+                    int value = AutoInitDictionary.GetValueOrDefault(counterKey, 0);
 
                     // 前置操作符
                     if (prefix == "++")
@@ -331,9 +332,8 @@ namespace MFAWPF.Utils
                         string operationType = operation[0].ToString();
                         string operandKey = operation.Substring(1);
 
-                        if (AutoInitDictionary.ContainsKey(operandKey))
+                        if (AutoInitDictionary.TryGetValue(operandKey, out var operandValue))
                         {
-                            int operandValue = AutoInitDictionary[operandKey];
                             value = operationType switch
                             {
                                 "+" => value + operandValue,
@@ -351,6 +351,8 @@ namespace MFAWPF.Utils
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                ErrorView errorView = new ErrorView(e, false);
+                errorView.Show();
                 return content;
             }
         }
@@ -429,16 +431,19 @@ namespace MFAWPF.Utils
 
             foreach (var recognizer in MaaInterface.Instance.CustomRecognizerExecutors)
             {
-                Console.WriteLine($"RegisterCustomRecognizer".GetLocalizationString().FormatWith(recognizer.Name));
+                LoggerService.LogInfo($"RegisterCustomRecognizer".GetLocalizationString().FormatWith(recognizer.Name));
                 instance.Toolkit.ExecAgent.Register(instance, recognizer);
             }
 
             LoggerService.LogInfo("RegisteringCustomAction".GetLocalizationString());
             foreach (var action in MaaInterface.Instance.CustomActionExecutors)
             {
-                Console.WriteLine($"RegisterCustomAction".GetLocalizationString().FormatWith(action.Name));
+                LoggerService.LogInfo("RegisterCustomAction".GetLocalizationString().FormatWith(action.Name));
                 instance.Toolkit.ExecAgent.Register(instance, action);
             }
+
+            instance.Register(new MoneyRecognizer());
+            instance.Register(new MoneyDetectRecognizer());
 
             instance.Callback += (sender, args) =>
             {

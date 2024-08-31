@@ -91,7 +91,7 @@ public static class JSONHelper
         File.WriteAllText(directory, jsonString);
     }
 
-    public static T? ReadFromJsonFilePath<T>(string path, string file, T? defaultS = default, Action action = null)
+    public static T? ReadFromJsonFilePath<T>(string path, string file, T? defaultS = default, Action? action = null)
     {
         if (string.IsNullOrWhiteSpace(path))
             path = AppDomain.CurrentDomain.BaseDirectory;
@@ -108,8 +108,7 @@ public static class JSONHelper
             Console.WriteLine(e.Message);
             LoggerService.LogError(e);
             Growls.Error(e.Message);
-            if (action == null)
-                action.Invoke();
+            action?.Invoke();
             return defaultS;
         }
     }

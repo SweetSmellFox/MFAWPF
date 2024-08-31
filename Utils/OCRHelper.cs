@@ -38,7 +38,7 @@ public class OCRHelper
         string result = string.Empty;
         TaskItemViewModel taskItemViewModel = new TaskItemViewModel()
         {
-            Task = new TaskModel()
+            Task = new TaskModel
             {
                 recognition = "OCR", roi = new List<int>
                 {
@@ -74,7 +74,7 @@ public class OCRHelper
         string result = string.Empty;
         TaskItemViewModel taskItemViewModel = new TaskItemViewModel()
         {
-            Task = new TaskModel()
+            Task = new TaskModel
             {
                 recognition = "OCR", roi = new List<int>
                 {

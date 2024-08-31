@@ -28,9 +28,8 @@ namespace MFAWPF.ViewModels
                 LanguageManager.LanguageChanged += OnLanguageChanged;
             }
             else
-            {
                 Content = resourceKey;
-            }
+            
         }
 
         public LogItemViewModel(string content, Brush color, string weight = "Regular",
@@ -101,7 +100,6 @@ namespace MFAWPF.ViewModels
         private void UpdateContent()
         {
             if (_formatArgsKeys == null || _formatArgsKeys.Length == 0)
-
                 Content = ResourceKey.GetLocalizationString();
             else
             {

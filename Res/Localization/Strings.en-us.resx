@@ -350,4 +350,19 @@
     <data name="ScreenshotTime" xml:space="preserve">
         <value>Screenshot time: {0}ms({1})</value>
     </data>
+    <data name="Error" xml:space="preserve">
+        <value>Error</value>
+    </data>
+    <data name="ErrorProlog" xml:space="preserve">
+        <value>MFA has encountered an error</value>
+    </data>
+    <data name="ErrorDetails" xml:space="preserve">
+        <value>Details</value>
+    </data>
+    <data name="CopyErrorMessage" xml:space="preserve">
+        <value>Copy error message</value>
+    </data>
+    <data name="CopiedToClipboard" xml:space="preserve">
+        <value>Copied to Clipboard</value>
+    </data>
 </root>

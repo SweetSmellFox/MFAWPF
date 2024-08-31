@@ -378,4 +378,19 @@
     <data name="ScreenshotTime" xml:space="preserve">
         <value>截图耗时: {0}ms({1})</value>
     </data>
+    <data name="Error" xml:space="preserve">
+        <value>错误</value>
+    </data>
+    <data name="ErrorProlog" xml:space="preserve">
+        <value>MFA 遇到了问题</value>
+    </data>
+    <data name="ErrorDetails" xml:space="preserve">
+        <value>详细信息</value>
+    </data>
+    <data name="CopyErrorMessage" xml:space="preserve">
+        <value>复制错误信息</value>
+    </data>
+    <data name="CopiedToClipboard" xml:space="preserve">
+        <value>已复制到剪切板</value>
+    </data>
 </root>

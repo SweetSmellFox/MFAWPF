@@ -210,7 +210,7 @@
                                     Click="Screenshot"
                                     Padding="0" Margin="2 0  2 0" hc:IconElement.Width="12"
                                     hc:IconElement.Height="12"
-                                    hc:IconElement.Geometry="{StaticResource ScreenshotsGeometry}" />
+                                    hc:IconElement.Geometry="{StaticResource ImageGeometry}" />
                             <Button ToolTip="{lex:Loc EditTaskDialog_SelectionRegion_Tooltip}" Width="15" Height="15"
                                     Style="{StaticResource textBoxButton}"
                                     Foreground="{DynamicResource GrayColor4}"

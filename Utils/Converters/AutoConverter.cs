@@ -10,7 +10,8 @@ public class AutoConverter : JsonConverter
         return objectType == typeof(object); // We are converting to object as it can be any type.
     }
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+        JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
 
@@ -21,10 +22,8 @@ public class AutoConverter : JsonConverter
 
             case JTokenType.Integer:
                 long longValue = token.ToObject<long>();
-                if (longValue >= uint.MinValue && longValue <= uint.MaxValue)
-                {
+                if (longValue is >= uint.MinValue and <= uint.MaxValue)
                     return (uint)longValue;
-                }
 
                 return longValue;
 
@@ -37,17 +36,11 @@ public class AutoConverter : JsonConverter
             case JTokenType.Array:
                 var firstElement = token.First;
                 if (firstElement?.Type == JTokenType.Integer)
-                {
                     return token.ToObject<List<int>>();
-                }
-                else if (firstElement?.Type == JTokenType.String)
-                {
+                if (firstElement?.Type == JTokenType.String)
                     return token.ToObject<List<string>>();
-                }
-                else if (firstElement?.Type == JTokenType.Array)
-                {
+                if (firstElement?.Type == JTokenType.Array)
                     return token.ToObject<List<List<int>>>();
-                }
 
                 break;
         }

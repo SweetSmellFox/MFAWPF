@@ -542,6 +542,8 @@ public partial class EditAttributeDialog : CustomWindow
                 case "expected":
                 case "template":
                 case "labels":
+                case "focus_tip":
+                case "focus_tip_color":
                     SwitchList(defaultValue);
                     break;
                 //List<int>
@@ -620,7 +622,7 @@ public partial class EditAttributeDialog : CustomWindow
 
                     if (Control is StackPanel p0)
                     {
-                        List<string> list = new List<string>();
+                        var list = new List<string>();
                         foreach (var VARIABLE in p0.Children)
                         {
                             if (VARIABLE is SAutoCompleteTextBox sAutoCompleteTextBox)
@@ -635,28 +637,25 @@ public partial class EditAttributeDialog : CustomWindow
                             }
                         }
 
-                        Console.WriteLine(string.Join(",", list));
                         Attribute.Value = list;
                     }
-
                     break;
                 case "expected":
                 case "template":
                 case "labels":
-                    if (Control is StackPanel p1)
+                case "focus_tip":
+                case "focus_tip_color":
+                    if (Control is StackPanel { Children: var children })
                     {
-                        List<string> list = new List<string>();
-                        foreach (var VARIABLE in p1.Children)
-                        {
-                            if (VARIABLE is TextBox textBox)
-                            {
-                                if (!string.IsNullOrEmpty(textBox.Text))
-                                    list.Add(textBox.Text);
-                            }
-                        }
+                        var list = children
+                            .OfType<TextBox>()
+                            .Where(textBox => !string.IsNullOrEmpty(textBox.Text))
+                            .Select(textBox => textBox.Text)
+                            .ToList();
 
                         Attribute.Value = list;
                     }
+
 
                     break;
                 //List<int>
@@ -664,68 +663,52 @@ public partial class EditAttributeDialog : CustomWindow
                 case "begin_offset":
                 case "end_offset":
                 case "key":
-                    if (Control is StackPanel p2)
+                    if (Control is StackPanel { Children: var child })
                     {
-                        List<int> list = new List<int>();
-                        foreach (var VARIABLE in p2.Children)
-                        {
-                            if (VARIABLE is TextBox textBox)
-                            {
-                                if (int.TryParse(textBox.Text, out var i))
-                                    list.Add(i);
-                            }
-                        }
+                        var list = child
+                            .OfType<TextBox>()
+                            .Select(textBox => int.TryParse(textBox.Text, out var i) ? i : (int?)null)
+                            .Where(i => i.HasValue)
+                            .Select(i => i ?? 0)
+                            .ToList();
 
                         Attribute.Value = list;
                     }
+
 
                     break;
                 //List<List<int>>
                 case "upper":
                 case "lower":
                 case "roi":
-                    if (Control is StackPanel p3)
+                    if (Control is StackPanel { Children.Count: > 0 } p3)
                     {
-                        if (p3.Children.Count > 0)
+                        if (p3.Children[0] is TextBox { Text: var text } && text.Contains(","))
                         {
-                            if (p3.Children[0] is TextBox tb && tb.Text.Contains(","))
+                            try
                             {
-                                List<List<int>> list = new List<List<int>>();
-                                foreach (var VARIABLE in p3.Children)
-                                {
-                                    if (VARIABLE is TextBox textBox)
-                                    {
-                                        try
-                                        {
-                                            list.Add(textBox.Text.Split(",")
-                                                .Select(s => int.Parse(s)) // 将每个字符串转换为整数
-                                                .ToList());
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            Console.WriteLine(e);
-                                            Growls.WarningGlobal("读取数字数组时出现错误！");
-                                            return;
-                                        }
-                                    }
-                                }
-
+                                var list = p3.Children
+                                    .OfType<TextBox>()
+                                    .Select(tb => tb.Text.Split(",").Select(int.Parse).ToList())
+                                    .ToList();
                                 Attribute.Value = list;
                             }
-                            else
+                            catch (Exception e)
                             {
-                                List<int> list = new List<int>();
-                                foreach (var VARIABLE in p3.Children)
-                                {
-                                    if (VARIABLE is TextBox textBox)
-                                    {
-                                        if (int.TryParse(textBox.Text, out var i))
-                                            list.Add(i);
-                                    }
-                                }
-
-                                Attribute.Value = list;
+                                Console.WriteLine(e);
+                                LoggerService.LogError(e);
+                                Growls.WarningGlobal("读取数字数组时出现错误！");
                             }
+                        }
+                        else
+                        {
+                            var list = p3.Children
+                                .OfType<TextBox>()
+                                .Select(tb => int.TryParse(tb.Text, out var i) ? i : (int?)null)
+                                .Where(i => i.HasValue)
+                                .Select(i => i ?? 0)
+                                .ToList();
+                            Attribute.Value = list;
                         }
                     }
 
@@ -757,7 +740,7 @@ public partial class EditAttributeDialog : CustomWindow
                 case "count":
                     if (Control is TextBox t2)
                         Attribute.Value = int.TryParse(t2.Text, out var i) ? i : 0;
-                    
+
                     break;
                 //double
                 case "ratio":
@@ -777,68 +760,51 @@ public partial class EditAttributeDialog : CustomWindow
                 case "target":
                 case "begin":
                 case "end":
-                    if (Control is StackPanel p4)
+                    if (Control is StackPanel { Children: var children1 })
                     {
-                        if (p4.Children.Count == 1)
+                        if (children1.Count == 1 && children1[0] is SAutoCompleteTextBox textBox)
                         {
-                            if (p4.Children[0] is SAutoCompleteTextBox textBox)
+                            if (bool.TryParse(textBox.Text, out var b) && b)
                             {
-                                if (bool.TryParse(textBox.Text, out var b))
-                                {
-                                    if (b)
-                                        Attribute.Value = true;
-                                }
-                                else
-                                {
-                                    Attribute.Value = textBox.Text;
-                                }
+                                Attribute.Value = true;
+                            }
+                            else
+                            {
+                                Attribute.Value = textBox.Text;
                             }
                         }
-                        else
+                        else if (children1.Count > 0)
                         {
-                            if (p4.Children.Count > 0)
+                            if (children1[0] is SAutoCompleteTextBox { Text: var text } && text.Contains(","))
                             {
-                                if (p4.Children[0] is SAutoCompleteTextBox tb && tb.Text.Contains(","))
+                                try
                                 {
-                                    List<List<int>> list = new List<List<int>>();
-                                    foreach (var VARIABLE in p4.Children)
-                                    {
-                                        if (VARIABLE is TextBox textBox)
-                                        {
-                                            try
-                                            {
-                                                list.Add(textBox.Text.Split(",")
-                                                    .Select(s => int.Parse(s)) // 将每个字符串转换为整数
-                                                    .ToList());
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                Console.WriteLine(e);
-                                                Growls.WarningGlobal("读取数字数组时出现错误！");
-                                                return;
-                                            }
-                                        }
-                                    }
-
+                                    var list = children1
+                                        .OfType<TextBox>()
+                                        .Select(tb => tb.Text.Split(",").Select(int.Parse).ToList())
+                                        .ToList();
                                     Attribute.Value = list;
                                 }
-                                else
+                                catch (Exception e)
                                 {
-                                    List<int> list = new List<int>();
-                                    foreach (var VARIABLE in p4.Children)
-                                    {
-                                        if (VARIABLE is TextBox textBox)
-                                        {
-                                            if (int.TryParse(textBox.Text, out var i))
-                                                list.Add(i);
-                                        }
-                                    }
-
-                                    Attribute.Value = list;
+                                    Console.WriteLine(e);
+                                    LoggerService.LogError(e);
+                                    Growls.WarningGlobal("读取数字数组时出现错误！");
                                 }
+                            }
+                            else
+                            {
+                                var list = children1
+                                    .OfType<TextBox>()
+                                    .Select(tb => int.TryParse(tb.Text, out var i) ? i : (int?)null)
+                                    .Where(i => i.HasValue)
+                                    .Select(i => i ?? 0) 
+                                    .ToList();
+                                Attribute.Value = list;
                             }
                         }
                     }
+
 
                     break;
                 //string
@@ -862,7 +828,7 @@ public partial class EditAttributeDialog : CustomWindow
         for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
         {
             var child = VisualTreeHelper.GetChild(parent, i);
-            if (child != null && child is T t)
+            if (child is T t)
             {
                 return t;
             }
@@ -890,17 +856,16 @@ public partial class EditAttributeDialog : CustomWindow
         if (sender is Button button)
         {
             // 找到根 Grid
-            Grid grid = (Grid)VisualTreeHelper.GetParent(button);
-            StackPanel rootkPanel = (StackPanel)VisualTreeHelper.GetParent(grid);
+            var grid = (Grid)VisualTreeHelper.GetParent(button);
+            var rootPanel = (StackPanel)VisualTreeHelper.GetParent(grid);
 
             // 找到 ScrollViewer
-            ScrollViewer? scrollViewer = FindVisualChild<ScrollViewer>(rootkPanel);
-            if (scrollViewer != null)
-            {
-                // 找到 ScrollViewer 内部的 StackPanel
-                StackPanel? stackPanel = FindVisualChild<StackPanel>(scrollViewer);
-                AddAutoAttribute(stackPanel, content);
-            }
+            var scrollViewer = FindVisualChild<ScrollViewer>(rootPanel);
+            if (scrollViewer == null)
+                return;
+            // 找到 ScrollViewer 内部的 StackPanel
+            var stackPanel = FindVisualChild<StackPanel>(scrollViewer);
+            AddAutoAttribute(stackPanel, content);
         }
     }
 
@@ -908,14 +873,14 @@ public partial class EditAttributeDialog : CustomWindow
     {
         if (panel != null)
         {
-            ContextMenu contextMenu = new ContextMenu();
-            MenuItem deleteItem = new MenuItem { Header = "删除" };
+            var contextMenu = new ContextMenu();
+            var deleteItem = new MenuItem { Header = "删除" };
             deleteItem.Click += DeleteAttribute;
             contextMenu.Items.Add(deleteItem);
-            EditTaskDialog? taskDialog = ParentDialog as EditTaskDialog;
+            var taskDialog = ParentDialog as EditTaskDialog;
             if (taskDialog == null)
                 return;
-            SAutoCompleteTextBox newTextBox = new SAutoCompleteTextBox
+            var newTextBox = new SAutoCompleteTextBox
             {
                 Margin = new Thickness(5, 2, 5, 2), DisplayMemberPath = "Name",
                 DataList = taskDialog.Data?.DataList, ItemsSource = taskDialog.Data?.DataList
@@ -933,12 +898,12 @@ public partial class EditAttributeDialog : CustomWindow
     {
         if (panel != null)
         {
-            ContextMenu contextMenu = new ContextMenu();
-            MenuItem deleteItem = new MenuItem { Header = "删除" };
+            var contextMenu = new ContextMenu();
+            var deleteItem = new MenuItem { Header = "删除" };
             deleteItem.Click += DeleteAttribute;
             contextMenu.Items.Add(deleteItem);
 
-            TextBox newTextBox = new TextBox
+            var newTextBox = new TextBox
             {
                 Margin = new Thickness(5, 2, 5, 2)
             };
@@ -954,17 +919,17 @@ public partial class EditAttributeDialog : CustomWindow
         if (sender is Button button)
         {
             // 找到根 Grid
-            Grid grid = (Grid)VisualTreeHelper.GetParent(button);
-            StackPanel rootkPanel = (StackPanel)VisualTreeHelper.GetParent(grid);
+            var grid = (Grid)VisualTreeHelper.GetParent(button);
+            var rootPanel = (StackPanel)VisualTreeHelper.GetParent(grid);
 
-            // 找到 ScrollViewer
-            ScrollViewer? scrollViewer = FindVisualChild<ScrollViewer>(rootkPanel);
-            if (scrollViewer != null)
-            {
-                // 找到 ScrollViewer 内部的 StackPanel
-                StackPanel? stackPanel = FindVisualChild<StackPanel>(scrollViewer);
-                AddAttribute(stackPanel, content);
-            }
+// 找到 ScrollViewer
+            var scrollViewer = FindVisualChild<ScrollViewer>(rootPanel);
+            if (scrollViewer is null)
+                return;
+
+// 找到 ScrollViewer 内部的 StackPanel
+            var stackPanel = FindVisualChild<StackPanel>(scrollViewer);
+            AddAttribute(stackPanel, content);
         }
     }
 
@@ -975,15 +940,10 @@ public partial class EditAttributeDialog : CustomWindow
 
     private void DeleteAttribute(object sender, RoutedEventArgs e)
     {
-        MenuItem? menuItem = sender as MenuItem;
-        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
-        if (contextMenu?.PlacementTarget is Control control)
-        {
-            var parentPanel = control.Parent as Panel;
-            if (parentPanel != null)
-            {
-                parentPanel.Children.Remove(control);
-            }
-        }
+        var menuItem = sender as MenuItem;
+        var contextMenu = menuItem?.Parent as ContextMenu;
+
+        if (contextMenu?.PlacementTarget is Control { Parent: Panel { Children: var children } } control)
+            children.Remove(control);
     }
 }

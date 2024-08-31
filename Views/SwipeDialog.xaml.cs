@@ -77,7 +77,7 @@ public partial class SwipeDialog : CustomWindow
 
         // 判断点击是否在Image边缘5个像素内
         if (canvasPosition.X < image.ActualWidth + 5 && canvasPosition.Y < image.ActualHeight + 5 &&
-            canvasPosition.X > -5 && canvasPosition.Y > -5)
+            canvasPosition is { X: > -5, Y: > -5 })
         {
             // 如果超出5个像素内，调整点击位置到Image边界
             imagePosition.X = Math.Max(0, Math.Min(imagePosition.X, image.ActualWidth));

@@ -62,7 +62,8 @@
     <!-- Background Colors -->
     <SolidColorBrush x:Key="PrimaryBackgroundColor" Color="#f3f3f3" />
     <SolidColorBrush x:Key="SecundaryBackgroundColor" Color="#f9f9f9" />
-
+    <SolidColorBrush x:Key="ErrorViewBackgroundBrush" Color="#E6E6E6" />
+    
     <!-- Primary Colors -->
     <SolidColorBrush x:Key="PrimaryBlueColor" Color="#5B7FFF" />
     <SolidColorBrush x:Key="PrimaryLightBlueColor" Color="#28AEED" />

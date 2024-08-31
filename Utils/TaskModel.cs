@@ -139,7 +139,7 @@ public class TaskModel
         foreach (var property in properties)
         {
             PropertyInfo? propInfo =
-                this.GetType().GetProperty(property.Key, BindingFlags.Public | BindingFlags.Instance);
+                GetType().GetProperty(property.Key, BindingFlags.Public | BindingFlags.Instance);
             if (propInfo != null && propInfo.CanWrite)
             {
                 propInfo.SetValue(this, property.Value);

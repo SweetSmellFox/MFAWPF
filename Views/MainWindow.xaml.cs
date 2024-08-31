@@ -73,11 +73,12 @@ namespace MFAWPF.Views
 
         private bool InitializeData()
         {
-            DataSet.Data = JSONHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
+            DataSet.Data = JSONHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());  
             if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json"))
             {
                 try
                 {
+                  
                     File.WriteAllText($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json",
                         JsonConvert.SerializeObject(new MaaInterface()
                         {
@@ -213,7 +214,7 @@ namespace MFAWPF.Views
             }
         }
 
-        private void Close()
+        protected new void Close()
         {
             base.Close();
             Application.Current.Shutdown();
@@ -412,7 +413,7 @@ namespace MFAWPF.Views
             }
             else AutoDetectDevice();
 
-            MaaProcessor.Instance.SetCurrentInstance(null);
+            MaaProcessor.Instance.SetCurrentInstance();
             if (ConnectSettingButton.IsChecked == true)
             {
                 ConfigureSettingsPanel();
@@ -426,6 +427,7 @@ namespace MFAWPF.Views
                 Growl.Info(string.Format(LocExtension.GetLocalizedValue<string>("WindowSelectionMessage"),
                     window.Name));
                 MaaProcessor.Config.Win32.HWnd = window.Handle;
+                MaaProcessor.Instance.SetCurrentInstance();
             }
             else if (deviceComboBox.SelectedItem is DeviceInfo device)
             {
@@ -434,6 +436,7 @@ namespace MFAWPF.Views
                 MaaProcessor.Config.Adb.Adb = device.AdbPath;
                 MaaProcessor.Config.Adb.AdbAddress = device.AdbSerial;
                 MaaProcessor.Config.Adb.AdbConfig = device.AdbConfig;
+                MaaProcessor.Instance.SetCurrentInstance();
                 DataSet.SetData("Adb", device);
             }
         }
@@ -567,7 +570,7 @@ namespace MFAWPF.Views
 
         private void AddThemeOption(int defaultValue = 0)
         {
-            var comboBox = new ComboBox()
+            var comboBox = new ComboBox
             {
                 Style = FindResource("ComboBoxExtend") as Style,
                 Margin = new Thickness(5)
@@ -645,11 +648,11 @@ namespace MFAWPF.Views
 
             comboBox.BindLocalization(titleKey);
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-            comboBox.SelectionChanged += (sender, args) =>
+            comboBox.SelectionChanged += (sender, _) =>
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
                 DataSet.SetData(datatype, index);
-                MaaProcessor.Instance.SetCurrentInstance(null);
+                MaaProcessor.Instance.SetCurrentInstance();
             };
 
             settingPanel.Children.Add(comboBox);
@@ -710,7 +713,7 @@ namespace MFAWPF.Views
 
         private void AddRepeatOption(DragItemViewModel source)
         {
-            if (source.InterfaceItem != null && source.InterfaceItem.repeatable == true)
+            if (source.InterfaceItem is { repeatable: true })
             {
                 NumericUpDown numericUpDown = new NumericUpDown
                 {
@@ -746,7 +749,7 @@ namespace MFAWPF.Views
         {
             if (!MaaProcessor.Config.IsConnected)
             {
-                Growls.Warning($"无法连接至{(IsADB ? "模拟器" : "窗口")}");
+                Growls.Warning("Warning_CannotConnect".GetLocalizedFormattedString((IsADB ? "Simulator" : "Window")));
                 return;
             }
 
@@ -852,7 +855,9 @@ namespace MFAWPF.Views
                 MaaProcessor.Config.Win32.ScreenCap = winScreenCapType;
 
                 Console.WriteLine(
-                    $"{LocExtension.GetLocalizedValue<string>("AdbTouchMode")}{winTouchType},{LocExtension.GetLocalizedValue<string>("AdbCaptureMode")}{winScreenCapType}");
+                    $"{"AdbTouchMode".GetLocalizationString()}{winTouchType},{"AdbCaptureMode".GetLocalizationString()}{winScreenCapType}");
+                LoggerService.LogInfo(
+                    $"{"AdbTouchMode".GetLocalizationString()}{winTouchType},{"AdbCaptureMode".GetLocalizationString()}{winScreenCapType}");
             }
         }
 
@@ -928,6 +933,16 @@ namespace MFAWPF.Views
             }
             else
                 Dispatcher.Invoke(ShowEditButton);
+        }
+
+        private void ToggleWindowTopMost(object sender, RoutedEventArgs e)
+        {
+            if (Data == null) return;
+            Topmost = !Topmost;
+            if (Topmost)
+                Data.WindowTopMostButtonForeground = FindResource("PrimaryBrush") as Brush ?? Brushes.DarkGray;
+            else
+                Data.WindowTopMostButtonForeground = FindResource("ActionIconColor") as Brush ?? Brushes.DarkGray;
         }
     }
 }

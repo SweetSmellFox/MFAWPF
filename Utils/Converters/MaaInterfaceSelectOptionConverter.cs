@@ -53,7 +53,7 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
     {
         JArray array = new JArray();
 
-        if (value != null && value is List<MaaInterface.MaaInterfaceSelectOption> selectOptions)
+        if (value is List<MaaInterface.MaaInterfaceSelectOption> selectOptions)
         {
             foreach (var option in selectOptions)
             {

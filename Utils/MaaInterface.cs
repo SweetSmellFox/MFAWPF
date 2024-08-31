@@ -56,8 +56,8 @@ namespace MFAWPF.Utils
         public class MaaResourceVersion
         {
             public string? name { get; set; }
-
             public string? version { get; set; }
+            public string? url { get; set; }
         }
 
         public MaaResourceVersion? version { get; set; }

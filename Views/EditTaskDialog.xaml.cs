@@ -22,12 +22,12 @@ using Path = System.Windows.Shapes.Path;
 
 namespace MFAWPF.Views;
 
-public partial class EditTaskDialog 
+public partial class EditTaskDialog
 {
     private List<TaskModel> tasks;
     public EditTaskDialogViewModel? Data;
 
-    public EditTaskDialog() 
+    public EditTaskDialog()
     {
         InitializeComponent();
         tasks = new List<TaskModel>();
@@ -45,42 +45,36 @@ public partial class EditTaskDialog
 
     private void List_KeyDown(object sender, KeyEventArgs e)
     {
-        if (Data is { CurrentTask: not null, DataList: not null })
-        {
-            if (e.Key == Key.Delete)
-            {
-                var itemToDelete = Data.CurrentTask;
-                int index = Data.DataList?.IndexOf(itemToDelete) ?? -1;
-                if (index != -1)
-                {
-                    Data?.DataList?.Remove(itemToDelete);
-                    Data?.UndoStack?.Push(new RelayCommand(o => Data?.DataList?.Insert(index, itemToDelete)));
-                }
-            }
-        }
+        if (Data is not { CurrentTask: not null, DataList: not null } || e.Key != Key.Delete)
+            return;
+
+        var itemToDelete = Data.CurrentTask;
+        int index = Data.DataList?.IndexOf(itemToDelete) ?? -1;
+        if (index == -1)
+            return;
+
+        Data?.DataList?.Remove(itemToDelete);
+        Data?.UndoStack.Push(new RelayCommand(o => Data?.DataList?.Insert(index, itemToDelete)));
     }
 
     public void Save(object? sender, RoutedEventArgs? e)
     {
-        if (Data?.DataList != null && Data.DataList
-                .Where(t => !string.IsNullOrWhiteSpace(t.Name) && t.Name.Equals(TaskName.Text))
-                .ToList()
-                .Count > 1)
+        if (Data?.DataList?.Count(t => !string.IsNullOrWhiteSpace(t.Name) && t.Name.Equals(TaskName.Text)) > 1)
         {
             Growls.Error(string.Format("DuplicateTaskNameError".GetLocalizationString(), TaskName.Text));
             return;
         }
 
-        if (Data?.CurrentTask?.Task != null)
+        if (Data?.CurrentTask?.Task is not null)
         {
             Data.CurrentTask.Task.Reset();
             Data.CurrentTask.Task.name = TaskName.Text;
-            foreach (var VARIABLE in Parts.Children)
+
+            foreach (var button in Parts.Children.OfType<AttributeButton>())
             {
-                if (VARIABLE is AttributeButton button)
+                if (button.Attribute is not null)
                 {
-                    if (button.Attribute != null)
-                        Data.CurrentTask.Task.Set(button.Attribute);
+                    Data.CurrentTask.Task.Set(button.Attribute);
                 }
             }
 
@@ -144,12 +138,11 @@ public partial class EditTaskDialog
 
     public AttributeButton? GetAttribute(string key)
     {
-        foreach (var VARIABLE in Parts.Children)
+        foreach (var button in Parts.Children.OfType<AttributeButton>())
         {
-            if (VARIABLE is AttributeButton button)
+            if (button.Attribute?.Key?.Equals(key) == true)
             {
-                if (button.Attribute != null && button.Attribute.Key?.Equals(key) == true)
-                    return button;
+                return button;
             }
         }
 
@@ -158,75 +151,68 @@ public partial class EditTaskDialog
 
     public void RemoveAttribute(string key)
     {
-        foreach (var VARIABLE in Parts.Children)
+        foreach (var button in Parts.Children.OfType<AttributeButton>()
+                     .Where(button => button.Attribute?.Key?.Equals(key) == true).ToList())
         {
-            if (VARIABLE is AttributeButton button)
-            {
-                if (button.Attribute != null && button.Attribute.Key?.Equals(key) == true)
-                    Parts.Children.Remove(button);
-            }
+            Parts.Children.Remove(button);
         }
     }
 
     private void CopyAttribute(object sender, RoutedEventArgs e)
     {
-        MenuItem? menuItem = sender as MenuItem;
-        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
-        if (contextMenu?.PlacementTarget is AttributeButton attributeButton)
-        {
-            if (attributeButton != null && attributeButton.Attribute != null)
+        if (sender is MenuItem
             {
-                var settings = new JsonSerializerSettings
-                {
-                    Formatting = Formatting.Indented,
-                    NullValueHandling = NullValueHandling.Ignore,
-                    DefaultValueHandling = DefaultValueHandling.Ignore
-                };
+                Parent: ContextMenu { PlacementTarget: AttributeButton { Attribute: var attribute } }
+            })
+        {
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore
+            };
 
-                string json = JsonConvert.SerializeObject(attributeButton.Attribute, settings);
-                Clipboard.SetDataObject(json);
-            }
+            var json = JsonConvert.SerializeObject(attribute, settings);
+            Clipboard.SetDataObject(json);
         }
     }
 
     private void DeleteAttribute(object sender, RoutedEventArgs e)
     {
-        MenuItem? menuItem = sender as MenuItem;
-        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
-        if (contextMenu?.PlacementTarget is AttributeButton attributeButton)
-        {
-            var parentPanel = attributeButton.Parent as Panel;
-            if (parentPanel != null)
+        if (sender is MenuItem
             {
-                var itemToDelete = attributeButton.Attribute;
-                int index = parentPanel.Children.IndexOf(attributeButton);
-                parentPanel.Children.Remove(attributeButton);
-                Data?.UndoTaskStack?.Push(new RelayCommand(o => AddAttribute(itemToDelete, index)));
-            }
+                Parent: ContextMenu
+                {
+                    PlacementTarget: AttributeButton
+                    {
+                        Parent: Panel parentPanel, Attribute: var itemToDelete
+                    } attributeButton
+                }
+            })
+        {
+            var index = parentPanel.Children.IndexOf(attributeButton);
+            parentPanel.Children.Remove(attributeButton);
+            Data?.UndoTaskStack?.Push(new RelayCommand(o => AddAttribute(itemToDelete, index)));
         }
     }
 
 
     private void EditAttribute(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem menuItem && menuItem.Parent != null)
+        if (sender is MenuItem { Parent: ContextMenu { PlacementTarget: AttributeButton buttonFromMenu } })
         {
-            ContextMenu? contextMenu = menuItem.Parent as ContextMenu;
-            if (contextMenu?.PlacementTarget is AttributeButton attributeButton)
-            {
-                var editDialog = new EditAttributeDialog(attributeButton.WindowParent, attributeButton.Attribute, true);
-                if (editDialog.ShowDialog() == true)
-                {
-                    attributeButton.Attribute = editDialog.Attribute;
-                }
-            }
-        }
-        else if (sender is AttributeButton attributeButton)
-        {
-            var editDialog = new EditAttributeDialog(attributeButton.WindowParent, attributeButton.Attribute, true);
+            var editDialog = new EditAttributeDialog(buttonFromMenu.WindowParent, buttonFromMenu.Attribute, true);
             if (editDialog.ShowDialog() == true)
             {
-                attributeButton.Attribute = editDialog.Attribute;
+                buttonFromMenu.Attribute = editDialog.Attribute;
+            }
+        }
+        else if (sender is AttributeButton buttonDirect)
+        {
+            var editDialog = new EditAttributeDialog(buttonDirect.WindowParent, buttonDirect.Attribute, true);
+            if (editDialog.ShowDialog() == true)
+            {
+                buttonDirect.Attribute = editDialog.Attribute;
             }
         }
     }
@@ -601,7 +587,7 @@ public partial class EditTaskDialog
                             {
                                 if (imageDialog.Output != null)
                                     lli.Add(imageDialog.Output);
-                                
+
                                 attribute.Attribute = new Attribute()
                                 {
                                     Key = "roi", Value = lli

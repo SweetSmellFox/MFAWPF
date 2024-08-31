@@ -19,13 +19,15 @@ namespace MFAWPF.Controls
         private const string SearchTextBox = "PART_SearchTextBox";
         private bool ignoreTextChanging;
         private TextBox? _searchTextBox;
+
         private object?
             _selectedItem;
+
         private bool isApplyingTemplate;
         private bool isSelectionChanging;
 
         public static readonly DependencyProperty DataListProperty = DependencyProperty
-            .Register("DataList", typeof(Collection<TaskItemViewModel>), typeof(SAutoCompleteTextBox),
+            .Register(nameof(DataList), typeof(Collection<TaskItemViewModel>), typeof(SAutoCompleteTextBox),
                 new FrameworkPropertyMetadata(null));
 
         public Collection<TaskItemViewModel>? DataList
@@ -139,7 +141,7 @@ namespace MFAWPF.Controls
                     baseMethod.Invoke(this, new object[] { e });
                 }
 
-                if (e.AddedItems != null && e.AddedItems.Count > 0 && e.AddedItems[0] != null)
+                if (e.AddedItems is { Count: > 0 } && e.AddedItems[0] is not null)
                 {
                     _selectedItem = e.AddedItems[0];
                     UpdateTextBoxBySelectedItem(_selectedItem);

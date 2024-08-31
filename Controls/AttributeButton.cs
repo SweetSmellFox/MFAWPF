@@ -18,11 +18,11 @@ public class AttributeButton : Button
     }
 
     public static readonly DependencyProperty AttributeProperty =
-        DependencyProperty.Register("Attribute", typeof(Attribute), typeof(AttributeButton),
+        DependencyProperty.Register(nameof(Attribute), typeof(Attribute), typeof(AttributeButton),
             new PropertyMetadata(null, OnAttributeValueChanged));
 
     public static readonly DependencyProperty IsSelectedProperty =
-        DependencyProperty.Register("IsSelected", typeof(bool), typeof(AttributeButton),
+        DependencyProperty.Register(nameof(IsSelected), typeof(bool), typeof(AttributeButton),
             new PropertyMetadata(false));
 
     public bool IsSelected
@@ -42,21 +42,18 @@ public class AttributeButton : Button
 
     private static void OnAttributeValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var button = d as AttributeButton;
-        if (button != null)
+        if (d is AttributeButton button)
         {
             if (e.NewValue == null)
             {
-                var parentPanel = button.Parent as Panel;
-                if (parentPanel != null)
+                if (button.Parent is Panel parentPanel)
                     parentPanel.Children.Remove(button);
             }
             else if (e.NewValue is Attribute attribute)
             {
                 if (string.IsNullOrWhiteSpace(attribute.Value?.ToString()))
                 {
-                    var parentPanel = button.Parent as Panel;
-                    if (parentPanel != null)
+                    if (button.Parent is Panel parentPanel)
                         parentPanel.Children.Remove(button);
                 }
                 else

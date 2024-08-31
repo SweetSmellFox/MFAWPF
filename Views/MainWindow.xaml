@@ -14,7 +14,7 @@
                        xmlns:utils="clr-namespace:MFAWPF.Utils"
                        engine:ResxLocalizationProvider.DefaultAssembly="MFAWPF"
                        engine:ResxLocalizationProvider.DefaultDictionary="Strings"
-                       mc:Ignorable="d"
+                       mc:Ignorable="d" x:Name="home"
                        Title="{lex:Loc AppTitle}" Height="520" Width="800" MinWidth="400" MinHeight="205"
                        WindowStartupLocation="CenterScreen" WindowStyle="None"
                        Background="Transparent" AllowsTransparency="True"
@@ -29,21 +29,21 @@
             <TextBlock>
                 <TextBlock.Text>
                     <MultiBinding StringFormat="{}{0} ({1})">
-                        <Binding Path="Name"/>
-                        <Binding Path="AdbSerial"/>
+                        <Binding Path="Name" />
+                        <Binding Path="AdbSerial" />
                     </MultiBinding>
                 </TextBlock.Text>
             </TextBlock>
         </DataTemplate>
         <!-- DataTemplate for WindowInfo -->
         <DataTemplate x:Key="WindowInfoTemplate">
-            <TextBlock Text="{Binding Name}"/>
+            <TextBlock Text="{Binding Name}" />
         </DataTemplate>
 
         <!-- DataTemplateSelector -->
         <utils:DeviceWindowTemplateSelector x:Key="DeviceWindowTemplateSelector"
                                             DeviceInfoTemplate="{StaticResource DeviceInfoTemplate}"
-                                            WindowInfoTemplate="{StaticResource WindowInfoTemplate}"/>
+                                            WindowInfoTemplate="{StaticResource WindowInfoTemplate}" />
         <ContextMenu x:Key="TaskMenu">
             <MenuItem Header="{lex:Loc Delete}" Click="Delete" />
         </ContextMenu>
@@ -54,11 +54,11 @@
 
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
+                    <RowDefinition Height="42" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <Border CornerRadius="10 10 0 0" VerticalAlignment="Top" x:Name="TitleBar"
-                        Padding="0,2,10,0" Height="30" Background="{DynamicResource MainContentBackgroundBrush}"
+                        Height="30" Background="{DynamicResource MainContentBackgroundBrush}"
                         ClipToBounds="False">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -76,39 +76,51 @@
                             <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}"
                                        Margin="2 4 4 0" x:Name="version" Text="Debug">
                             </TextBlock>
-                            <TextBlock VerticalAlignment="Center" Margin="6 4 4 0" Text="{lex:Loc ResourceName}" x:Name="resourceNameText" Visibility="Collapsed"
+                            <TextBlock VerticalAlignment="Center" Margin="6 4 4 0" Text="{lex:Loc ResourceName}"
+                                       x:Name="resourceNameText" Visibility="Collapsed"
                                        Foreground="{DynamicResource PrimaryTextBrush}">
 
                             </TextBlock>
-                            <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}" Visibility="Collapsed"
+                            <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}"
+                                       Visibility="Collapsed"
                                        Margin="2 4 4 0" x:Name="resourceName" Text="Debug">
                             </TextBlock>
-                            <TextBlock VerticalAlignment="Center" Margin="6 4 4 0" Text="{lex:Loc ResourceVersion}" x:Name="resourceVersionText" Visibility="Collapsed"
+                            <TextBlock VerticalAlignment="Center" Margin="6 4 4 0" Text="{lex:Loc ResourceVersion}"
+                                       x:Name="resourceVersionText" Visibility="Collapsed"
                                        Foreground="{DynamicResource PrimaryTextBrush}">
 
                             </TextBlock>
-                            <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}" Visibility="Collapsed"
+                            <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}"
+                                       Visibility="Collapsed"
                                        Margin="2 4 4 0" x:Name="resourceVersion" Text="Debug">
                             </TextBlock>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" FlowDirection="RightToLeft">
-                            <Button x:Name="btnClose" Style="{StaticResource IconButtonsStyle}"
+
+                            <Button x:Name="btnClose" Style="{StaticResource IconButtonsStyle}" Width="40"
+                                    ClipToBounds="True"
                                     Content="{DynamicResource close}" Click="btnClose_Click" Tag="IsCloseButton" />
-                            <Button x:Name="btnRestore" Margin="5,0" Click="btnRestore_Click">
+                            <Button x:Name="btnRestore" Margin="5,0" Click="btnRestore_Click" Width="40">
                                 <Button.Style>
                                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource IconButtonsStyle}">
                                         <Setter Property="Content" Value="{DynamicResource maximize}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ElementName=home, Path=WindowState}"
                                                          Value="Maximized">
-                                                <Setter Property="Content" Value="{DynamicResource restore}" />
+                                                <Setter Property="Content"
+                                                        Value="{DynamicResource WindowRestoreGeometry}" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Button.Style>
                             </Button>
-                            <Button x:Name="btnMinimize" Style="{DynamicResource IconButtonsStyle}"
+                            <Button x:Name="btnMinimize" Style="{DynamicResource IconButtonsStyle}" Width="40"
                                     Content="{DynamicResource minimize}" Click="btnMinimize_Click" />
+                            <Button x:Name="btnPin" Padding="0 -2 0 0" Width="42"
+                                    Content="📌" Click="ToggleWindowTopMost"
+                                    Style="{StaticResource PushpinButtonStyle}"
+                                    Foreground="{Binding WindowTopMostButtonForeground}">
+                            </Button>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -125,8 +137,9 @@
                             <TabItem Header="{lex:Loc TabADB}" x:Name="adbTab"></TabItem>
                             <TabItem Header="{lex:Loc TabWin32}" x:Name="win32Tab"></TabItem>
                         </TabControl>
-                        <ComboBox Width="250" x:Name="deviceComboBox"  Margin="4 0 0 0"
-                                  IsEnabled="{Binding Idle}" ItemTemplateSelector="{StaticResource DeviceWindowTemplateSelector}"
+                        <ComboBox Width="250" x:Name="deviceComboBox" Margin="4 0 0 0"
+                                  IsEnabled="{Binding Idle}"
+                                  ItemTemplateSelector="{StaticResource DeviceWindowTemplateSelector}"
                                   SelectionChanged="DeviceComboBox_OnSelectionChanged" />
                         <Button ToolTip="{lex:Loc TooltipRefresh}" Width="20" Height="20" Margin="6 0 2 0"
                                 Style="{StaticResource textBoxButton}"
@@ -193,13 +206,15 @@
                                             Click="SelectNone" IsEnabled="{Binding Idle}"
                                             Padding="0"
                                             hc:IconElement.Geometry="{StaticResource SelectNoneGeometry}" />
-                                    <Button ToolTip="{lex:Loc EditTask}" Width="15" Height="15" Margin="7 0 0 0" x:Name="EditButton"
+                                    <Button ToolTip="{lex:Loc EditTask}" Width="15" Height="15" Margin="7 0 0 0"
+                                            x:Name="EditButton"
                                             Style="{StaticResource textBoxButton}"
                                             Foreground="{DynamicResource GrayColor4}"
                                             Click="Edit" IsEnabled="{Binding Idle}"
                                             Padding="0"
                                             hc:IconElement.Geometry="{StaticResource EditGeometry}" />
-                                    <Button ToolTip="{lex:Loc EditTaskDialog_AddTask_Tooltip}" Width="15" Height="15" Margin="7 0 0 0"
+                                    <Button ToolTip="{lex:Loc EditTaskDialog_AddTask_Tooltip}" Width="15" Height="15"
+                                            Margin="7 0 0 0"
                                             Style="{StaticResource textBoxButton}"
                                             Foreground="{DynamicResource GrayColor4}"
                                             Click="Add" IsEnabled="{Binding Idle}"
@@ -233,7 +248,7 @@
                                          ItemsSource="{Binding TaskItemViewModels}">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid x:Name="ListGrid"  ContextMenu="{StaticResource TaskMenu}"> 
+                                            <Grid x:Name="ListGrid" ContextMenu="{StaticResource TaskMenu}">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition />
                                                     <ColumnDefinition Width="45" />
@@ -311,11 +326,11 @@
                                 <StackPanel.RenderTransform>
                                     <TranslateTransform Y="-5" />
                                 </StackPanel.RenderTransform>
-                          
+
                             </StackPanel>
                         </ScrollViewer>
 
-                        <hc:ScrollViewer Grid.Column="2" Margin="10 -0 10 10" Height="440"
+                        <hc:ScrollViewer Grid.Column="2" Margin="10 0 10 0" Height="440"
                                          VerticalAlignment="Top"
                                          BorderBrush="LightGray" BorderThickness="1" ClipToBounds="False"
                                          properties:AutoScroll.AutoScroll="True" VerticalContentAlignment="Top"

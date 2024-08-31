@@ -34,6 +34,7 @@ public partial class SelectionRegionDialog : CustomWindow
     private double _scaleRatio;
     private double originWidth;
     private double originHeight;
+
     private void UpdateImage(BitmapImage _imageSource)
     {
         image.Source = _imageSource;
@@ -58,14 +59,14 @@ public partial class SelectionRegionDialog : CustomWindow
         Height = image.Height + 100;
     }
 
-     private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
+    private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
     {
         var position = e.GetPosition(image);
         var canvasPosition = e.GetPosition(SelectionCanvas);
 
         // 判断点击是否在Image边缘5个像素内
         if (canvasPosition.X < image.ActualWidth + 5 && canvasPosition.Y < image.ActualHeight + 5 &&
-            canvasPosition.X > -5 && canvasPosition.Y > -5)
+            canvasPosition is { X: > -5, Y: > -5 })
         {
             if (_selectionRectangle != null)
             {
@@ -84,7 +85,7 @@ public partial class SelectionRegionDialog : CustomWindow
             {
                 Stroke = Brushes.Red,
                 StrokeThickness = 2.5,
-                StrokeDashArray = new DoubleCollection { 2 }
+                StrokeDashArray = { 2 }
             };
 
             Canvas.SetLeft(_selectionRectangle, _startPoint.X);

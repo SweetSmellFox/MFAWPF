@@ -46,7 +46,7 @@ namespace MFAWPF.Views
                     _vertexTaskMapping[vertex.Name] = task;
                 }
 
-                if (task.Task != null && task.Task?.next != null)
+                if (task.Task is { next: not null })
                 {
                     AddEdges(graph, vertexDictionary, task.Task.next, vertexDictionary[task.Name], "Normal");
                 }
@@ -113,6 +113,27 @@ namespace MFAWPF.Views
 
         private void GraphLayout_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                if (Keyboard.Modifiers == ModifierKeys.Control)
+                {
+                    _startPoint = e.GetPosition(scrollViewer);
+                    _isDragging = true;
+                    Mouse.Capture(graphLayout);
+                }
+                else
+                {
+                    var hitTestResult = VisualTreeHelper.HitTest(graphLayout, e.GetPosition(graphLayout));
+                    if (hitTestResult?.VisualHit is TextBlock textBlock && _editTaskDialog.Data is { DataList: not null })
+                    {
+                        _editTaskDialog.Data.CurrentTask =
+                            _editTaskDialog.Data.DataList.FirstOrDefault(model =>
+                                !string.IsNullOrWhiteSpace(textBlock.Text) && model.Name.Equals(textBlock.Text))
+                            ?? _editTaskDialog.Data.CurrentTask;
+                    }
+
+                }
+            }
             // if (e.ChangedButton == MouseButton.Right)
             // {
             //     // 右键删除节点或连线
@@ -150,7 +171,7 @@ namespace MFAWPF.Views
         {
             if (_isDragging)
             {
-                Point currentPoint = e.GetPosition(scrollViewer);
+                var currentPoint = e.GetPosition(scrollViewer);
                 scrollViewer.ScrollToHorizontalOffset(scrollViewer.HorizontalOffset -
                                                       (currentPoint.X - _startPoint.X));
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - (currentPoint.Y - _startPoint.Y));

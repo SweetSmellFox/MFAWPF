@@ -16,11 +16,9 @@ public class AutoInitDictionary : Dictionary<string, int>
             {
                 this[key] = 0;
             }
+
             return base[key];
         }
-        set
-        {
-            base[key] = value;
-        }
+        set => base[key] = value;
     }
 }

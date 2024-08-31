@@ -32,8 +32,8 @@ namespace MFAWPF.Controls
 
         public Brush CustomForeground
         {
-            get { return (Brush)GetValue(CustomForegroundProperty); }
-            set { SetValue(CustomForegroundProperty, value); }
+            get => (Brush)GetValue(CustomForegroundProperty);
+            set => SetValue(CustomForegroundProperty, value);
         }
 
         public static readonly DependencyProperty ForegroundKeyProperty =
@@ -51,7 +51,7 @@ namespace MFAWPF.Controls
 
         public string ForegroundKey
         {
-            get { return (string)GetValue(ForegroundKeyProperty); }
+            get => (string)GetValue(ForegroundKeyProperty);
             set
             {
                 SetValue(ForegroundKeyProperty, value);

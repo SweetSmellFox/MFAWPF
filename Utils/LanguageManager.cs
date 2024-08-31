@@ -4,7 +4,7 @@ using WPFLocalizeExtension.Extensions;
 
 namespace MFAWPF.Utils;
 
-public class LanguageManager
+public static class LanguageManager
 {
     public static event EventHandler? LanguageChanged;
 

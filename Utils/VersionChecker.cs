@@ -40,37 +40,35 @@ public class VersionChecker
     {
         string url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
 
-        using (HttpClient client = new HttpClient())
+        using HttpClient client = new HttpClient();
+        client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
+
+        try
         {
-            client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
 
-            try
-            {
-                HttpResponseMessage response = await client.GetAsync(url);
-                response.EnsureSuccessStatusCode();
-
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-                JObject releaseData = JObject.Parse(jsonResponse);
-                return releaseData["tag_name"]?.ToString() ?? string.Empty;
-            }
-            catch (HttpRequestException e) when (e.Message.Contains("403"))
-            {
-                Console.WriteLine("GitHub API速率限制已超出，请稍后再试。");
-                LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
-                throw new Exception("GitHub API速率限制已超出，请稍后再试。");
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine($"请求GitHub时发生错误: {e.Message}");
-                LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
-                throw new Exception("请求GitHub时发生错误。");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"处理GitHub响应时发生错误: {e.Message}");
-                LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
-                throw new Exception("处理GitHub响应时发生错误。");
-            }
+            string jsonResponse = await response.Content.ReadAsStringAsync();
+            JObject releaseData = JObject.Parse(jsonResponse);
+            return releaseData["tag_name"]?.ToString() ?? string.Empty;
+        }
+        catch (HttpRequestException e) when (e.Message.Contains("403"))
+        {
+            Console.WriteLine("GitHub API速率限制已超出，请稍后再试。");
+            LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
+            throw new Exception("GitHub API速率限制已超出，请稍后再试。");
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine($"请求GitHub时发生错误: {e.Message}");
+            LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
+            throw new Exception("请求GitHub时发生错误。");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"处理GitHub响应时发生错误: {e.Message}");
+            LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
+            throw new Exception("处理GitHub响应时发生错误。");
         }
     }
 
