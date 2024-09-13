@@ -1,8 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Data;
 using HandyControl.Controls;
-using WPFLocalizeExtension.Deprecated.Extensions;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Extensions;
 
@@ -37,8 +35,7 @@ public static class MFAExtensions
     public static void BindLocalization(this FrameworkElement control, string resourceKey,
         DependencyProperty? property = null)
     {
-        if (property == null)
-            property = InfoElement.TitleProperty;
+        property ??= InfoElement.TitleProperty;
         var locExtension = new LocExtension(resourceKey);
         locExtension.SetBinding(control, property);
     }

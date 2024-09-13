@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using MFAWPF.Utils;
 using Newtonsoft.Json.Linq;
 
@@ -14,7 +13,7 @@ namespace MFAWPF.Data
             if (Data == null || value == null) return;
             Data[key] = value; // 如果 key 不存在，将自动添加条目；如果存在，将更新值
 
-            JSONHelper.WriteToConfigJsonFile("config", Data);
+            JsonHelper.WriteToConfigJsonFile("config", Data);
         }
 
 

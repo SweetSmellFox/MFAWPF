@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
+using MFAWPF.Data;
 using MFAWPF.Utils;
 using MFAWPF.Views;
 using Newtonsoft.Json;
@@ -47,7 +48,8 @@ public class DragItemViewModel : ObservableObject
             value ??= false;
             if (InterfaceItem != null)
                 InterfaceItem.check = IsChecked;
-            JSONHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface", MaaInterface.Instance);
+            JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface", MaaInterface.Instance);
+            DataSet.SetData("Tasks", MainWindow.Data?.TaskItemViewModels.ToList());
         }
     }
 

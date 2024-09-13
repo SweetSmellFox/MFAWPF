@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using WPFLocalizeExtension.Engine;
-using WPFLocalizeExtension.Extensions;
+
 
 namespace MFAWPF.Utils;
 

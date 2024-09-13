@@ -5,7 +5,7 @@ namespace MFAWPF.Utils.Converters;
 
 public class SubtractConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is double originalWidth && parameter is string parameterString && double.TryParse(parameterString, out double subtractValue))
         {
@@ -14,7 +14,7 @@ public class SubtractConverter : IValueConverter
         return value;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new Exception("Type not exists!");
     }

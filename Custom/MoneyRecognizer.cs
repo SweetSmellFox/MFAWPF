@@ -3,7 +3,7 @@ using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Custom;
 
-namespace MFAWPF.Actions;
+namespace MFAWPF.Custom;
 
 public class MoneyRecognizer : IMaaCustomRecognizer
 {

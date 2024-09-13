@@ -1,61 +1,50 @@
-﻿using System.Collections.ObjectModel;
-using System.IO;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MFAWPF.Utils;
-using MFAWPF.ViewModels;
-using HandyControl.Controls;
-using HandyControl.Data;
-using MFAWPF.Controls;
 using Microsoft.Win32;
-using Newtonsoft.Json;
-using Attribute = MFAWPF.Utils.Attribute;
 
 namespace MFAWPF.Views;
 
-public partial class SwipeDialog : CustomWindow
+public partial class SwipeDialog
 {
     private Point _startPoint;
     private Point _endPoint;
     private Line? _arrowLine;
     private Polygon? _arrowHead;
-    public Point StartPoint { get; private set; }
-    public Point EndPoint { get; private set; }
-    public List<int>? OutputBegin { get; set; }
-    public List<int>? OutputEnd { get; set; }
+    private Point StartPoint { get; set; }
+    private Point EndPoint { get; set; }
+    public List<int>? OutputBegin { get; private set; }
+    public List<int>? OutputEnd { get; private set; }
 
-    public SwipeDialog(BitmapImage bitmapImage) :
-        base()
+    public SwipeDialog(BitmapImage bitmapImage)
     {
         InitializeComponent();
         UpdateImage(bitmapImage);
     }
 
     private double _scaleRatio;
-    private double originWidth;
-    private double originHeight;
+    private double _originWidth;
+    private double _originHeight;
 
-    private void UpdateImage(BitmapImage _imageSource)
+    private void UpdateImage(BitmapImage imageSource)
     {
-        image.Source = _imageSource;
-        Console.WriteLine($"{_imageSource.PixelWidth},{_imageSource.PixelHeight}");
+        image.Source = imageSource;
 
-        originWidth = _imageSource.PixelWidth;
-        originHeight = _imageSource.PixelHeight;
+        _originWidth = imageSource.PixelWidth;
+        _originHeight = imageSource.PixelHeight;
 
         double maxWidth = image.MaxWidth;
         double maxHeight = image.MaxHeight;
 
-        double widthRatio = maxWidth / originWidth;
-        double heightRatio = maxHeight / originHeight;
+        double widthRatio = maxWidth / _originWidth;
+        double heightRatio = maxHeight / _originHeight;
         _scaleRatio = Math.Min(widthRatio, heightRatio);
 
-        image.Width = originWidth * _scaleRatio;
-        image.Height = originHeight * _scaleRatio;
+        image.Width = _originWidth * _scaleRatio;
+        image.Height = _originHeight * _scaleRatio;
 
         SelectionCanvas.Width = image.Width;
         SelectionCanvas.Height = image.Height;
@@ -127,7 +116,8 @@ public partial class SwipeDialog : CustomWindow
         _arrowLine.Y2 = _endPoint.Y;
 
         DrawArrowHead(_startPoint, _endPoint);
-        MousePositionText.Text = $"[ {(int)(_startPoint.X / _scaleRatio)}, {(int)(_startPoint.Y / _scaleRatio)} ] -> [ {(int)(_endPoint.X / _scaleRatio)}, {(int)(_endPoint.Y / _scaleRatio)} ]";
+        MousePositionText.Text =
+            $"[ {(int)(_startPoint.X / _scaleRatio)}, {(int)(_startPoint.Y / _scaleRatio)} ] -> [ {(int)(_endPoint.X / _scaleRatio)}, {(int)(_endPoint.Y / _scaleRatio)} ]";
     }
 
     private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
@@ -149,8 +139,8 @@ public partial class SwipeDialog : CustomWindow
         }
 
         // 输出起点和终点的坐标
-        OutputBegin = new() { (int)(StartPoint.X / _scaleRatio), (int)(StartPoint.Y / _scaleRatio), 1, 1 };
-        OutputEnd = new() { (int)(EndPoint.X / _scaleRatio), (int)(EndPoint.Y / _scaleRatio), 1, 1 };
+        OutputBegin = [(int)(StartPoint.X / _scaleRatio), (int)(StartPoint.Y / _scaleRatio), 1, 1];
+        OutputEnd = [(int)(EndPoint.X / _scaleRatio), (int)(EndPoint.Y / _scaleRatio), 1, 1];
 
         DialogResult = true;
         Close();
@@ -174,8 +164,26 @@ public partial class SwipeDialog : CustomWindow
         _arrowHead?.Points.Add(p2);
     }
 
-    protected override void Close(object? sender, RoutedEventArgs? e)
+    private void Load(object sender, RoutedEventArgs e)
     {
-        Close();
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Title = "LoadImageTitle".GetLocalizationString()
+        };
+        openFileDialog.Filter = "ImageFilter".GetLocalizationString();
+
+        if (openFileDialog.ShowDialog() == true)
+        {
+            try
+            {
+                BitmapImage bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
+                UpdateImage(bitmapImage);
+            }
+            catch (Exception ex)
+            {
+                ErrorView errorView = new ErrorView(ex, false);
+                errorView.Show();
+            }
+        }
     }
 }

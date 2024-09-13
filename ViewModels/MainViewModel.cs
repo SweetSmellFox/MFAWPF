@@ -1,12 +1,9 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using HandyControl.Collections;
 using MFAWPF.Utils;
-using MFAWPF.Views;
 
 
 namespace MFAWPF.ViewModels;
@@ -18,8 +15,7 @@ public class MainViewModel : ObservableObject
     public void AddLog(string content, Brush? color = null, string weight = "Regular",
         bool showTime = true)
     {
-        if (color == null)
-            color = Brushes.Gray;
+        color ??= Brushes.Gray;
         Task.Run(() =>
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -32,8 +28,7 @@ public class MainViewModel : ObservableObject
 
     public void AddLogByKey(string key, Brush? color = null, params string[]? formatArgsKeys)
     {
-        if (color == null)
-            color = Brushes.Gray;
+        color ??= Brushes.Gray;
         Task.Run(() =>
         {
             Application.Current.Dispatcher.Invoke(() =>

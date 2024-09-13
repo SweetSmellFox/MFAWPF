@@ -8,7 +8,7 @@ namespace MFAWPF.Controls;
 public class CustomWindow : Window
 {
     Point _pressedPosition;
-    bool _isDragMoved = false;
+    bool _isDragMoved;
 
 
     public static readonly DependencyProperty IsResizableProperty =

@@ -1,9 +1,4 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Windows.Media.Imaging;
+﻿
 using MFAWPF.ViewModels;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
@@ -48,7 +43,7 @@ public class OCRHelper
             },
             Name = "AppendOCR",
         };
-        var job = MaaProcessor.Instance?.GetCurrentInstance()?
+        var job = MaaProcessor.Instance.GetCurrentInstance()?
             .AppendRecognition(taskItemViewModel.Name, taskItemViewModel.ToString());
         if (job != null && job.Wait() == MaaJobStatus.Success)
         {

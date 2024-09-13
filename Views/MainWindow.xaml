@@ -192,7 +192,7 @@
                                            HorizontalAlignment="Left">
                                 </TextBlock>
 
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="2 2 0 0"
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="2 2 0 0" 
                                             HorizontalAlignment="Right">
                                     <Button ToolTip="{lex:Loc SelectAll}" Width="15" Height="15" Margin="7 0 0 0"
                                             Style="{StaticResource textBoxButton}"
@@ -302,6 +302,7 @@
 
 
                             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+
                                 <Button
                                     Content="{lex:Loc StartTask}" x:Name="startButton"
                                     Foreground="{DynamicResource BlackColor}"
@@ -325,8 +326,9 @@
                             <StackPanel Orientation="Vertical" x:Name="settingPanel">
                                 <StackPanel.RenderTransform>
                                     <TranslateTransform Y="-5" />
+                                  
                                 </StackPanel.RenderTransform>
-
+                             
                             </StackPanel>
                         </ScrollViewer>
 
@@ -349,7 +351,7 @@
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
 
-                                            <controls:TextBlock
+                                            <controls:CustomTextBlock
                                                 Grid.Column="0"
                                                 Margin="0,5,12,0"
                                                 HorizontalAlignment="Left" FontSize="12"
@@ -357,7 +359,7 @@
                                                 Foreground="{StaticResource GrayColor1}"
                                                 Text="{Binding Time}"
                                                 TextWrapping="Wrap" />
-                                            <controls:TextBlock
+                                            <controls:CustomTextBlock
                                                 Grid.Column="1"
                                                 Margin="0,5"
                                                 HorizontalAlignment="Left" FontSize="12"

@@ -1,31 +1,23 @@
-﻿using System.Collections.ObjectModel;
-using System.IO;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MFAWPF.Utils;
-using MFAWPF.ViewModels;
-using HandyControl.Controls;
-using HandyControl.Data;
 using MFAWPF.Controls;
 using Microsoft.Win32;
-using Newtonsoft.Json;
-using Attribute = MFAWPF.Utils.Attribute;
 
 namespace MFAWPF.Views;
 
-public partial class SelectionRegionDialog : CustomWindow
+public partial class SelectionRegionDialog
 {
     private Point _startPoint;
     private Rectangle? _selectionRectangle;
     public List<int>? Output { get; set; }
     public bool IsRoi { get; set; }
 
-    public SelectionRegionDialog(BitmapImage bitmapImage) :
-        base()
+    public SelectionRegionDialog(BitmapImage bitmapImage)
     {
         InitializeComponent();
         UpdateImage(bitmapImage);
@@ -38,7 +30,6 @@ public partial class SelectionRegionDialog : CustomWindow
     private void UpdateImage(BitmapImage _imageSource)
     {
         image.Source = _imageSource;
-        Console.WriteLine($"{_imageSource.PixelWidth},{_imageSource.PixelHeight}");
 
         originWidth = _imageSource.PixelWidth;
         originHeight = _imageSource.PixelHeight;
@@ -174,14 +165,32 @@ public partial class SelectionRegionDialog : CustomWindow
 
         // 显示 x, y, w, h 值，可以替换为其他处理逻辑
         // Growl.InfoGlobal($"Roi: {x}, {y}, {w}, {h}");
-        Output = new() { (int)x, (int)y, (int)w, (int)h };
+        Output = [(int)x, (int)y, (int)w, (int)h];
         DialogResult = true;
         IsRoi = SelectType.SelectedIndex == 0;
         Close();
     }
-
-    protected override void Close(object? sender, RoutedEventArgs? e)
+    
+    private void Load(object sender, RoutedEventArgs e)
     {
-        Close();
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Title = "LoadImageTitle".GetLocalizationString()
+        };
+        openFileDialog.Filter = "ImageFilter".GetLocalizationString();
+
+        if (openFileDialog.ShowDialog() == true)
+        {
+            try
+            {
+                BitmapImage bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
+                UpdateImage(bitmapImage);
+            }
+            catch (Exception ex)
+            {
+                ErrorView errorView = new ErrorView(ex, false);
+                errorView.Show();
+            }
+        }
     }
 }

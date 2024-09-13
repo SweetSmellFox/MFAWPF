@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -7,17 +6,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MFAWPF.Utils;
-using MFAWPF.ViewModels;
-using HandyControl.Controls;
-using HandyControl.Data;
-using MFAWPF.Controls;
 using Microsoft.Win32;
-using Newtonsoft.Json;
-using Attribute = MFAWPF.Utils.Attribute;
 
 namespace MFAWPF.Views;
 
-public partial class CropImageDialog : CustomWindow
+public partial class CropImageDialog
 {
     private Point _startPoint;
     private Rectangle? _selectionRectangle;
@@ -25,8 +18,7 @@ public partial class CropImageDialog : CustomWindow
     public string? Output { get; set; }
     public List<int>? OutputRoi { get; set; }
 
-    public CropImageDialog(BitmapImage bitmapImage) :
-        base()
+    public CropImageDialog(BitmapImage bitmapImage)
     {
         InitializeComponent();
         UpdateImage(bitmapImage);
@@ -39,7 +31,6 @@ public partial class CropImageDialog : CustomWindow
     private void UpdateImage(BitmapImage _imageSource)
     {
         image.Source = _imageSource;
-        Console.WriteLine($"{_imageSource.PixelWidth},{_imageSource.PixelHeight}");
 
         originWidth = _imageSource.PixelWidth;
         originHeight = _imageSource.PixelHeight;
@@ -67,7 +58,7 @@ public partial class CropImageDialog : CustomWindow
 
         // 判断点击是否在Image边缘5个像素内
         if (canvasPosition.X < image.ActualWidth + 5 && canvasPosition.Y < image.ActualHeight + 5 &&
-            canvasPosition.X > -5 && canvasPosition.Y > -5)
+            canvasPosition is { X: > -5, Y: > -5 })
         {
             if (_selectionRectangle != null)
             {
@@ -86,7 +77,7 @@ public partial class CropImageDialog : CustomWindow
             {
                 Stroke = Brushes.Red,
                 StrokeThickness = 2.5,
-                StrokeDashArray = new DoubleCollection { 2 }
+                StrokeDashArray = { 2 }
             };
 
             Canvas.SetLeft(_selectionRectangle, _startPoint.X);
@@ -203,7 +194,7 @@ public partial class CropImageDialog : CustomWindow
 
             var saveFileDialog = new SaveFileDialog
             {
-                Filter = "PNG 文件|*.png|JPEG 文件|*.jpg|Bitmap 文件|*.bmp",
+                Filter = "ImageFilter".GetLocalizationString(),
                 DefaultExt = "png"
             };
 
@@ -240,9 +231,27 @@ public partial class CropImageDialog : CustomWindow
                 return new PngBitmapEncoder();
         }
     }
-
-    protected override void Close(object? sender, RoutedEventArgs? e)
+    
+    private void Load(object sender, RoutedEventArgs e)
     {
-        Close();
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Title = "LoadImageTitle".GetLocalizationString()
+        };
+        openFileDialog.Filter = "ImageFilter".GetLocalizationString();
+
+        if (openFileDialog.ShowDialog() == true)
+        {
+            try
+            {
+                BitmapImage bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
+                UpdateImage(bitmapImage);
+            }
+            catch (Exception ex)
+            {
+                ErrorView errorView = new ErrorView(ex, false);
+                errorView.Show();
+            }
+        }
     }
 }

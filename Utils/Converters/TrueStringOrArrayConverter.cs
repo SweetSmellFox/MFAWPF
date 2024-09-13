@@ -46,12 +46,13 @@ public class TrueStringOrArrayConverter : JsonConverter
         {
             writer.WriteValue(stringValue);
         }
-        else if (value is List<int> intList)
+        else if (value is IEnumerable<int> intList)
         {
             serializer.Serialize(writer, intList);
         }
         else
         {
+            Console.WriteLine(value?.GetType());
             throw new JsonSerializationException("Unexpected value type for TrueStringOrArrayConverter.");
         }
     }

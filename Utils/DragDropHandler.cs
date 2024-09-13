@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.ObjectModel;
-using System.IO;
+
 using GongSolutions.Wpf.DragDrop;
 using MFAWPF.ViewModels;
-using Newtonsoft.Json;
+
 
 namespace MFAWPF.Utils;
 
@@ -12,7 +12,7 @@ public class DragDropHandler : IDropTarget
     public void DragOver(IDropInfo dropInfo)
     {
         // 确保拖动有效性并显示可视化反馈
-        if (dropInfo.Data != null && dropInfo.TargetCollection != null)
+        if (dropInfo is { Data: not null, TargetCollection: not null })
         {
             dropInfo.Effects = System.Windows.DragDropEffects.Move;
             dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
@@ -22,7 +22,7 @@ public class DragDropHandler : IDropTarget
     public void Drop(IDropInfo dropInfo)
     {
         // 当拖放完成后
-        if (dropInfo.Data != null && dropInfo.TargetCollection is IList targetCollection)
+        if (dropInfo is { Data: not null, TargetCollection: IList targetCollection })
         {
             var insertIndex = dropInfo.InsertIndex;
 
@@ -77,7 +77,7 @@ public class DragDropHandler : IDropTarget
                 if (MaaInterface.Instance != null)
                     MaaInterface.Instance.task = tasks;
                 // 保存当前的 ItemsSource 到 JSON
-                JSONHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory,"interface", MaaInterface.Instance);
+                JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory,"interface", MaaInterface.Instance);
             }
         }
     }

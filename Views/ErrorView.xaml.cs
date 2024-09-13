@@ -70,7 +70,7 @@ public partial class ErrorView : INotifyPropertyChanged
         base.OnClosed(e);
     }
 
-    private void Hyperlink_OnClick(object sender, RoutedEventArgs e)
+    private void Hyperlink_OnClick(object sender, RoutedEventArgs _)
     {
         Process.Start(new ProcessStartInfo(((Hyperlink)sender).NavigateUri.AbsoluteUri) { UseShellExecute = true });
     }

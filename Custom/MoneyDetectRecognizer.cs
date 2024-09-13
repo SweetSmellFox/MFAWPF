@@ -4,7 +4,7 @@ using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Custom;
 using MFAWPF.Views;
 
-namespace MFAWPF.Actions;
+namespace MFAWPF.Custom;
 
 public class MoneyDetectRecognizer : IMaaCustomRecognizer
 {

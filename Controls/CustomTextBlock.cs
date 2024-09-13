@@ -1,4 +1,4 @@
-// <copyright file="TextBlock.cs" company="MaaAssistantArknights">
+// <copyright file="CustomTextBlock.cs" company="MaaAssistantArknights">
 // MaaWpfGui - A part of the MaaCoreArknights project
 // Copyright (C) 2021 MistEO and Contributors
 //
@@ -18,16 +18,16 @@ using MFAWPF.Views;
 
 namespace MFAWPF.Controls
 {
-    public class TextBlock : System.Windows.Controls.TextBlock
+    public class CustomTextBlock : System.Windows.Controls.TextBlock
     {
-        static TextBlock()
+        static CustomTextBlock()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(TextBlock),
-                new FrameworkPropertyMetadata(typeof(TextBlock)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomTextBlock),
+                new FrameworkPropertyMetadata(typeof(CustomTextBlock)));
         }
 
         public static readonly DependencyProperty CustomForegroundProperty =
-            DependencyProperty.Register(nameof(CustomForeground), typeof(Brush), typeof(TextBlock),
+            DependencyProperty.Register(nameof(CustomForeground), typeof(Brush), typeof(CustomTextBlock),
                 new PropertyMetadata(Brushes.Gray));
 
         public Brush CustomForeground
@@ -37,12 +37,12 @@ namespace MFAWPF.Controls
         }
 
         public static readonly DependencyProperty ForegroundKeyProperty =
-            DependencyProperty.Register(nameof(ForegroundKey), typeof(string), typeof(TextBlock),
+            DependencyProperty.Register(nameof(ForegroundKey), typeof(string), typeof(CustomTextBlock),
                 new PropertyMetadata("GrayColor1", OnForegroundKeyChanged));
 
         private static void OnForegroundKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var element = (TextBlock)d;
+            var element = (CustomTextBlock)d;
             if (e.NewValue != null)
             {
                 element.ForegroundKey = (string)e.NewValue;

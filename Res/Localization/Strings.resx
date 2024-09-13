@@ -211,8 +211,8 @@
     <value>清空属性</value>
   </data>
     <data name="EditTaskDialog_SaveTask_Button" xml:space="preserve">
-    <value>保存任务</value>
-  </data>
+        <value>保存任务名称</value>
+    </data>
     <data name="EditTaskDialog_ShowChart_Button" xml:space="preserve">
         <value>流程图</value>
     </data>
@@ -392,5 +392,41 @@
     </data>
     <data name="CopiedToClipboard" xml:space="preserve">
         <value>已复制到剪切板</value>
+    </data>
+    <data name="MiniTouch" xml:space="preserve">
+        <value>MiniTouch (默认)</value>
+    </data>
+    <data name="MaaTouch" xml:space="preserve">
+        <value>MaaTouch (实验功能)</value>
+    </data>
+    <data name="AdbInput" xml:space="preserve">
+        <value>AdbInput (不推荐)</value>
+    </data>
+    <data name="AutoDetect" xml:space="preserve">
+        <value>AutoDetect (自动检测)</value>
+    </data>
+    <data name="CopyKey" xml:space="preserve">
+        <value>复制键</value>
+    </data>
+    <data name="CopyValue" xml:space="preserve">
+        <value>复制值</value>
+    </data>
+    <data name="Edit" xml:space="preserve">
+        <value>编辑</value>
+    </data>
+    <data name="Load" xml:space="preserve">
+        <value>导入</value>
+    </data>
+    <data name="LoadImageTitle" xml:space="preserve">
+        <value>选择图片文件</value>
+    </data>
+    <data name="ImageFilter" xml:space="preserve">
+        <value>图片文件 (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp</value>
+    </data>
+    <data name="JSONFilter" xml:space="preserve">
+        <value>JSON 文件 (*.json)|*.json|所有文件 (*.*)|*.*</value>
+    </data>
+    <data name="ButtonClear" xml:space="preserve">
+        <value>清空</value>
     </data>
 </root>

@@ -1,19 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using HandyControl.Controls;
-using HandyControl.Tools.Extension;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Messages;
-using MFAWPF.Actions;
+using MFAWPF.Custom;
 using MFAWPF.Data;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
@@ -141,7 +136,7 @@ namespace MFAWPF.Utils
                 if (setIsStopped)
                 {
                     Growls.Warning("NoTaskToStop".GetLocalizationString());
-                    TaskQueue?.Clear();
+                    TaskQueue.Clear();
                     OnTaskQueueChanged();
                 }
             }
@@ -175,15 +170,16 @@ namespace MFAWPF.Utils
             foreach (var selectOption in options)
             {
                 if (MaaInterface.Instance?.option?.TryGetValue(selectOption.name ?? string.Empty,
-                        out var interfaceOption) == true && MainWindow.Instance != null &&
-                    selectOption.index != null && interfaceOption?.cases != null &&
-                    interfaceOption.cases[selectOption.index.Value] != null &&
-                    interfaceOption.cases[selectOption.index.Value].param != null)
+                        out var interfaceOption) ==
+                    true &&
+                    MainWindow.Instance != null &&
+                    selectOption.index is int index &&
+                    interfaceOption.cases is { } cases &&
+                    cases[index]?.param != null)
                 {
-                    MainWindow.Instance.TaskDictionary =
-                        MainWindow.Instance.TaskDictionary.MergeTaskModels(interfaceOption
-                            .cases[selectOption.index.Value].param);
-                    taskModels = taskModels.MergeTaskModels(interfaceOption.cases[selectOption.index.Value].param);
+                    var param = interfaceOption.cases[selectOption.index.Value].param;
+                    MainWindow.Instance.TaskDictionary = MainWindow.Instance.TaskDictionary.MergeTaskModels(param);
+                    taskModels = taskModels.MergeTaskModels(param);
                 }
             }
         }
@@ -199,7 +195,7 @@ namespace MFAWPF.Utils
 
             try
             {
-                return JsonConvert.SerializeObject(taskModels, settings) ?? "{}";
+                return JsonConvert.SerializeObject(taskModels, settings);
             }
             catch (Exception e)
             {
@@ -445,11 +441,11 @@ namespace MFAWPF.Utils
             instance.Register(new MoneyRecognizer());
             instance.Register(new MoneyDetectRecognizer());
 
-            instance.Callback += (sender, args) =>
+            instance.Callback += (_, args) =>
             {
                 var jObject = JObject.Parse(args.Details);
                 string name = jObject["name"]?.ToString() ?? string.Empty;
-                if (args.Message?.Equals(MaaMsg.Task.Focus.Completed) == true)
+                if (args.Message.Equals(MaaMsg.Task.Focus.Completed))
                 {
                     if (MainWindow.Instance?.TaskDictionary.TryGetValue(name, out var taskModel) == true)
                     {

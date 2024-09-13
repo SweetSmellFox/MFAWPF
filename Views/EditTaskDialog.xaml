@@ -10,8 +10,8 @@
                        xmlns:utils="clr-namespace:MFAWPF.Utils"
                        xmlns:dd="urn:gong-wpf-dragdrop"
                        xmlns:lex="http://wpflocalizeextension.codeplex.com"
-                       mc:Ignorable="d"  MinHeight="230" MinWidth="450"
-                       Title="{lex:Loc EditTaskDialog_Title}" Height="500" Width="730">
+                       mc:Ignorable="d" MinHeight="230" MinWidth="450"
+                       Title="{lex:Loc EditTaskDialog_Title}" Height="800" Width="1000">
     <controls:CustomWindow.DataContext>
         <models:EditTaskDialogViewModel />
     </controls:CustomWindow.DataContext>
@@ -22,9 +22,6 @@
             <MenuItem Header="{lex:Loc PasteAbove}" Click="PasteAbove" />
             <MenuItem Header="{lex:Loc PasteBelow}" Click="PasteBelow" />
             <MenuItem Header="{lex:Loc Delete}" Click="Delete" />
-        </ContextMenu>
-        <ContextMenu x:Key="AttributeMenu">
-            <MenuItem Header="{lex:Loc Paste}" Click="Paste" />
         </ContextMenu>
     </controls:CustomWindow.Resources>
 
@@ -39,7 +36,8 @@
                 <RowDefinition Height="15" />
             </Grid.RowDefinitions>
 
-            <Border Grid.Row="0" CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"  x:Name="TitleBar"
+            <Border Grid.Row="0" CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"
+                    x:Name="TitleBar"
                     ClipToBounds="False">
                 <Grid Height="34">
                     <TextBlock Text="{lex:Loc EditTaskDialog_Header}" VerticalAlignment="Center"
@@ -53,7 +51,7 @@
                 </Grid>
             </Border>
 
-            <Grid Grid.Row="1" >
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="7*" MinWidth="200" />
                     <ColumnDefinition Width="7*" MinWidth="200" />
@@ -162,7 +160,7 @@
 
                     </Border>
                 </Grid>
-                <Grid Grid.Column="1"  Margin="15 10 15 0">
+                <Grid Grid.Column="1" Margin="15 10 15 0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="32" />
                         <RowDefinition Height="25" />
@@ -173,7 +171,7 @@
                                 hc:InfoElement.TitlePlacement="Left"
                                 hc:InfoElement.Title="{lex:Loc EditTaskDialog_TaskName_Title}"
                                 x:Name="TaskName" hc:InfoElement.Placeholder="{lex:Loc EditTaskDialog_TaskName_Title}" />
-                    <Grid Grid.Row="1"  VerticalAlignment="Top" Margin="0,5,10,4">
+                    <Grid Grid.Row="1" VerticalAlignment="Top" Margin="0,5,10,4">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
@@ -218,38 +216,17 @@
                                     Padding="0" Margin="2 0  2 0" hc:IconElement.Width="12"
                                     hc:IconElement.Height="12"
                                     hc:IconElement.Geometry="{StaticResource SelectionRegionGeometry}" />
-                            <Button ToolTip="{lex:Loc EditTaskDialog_AddAttribute_Tooltip}" Width="15" Height="15"
-                                    Style="{StaticResource textBoxButton}"
-                                    Foreground="{DynamicResource GrayColor4}"
-                                    Click="AddAttribute"
-                                    Padding="0" Margin="2 0  2 0" hc:IconElement.Width="12"
-                                    hc:IconElement.Height="12"
-                                    hc:IconElement.Geometry="{StaticResource AddGeometry}" />
-                            <Button ToolTip="{lex:Loc EditTaskDialog_ClearAttribute_Tooltip}" Width="15" Height="15"
-                                    Style="{StaticResource textBoxButton}"
-                                    Foreground="{DynamicResource GrayColor4}"
-                                    Click="ClearAttribute"
-                                    Padding="0" Margin="2 0  2 0" hc:IconElement.Width="12"
-                                    hc:IconElement.Height="12"
-                                    hc:IconElement.Geometry="{StaticResource clear}" />
                         </StackPanel>
                     </Grid>
                     <Border Grid.Row="2" Background="{DynamicResource WhiteColor}" CornerRadius="8" Margin="2 4 2 0"
-                            Padding="4"
-                            ContextMenu="{StaticResource AttributeMenu}">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <WrapPanel x:Name="Parts">
-                                <WrapPanel.InputBindings>
-                                    <KeyBinding Key="C" Modifiers="Control" Command="{Binding CopyTaskCommand}" />
-                                    <KeyBinding Key="V" Modifiers="Control" Command="{Binding PasteTaskCommand}" />
-                                    <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveTaskCommand}" />
-                                    <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoTaskCommand}" />
-                                    <KeyBinding Key="Delete" Command="{Binding DeleteTaskCommand}" />
-                                </WrapPanel.InputBindings>
-                            </WrapPanel>
+                            Padding="4">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                            <StackPanel> 
+                                <hc:PropertyGrid x:Name="PropertyGrid" />
+                            </StackPanel>
                         </ScrollViewer>
                     </Border>
-                    <Grid Grid.Row="3"  Margin="0 13 0 0">
+                    <Grid Grid.Row="3" Margin="0 13 0 0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />

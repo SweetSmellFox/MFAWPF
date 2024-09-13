@@ -54,6 +54,12 @@
                     <ComboBoxItem>Roi</ComboBoxItem>
                     <ComboBoxItem>Target</ComboBoxItem>
                 </hc:ComboBox>
+                <Button ToolTip="{lex:Loc Load}"
+                        Height="30"  Margin="10,0,0,10"
+                        Foreground="{DynamicResource GrayColor4}" VerticalContentAlignment="Center"
+                        hc:IconElement.Width="15"
+                        hc:IconElement.Height="15" Click="Load"
+                        hc:IconElement.Geometry="{StaticResource LoadGeometry}" />
                 <Button x:Name="SaveButton"
                         BorderThickness="0"
                         Content="{lex:Loc ButtonSave}" Click="SaveButton_Click"
@@ -61,7 +67,7 @@
                         FontSize="11"
                         VerticalContentAlignment="Center"
                         Width="90"
-                        Margin="0,0,0,10">
+                        Margin="10,0,0,10">
 
                     <Button.Style>
                         <Style TargetType="Button">

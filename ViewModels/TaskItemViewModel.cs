@@ -1,5 +1,7 @@
-﻿using MFAWPF.Utils;
+﻿using System.ComponentModel;
+using MFAWPF.Utils;
 using CommunityToolkit.Mvvm.ComponentModel;
+using HandyControl.Controls;
 using Newtonsoft.Json;
 
 namespace MFAWPF.ViewModels;
@@ -17,14 +19,6 @@ public class TaskItemViewModel : ObservableObject
                 Task.name = value;
             SetProperty(ref _name, value);
         }
-    }
-
-    private bool _isNew = false;
-
-    public bool IsNew
-    {
-        get => _isNew;
-        set => SetProperty(ref _isNew, value);
     }
 
     private TaskModel? _task;
@@ -56,4 +50,5 @@ public class TaskItemViewModel : ObservableObject
             taskModels.Add(Name, Task);
         return JsonConvert.SerializeObject(taskModels, settings);
     }
+    
 }

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -20,8 +18,6 @@ using MFAWPF.Utils;
 using MFAWPF.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using WPFLocalizeExtension.Deprecated.Extensions;
-using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Extensions;
 using ComboBox = HandyControl.Controls.ComboBox;
 using ScrollViewer = HandyControl.Controls.ScrollViewer;
@@ -73,12 +69,11 @@ namespace MFAWPF.Views
 
         private bool InitializeData()
         {
-            DataSet.Data = JSONHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());  
+            DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
             if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json"))
             {
                 try
                 {
-                  
                     File.WriteAllText($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json",
                         JsonConvert.SerializeObject(new MaaInterface()
                         {
@@ -130,7 +125,7 @@ namespace MFAWPF.Views
             }
 
             MaaInterface.Instance =
-                JSONHelper.ReadFromJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface", new MaaInterface(),
+                JsonHelper.ReadFromJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface", new MaaInterface(),
                     () => { });
             if (MaaInterface.Instance != null)
             {
@@ -186,14 +181,7 @@ namespace MFAWPF.Views
 
         private void OnTaskStackChanged(object? sender, EventArgs e)
         {
-            if (MaaProcessor.Instance.TaskQueue.Count > 0)
-            {
-                ToggleTaskButtonsVisibility(isRunning: true);
-            }
-            else
-            {
-                ToggleTaskButtonsVisibility(isRunning: false);
-            }
+            ToggleTaskButtonsVisibility(isRunning: MaaProcessor.Instance.TaskQueue.Count > 0);
         }
 
         private void ToggleTaskButtonsVisibility(bool isRunning)
@@ -493,16 +481,14 @@ namespace MFAWPF.Views
             {
                 AddResourcesOption();
                 AddSettingOption("CaptureModeOption",
-                    new List<string>
-                    {
+                    [
                         "ScreencapFastestLosslessWay", "ScreencapRawWithGzip", "ScreencapFastestWayCompatible",
                         "ScreencapRawByNetcat", "ScreencapEncode", "ScreencapEncodeToFile", "ScreencapMinicapDirect",
                         "ScreencapMinicapStream", "ScreencapEmulatorExtras", "ScreencapFastestWay"
-                    },
+                    ],
                     "AdbControlScreenCapType", 0);
-
-                AddSettingOption("TouchModeOption",
-                    new List<string> { "MiniTouch (默认)", "MaaTouch (实验功能)", "AdbInput (不推荐)", "AutoDetect (自动检测)" },
+                AddBindSettingOption("TouchModeOption",
+                    ["MiniTouch", "MaaTouch", "AdbInput", "AutoDetect"],
                     "AdbControlTouchType", 0);
                 AddThemeOption();
                 AddLanguageOption();
@@ -511,11 +497,11 @@ namespace MFAWPF.Views
             {
                 AddResourcesOption();
                 AddSettingOption("CaptureModeOption",
-                    new List<string> { "ScreencapDXGIFramePool", "ScreencapDXGIDesktopDup", "ScreencapGDI" },
+                    ["ScreencapDXGIFramePool", "ScreencapDXGIDesktopDup", "ScreencapGDI"],
                     "Win32ControlScreenCapType", 0);
 
                 AddSettingOption("TouchModeOption",
-                    new List<string> { "Seize", "SendMessage" },
+                    ["Seize", "SendMessage"],
                     "Win32ControlTouchType", 0);
                 AddThemeOption();
                 AddLanguageOption();
@@ -536,7 +522,7 @@ namespace MFAWPF.Views
 
         private void AddResourcesOption(int defaultValue = 0)
         {
-            var comboBox = new ComboBox()
+            var comboBox = new ComboBox
             {
                 SelectedIndex = DataSet.GetData("ResourceIndex", defaultValue), DisplayMemberPath = "name",
                 Style = FindResource("ComboBoxExtend") as Style,
@@ -548,14 +534,14 @@ namespace MFAWPF.Views
                 Source = Data,
                 Mode = BindingMode.OneWay
             };
-            comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
+            comboBox.SetBinding(IsEnabledProperty, binding);
 
             comboBox.BindLocalization("ResourceOption");
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
             if (MaaInterface.Instance?.resource != null)
                 comboBox.ItemsSource = MaaInterface.Instance.resource;
-            comboBox.SelectionChanged += (sender, args) =>
+            comboBox.SelectionChanged += (sender, _) =>
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
 
@@ -575,10 +561,10 @@ namespace MFAWPF.Views
                 Style = FindResource("ComboBoxExtend") as Style,
                 Margin = new Thickness(5)
             };
-            var light = new TextBlock();
-            light.BindLocalization("LightColor", TextBlock.TextProperty);
-            var dark = new TextBlock();
-            dark.BindLocalization("DarkColor", TextBlock.TextProperty);
+            var light = new ComboBoxItem();
+            light.BindLocalization("LightColor", ContentProperty);
+            var dark = new ComboBoxItem();
+            dark.BindLocalization("DarkColor", ContentProperty);
             comboBox.Items.Add(light);
             comboBox.Items.Add(dark);
             var binding = new Binding("Idle")
@@ -586,11 +572,11 @@ namespace MFAWPF.Views
                 Source = Data,
                 Mode = BindingMode.OneWay
             };
-            comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
+            comboBox.SetBinding(IsEnabledProperty, binding);
             comboBox.BindLocalization("ThemeOption");
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
-            comboBox.SelectionChanged += (sender, args) =>
+            comboBox.SelectionChanged += (sender, _) =>
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
                 ThemeManager.Current.ApplicationTheme = index == 0 ? ApplicationTheme.Light : ApplicationTheme.Dark;
@@ -602,7 +588,7 @@ namespace MFAWPF.Views
 
         private void AddLanguageOption(int defaultValue = 0)
         {
-            var comboBox = new ComboBox()
+            var comboBox = new ComboBox
             {
                 Style = FindResource("ComboBoxExtend") as Style,
                 Margin = new Thickness(5)
@@ -614,11 +600,11 @@ namespace MFAWPF.Views
                 Source = Data,
                 Mode = BindingMode.OneWay
             };
-            comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
+            comboBox.SetBinding(IsEnabledProperty, binding);
             comboBox.BindLocalization("LanguageOption");
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
-            comboBox.SelectionChanged += (sender, args) =>
+            comboBox.SelectionChanged += (sender, _) =>
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
                 LanguageManager.ChangeLanguage(
@@ -630,9 +616,10 @@ namespace MFAWPF.Views
             settingPanel.Children.Add(comboBox);
         }
 
-        private void AddSettingOption(string titleKey, List<string> options, string datatype, int defaultValue = 0)
+        private void AddSettingOption(string titleKey, IEnumerable<string> options, string datatype,
+            int defaultValue = 0)
         {
-            var comboBox = new ComboBox()
+            var comboBox = new ComboBox
             {
                 ItemsSource = options,
                 SelectedIndex = DataSet.GetData(datatype, defaultValue),
@@ -644,7 +631,40 @@ namespace MFAWPF.Views
                 Source = Data,
                 Mode = BindingMode.OneWay
             };
-            comboBox.SetBinding(ComboBox.IsEnabledProperty, binding);
+            comboBox.SetBinding(IsEnabledProperty, binding);
+            comboBox.BindLocalization(titleKey);
+            comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+            comboBox.SelectionChanged += (sender, _) =>
+            {
+                var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+                DataSet.SetData(datatype, index);
+                MaaProcessor.Instance.SetCurrentInstance();
+            };
+
+            settingPanel.Children.Add(comboBox);
+        }
+
+        private void AddBindSettingOption(string titleKey, IEnumerable<string> options, string datatype,
+            int defaultValue = 0)
+        {
+            var comboBox = new ComboBox
+            {
+                SelectedIndex = DataSet.GetData(datatype, defaultValue),
+                Style = FindResource("ComboBoxExtend") as Style,
+                Margin = new Thickness(5)
+            };
+            var binding = new Binding("Idle")
+            {
+                Source = Data,
+                Mode = BindingMode.OneWay
+            };
+            comboBox.SetBinding(IsEnabledProperty, binding);
+            foreach (var s in options)
+            {
+                var comboBoxItem = new ComboBoxItem();
+                comboBoxItem.BindLocalization(s, ContentProperty);
+                comboBox.Items.Add(comboBoxItem);
+            }
 
             comboBox.BindLocalization(titleKey);
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
@@ -736,13 +756,26 @@ namespace MFAWPF.Views
                 numericUpDown.ValueChanged += (sender, args) =>
                 {
                     source.InterfaceItem.repeat_count = Convert.ToInt16(numericUpDown.Value);
-                    JSONHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
+                    JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
                         MaaInterface.Instance);
                 };
                 numericUpDown.BindLocalization("RepeatOption");
                 numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
                 settingPanel.Children.Add(numericUpDown);
             }
+        }
+
+        private static EditTaskDialog? _taskDialog;
+
+        public static EditTaskDialog? TaskDialog
+        {
+            get
+            {
+                if (_taskDialog == null)
+                    _taskDialog = new EditTaskDialog();
+                return _taskDialog;
+            }
+            set => _taskDialog = value;
         }
 
         private void Edit(object sender, RoutedEventArgs e)
@@ -753,8 +786,7 @@ namespace MFAWPF.Views
                 return;
             }
 
-            var editDialog = new EditTaskDialog();
-            editDialog.Show();
+            TaskDialog?.Show();
             if (Data != null)
                 Data.Idle = false;
         }

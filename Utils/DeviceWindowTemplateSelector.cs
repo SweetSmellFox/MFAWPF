@@ -9,7 +9,7 @@ public class DeviceWindowTemplateSelector : DataTemplateSelector
     public DataTemplate? DeviceInfoTemplate { get; set; }
     public DataTemplate? WindowInfoTemplate { get; set; }
 
-    public override DataTemplate SelectTemplate(object item, DependencyObject container)
+    public override DataTemplate? SelectTemplate(object? item, DependencyObject container)
     {
         if (item is DeviceInfo)
             return DeviceInfoTemplate ?? base.SelectTemplate(item, container);

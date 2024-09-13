@@ -1,7 +1,5 @@
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
-using WPFLocalizeExtension.Extensions;
-using System.Globalization;
 using MFAWPF.Utils;
 
 namespace MFAWPF.ViewModels

@@ -66,7 +66,7 @@
             Padding="12,0"
             Background="{DynamicResource ErrorViewBackgroundBrush}">
             <Grid MinHeight="40" VerticalAlignment="Center">
-                <controls:TextBlock VerticalAlignment="Center">
+                <controls:CustomTextBlock VerticalAlignment="Center">
                     <Hyperlink Name="CopyErrorMessage" Click="CopyErrorMessage_Click">
                         <Run Text="{lex:Loc CopyErrorMessage}" />
                     </Hyperlink>
@@ -76,7 +76,7 @@
                             hc:Poptip.HitMode="None"
                             Content="{lex:Loc  CopiedToClipboard}" />
                     </hc:Poptip.Instance>
-                </controls:TextBlock>
+                </controls:CustomTextBlock>
             </Grid>
         </Border>
     </Grid>

@@ -12,7 +12,7 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="AppTitle" xml:space="preserve">
-        <value>Maa Framework Task Manager</value>
+        <value>MFA Tools</value>
     </data>
     <data name="DeselectAll" xml:space="preserve">
         <value>Deselect All</value>
@@ -183,9 +183,9 @@
     <value>Clear Attributes</value>
   </data>
     <data name="EditTaskDialog_SaveTask_Button" xml:space="preserve">
-    <value>Save Task</value>
-  </data>
-  <data name="EditTaskDialog_ShowChart_Button" xml:space="preserve">
+        <value>Save Task Name</value>
+    </data>
+    <data name="EditTaskDialog_ShowChart_Button" xml:space="preserve">
     <value>Flowchart</value>
   </data>
     <data name="Quit" xml:space="preserve">
@@ -364,5 +364,41 @@
     </data>
     <data name="CopiedToClipboard" xml:space="preserve">
         <value>Copied to Clipboard</value>
+    </data>
+    <data name="MiniTouch" xml:space="preserve">
+        <value>MiniTouch (Default)</value>
+    </data>
+    <data name="MaaTouch" xml:space="preserve">
+        <value>MaaTouch (Experimental)</value>
+    </data>
+    <data name="AdbInput" xml:space="preserve">
+        <value>AdbInput (Not Recommended)</value>
+    </data>
+    <data name="AutoDetect" xml:space="preserve">
+        <value>AutoDetect (Automatic Detection)</value>
+    </data>
+    <data name="CopyKey" xml:space="preserve">
+        <value>Copy Key</value>
+    </data>
+    <data name="CopyValue" xml:space="preserve">
+        <value>Copy Value</value>
+    </data>
+    <data name="Edit" xml:space="preserve">
+        <value>Edit</value>
+    </data>
+    <data name="Load" xml:space="preserve">
+        <value>Load</value>
+    </data>
+    <data name="LoadImageTitle" xml:space="preserve">
+        <value>Select Image File</value>
+    </data>
+    <data name="ImageFilter" xml:space="preserve">
+        <value>Image Files (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp</value>
+    </data>
+    <data name="JSONFilter" xml:space="preserve">
+        <value>JSON Files (*.json)|*.json|All files (*.*)|*.*"</value>
+    </data>
+    <data name="ButtonClear" xml:space="preserve">
+        <value>Clear</value>
     </data>
 </root>

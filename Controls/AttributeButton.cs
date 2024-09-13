@@ -1,10 +1,5 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Text.RegularExpressions;
-using System.Data;
-using MFAWPF.Views;
-using Newtonsoft.Json;
 using Attribute = MFAWPF.Utils.Attribute;
 
 namespace MFAWPF.Controls;
@@ -31,7 +26,7 @@ public class AttributeButton : Button
         set => SetValue(IsSelectedProperty, value);
     }
 
-    public CustomWindow? WindowParent { get; set; }
+    public CustomWindow? WindowParent { get; init; }
 
     static string ConvertListToString(List<List<int>> listOfLists)
     {
@@ -76,9 +71,9 @@ public class AttributeButton : Button
                         contentText = $"{button.Attribute.Key}: {attribute.Value}";
                     }
 
-                    // 使用 TextBlock 包装内容并设置 TextTrimming
+                    // 使用 CustomTextBlock 包装内容并设置 TextTrimming
 
-                    var textBlock = new TextBlock
+                    var textBlock = new CustomTextBlock
                     {
                         Text = contentText,
                         TextAlignment = TextAlignment.Left,
@@ -103,7 +98,7 @@ public class AttributeButton : Button
 
     public AttributeButton()
     {
-        Click += (s, e) => { IsSelected = !IsSelected; };
+        Click += (_, _) => { IsSelected = !IsSelected; };
         Style = FindResource("AttributeButtonStyle") as Style;
     }
 }

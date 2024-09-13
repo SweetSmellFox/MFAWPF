@@ -27,7 +27,6 @@ namespace MFAWPF.Views
         private void UpdateImage(BitmapImage _imageSource)
         {
             image.Source = _imageSource;
-            Console.WriteLine($"{_imageSource.PixelWidth},{_imageSource.PixelHeight}");
 
             double imageWidth = _imageSource.PixelWidth;
             double imageHeight = _imageSource.PixelHeight;
@@ -55,7 +54,7 @@ namespace MFAWPF.Views
 
             // 判断点击是否在Image边缘5个像素内
             if (canvasPosition.X < image.ActualWidth + 5 && canvasPosition.Y < image.ActualHeight + 5 &&
-                canvasPosition.X > -5 && canvasPosition.Y > -5)
+                canvasPosition is { X: > -5, Y: > -5 })
             {
                 if (_selectionRectangle != null)
                 {
@@ -74,7 +73,7 @@ namespace MFAWPF.Views
                 {
                     Stroke = Brushes.Red,
                     StrokeThickness = 2.5,
-                    StrokeDashArray = new DoubleCollection { 2 }
+                    StrokeDashArray = { 2 }
                 };
 
                 Canvas.SetLeft(_selectionRectangle, _startPoint.X);
@@ -159,21 +158,17 @@ namespace MFAWPF.Views
             var w = (int)(_selectionRectangle.Width / _scaleRatio);
             var h = (int)(_selectionRectangle.Height / _scaleRatio);
 
-            Output = new() { x, y, w, h };
+            Output = [x, y, w, h];
             if (image.Source is BitmapImage bitmapImage)
             {
                 var roiX = Math.Max(x - 5, 0);
                 var roiY = Math.Max(y - 5, 0);
                 var roiW = Math.Min(w + 10, bitmapImage.PixelWidth - roiX);
                 var roiH = Math.Min(h + 10, bitmapImage.PixelHeight - roiY);
-                OutputRoi = new List<int> { (int)roiX, (int)roiY, (int)roiW, (int)roiH };
+                OutputRoi = new List<int> { roiX, roiY, roiW, roiH };
             }
-            DialogResult = true;
-            Close();
-        }
 
-        protected override void Close(object? sender, RoutedEventArgs? e)
-        {
+            DialogResult = true;
             Close();
         }
     }

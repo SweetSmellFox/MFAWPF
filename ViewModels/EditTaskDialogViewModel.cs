@@ -1,13 +1,15 @@
 ﻿using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using MFAWPF.Controls;
 using MFAWPF.Utils;
 using MFAWPF.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using HandyControl.Tools.Command;
+using HandyControl.Tools.Extension;
 using Newtonsoft.Json;
 using Attribute = MFAWPF.Utils.Attribute;
 
@@ -21,6 +23,31 @@ public class EditTaskDialogViewModel : ObservableObject
     {
         get => dataList;
         set => SetProperty(ref dataList, value);
+    }
+
+    private ObservableCollection<TaskItemViewModel>? _colors;
+
+    public ObservableCollection<TaskItemViewModel> Colors
+    {
+        get
+        {
+            if (_colors == null)
+            {
+                // 获取 Brushes 类中的所有静态属性
+                var brushesType = typeof(Brushes);
+                var properties = brushesType.GetProperties(BindingFlags.Public | BindingFlags.Static);
+
+                // 获取每个属性的名称（颜色名称），并存入 CustomValue<string> 列表
+                _colors = new ObservableCollection<TaskItemViewModel>(properties
+                    .Select(p => new TaskItemViewModel()
+                    {
+                        Name = p.Name
+                    }).ToList());
+            }
+
+            return _colors;
+        }
+        set => SetProperty(ref _colors, value);
     }
 
     private int selectedIndex = 0;
@@ -81,10 +108,11 @@ public class EditTaskDialogViewModel : ObservableObject
         {
             if (value?.Task != null && Dialog != null)
             {
-                Dialog.TaskName.Text = value.Task.name ?? string.Empty;
-                Dialog.Parts.Children.Clear();
-                foreach (var VARIABLE in value.Task.ToAttributeList() ?? Enumerable.Empty<Attribute>())
-                    Dialog.AddAttribute(VARIABLE);
+                Dialog.TaskName.Text = value.Task.name;
+                Dialog.PropertyGrid.SelectedObject = value.Task;
+                // Dialog.Parts.Children.Clear();
+                // foreach (var VARIABLE in value.Task.ToAttributeList())
+                //     Dialog.AddAttribute(VARIABLE);
             }
 
 
@@ -129,7 +157,7 @@ public class EditTaskDialogViewModel : ObservableObject
                             Name = VARIABLE.Key, Task = VARIABLE.Value
                         };
                         DataList?.Insert(index + 1, newItem);
-                        UndoStack?.Push(new RelayCommand(o => DataList?.Remove(newItem)));
+                        UndoStack?.Push(new RelayCommand(_ => DataList?.Remove(newItem)));
                     }
                 }
                 catch (Exception exception)
@@ -166,7 +194,7 @@ public class EditTaskDialogViewModel : ObservableObject
             var itemToDelete = CurrentTask;
             int index = DataList.IndexOf(itemToDelete);
             DataList.Remove(itemToDelete);
-            UndoStack.Push(new RelayCommand(o => DataList.Insert(index, itemToDelete)));
+            UndoStack.Push(new RelayCommand(_ => DataList.Insert(index, itemToDelete)));
         }
     }
 
@@ -214,9 +242,9 @@ public class EditTaskDialogViewModel : ObservableObject
                 var attribute =
                     JsonConvert.DeserializeObject<Attribute>(
                         (string)iData.GetData(DataFormats.Text));
-                AttributeButton? button = Dialog?.AddAttribute(attribute);
-                if (button != null)
-                    UndoTaskStack.Push(new RelayCommand(o => Dialog?.Parts.Children.Remove(button)));
+                // AttributeButton? button = Dialog?.AddAttribute(attribute);
+                // if (button != null)
+                //     UndoTaskStack.Push(new RelayCommand(_ => Dialog?.Parts.Children.Remove(button)));
             }
             catch (Exception exception)
             {
@@ -245,7 +273,7 @@ public class EditTaskDialogViewModel : ObservableObject
             {
                 int index = itemPanel.Children.IndexOf(SelectedAttribute);
                 itemPanel.Children.Remove(SelectedAttribute);
-                UndoTaskStack.Push(new RelayCommand(o => Dialog?.AddAttribute(itemToDelete, index)));
+                // UndoTaskStack.Push(new RelayCommand(_ => Dialog?.AddAttribute(itemToDelete, index)));
             }
         }
     }

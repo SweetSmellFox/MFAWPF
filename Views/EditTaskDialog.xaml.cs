@@ -1,31 +1,24 @@
-﻿using System.Collections;
-using System.Collections.ObjectModel;
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using MFAWPF.Actions;
 using MFAWPF.Controls;
 using MFAWPF.Utils;
 using MFAWPF.ViewModels;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools.Command;
-using MaaFramework.Binding;
-using MaaFramework.Binding.Buffers;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Attribute = MFAWPF.Utils.Attribute;
-using Path = System.Windows.Shapes.Path;
+using ScrollViewer = System.Windows.Controls.ScrollViewer;
 
 namespace MFAWPF.Views;
 
 public partial class EditTaskDialog
 {
     private List<TaskModel> tasks;
-    public EditTaskDialogViewModel? Data;
+    public EditTaskDialogViewModel? Data { get; set; }
 
     public EditTaskDialog()
     {
@@ -36,7 +29,7 @@ public partial class EditTaskDialog
             Data.Dialog = this;
     }
 
-    protected override void Close(object? sender, RoutedEventArgs? e)
+    protected override void Close(object? sender = null, RoutedEventArgs? e = null)
     {
         if (MainWindow.Data != null)
             MainWindow.Data.Idle = true;
@@ -54,7 +47,7 @@ public partial class EditTaskDialog
             return;
 
         Data?.DataList?.Remove(itemToDelete);
-        Data?.UndoStack.Push(new RelayCommand(o => Data?.DataList?.Insert(index, itemToDelete)));
+        Data?.UndoStack.Push(new RelayCommand(_ => Data?.DataList?.Insert(index, itemToDelete)));
     }
 
     public void Save(object? sender, RoutedEventArgs? e)
@@ -67,16 +60,16 @@ public partial class EditTaskDialog
 
         if (Data?.CurrentTask?.Task is not null)
         {
-            Data.CurrentTask.Task.Reset();
+            // Data.CurrentTask.Task.Reset();
             Data.CurrentTask.Task.name = TaskName.Text;
 
-            foreach (var button in Parts.Children.OfType<AttributeButton>())
-            {
-                if (button.Attribute is not null)
-                {
-                    Data.CurrentTask.Task.Set(button.Attribute);
-                }
-            }
+            // foreach (var button in Parts.Children.OfType<AttributeButton>())
+            // {
+            //     if (button.Attribute is not null)
+            //     {
+            //         Data.CurrentTask.Task.Set(button.Attribute);
+            //     }
+            // }
 
             Data.CurrentTask.Task = Data.CurrentTask.Task;
             _chartDialog?.UpdateGraph();
@@ -100,20 +93,21 @@ public partial class EditTaskDialog
 
     private void Load(object sender, RoutedEventArgs e)
     {
-        OpenFileDialog openFileDialog = new OpenFileDialog()
+        OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadPipelineTitle".GetLocalizationString()
+            Title = "LoadPipelineTitle".GetLocalizationString(),
+            Filter = "JSONFilter".GetLocalizationString()
         };
-        openFileDialog.Filter = "JSON 文件 (*.json)|*.json|All files (*.*)|*.*";
+
         if (openFileDialog.ShowDialog() == true)
         {
             string filePath = openFileDialog.FileName;
-            string fileName = System.IO.Path.GetFileName(filePath);
+            string fileName = Path.GetFileName(filePath);
             PipelineFilePath = filePath.Replace(fileName, "");
             PipelineFileName.Text = fileName;
             try
             {
-                string? jsonText = File.ReadAllText(filePath);
+                string jsonText = File.ReadAllText(filePath);
                 Dictionary<string, TaskModel>? taskDictionary =
                     JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(jsonText);
                 Data?.DataList?.Clear();
@@ -136,149 +130,12 @@ public partial class EditTaskDialog
         }
     }
 
-    public AttributeButton? GetAttribute(string key)
-    {
-        foreach (var button in Parts.Children.OfType<AttributeButton>())
-        {
-            if (button.Attribute?.Key?.Equals(key) == true)
-            {
-                return button;
-            }
-        }
-
-        return null;
-    }
-
-    public void RemoveAttribute(string key)
-    {
-        foreach (var button in Parts.Children.OfType<AttributeButton>()
-                     .Where(button => button.Attribute?.Key?.Equals(key) == true).ToList())
-        {
-            Parts.Children.Remove(button);
-        }
-    }
-
-    private void CopyAttribute(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuItem
-            {
-                Parent: ContextMenu { PlacementTarget: AttributeButton { Attribute: var attribute } }
-            })
-        {
-            var settings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented,
-                NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore
-            };
-
-            var json = JsonConvert.SerializeObject(attribute, settings);
-            Clipboard.SetDataObject(json);
-        }
-    }
-
-    private void DeleteAttribute(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuItem
-            {
-                Parent: ContextMenu
-                {
-                    PlacementTarget: AttributeButton
-                    {
-                        Parent: Panel parentPanel, Attribute: var itemToDelete
-                    } attributeButton
-                }
-            })
-        {
-            var index = parentPanel.Children.IndexOf(attributeButton);
-            parentPanel.Children.Remove(attributeButton);
-            Data?.UndoTaskStack?.Push(new RelayCommand(o => AddAttribute(itemToDelete, index)));
-        }
-    }
-
-
-    private void EditAttribute(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuItem { Parent: ContextMenu { PlacementTarget: AttributeButton buttonFromMenu } })
-        {
-            var editDialog = new EditAttributeDialog(buttonFromMenu.WindowParent, buttonFromMenu.Attribute, true);
-            if (editDialog.ShowDialog() == true)
-            {
-                buttonFromMenu.Attribute = editDialog.Attribute;
-            }
-        }
-        else if (sender is AttributeButton buttonDirect)
-        {
-            var editDialog = new EditAttributeDialog(buttonDirect.WindowParent, buttonDirect.Attribute, true);
-            if (editDialog.ShowDialog() == true)
-            {
-                buttonDirect.Attribute = editDialog.Attribute;
-            }
-        }
-    }
-
-    public AttributeButton AddAttribute(Attribute? attribute, int index = -1)
-    {
-        if (attribute == null)
-            attribute = new Attribute()
-            {
-                Key = "OCR", Value = ""
-            };
-        AttributeButton newButton = new AttributeButton()
-        {
-            Margin = new Thickness(4),
-            Attribute = attribute, WindowParent = this
-        };
-        newButton.Click += (sender, args) =>
-        {
-            AttributeButton? button = sender as AttributeButton;
-            if (Data == null)
-                return;
-            if (Data.SelectedAttribute != null)
-                Data.SelectedAttribute.IsSelected = false;
-            if (button != null && button.IsSelected)
-                Data.SelectedAttribute = button;
-            else
-                Data.SelectedAttribute = null;
-        };
-        newButton.MouseDoubleClick += EditAttribute;
-        // 创建右键菜单
-        ContextMenu contextMenu = new ContextMenu();
-        MenuItem copyItem = new MenuItem { Header = "复制" };
-        copyItem.Click += CopyAttribute;
-        MenuItem editItem = new MenuItem { Header = "编辑" };
-        editItem.Click += EditAttribute;
-        MenuItem deleteItem = new MenuItem { Header = "删除" };
-        deleteItem.Click += DeleteAttribute;
-        contextMenu.Items.Add(copyItem);
-        contextMenu.Items.Add(editItem);
-        contextMenu.Items.Add(deleteItem);
-        newButton.ContextMenu = contextMenu;
-        if (index == -1)
-            Parts.Children.Add(newButton);
-        else
-            Parts.Children.Insert(index, newButton);
-
-        return newButton;
-    }
-
-    private void AddAttribute(object sender, RoutedEventArgs e)
-    {
-        Attribute attribute = new Attribute("recognition", "OCR");
-
-        var editDialog = new EditAttributeDialog(this, attribute, false);
-        if (editDialog.ShowDialog() == true)
-        {
-            attribute = editDialog.Attribute;
-            AddAttribute(attribute);
-        }
-    }
 
     private void ScrollListBoxToBottom()
     {
         if (ListBoxDemo.Items.Count > 0)
         {
-            var lastItem = ListBoxDemo.Items[ListBoxDemo.Items.Count - 1];
+            var lastItem = ListBoxDemo.Items;
             ListBoxDemo.ScrollIntoView(lastItem);
         }
     }
@@ -287,7 +144,7 @@ public partial class EditTaskDialog
     {
         Data?.DataList?.Add(new TaskItemViewModel()
         {
-            Task = new TaskModel(), IsNew = true
+            Task = new TaskModel()
         });
         ScrollListBoxToBottom();
         _chartDialog?.UpdateGraph();
@@ -296,8 +153,6 @@ public partial class EditTaskDialog
     private void TaskSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         TaskItemViewModel? taskItemViewModel = ListBoxDemo.SelectedValue as TaskItemViewModel;
-        if (taskItemViewModel != null)
-            taskItemViewModel.IsNew = false;
         if (Data != null)
             Data.CurrentTask = taskItemViewModel;
     }
@@ -326,7 +181,7 @@ public partial class EditTaskDialog
 
         SaveFileDialog saveFileDialog = new SaveFileDialog
         {
-            Filter = "JSON 文件 (*.json)|*.json|所有文件 (*.*)|*.*",
+            Filter = "JSONFilter".GetLocalizationString(),
             DefaultExt = ".json",
             AddExtension = true
         };
@@ -361,186 +216,161 @@ public partial class EditTaskDialog
         Data?.DataList?.Clear();
     }
 
-    private void ClearAttribute(object sender, RoutedEventArgs e)
-    {
-        Parts.Children.Clear();
-    }
-
     private void Cut(object sender, RoutedEventArgs e)
     {
-        MenuItem? menuItem = sender as MenuItem;
-        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
-        if (contextMenu?.PlacementTarget is ListBoxItem item)
-        {
-            if (item.DataContext is TaskItemViewModel taskItemViewModel)
+        if (sender is MenuItem
             {
-                Clipboard.SetDataObject(taskItemViewModel.ToString());
-                ListBox? listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
-                if (listBox != null)
+                Parent: ContextMenu
                 {
-                    // 获取选中项的索引
-                    var index = listBox.Items.IndexOf(item.DataContext);
-                    Data?.DataList?.RemoveAt(index);
-                    Data?.UndoStack?.Push(new RelayCommand(o => Data?.DataList?.Insert(index, taskItemViewModel)));
+                    PlacementTarget: ListBoxItem { DataContext: TaskItemViewModel taskItemViewModel } item
                 }
+            })
+        {
+            Clipboard.SetDataObject(taskItemViewModel.ToString());
+            if (ItemsControl.ItemsControlFromItemContainer(item) is ListBox listBox)
+            {
+                // 获取选中项的索引
+                var index = listBox.Items.IndexOf(item.DataContext);
+                Data?.DataList?.RemoveAt(index);
+                Data?.UndoStack.Push(new RelayCommand(_ => Data?.DataList?.Insert(index, taskItemViewModel)));
             }
         }
     }
 
     private void Copy(object sender, RoutedEventArgs e)
     {
-        MenuItem? menuItem = sender as MenuItem;
-        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
-        if (contextMenu?.PlacementTarget is ListBoxItem item)
-        {
-            if (item.DataContext is TaskItemViewModel taskItemViewModel)
+        if (sender is MenuItem
             {
-                Clipboard.SetDataObject(taskItemViewModel.ToString());
-            }
+                Parent: ContextMenu
+                {
+                    PlacementTarget: ListBoxItem { DataContext: TaskItemViewModel taskItemViewModel }
+                }
+            })
+        {
+            Clipboard.SetDataObject(taskItemViewModel.ToString());
         }
     }
 
     private void PasteAbove(object sender, RoutedEventArgs e)
     {
-        MenuItem? menuItem = sender as MenuItem;
-        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
-        if (contextMenu?.PlacementTarget is ListBoxItem item)
-        {
-            if (item.DataContext is TaskItemViewModel taskItemViewModel)
+        if (sender is MenuItem
             {
-                ListBox? listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
-                if (listBox != null)
+                Parent: ContextMenu
                 {
-                    // 获取选中项的索引
-                    int index = listBox.Items.IndexOf(item.DataContext);
-                    IDataObject iData = Clipboard.GetDataObject();
-                    if (iData.GetDataPresent(DataFormats.Text))
+                    PlacementTarget: ListBoxItem { DataContext: TaskItemViewModel taskItemViewModel } item
+                }
+            } &&
+            ItemsControl.ItemsControlFromItemContainer(item) is ListBox listBox)
+        {
+            // 获取选中项的索引
+            int index = listBox.Items.IndexOf(taskItemViewModel);
+            var iData = Clipboard.GetDataObject();
+            if (iData?.GetDataPresent(DataFormats.Text) == true)
+            {
+                try
+                {
+                    Dictionary<string, TaskModel>? taskModels =
+                        JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(
+                            (string)iData.GetData(DataFormats.Text));
+                    if (taskModels == null || taskModels.Count == 0)
+                        return;
+                    foreach (var VARIABLE in taskModels)
                     {
-                        try
+                        VARIABLE.Value.name = VARIABLE.Key;
+                        var newItem = new TaskItemViewModel()
                         {
-                            Dictionary<string, TaskModel>? taskModels =
-                                JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(
-                                    (string)iData.GetData(DataFormats.Text));
-                            if (taskModels == null || taskModels.Count == 0)
-                                return;
-                            foreach (var VARIABLE in taskModels)
-                            {
-                                VARIABLE.Value.name = VARIABLE.Key;
-                                var newItem = new TaskItemViewModel()
-                                {
-                                    Name = VARIABLE.Key, Task = VARIABLE.Value
-                                };
-                                Data?.DataList?.Insert(index, newItem);
-                                Data?.UndoStack?.Push(new RelayCommand(o => Data?.DataList?.Remove(newItem)));
-                            }
-                        }
-                        catch (Exception exception)
-                        {
-                            Console.WriteLine(exception);
-                            throw;
-                        }
-                    }
-                    else
-                    {
-                        Growls.ErrorGlobal("ClipboardDataError".GetLocalizationString());
+                            Name = VARIABLE.Key, Task = VARIABLE.Value
+                        };
+                        Data?.DataList?.Insert(index, newItem);
+                        Data?.UndoStack?.Push(new RelayCommand(_ => Data?.DataList?.Remove(newItem)));
                     }
                 }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                    throw;
+                }
+            }
+            else
+            {
+                Growls.ErrorGlobal("ClipboardDataError".GetLocalizationString());
             }
         }
     }
 
     private void PasteBelow(object sender, RoutedEventArgs e)
     {
-        MenuItem? menuItem = sender as MenuItem;
-        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
-        if (contextMenu?.PlacementTarget is ListBoxItem item)
-        {
-            if (item.DataContext is TaskItemViewModel taskItemViewModel)
+        if (sender is MenuItem
             {
-                ListBox? listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
-                if (listBox != null)
+                Parent: ContextMenu
                 {
-                    // 获取选中项的索引
-                    int index = listBox.Items.IndexOf(item.DataContext);
-                    IDataObject iData = Clipboard.GetDataObject();
-                    if (iData.GetDataPresent(DataFormats.Text))
+                    PlacementTarget: ListBoxItem { DataContext: TaskItemViewModel taskItemViewModel } item
+                }
+            } &&
+            ItemsControl.ItemsControlFromItemContainer(item) is ListBox listBox)
+        {
+            // 获取选中项的索引
+            var index = listBox.Items.IndexOf(item.DataContext);
+            var iData = Clipboard.GetDataObject();
+            if (iData.GetDataPresent(DataFormats.Text))
+            {
+                try
+                {
+                    var taskModels =
+                        JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(
+                            (string)iData.GetData(DataFormats.Text));
+                    if (taskModels == null || taskModels.Count == 0)
+                        return;
+                    foreach (var VARIABLE in taskModels)
                     {
-                        try
+                        VARIABLE.Value.name = VARIABLE.Key;
+                        var newItem = new TaskItemViewModel()
                         {
-                            Dictionary<string, TaskModel>? taskModels =
-                                JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(
-                                    (string)iData.GetData(DataFormats.Text));
-                            if (taskModels == null || taskModels.Count == 0)
-                                return;
-                            foreach (var VARIABLE in taskModels)
-                            {
-                                VARIABLE.Value.name = VARIABLE.Key;
-                                var newItem = new TaskItemViewModel()
-                                {
-                                    Name = VARIABLE.Key, Task = VARIABLE.Value
-                                };
-                                Data?.DataList?.Insert(index + 1, newItem);
-                                Data?.UndoStack?.Push(new RelayCommand(o => Data?.DataList?.Remove(newItem)));
-                            }
-                        }
-                        catch (Exception exception)
-                        {
-                            Console.WriteLine(exception);
-                            throw;
-                        }
-                    }
-                    else
-                    {
-                        Growls.ErrorGlobal("ClipboardDataError".GetLocalizationString());
+                            Name = VARIABLE.Key, Task = VARIABLE.Value
+                        };
+                        Data?.DataList?.Insert(index + 1, newItem);
+                        Data?.UndoStack?.Push(new RelayCommand(_ => Data?.DataList?.Remove(newItem)));
                     }
                 }
+                catch (Exception exception)
+                {
+                    Console.WriteLine(exception);
+                    throw;
+                }
+            }
+            else
+            {
+                Growls.ErrorGlobal("ClipboardDataError".GetLocalizationString());
             }
         }
     }
 
     private void Delete(object sender, RoutedEventArgs e)
     {
-        MenuItem? menuItem = sender as MenuItem;
-        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
-        if (contextMenu?.PlacementTarget is ListBoxItem item)
-        {
-            if (item.DataContext is TaskItemViewModel taskItemViewModel)
+        if (sender is MenuItem
             {
-                ListBox? listBox = ItemsControl.ItemsControlFromItemContainer(item) as ListBox;
-                if (listBox != null)
+                Parent: ContextMenu
                 {
-                    // 获取选中项的索引
-                    int index = listBox.Items.IndexOf(item.DataContext);
-                    Data?.DataList?.RemoveAt(index);
-                    Data?.UndoStack?.Push(new RelayCommand(o => Data?.DataList?.Insert(index, taskItemViewModel)));
+                    PlacementTarget: ListBoxItem { DataContext: TaskItemViewModel taskItemViewModel } item
                 }
-            }
+            } &&
+            ItemsControl.ItemsControlFromItemContainer(item) is ListBox listBox)
+        {
+            // 获取选中项的索引
+            int index = listBox.Items.IndexOf(item.DataContext);
+            Data?.DataList?.RemoveAt(index);
+            Data?.UndoStack.Push(new RelayCommand(_ => Data?.DataList?.Insert(index, taskItemViewModel)));
         }
     }
 
-    private void Paste(object sender, RoutedEventArgs e)
+    private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
-        IDataObject iData = Clipboard.GetDataObject();
-        if (iData.GetDataPresent(DataFormats.Text))
-        {
-            try
-            {
-                var attribute =
-                    JsonConvert.DeserializeObject<Attribute>(
-                        (string)iData.GetData(DataFormats.Text));
-                AttributeButton button = AddAttribute(attribute);
-                Data?.UndoTaskStack?.Push(new RelayCommand(o => Parts.Children.Remove(button)));
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-                throw;
-            }
-        }
-        else
-        {
-            Growls.ErrorGlobal("ClipboardDataError".GetLocalizationString());
-        }
+        var scrollViewer = sender as ScrollViewer;
+        if (scrollViewer == null) return;
+        var scrollChange = e.Delta * 0.5; // 根据滚动幅度调整的比例系数
+        scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - scrollChange);
+
+        e.Handled = true;
     }
 
     private void SelectionRegion(object sender, RoutedEventArgs e)
@@ -552,65 +382,40 @@ public partial class EditTaskDialog
             SelectionRegionDialog imageDialog = new SelectionRegionDialog(image);
             if (imageDialog.ShowDialog() == true)
             {
-                if (Data?.CurrentTask != null)
+                if (Data?.CurrentTask?.Task != null)
                 {
                     if (imageDialog.IsRoi)
                     {
-                        var attribute = GetAttribute("roi");
-                        if (attribute == null)
+                        if (Data.CurrentTask.Task.roi == null)
                         {
-                            AddAttribute(new Attribute()
-                            {
-                                Key = "roi", Value = imageDialog.Output
-                            });
+                            Data.CurrentTask.Task.roi = imageDialog.Output;
                         }
                         else
                         {
-                            if (attribute.Attribute.Value is List<int> li)
+                            if (Data.CurrentTask.Task?.roi is List<int> li)
                             {
                                 if (imageDialog.Output == null)
                                 {
-                                    attribute.Attribute = new Attribute()
-                                    {
-                                        Key = "roi", Value = new List<List<int>>() { li }
-                                    };
+                                    Data.CurrentTask.Task.roi = new List<List<int>>() { li };
                                 }
                                 else
                                 {
-                                    attribute.Attribute = new Attribute()
-                                    {
-                                        Key = "roi", Value = new List<List<int>>() { li, imageDialog.Output }
-                                    };
+                                    Data.CurrentTask.Task.roi = new List<List<int>>() { li, imageDialog.Output };
                                 }
                             }
-                            else if (attribute.Attribute.Value is List<List<int>> lli)
+                            else if (Data.CurrentTask.Task?.roi is List<List<int>> lli)
                             {
                                 if (imageDialog.Output != null)
                                     lli.Add(imageDialog.Output);
-
-                                attribute.Attribute = new Attribute()
-                                {
-                                    Key = "roi", Value = lli
-                                };
+                                Data.CurrentTask.Task.roi = lli;
                             }
                         }
                     }
                     else
                     {
-                        var attribute = GetAttribute("target");
-                        if (attribute != null)
+                        if (Data.CurrentTask.Task != null)
                         {
-                            attribute.Attribute = new Attribute()
-                            {
-                                Key = "target", Value = imageDialog.Output
-                            };
-                        }
-                        else
-                        {
-                            AddAttribute(new Attribute()
-                            {
-                                Key = "target", Value = imageDialog.Output
-                            });
+                            Data.CurrentTask.Task.target = imageDialog.Output;
                         }
                     }
                 }
@@ -628,43 +433,19 @@ public partial class EditTaskDialog
             if (imageDialog.ShowDialog() == true)
             {
                 Console.WriteLine(imageDialog.Output);
-                if (Data?.CurrentTask != null)
+                if (Data?.CurrentTask?.Task != null)
                 {
-                    var attribute = GetAttribute("template");
-                    if (attribute == null && imageDialog.Output != null)
+                    if (Data.CurrentTask.Task.template == null && imageDialog.Output != null)
                     {
-                        AddAttribute(new Attribute()
-                        {
-                            Key = "template", Value = new List<string>() { imageDialog.Output }
-                        });
+                        Data.CurrentTask.Task.template = new List<string> { imageDialog.Output };
                     }
                     else
                     {
-                        if (attribute?.Attribute.Value is string s)
-                        {
-                            if (imageDialog.Output == null)
-                            {
-                                attribute.Attribute = new Attribute()
-                                {
-                                    Key = "template", Value = new List<string>() { s }
-                                };
-                            }
-                            else
-                            {
-                                attribute.Attribute = new Attribute()
-                                {
-                                    Key = "template", Value = new List<string>() { s, imageDialog.Output }
-                                };
-                            }
-                        }
-                        else if (attribute?.Attribute.Value is List<string> ls)
+                        if (Data.CurrentTask.Task.template is List<string> ls)
                         {
                             if (imageDialog.Output != null)
                                 ls.Add(imageDialog.Output);
-                            attribute.Attribute = new Attribute()
-                            {
-                                Key = "template", Value = ls
-                            };
+                            Data.CurrentTask.Task.template = ls;
                         }
                     }
                 }
@@ -681,39 +462,10 @@ public partial class EditTaskDialog
             SwipeDialog imageDialog = new SwipeDialog(image);
             if (imageDialog.ShowDialog() == true)
             {
-                if (Data?.CurrentTask != null)
+                if (Data?.CurrentTask?.Task != null)
                 {
-                    var begin = GetAttribute("begin");
-                    if (begin == null)
-                    {
-                        AddAttribute(new Attribute()
-                        {
-                            Key = "begin", Value = imageDialog.OutputBegin
-                        });
-                    }
-                    else
-                    {
-                        begin.Attribute = new Attribute()
-                        {
-                            Key = "begin", Value = imageDialog.OutputBegin
-                        };
-                    }
-
-                    var end = GetAttribute("end");
-                    if (end == null)
-                    {
-                        AddAttribute(new Attribute()
-                        {
-                            Key = "end", Value = imageDialog.OutputEnd
-                        });
-                    }
-                    else
-                    {
-                        end.Attribute = new Attribute()
-                        {
-                            Key = "end", Value = imageDialog.OutputEnd
-                        };
-                    }
+                    Data.CurrentTask.Task.begin = imageDialog.OutputBegin;
+                    Data.CurrentTask.Task.end = imageDialog.OutputEnd;
                 }
             }
         }
@@ -728,39 +480,10 @@ public partial class EditTaskDialog
             ColorExtractionDialog imageDialog = new ColorExtractionDialog(image);
             if (imageDialog.ShowDialog() == true)
             {
-                if (Data?.CurrentTask != null)
+                if (Data?.CurrentTask?.Task != null)
                 {
-                    var upper = GetAttribute("upper");
-                    if (upper == null)
-                    {
-                        AddAttribute(new Attribute()
-                        {
-                            Key = "upper", Value = imageDialog.OutputUpper
-                        });
-                    }
-                    else
-                    {
-                        upper.Attribute = new Attribute()
-                        {
-                            Key = "upper", Value = imageDialog.OutputUpper
-                        };
-                    }
-
-                    var lower = GetAttribute("lower");
-                    if (lower == null)
-                    {
-                        AddAttribute(new Attribute()
-                        {
-                            Key = "lower", Value = imageDialog.OutputLower
-                        });
-                    }
-                    else
-                    {
-                        lower.Attribute = new Attribute()
-                        {
-                            Key = "lower", Value = imageDialog.OutputLower
-                        };
-                    }
+                    Data.CurrentTask.Task.upper = imageDialog.OutputUpper;
+                    Data.CurrentTask.Task.lower = imageDialog.OutputLower;
                 }
             }
         }
@@ -775,35 +498,21 @@ public partial class EditTaskDialog
             RecognitionTextDialog imageDialog = new RecognitionTextDialog(image);
             if (imageDialog.ShowDialog() == true)
             {
-                if (Data?.CurrentTask != null && imageDialog.Output != null)
+                if (Data?.CurrentTask?.Task != null && imageDialog.Output != null)
                 {
-                    var attribute = GetAttribute("expected");
                     string text = OCRHelper.ReadTextFromMAARecognition(
                         imageDialog.Output[0], imageDialog.Output[1],
                         imageDialog.Output[2], imageDialog.Output[3]);
-                    if (attribute == null)
+                    if (Data.CurrentTask.Task.expected == null)
                     {
-                        AddAttribute(new Attribute()
-                        {
-                            Key = "expected", Value = new List<string>() { text }
-                        });
+                        Data.CurrentTask.Task.expected = new List<string> { text };
                     }
                     else
                     {
-                        if (attribute.Attribute.Value is string s)
-                        {
-                            attribute.Attribute = new Attribute()
-                            {
-                                Key = "expected", Value = new List<string>() { s, text }
-                            };
-                        }
-                        else if (attribute.Attribute.Value is List<string> ls)
+                        if (Data.CurrentTask.Task.expected is List<string> ls)
                         {
                             ls.Add(text);
-                            attribute.Attribute = new Attribute()
-                            {
-                                Key = "expected", Value = ls
-                            };
+                            Data.CurrentTask.Task.expected = ls;
                         }
                     }
                 }

@@ -1,17 +1,17 @@
 ﻿using System.IO;
-using MFAWPF.Views;
+
 using Newtonsoft.Json;
 
 namespace MFAWPF.Utils;
 
-public static class JSONHelper
+public static class JsonHelper
 {
     /// <summary>
     /// 将对象序列化为指定的文件名
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="obj"></param>
-    /// <param name="fileName"></param>
+    /// <param name="file"></param>
+    /// <param name="defaultS"></param>
     /// <returns></returns>
     ///    //序列化到文件
     public static T? ReadFromConfigJsonFile<T>(string file, T? defaultS = default)

@@ -13,7 +13,7 @@ public class AddTaskDialogViewModel: ObservableObject
         set => SetProperty(ref dataList, value);
     }
 
-    private int selectedIndex = 0;
+    private int selectedIndex ;
 
     public int SelectedIndex
     {

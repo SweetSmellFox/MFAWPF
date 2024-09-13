@@ -209,8 +209,8 @@ public partial class EditAttributeDialog : CustomWindow
         switch (key)
         {
             case "recognition":
-                Types = new List<string>()
-                {
+                Types =
+                [
                     "DirectHit",
                     "TemplateMatch",
                     "FeatureMatch",
@@ -219,11 +219,11 @@ public partial class EditAttributeDialog : CustomWindow
                     "NeuralNetworkClassify",
                     "NeuralNetworkDetect",
                     "Custom"
-                };
+                ];
                 break;
             case "action":
-                Types = new List<string>()
-                {
+                Types =
+                [
                     "DoNothing",
                     "Click",
                     "Swipe",
@@ -233,28 +233,28 @@ public partial class EditAttributeDialog : CustomWindow
                     "StopApp",
                     "StopTask",
                     "Custom"
-                };
+                ];
                 break;
             case "order_by":
-                Types = new List<string>()
-                {
+                Types =
+                [
                     "Horizontal",
                     "Vertical",
                     "Score",
                     "Random",
                     "Area",
                     "Length"
-                };
+                ];
                 break;
             case "detector":
-                Types = new List<string>()
-                {
+                Types =
+                [
                     "SIFT",
                     "KAZE",
                     "AKAZE",
                     "BRISK",
                     "ORB"
-                };
+                ];
                 break;
         }
 
@@ -625,7 +625,7 @@ public partial class EditAttributeDialog : CustomWindow
                         var list = new List<string>();
                         foreach (var VARIABLE in p0.Children)
                         {
-                            if (VARIABLE is SAutoCompleteTextBox sAutoCompleteTextBox)
+                            if (VARIABLE is CustomAutoCompleteTextBox sAutoCompleteTextBox)
                             {
                                 if (!string.IsNullOrEmpty(sAutoCompleteTextBox.Text))
                                     list.Add(sAutoCompleteTextBox.Text);
@@ -639,6 +639,7 @@ public partial class EditAttributeDialog : CustomWindow
 
                         Attribute.Value = list;
                     }
+
                     break;
                 case "expected":
                 case "template":
@@ -762,7 +763,7 @@ public partial class EditAttributeDialog : CustomWindow
                 case "end":
                     if (Control is StackPanel { Children: var children1 })
                     {
-                        if (children1.Count == 1 && children1[0] is SAutoCompleteTextBox textBox)
+                        if (children1.Count == 1 && children1[0] is CustomAutoCompleteTextBox textBox)
                         {
                             if (bool.TryParse(textBox.Text, out var b) && b)
                             {
@@ -775,7 +776,7 @@ public partial class EditAttributeDialog : CustomWindow
                         }
                         else if (children1.Count > 0)
                         {
-                            if (children1[0] is SAutoCompleteTextBox { Text: var text } && text.Contains(","))
+                            if (children1[0] is CustomAutoCompleteTextBox { Text: var text } && text.Contains(","))
                             {
                                 try
                                 {
@@ -798,7 +799,7 @@ public partial class EditAttributeDialog : CustomWindow
                                     .OfType<TextBox>()
                                     .Select(tb => int.TryParse(tb.Text, out var i) ? i : (int?)null)
                                     .Where(i => i.HasValue)
-                                    .Select(i => i ?? 0) 
+                                    .Select(i => i ?? 0)
                                     .ToList();
                                 Attribute.Value = list;
                             }
@@ -874,16 +875,17 @@ public partial class EditAttributeDialog : CustomWindow
         if (panel != null)
         {
             var contextMenu = new ContextMenu();
-            var deleteItem = new MenuItem { Header = "删除" };
+            var deleteItem = new MenuItem();
+            deleteItem.BindLocalization("Delete", MenuItem.HeaderProperty);
             deleteItem.Click += DeleteAttribute;
             contextMenu.Items.Add(deleteItem);
             var taskDialog = ParentDialog as EditTaskDialog;
             if (taskDialog == null)
                 return;
-            var newTextBox = new SAutoCompleteTextBox
+            var newTextBox = new CustomAutoCompleteTextBox
             {
                 Margin = new Thickness(5, 2, 5, 2), DisplayMemberPath = "Name",
-                DataList = taskDialog.Data?.DataList, ItemsSource = taskDialog.Data?.DataList
+                DataList = taskDialog.Data?.DataList
             };
             if (content != null)
                 newTextBox.Text = content.ToString();
