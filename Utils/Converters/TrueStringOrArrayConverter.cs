@@ -33,7 +33,9 @@ public class TrueStringOrArrayConverter : JsonConverter
             return list;
         }
 
-        throw new JsonSerializationException("Invalid JSON format for TrueStringOrArrayConverter.");
+        Console.WriteLine(objectType);
+        Console.WriteLine(token.ToString());
+        return token.ToString();
     }
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
@@ -53,7 +55,8 @@ public class TrueStringOrArrayConverter : JsonConverter
         else
         {
             Console.WriteLine(value?.GetType());
-            throw new JsonSerializationException("Unexpected value type for TrueStringOrArrayConverter.");
+            Console.WriteLine(value?.ToString());
+            writer.WriteValue(value?.ToString());
         }
     }
 }

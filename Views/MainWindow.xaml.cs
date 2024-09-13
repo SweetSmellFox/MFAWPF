@@ -21,6 +21,8 @@ using Newtonsoft.Json.Linq;
 using WPFLocalizeExtension.Extensions;
 using ComboBox = HandyControl.Controls.ComboBox;
 using ScrollViewer = HandyControl.Controls.ScrollViewer;
+using TabControl = System.Windows.Controls.TabControl;
+using TabItem = System.Windows.Controls.TabItem;
 using TextBlock = System.Windows.Controls.TextBlock;
 
 namespace MFAWPF.Views
@@ -368,7 +370,7 @@ namespace MFAWPF.Views
             }
         }
 
-        private void Start(object sender, RoutedEventArgs e)
+        private void Start(object? sender, RoutedEventArgs? e)
         {
             if (InitializeData())
             {
@@ -388,7 +390,8 @@ namespace MFAWPF.Views
         {
             IsADB = adbTab.IsSelected;
 
-            if ("adb".Equals(MaaProcessor.Config.Adb.Adb) && DataSet.TryGetData<JObject>("Adb", out var jObject))
+            if (IsFirstStart && "adb".Equals(MaaProcessor.Config.Adb.Adb) &&
+                DataSet.TryGetData<JObject>("Adb", out var jObject))
             {
                 var device = jObject?.ToObject<DeviceInfo>();
                 if (device != null)
@@ -396,7 +399,11 @@ namespace MFAWPF.Views
                     deviceComboBox.ItemsSource = new List<DeviceInfo> { device };
                     deviceComboBox.SelectedIndex = 0;
                     MaaProcessor.Config.IsConnected = true;
+                    if (DataSet.GetData("AutoStartIndex", 0) == 1)
+                        Start(null, null);
                 }
+
+                IsFirstStart = false;
             }
             else AutoDetectDevice();
 
@@ -433,6 +440,8 @@ namespace MFAWPF.Views
             AutoDetectDevice();
         }
 
+        public bool IsFirstStart = true;
+
         public async void AutoDetectDevice()
         {
             try
@@ -447,6 +456,11 @@ namespace MFAWPF.Views
                     deviceComboBox.ItemsSource = devices;
                     MaaProcessor.Config.IsConnected = devices.Length > 0;
                     deviceComboBox.SelectedIndex = 0;
+                    if (IsFirstStart && DataSet.GetData("AutoStartIndex", 0) == 1)
+                    {
+                        Start(null, null);
+                        IsFirstStart = false;
+                    }
                 }
                 else
                 {
@@ -476,35 +490,74 @@ namespace MFAWPF.Views
         private void ConfigureSettingsPanel(object? sender = null, RoutedEventArgs? e = null)
         {
             settingPanel.Children.Clear();
+// Create a new TabControl instance
+            TabControl tabControl = new TabControl
+            {
+                TabStripPlacement = Dock.Bottom,
+                Background = Brushes.Transparent,
+                Height = 350,
+                BorderThickness = new Thickness(0),
+                Style = (Style)FindResource("TabControlCapsule") // Assuming 'TabControlCapsule' is a style in resources
+            };
+            // var binding = new Binding("Idle")
+            // {
+            //     Source = Data,
+            //     Mode = BindingMode.OneWay
+            // };
+            // tabControl.SetBinding(IsEnabledProperty, binding);
+            StackPanel s1 = new(), s2 = new();
+            AddResourcesOption(s1);
             if (IsADB)
             {
-                AddResourcesOption();
-                AddSettingOption("CaptureModeOption",
+                AddSettingOption(s1, "CaptureModeOption",
                     [
                         "ScreencapFastestLosslessWay", "ScreencapRawWithGzip", "ScreencapFastestWayCompatible",
                         "ScreencapRawByNetcat", "ScreencapEncode", "ScreencapEncodeToFile", "ScreencapMinicapDirect",
                         "ScreencapMinicapStream", "ScreencapEmulatorExtras", "ScreencapFastestWay"
                     ],
                     "AdbControlScreenCapType", 0);
-                AddBindSettingOption("TouchModeOption",
+                AddBindSettingOption(s1, "TouchModeOption",
                     ["MiniTouch", "MaaTouch", "AdbInput", "AutoDetect"],
                     "AdbControlTouchType", 0);
-                AddThemeOption();
-                AddLanguageOption();
             }
             else
             {
-                AddResourcesOption();
-                AddSettingOption("CaptureModeOption",
+                AddSettingOption(s1, "CaptureModeOption",
                     ["ScreencapDXGIFramePool", "ScreencapDXGIDesktopDup", "ScreencapGDI"],
                     "Win32ControlScreenCapType", 0);
 
-                AddSettingOption("TouchModeOption",
+                AddSettingOption(s1, "TouchModeOption",
                     ["Seize", "SendMessage"],
                     "Win32ControlTouchType", 0);
-                AddThemeOption();
-                AddLanguageOption();
             }
+
+            AddThemeOption(s1);
+            AddLanguageOption(s1);
+            AddAutoStartOption(s2);
+            ScrollViewer sv1 = new()
+                {
+                    Content = s1, VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                },
+                sv2 = new()
+                {
+                    Content = s2, VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                };
+            var commonSettingTabItem = new TabItem
+            {
+                Content = sv1
+            };
+            commonSettingTabItem.BindLocalization("CommonSetting", TabItem.HeaderProperty);
+            var advancedSettingTabItem = new TabItem
+            {
+                Content = sv2
+            };
+            advancedSettingTabItem.BindLocalization("AdvancedSetting", TabItem.HeaderProperty);
+
+
+            tabControl.Items.Add(commonSettingTabItem);
+            tabControl.Items.Add(advancedSettingTabItem);
+
+            settingPanel.Children.Add(tabControl);
         }
 
         private void About(object? sender = null, RoutedEventArgs? e = null)
@@ -519,8 +572,9 @@ namespace MFAWPF.Views
             });
         }
 
-        private void AddResourcesOption(int defaultValue = 0)
+        private void AddResourcesOption(Panel? panel = null, int defaultValue = 0)
         {
+            panel ??= settingPanel;
             var comboBox = new ComboBox
             {
                 SelectedIndex = DataSet.GetData("ResourceIndex", defaultValue), DisplayMemberPath = "name",
@@ -550,11 +604,12 @@ namespace MFAWPF.Views
                 DataSet.SetData("ResourceIndex", index);
             };
 
-            settingPanel.Children.Add(comboBox);
+            panel.Children.Add(comboBox);
         }
 
-        private void AddThemeOption(int defaultValue = 0)
+        private void AddThemeOption(Panel? panel = null, int defaultValue = 0)
         {
+            panel ??= settingPanel;
             var comboBox = new ComboBox
             {
                 Style = FindResource("ComboBoxExtend") as Style,
@@ -582,11 +637,12 @@ namespace MFAWPF.Views
                 DataSet.SetData("ThemeIndex", index);
             };
             comboBox.SelectedIndex = DataSet.GetData("ThemeIndex", defaultValue);
-            settingPanel.Children.Add(comboBox);
+            panel.Children.Add(comboBox);
         }
 
-        private void AddLanguageOption(int defaultValue = 0)
+        private void AddLanguageOption(Panel? panel = null, int defaultValue = 0)
         {
+            panel ??= settingPanel;
             var comboBox = new ComboBox
             {
                 Style = FindResource("ComboBoxExtend") as Style,
@@ -612,10 +668,10 @@ namespace MFAWPF.Views
             };
 
             comboBox.SelectedIndex = DataSet.GetData("LangIndex", defaultValue);
-            settingPanel.Children.Add(comboBox);
+            panel.Children.Add(comboBox);
         }
 
-        private void AddSettingOption(string titleKey, IEnumerable<string> options, string datatype,
+        private void AddSettingOption(Panel? panel, string titleKey, IEnumerable<string> options, string datatype,
             int defaultValue = 0)
         {
             var comboBox = new ComboBox
@@ -640,11 +696,12 @@ namespace MFAWPF.Views
                 MaaProcessor.Instance.SetCurrentInstance();
             };
 
-            settingPanel.Children.Add(comboBox);
+            panel?.Children.Add(comboBox);
         }
 
-        private void AddBindSettingOption(string titleKey, IEnumerable<string> options, string datatype,
+        private void AddBindSettingOption(Panel? panel, string titleKey, IEnumerable<string> options, string datatype,
             int defaultValue = 0)
+
         {
             var comboBox = new ComboBox
             {
@@ -674,7 +731,39 @@ namespace MFAWPF.Views
                 MaaProcessor.Instance.SetCurrentInstance();
             };
 
-            settingPanel.Children.Add(comboBox);
+            panel?.Children.Add(comboBox);
+        }
+
+        private void AddAutoStartOption(Panel? panel = null, int defaultValue = 0)
+        {
+            panel ??= settingPanel;
+            var comboBox = new ComboBox
+            {
+                Style = FindResource("ComboBoxExtend") as Style,
+                Margin = new Thickness(5)
+            };
+            var c1 = new ComboBoxItem();
+            c1.BindLocalization("None", ContentProperty);
+            var c2 = new ComboBoxItem();
+            c2.BindLocalization("StartupScript", ContentProperty);
+            comboBox.Items.Add(c1);
+            comboBox.Items.Add(c2);
+            var binding = new Binding("Idle")
+            {
+                Source = Data,
+                Mode = BindingMode.OneWay
+            };
+            comboBox.SetBinding(IsEnabledProperty, binding);
+            comboBox.BindLocalization("AutoStartOption");
+            comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+
+            comboBox.SelectionChanged += (sender, _) =>
+            {
+                var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+                DataSet.SetData("AutoStartIndex", index);
+            };
+            comboBox.SelectedIndex = DataSet.GetData("AutoStartIndex", defaultValue);
+            panel.Children.Add(comboBox);
         }
 
         public void SetOption(DragItemViewModel dragItem, bool value)

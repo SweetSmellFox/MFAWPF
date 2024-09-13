@@ -155,7 +155,7 @@
                                      hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
                                      Foreground="{DynamicResource GrayColor4}"
                                      Background="Transparent"
-                                     BorderThickness="0" 
+                                     BorderThickness="0"
                                      GroupName="TaskSettings" Checked="ConfigureSettingsPanel"
                                      Style="{DynamicResource RadioGroupItemSingle}" />
                         <RadioButton ToolTip="{lex:Loc About}"
@@ -191,7 +191,7 @@
                                            HorizontalAlignment="Left">
                                 </TextBlock>
 
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="2 2 0 0" 
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="2 2 0 0"
                                             HorizontalAlignment="Right">
                                     <Button ToolTip="{lex:Loc SelectAll}" Width="15" Height="15" Margin="7 0 0 0"
                                             Style="{StaticResource textBoxButton}"
@@ -325,9 +325,9 @@
                             <StackPanel Orientation="Vertical" x:Name="settingPanel">
                                 <StackPanel.RenderTransform>
                                     <TranslateTransform Y="-5" />
-                                  
+
                                 </StackPanel.RenderTransform>
-                             
+                                
                             </StackPanel>
                         </ScrollViewer>
 

@@ -28,7 +28,7 @@ public partial class EditTaskDialog
         if (Data != null)
             Data.Dialog = this;
     }
-    
+
 
     protected override void OnClosed(EventArgs e)
     {
@@ -418,8 +418,11 @@ public partial class EditTaskDialog
                         if (Data.CurrentTask.Task != null)
                         {
                             Data.CurrentTask.Task.target = imageDialog.Output;
+                            Console.WriteLine("怎么回事");
                         }
                     }
+
+                    Data.CurrentTask = Data.CurrentTask;
                 }
             }
         }
@@ -434,7 +437,6 @@ public partial class EditTaskDialog
             CropImageDialog imageDialog = new CropImageDialog(image);
             if (imageDialog.ShowDialog() == true)
             {
-                Console.WriteLine(imageDialog.Output);
                 if (Data?.CurrentTask?.Task != null)
                 {
                     if (Data.CurrentTask.Task.template == null && imageDialog.Output != null)
@@ -443,13 +445,16 @@ public partial class EditTaskDialog
                     }
                     else
                     {
+                        Console.WriteLine(Data.CurrentTask.Task.template.GetType());
                         if (Data.CurrentTask.Task.template is List<string> ls)
                         {
                             if (imageDialog.Output != null)
                                 ls.Add(imageDialog.Output);
-                            Data.CurrentTask.Task.template = ls;
+                            Data.CurrentTask.Task.template = ls.ToList();
                         }
                     }
+
+                    Data.CurrentTask = Data.CurrentTask;
                 }
             }
         }
@@ -468,6 +473,7 @@ public partial class EditTaskDialog
                 {
                     Data.CurrentTask.Task.begin = imageDialog.OutputBegin;
                     Data.CurrentTask.Task.end = imageDialog.OutputEnd;
+                    Data.CurrentTask = Data.CurrentTask;
                 }
             }
         }
@@ -486,6 +492,7 @@ public partial class EditTaskDialog
                 {
                     Data.CurrentTask.Task.upper = imageDialog.OutputUpper;
                     Data.CurrentTask.Task.lower = imageDialog.OutputLower;
+                    Data.CurrentTask = Data.CurrentTask;
                 }
             }
         }
@@ -517,6 +524,8 @@ public partial class EditTaskDialog
                             Data.CurrentTask.Task.expected = ls;
                         }
                     }
+
+                    Data.CurrentTask = Data.CurrentTask;
                 }
             }
         }

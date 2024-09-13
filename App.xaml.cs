@@ -47,6 +47,7 @@ public partial class App : Application
         {
             e.Handled = true; //把 Handled 属性设为true，表示此异常已处理，程序可以继续运行，不会强制退出      
             Console.WriteLine(e.Exception);
+            LoggerService.LogError(e.Exception);
             ErrorView errorView = new ErrorView(e.Exception, false);
             errorView.Show();
         }

@@ -110,11 +110,7 @@ public class EditTaskDialogViewModel : ObservableObject
             {
                 Dialog.TaskName.Text = value.Task.name;
                 Dialog.PropertyGrid.SelectedObject = value.Task;
-                // Dialog.Parts.Children.Clear();
-                // foreach (var VARIABLE in value.Task.ToAttributeList())
-                //     Dialog.AddAttribute(VARIABLE);
             }
-
 
             SetProperty(ref _currentTask, value);
         }
