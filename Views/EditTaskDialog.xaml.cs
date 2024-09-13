@@ -28,12 +28,14 @@ public partial class EditTaskDialog
         if (Data != null)
             Data.Dialog = this;
     }
+    
 
-    protected override void Close(object? sender = null, RoutedEventArgs? e = null)
+    protected override void OnClosed(EventArgs e)
     {
+        base.OnClosed(e);
+        MainWindow.TaskDialog = null;
         if (MainWindow.Data != null)
             MainWindow.Data.Idle = true;
-        base.Close(sender, e);
     }
 
     private void List_KeyDown(object sender, KeyEventArgs e)
