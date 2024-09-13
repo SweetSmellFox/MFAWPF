@@ -49,7 +49,7 @@ namespace MFAWPF.Views
             InitializeData();
             OCRHelper.Initialize();
             VersionChecker.CheckVersion();
-            ShowEditButton();
+            LoadUI();
             MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
 
             SetIconFromExeDirectory();
@@ -154,7 +154,6 @@ namespace MFAWPF.Views
 
                 if (firstTask)
                 {
-                    ConnectSettingButton.IsChecked = true;
                     if (MaaInterface.Instance?.Resources != null &&
                         MaaInterface.Instance.Resources.Count > DataSet.GetData("ResourceIndex", 0))
                         MaaProcessor.CurrentResources =
@@ -954,17 +953,18 @@ namespace MFAWPF.Views
                 Dispatcher.Invoke(() => ShowResourceVersion(version));
         }
 
-        public void ShowEditButton()
+        public void LoadUI()
         {
             if (Dispatcher.CheckAccess())
             {
-                bool value = DataSet.GetData("EnableEdit", true);
+                ConnectSettingButton.IsChecked = true;
+                var value = DataSet.GetData("EnableEdit", true);
                 if (!value)
                     EditButton.Visibility = Visibility.Collapsed;
                 DataSet.SetData("EnableEdit", value);
             }
             else
-                Dispatcher.Invoke(ShowEditButton);
+                Dispatcher.Invoke(LoadUI);
         }
 
         private void ToggleWindowTopMost(object sender, RoutedEventArgs e)

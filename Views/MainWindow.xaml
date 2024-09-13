@@ -155,8 +155,7 @@
                                      hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
                                      Foreground="{DynamicResource GrayColor4}"
                                      Background="Transparent"
-                                     BorderThickness="0"
-
+                                     BorderThickness="0" 
                                      GroupName="TaskSettings" Checked="ConfigureSettingsPanel"
                                      Style="{DynamicResource RadioGroupItemSingle}" />
                         <RadioButton ToolTip="{lex:Loc About}"
