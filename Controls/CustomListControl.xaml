@@ -56,7 +56,7 @@
                             <!-- 第一列的宽度使用 SubtractConverter 动态计算 -->
                             <ColumnDefinition Width="*" />
                             <!-- 第二列按钮宽度保持固定 -->
-                            <ColumnDefinition Width="25" />
+                            <ColumnDefinition Width="18" />
                         </Grid.ColumnDefinitions>
 
                         <!-- TextBox 宽度通过绑定 Grid 的 ActualWidth 减去按钮宽度 -->
@@ -66,12 +66,12 @@
                                 <Binding Path="ActualWidth"
                                          RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}"
                                          Converter="{StaticResource SubtractConverter}"
-                                         ConverterParameter="60" />
+                                         ConverterParameter="45" />
                             </TextBox.Width>
                         </TextBox>
 
                         <Button Grid.Column="1" ToolTip="{lex:Loc Delete}" Width="15" Height="15"
-                                Style="{StaticResource textBoxButton}" Margin="5 0 0  0"
+                                Style="{StaticResource textBoxButton}" Margin="8 0 0  0"
                                 Foreground="{DynamicResource GrayColor4}"
                                 Click="DeleteButton_Click"
                                 Padding="0"

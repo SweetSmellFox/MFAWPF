@@ -34,6 +34,7 @@ public class DragItemViewModel : ObservableObject
     }
 
     private bool? _isCheckedWithNull = false;
+    private bool _isInitialized = false;
 
     /// <summary>
     /// Gets or sets a value indicating whether gets or sets whether the key is checked with null.
@@ -44,12 +45,22 @@ public class DragItemViewModel : ObservableObject
         get => _isCheckedWithNull;
         set
         {
-            SetProperty(ref _isCheckedWithNull, value);
-            value ??= false;
+            if (!_isInitialized)
+            {
+                // 这是初始化操作
+                _isInitialized = true; // 标记已初始化
+                SetProperty(ref _isCheckedWithNull, value); // 可以选择在初始化时不修改 value
+            }
+            else
+            {
+                // 这是后续的 set 操作
+                value ??= false; // 只有在后续 set 时才将 null 设置为 false
+                SetProperty(ref _isCheckedWithNull, value);
+                DataSet.SetData("Tasks", MainWindow.Data?.TaskItemViewModels.ToList());
+            }
+
             if (InterfaceItem != null)
                 InterfaceItem.check = IsChecked;
-            JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface", MaaInterface.Instance);
-            DataSet.SetData("Tasks", MainWindow.Data?.TaskItemViewModels.ToList());
         }
     }
 

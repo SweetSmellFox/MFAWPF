@@ -17,6 +17,7 @@ using ComboBox = HandyControl.Controls.ComboBox;
 using ScrollViewer = System.Windows.Controls.ScrollViewer;
 using TextBlock = System.Windows.Controls.TextBlock;
 using TextBox = System.Windows.Controls.TextBox;
+using Window = System.Windows.Window;
 
 namespace MFAWPF.Views;
 
@@ -25,9 +26,9 @@ public partial class EditAttributeDialog : CustomWindow
     public Attribute Attribute { get; private set; }
     private bool IsEdit = true;
     private UIElement? Control;
-    private CustomWindow? ParentDialog;
+    private Window? ParentDialog;
 
-    public EditAttributeDialog(CustomWindow? parentDialog, Attribute? attribute = null, bool isEdit = false) :
+    public EditAttributeDialog(Window? parentDialog, Attribute? attribute = null, bool isEdit = false) :
         base()
     {
         InitializeComponent();

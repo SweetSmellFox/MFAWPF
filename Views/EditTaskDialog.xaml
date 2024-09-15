@@ -4,13 +4,14 @@
                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                        xmlns:hc="https://handyorg.github.io/handycontrol"
-                       xmlns:local="clr-namespace:MFAWPF.Views" IsResizable="True"
+                       xmlns:local="clr-namespace:MFAWPF.Views"
                        xmlns:models="clr-namespace:MFAWPF.ViewModels"
                        xmlns:controls="clr-namespace:MFAWPF.Controls"
                        xmlns:utils="clr-namespace:MFAWPF.Utils"
                        xmlns:dd="urn:gong-wpf-dragdrop"
                        xmlns:lex="http://wpflocalizeextension.codeplex.com"
-                       mc:Ignorable="d" MinHeight="230" MinWidth="450"
+                       mc:Ignorable="d" MinHeight="230" MinWidth="450" x:Name="editor"
+                       Icon="../logo.ico"
                        Title="{lex:Loc EditTaskDialog_Title}" Height="800" Width="1000">
     <controls:CustomWindow.DataContext>
         <models:EditTaskDialogViewModel />
@@ -31,7 +32,7 @@
         BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="35" />
+                <RowDefinition Height="30" />
                 <RowDefinition />
                 <RowDefinition Height="15" />
             </Grid.RowDefinitions>
@@ -39,15 +40,43 @@
             <Border Grid.Row="0" CornerRadius="10 10 0 0" Background="{DynamicResource MainContentBackgroundBrush}"
                     x:Name="TitleBar"
                     ClipToBounds="False">
-                <Grid Height="34">
-                    <TextBlock Text="{lex:Loc EditTaskDialog_Header}" VerticalAlignment="Center"
-                               Foreground="{DynamicResource BlackColor}"
-                               FontWeight="Bold" FontSize="17" HorizontalAlignment="Center"
-                               Margin="0 0 0 0" />
-                    <Button Width="22" Height="22" Click="Close" Style="{StaticResource ButtonIcon}"
-                            Foreground="{DynamicResource PrimaryBrush}"
-                            hc:IconElement.Geometry="{StaticResource ErrorGeometry}"
-                            Padding="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,0" />
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="10 0 0 0 " Height="30">
+                        <Image VerticalAlignment="Center" DockPanel.Dock="Left" Source="/logo.ico" x:Name="logo"
+                               Height="20" Width="20">
+
+                        </Image>
+                        <TextBlock VerticalAlignment="Center" Margin="6 1 4 0" Text="{lex:Loc EditTaskDialog_Title}"
+                                   FontSize="15"
+                                   Foreground="{DynamicResource PrimaryTextBrush}">
+
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" FlowDirection="RightToLeft">
+
+                        <Button x:Name="btnClose" Style="{StaticResource IconButtonsStyle}" Width="40"
+                                ClipToBounds="True"
+                                Content="{DynamicResource close}" Click="btnClose_Click" Tag="IsCloseButton" />
+                        <Button x:Name="btnRestore" Margin="5,0" Click="btnRestore_Click" Width="40">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource IconButtonsStyle}">
+                                    <Setter Property="Content" Value="{DynamicResource maximize}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=editor, Path=WindowState}"
+                                                     Value="Maximized">
+                                            <Setter Property="Content"
+                                                    Value="{DynamicResource WindowRestoreGeometry}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button x:Name="btnMinimize" Style="{DynamicResource IconButtonsStyle}" Width="40"
+                                Content="{DynamicResource minimize}" Click="btnMinimize_Click" />
+                    </StackPanel>
                 </Grid>
             </Border>
 
@@ -220,8 +249,9 @@
                     </Grid>
                     <Border Grid.Row="2" Background="{DynamicResource WhiteColor}" CornerRadius="8" Margin="2 4 2 0"
                             Padding="4">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-                            <StackPanel> 
+                        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                      PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                            <StackPanel>
                                 <hc:PropertyGrid x:Name="PropertyGrid" />
                             </StackPanel>
                         </ScrollViewer>

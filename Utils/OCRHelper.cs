@@ -1,5 +1,4 @@
-﻿
-using MFAWPF.ViewModels;
+﻿using MFAWPF.ViewModels;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using Newtonsoft.Json;
@@ -59,7 +58,6 @@ public class OCRHelper
         }
 
         Console.WriteLine($"识别结果: {result}");
-        // 拼接结果文本
         return result;
     }
 

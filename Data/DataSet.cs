@@ -1,4 +1,4 @@
-﻿
+﻿using System.Diagnostics;
 using MFAWPF.Utils;
 using Newtonsoft.Json.Linq;
 
@@ -61,6 +61,7 @@ namespace MFAWPF.Data
             {
                 try
                 {
+
                     if (data is long longValue && typeof(T) == typeof(int))
                     {
                         return (T)(object)Convert.ToInt32(longValue);

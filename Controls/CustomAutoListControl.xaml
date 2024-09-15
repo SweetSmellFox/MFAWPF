@@ -57,7 +57,7 @@
                             <!-- 第一列的宽度使用 SubtractConverter 动态计算 -->
                             <ColumnDefinition Width="*" />
                             <!-- 第二列按钮宽度保持固定 -->
-                            <ColumnDefinition Width="25" />
+                            <ColumnDefinition Width="18" />
                         </Grid.ColumnDefinitions>
 
                         <!-- CustomAutoCompleteTextBox 绑定 ItemSource 和 DataList -->
@@ -70,14 +70,14 @@
                                 <Binding Path="ActualWidth"
                                          RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}"
                                          Converter="{StaticResource SubtractConverter}"
-                                         ConverterParameter="60" />
+                                         ConverterParameter="45" />
                             </local:CustomAutoCompleteTextBox.Width>
                         </local:CustomAutoCompleteTextBox>
 
                         <Button Grid.Column="1" ToolTip="{lex:Loc Delete}" Width="15" Height="15"
-                                Style="{StaticResource textBoxButton}" Margin="5 0 0  0"
+                                Style="{StaticResource textBoxButton}"
                                 Foreground="{DynamicResource GrayColor4}"
-                                Click="DeleteButton_Click"
+                                Click="DeleteButton_Click" Margin="8 0 0 0"
                                 Padding="0"
                                 hc:IconElement.Width="12" hc:IconElement.Height="12"
                                 hc:IconElement.Geometry="{StaticResource CloseGeometry}" />

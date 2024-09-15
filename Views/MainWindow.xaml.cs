@@ -140,7 +140,7 @@ namespace MFAWPF.Views
         }
 
 
-        private bool firstTask = true;
+        public bool firstTask = true;
 
         private void LoadTasks(IEnumerable<TaskInterfaceItem> tasks)
         {
@@ -203,25 +203,10 @@ namespace MFAWPF.Views
             }
         }
 
-        protected new void Close()
+        protected override void OnClosed(EventArgs e)
         {
-            base.Close();
+            base.OnClosed(e);
             Application.Current.Shutdown();
-        }
-
-        private void btnClose_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        private void btnRestore_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
-        }
-
-        private void btnMinimize_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
         }
 
         private void TaskList_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -276,7 +261,6 @@ namespace MFAWPF.Views
                     }
                 }
 
-                Console.WriteLine(taskDictionary.Count);
                 if (taskDictionary.Count == 0)
                 {
                     string? directoryPath = Path.GetDirectoryName($"{MaaProcessor.ResourceBase}/pipeline");
@@ -806,7 +790,7 @@ namespace MFAWPF.Views
                     comboBox.ItemsSource = interfaceOption.cases;
 
                     comboBox.Tag = option.name;
-                    comboBox.SelectionChanged += (sender, args) =>
+                    comboBox.SelectionChanged += (_, _) =>
                     {
                         option.index = comboBox.SelectedIndex;
 
@@ -1013,7 +997,7 @@ namespace MFAWPF.Views
                     // 获取选中项的索引
                     int index = Data.TaskItemViewModels.IndexOf(taskItemViewModel);
                     Data.TaskItemViewModels?.RemoveAt(index);
-                    DataSet.SetData("Tasks", Data?.TaskItemViewModels);
+                    DataSet.SetData("Tasks", Data?.TaskItemViewModels.ToList());
                 }
             }
         }

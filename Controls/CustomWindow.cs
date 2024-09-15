@@ -105,6 +105,21 @@ public class CustomWindow : Window
         base.Close();
     }
 
+    protected void btnClose_Click(object sender, RoutedEventArgs e)
+    {
+        base.Close();
+    }
+
+    protected void btnRestore_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
+    }
+
+    protected void btnMinimize_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
     protected void Window_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         _pressedPosition = e.GetPosition(this);
