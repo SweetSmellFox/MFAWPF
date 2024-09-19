@@ -144,7 +144,7 @@ namespace MFAWPF.Utils
 
         private TaskAndParam CreateTaskAndParam(DragItemViewModel task)
         {
-            var taskModels = task.InterfaceItem?.param ?? new Dictionary<string, TaskModel>();
+            var taskModels = task.InterfaceItem?.pipeline_override ?? new Dictionary<string, TaskModel>();
 
             UpdateTaskDictionary(ref taskModels, task.InterfaceItem?.option);
 
@@ -175,9 +175,9 @@ namespace MFAWPF.Utils
                     MainWindow.Instance != null &&
                     selectOption.index is int index &&
                     interfaceOption.cases is { } cases &&
-                    cases[index]?.param != null)
+                    cases[index]?.pipeline_override != null)
                 {
-                    var param = interfaceOption.cases[selectOption.index.Value].param;
+                    var param = interfaceOption.cases[selectOption.index.Value].pipeline_override;
                     MainWindow.Instance.TaskDictionary = MainWindow.Instance.TaskDictionary.MergeTaskModels(param);
                     taskModels = taskModels.MergeTaskModels(param);
                 }
@@ -244,7 +244,7 @@ namespace MFAWPF.Utils
                     {
                         var taskA = TaskQueue.Peek();
                         MainWindow.Data?.AddLogByKey("TaskStart", null, taskA.Name ?? string.Empty);
-                        if (!TryRunTasks(_currentInstance, taskA.Entry, taskA.Param))
+                        if (!TryRunTasks(_currentInstance, taskA.Entry, taskA.pipeline_override))
                         {
                             if (_isStopped) return false;
                             break;
