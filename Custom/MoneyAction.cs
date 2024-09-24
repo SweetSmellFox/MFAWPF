@@ -1,5 +1,4 @@
-﻿
-using MaaFramework.Binding;
+﻿using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Custom;
 
@@ -9,11 +8,9 @@ public class MoneyAction : IMaaCustomAction
 {
     public string Name { get; set; } = nameof(MoneyAction);
 
-    public bool Run(in IMaaSyncContext syncContext, string taskName, string customActionParam,
-        IMaaRectBuffer curBox,
-        string curRecDetail)
+    public bool Run<T>(in IMaaContext context, in RunArgs<T> args) where T : IMaaImageBuffer
     {
-        return true;
+        return false;
     }
 
     public void Abort()

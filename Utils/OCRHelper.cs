@@ -34,7 +34,7 @@ public class OCRHelper
         {
             Task = new TaskModel
             {
-                recognition = "OCR", roi = new List<int>
+                Recognition = "OCR", Roi = new List<int>
                 {
                     x, y,
                     width, height
@@ -42,9 +42,9 @@ public class OCRHelper
             },
             Name = "AppendOCR",
         };
-        var job = MaaProcessor.Instance.GetCurrentInstance()?
-            .AppendRecognition(taskItemViewModel.Name, taskItemViewModel.ToString());
-        if (job != null && job.Wait() == MaaJobStatus.Success)
+        var job = MaaProcessor.Instance.GetCurrentTasker()?
+            .AppendPipeline(taskItemViewModel.Name, taskItemViewModel.ToString());
+        if (job != null && job.Wait() == MaaJobStatus.Succeeded)
         {
             RecognitionQuery? query =
                 JsonConvert.DeserializeObject<RecognitionQuery>(job.QueryRecognitionDetail()?
@@ -61,7 +61,7 @@ public class OCRHelper
         return result;
     }
 
-    public static string ReadTextFromMAASyncContext(in IMaaSyncContext syncContext, IMaaImageBuffer image, int x, int y,
+    public static string ReadTextFromMAASyncContext(in IMaaContext syncContext, IMaaImageBuffer image, int x, int y,
         int width, int height)
     {
         string result = string.Empty;
@@ -69,7 +69,7 @@ public class OCRHelper
         {
             Task = new TaskModel
             {
-                recognition = "OCR", roi = new List<int>
+                Recognition = "OCR", Roi = new List<int>
                 {
                     x, y,
                     width, height
@@ -78,10 +78,7 @@ public class OCRHelper
             Name = "AppendOCR",
         };
         IMaaStringBuffer outDetail = new MaaStringBuffer();
-        syncContext.RunRecognizer(image, taskItemViewModel.Name, taskItemViewModel.ToString(), new MaaRectBuffer()
-        {
-            X = x, Y = y, Width = width, Height = height
-        }, outDetail);
+        syncContext.RunRecognition(taskItemViewModel.Name, taskItemViewModel.ToString(), image);
         string? json = outDetail.ToString();
         if (!string.IsNullOrWhiteSpace(json))
         {

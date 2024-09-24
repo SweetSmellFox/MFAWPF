@@ -13,8 +13,21 @@ namespace MFAWPF.Views
     {
         private Point _startPoint;
         private Rectangle? _selectionRectangle;
-        public List<int>? Output { get; set; }
-        public List<int>? OutputRoi { get; set; }
+        private List<int>? _output { get; set; }
+
+        public List<int>? Output
+        {
+            get => _output;
+            set => _output = value?.Select(i => i < 0 ? 0 : i).ToList();
+        }
+
+        private List<int>? _outputRoi { get; set; }
+
+        public List<int>? OutputRoi
+        {
+            get => _outputRoi;
+            set => _outputRoi = value?.Select(i => i < 0 ? 0 : i).ToList();
+        }
 
         public RecognitionTextDialog(BitmapImage bitmapImage) : base()
         {

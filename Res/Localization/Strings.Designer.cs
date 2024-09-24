@@ -71,9 +71,9 @@ namespace MFAWPF.Res.Localization {
         /// <summary>
         ///   Looks up a localized string similar to 触控模式:.
         /// </summary>
-        internal static string AdbTouchMode {
+        internal static string AdbInputMode {
             get {
-                return ResourceManager.GetString("AdbTouchMode", resourceCulture);
+                return ResourceManager.GetString("AdbInputMode", resourceCulture);
             }
         }
         
@@ -359,9 +359,9 @@ namespace MFAWPF.Res.Localization {
         /// <summary>
         ///   Looks up a localized string similar to 触控模式.
         /// </summary>
-        internal static string TouchModeOption {
+        internal static string InputModeOption {
             get {
-                return ResourceManager.GetString("TouchModeOption", resourceCulture);
+                return ResourceManager.GetString("InputModeOption", resourceCulture);
             }
         }
         

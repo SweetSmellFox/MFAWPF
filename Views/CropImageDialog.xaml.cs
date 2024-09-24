@@ -16,7 +16,14 @@ public partial class CropImageDialog
     private Rectangle? _selectionRectangle;
 
     public string? Output { get; set; }
-    public List<int>? OutputRoi { get; set; }
+    private List<int>? _outputRoi { get; set; }
+
+    public List<int>? OutputRoi
+    {
+        get => _outputRoi;
+        set => _outputRoi = value?.Select(i => i < 0 ? 0 : i).ToList();
+    }
+
 
     public CropImageDialog(BitmapImage bitmapImage)
     {

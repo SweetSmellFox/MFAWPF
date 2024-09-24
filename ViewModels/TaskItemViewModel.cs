@@ -16,7 +16,7 @@ public class TaskItemViewModel : ObservableObject
         set
         {
             if (Task != null)
-                Task.name = value;
+                Task.Name = value;
             SetProperty(ref _name, value);
         }
     }
@@ -32,7 +32,7 @@ public class TaskItemViewModel : ObservableObject
         set
         {
             if (value != null)
-                Name = value.name;
+                Name = value.Name;
             SetProperty(ref _task, value);
         }
     }

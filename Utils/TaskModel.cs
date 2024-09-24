@@ -17,6 +17,8 @@ public class TaskModel : ObservableObject
     private string? _recognition;
     private string? _action;
     private List<string>? _next;
+    private List<string>? _interrupt;
+    private List<string>? _on_error;
     private bool? _is_sub;
     private bool? _inverse;
     private bool? _enabled;
@@ -26,12 +28,14 @@ public class TaskModel : ObservableObject
     private List<string>? _runout_next;
     private uint? _pre_delay;
     private uint? _post_delay;
+    private uint? _rate_limit;
     private object? _pre_wait_freezes;
     private object? _post_wait_freezes;
     private bool? _focus;
     private List<string>? _focus_tip;
     private List<string>? _focus_tip_color;
     private List<string>? _expected;
+    private List<string[]>? _replace;
     private bool? _only_rec;
     private List<string>? _labels;
     private string? _model;
@@ -58,6 +62,7 @@ public class TaskModel : ObservableObject
     private double? _ratio;
     private List<string>? _template;
     private object? _roi;
+    private object? _roi_offset;
     private double? _threshold;
     private object? _lower;
     private object? _upper;
@@ -65,408 +70,459 @@ public class TaskModel : ObservableObject
 
     [Browsable(false)]
     [JsonIgnore]
-    public string name
+    [JsonProperty("name")]
+    public string Name
     {
         get => _name;
         set => SetNewProperty(ref _name, value);
     }
 
-    [Category("基本属性")]
+    [JsonProperty("recognition")]
+    [Category("基础属性")]
     [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
-    public string? recognition
+    public string? Recognition
     {
         get => _recognition;
         set => SetNewProperty(ref _recognition, value);
     }
 
-    [Category("基本属性")]
+    [JsonProperty("action")]
+    [Category("基础属性")]
     [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
-    public string? action
+    public string? Action
     {
         get => _action;
         set => SetNewProperty(ref _action, value);
     }
 
-    [Category("任务流程")]
+    [JsonProperty("next")]
+    [Category("基础属性")]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
-    public List<string>? next
+    public List<string>? Next
     {
         get => _next;
         set => SetNewProperty(ref _next, value);
     }
 
-    [Category("任务流程")]
-    [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
-    public bool? is_sub
+    [JsonProperty("interrupt")]
+    [Category("基础属性")]
+    [JsonConverter(typeof(SingleOrListConverter))]
+    [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
+    public List<string>? Interrupt
     {
-        get => _is_sub;
-        set => SetNewProperty(ref _is_sub, value);
+        get => _interrupt;
+        set => SetNewProperty(ref _interrupt, value);
     }
 
-    [Category("基本属性")]
-    [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
-    public bool? inverse
-    {
-        get => _inverse;
-        set => SetNewProperty(ref _inverse, value);
-    }
-
-    [Category("基本属性")]
-    [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
-    public bool? enabled
-    {
-        get => _enabled;
-        set => SetNewProperty(ref _enabled, value);
-    }
-
-    [Category("超时设置")]
+    [JsonProperty("timeout")]
+    [Category("基础属性")]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? timeout
+    public uint? Timeout
     {
         get => _timeout;
         set => SetNewProperty(ref _timeout, value);
     }
 
-    [Category("超时设置")]
+    [JsonProperty("on_error")]
+    [Category("基础属性")]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
-    public List<string>? timeout_next
+    public List<string>? On_Error
     {
-        get => _timeout_next;
-        set => SetNewProperty(ref _timeout_next, value);
+        get => _on_error;
+        set => SetNewProperty(ref _on_error, value);
     }
 
-    [Category("次数限制")]
+    [JsonProperty("inverse")]
+    [Category("基础属性")]
+    [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
+    public bool? Inverse
+    {
+        get => _inverse;
+        set => SetNewProperty(ref _inverse, value);
+    }
+
+    [JsonProperty("enabled")]
+    [Category("基础属性")]
+    [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
+    public bool? Enabled
+    {
+        get => _enabled;
+        set => SetNewProperty(ref _enabled, value);
+    }
+
+    [JsonProperty("pre_delay")]
+    [Category("基础属性")]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? times_limit
-    {
-        get => _times_limit;
-        set => SetNewProperty(ref _times_limit, value);
-    }
-
-    [Category("次数限制")]
-    [JsonConverter(typeof(SingleOrListConverter))]
-    [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
-    public List<string>? runout_next
-    {
-        get => _runout_next;
-        set => SetNewProperty(ref _runout_next, value);
-    }
-
-    [Category("延时设置")]
-    [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? pre_delay
+    public uint? Pre_Delay
     {
         get => _pre_delay;
         set => SetNewProperty(ref _pre_delay, value);
     }
 
-    [Category("延时设置")]
+    [JsonProperty("post_delay")]
+    [Category("基础属性")]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? post_delay
+    public uint? Post_Delay
     {
         get => _post_delay;
         set => SetNewProperty(ref _post_delay, value);
     }
 
+    [JsonProperty("pre_wait_freezes")]
     [Category("延时设置")]
     [Editor(typeof(NullableUIntStringEditor), typeof(NullableUIntStringEditor))]
-    public object? pre_wait_freezes
+    public object? Pre_Wait_Freezes
     {
         get => _pre_wait_freezes;
         set => SetNewProperty(ref _pre_wait_freezes, value);
     }
 
+    [JsonProperty("post_wait_freezes")]
     [Category("延时设置")]
     [Editor(typeof(NullableUIntStringEditor), typeof(NullableUIntStringEditor))]
-    public object? post_wait_freezes
+    public object? Post_Wait_Freezes
     {
         get => _post_wait_freezes;
         set => SetNewProperty(ref _post_wait_freezes, value);
     }
 
+    [JsonProperty("focus")]
     [Category("任务回调")]
     [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
-    public bool? focus
+    public bool? Focus
     {
         get => _focus;
         set => SetNewProperty(ref _focus, value);
     }
 
+    [JsonProperty("focus_tip")]
     [Category("任务回调")]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
-    public List<string>? focus_tip
+    public List<string>? Focus_Tip
     {
         get => _focus_tip;
         set => SetNewProperty(ref _focus_tip, value);
     }
 
+    [JsonProperty("focus_tip_color")]
     [Category("任务回调")]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
-    public List<string>? focus_tip_color
+    public List<string>? Focus_Tip_Color
     {
         get => _focus_tip_color;
         set => SetNewProperty(ref _focus_tip_color, value);
     }
 
-    [Category("文字匹配")]
-    [JsonConverter(typeof(SingleOrListConverter))]
-    [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
-    public List<string>? expected
-    {
-        get => _expected;
-        set => SetNewProperty(ref _expected, value);
-    }
-
-    [Category("文字匹配")]
-    [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
-    public bool? only_rec
-    {
-        get => _only_rec;
-        set => SetNewProperty(ref _only_rec, value);
-    }
-
-    [Category("文字匹配")]
-    [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
-    public List<string>? labels
-    {
-        get => _labels;
-        set => SetNewProperty(ref _labels, value);
-    }
-
-    [Category("文字匹配")]
-    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? model
-    {
-        get => _model;
-        set => SetNewProperty(ref _model, value);
-    }
-
-    [Category("动作匹配")]
-    [JsonConverter(typeof(TrueStringOrArrayConverter))]
-    [Editor(typeof(ListTrueIntStringEditor), typeof(ListTrueIntStringEditor))]
-    public object? target
-    {
-        get => _target;
-        set => SetNewProperty(ref _target, value);
-    }
-
-    [Category("动作匹配")]
-    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
-    public List<int>? target_offset
-    {
-        get => _target_offset;
-        set => SetNewProperty(ref _target_offset, value);
-    }
-
-    [Category("动作匹配")]
-    [JsonConverter(typeof(TrueStringOrArrayConverter))]
-    [Editor(typeof(ListTrueIntStringEditor), typeof(ListTrueIntStringEditor))]
-    public object? begin
-    {
-        get => _begin;
-        set => SetNewProperty(ref _begin, value);
-    }
-
-    [Category("动作匹配")]
-    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
-    public List<int>? begin_offset
-    {
-        get => _begin_offset;
-        set => SetNewProperty(ref _begin_offset, value);
-    }
-
-    [Category("动作匹配")]
-    [JsonConverter(typeof(TrueStringOrArrayConverter))]
-    [Editor(typeof(ListTrueIntStringEditor), typeof(ListTrueIntStringEditor))]
-    public object? end
-    {
-        get => _end;
-        set => SetNewProperty(ref _end, value);
-    }
-
-    [Category("动作匹配")]
-    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
-    public List<int>? end_offset
-    {
-        get => _end_offset;
-        set => SetNewProperty(ref _end_offset, value);
-    }
-
-    [Category("动作匹配")]
-    [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? duration
-    {
-        get => _duration;
-        set => SetNewProperty(ref _duration, value);
-    }
-
-    [Category("动作匹配")]
-    [JsonConverter(typeof(SingleOrIntListConverter))]
-    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
-    public List<int>? key
-    {
-        get => _key;
-        set => SetNewProperty(ref _key, value);
-    }
-
-    [Category("文本输入")]
-    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? input_text
-    {
-        get => _input_text;
-        set => SetNewProperty(ref _input_text, value);
-    }
-
-    [Category("App控制")]
-    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? package
-    {
-        get => _package;
-        set => SetNewProperty(ref _package, value);
-    }
-
-    [Category("自定义")]
-    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? custom_recognition
-    {
-        get => _custom_recognition;
-        set => SetNewProperty(ref _custom_recognition, value);
-    }
-
-    [Category("自定义")]
-    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? custom_recognition_param
-    {
-        get => _custom_recognition_param;
-        set => SetNewProperty(ref _custom_recognition_param, value);
-    }
-
-    [Category("自定义")]
-    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? custom_action
-    {
-        get => _custom_action;
-        set => SetNewProperty(ref _custom_action, value);
-    }
-
-    [Category("自定义")]
-    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? custom_action_param
-    {
-        get => _custom_action_param;
-        set => SetNewProperty(ref _custom_action_param, value);
-    }
-
-    [Category("排序")]
-    [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
-    public string? order_by
-    {
-        get => _order_by;
-        set => SetNewProperty(ref _order_by, value);
-    }
-
-    [Category("索引")]
-    [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
-    public int? index
-    {
-        get => _index;
-        set => SetNewProperty(ref _index, value);
-    }
-
-    [Category("算法选择")]
-    [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
-    public int? method
-    {
-        get => _method;
-        set => SetNewProperty(ref _method, value);
-    }
-
-    [Category("特征匹配")]
-    [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
-    public int? count
-    {
-        get => _count;
-        set => SetNewProperty(ref _count, value);
-    }
-
-    [Category("基本属性")]
-    [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
-    public bool? green_mask
-    {
-        get => _green_mask;
-        set => SetNewProperty(ref _green_mask, value);
-    }
-
-    [Category("检测器")]
-    [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
-    public string? detector
-    {
-        get => _detector;
-        set => SetNewProperty(ref _detector, value);
-    }
-
-    [Category("特征匹配")]
-    [Editor(typeof(NullableDoubleEditor), typeof(NullableDoubleEditor))]
-    public double? ratio
-    {
-        get => _ratio;
-        set => SetNewProperty(ref _ratio, value);
-    }
-
-    [Category("模板匹配")]
-    [JsonConverter(typeof(SingleOrListConverter))]
-    [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
-    public List<string>? template
-    {
-        get => _template;
-        set => SetNewProperty(ref _template, value);
-    }
-
-    [Category("基本属性")]
+    [JsonProperty("roi")]
+    [Category("识别器")]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
-    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
-    public object? roi
+    [Editor(typeof(AutoStringOrListIntStringEditor), typeof(AutoStringOrListIntStringEditor))]
+    public object? Roi
     {
         get => _roi;
         set => SetNewProperty(ref _roi, value);
     }
 
-    [Category("基本属性")]
+    [JsonProperty("roi_offset")]
+    [Category("识别器")]
+    [JsonConverter(typeof(SingleOrNestedListConverter))]
+    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
+    public object? Roi_Offset
+    {
+        get => _roi_offset;
+        set => SetNewProperty(ref _roi_offset, value);
+    }
+
+    [JsonProperty("template")]
+    [Category("识别器")]
+    [JsonConverter(typeof(SingleOrListConverter))]
+    [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
+    public List<string>? Template
+    {
+        get => _template;
+        set => SetNewProperty(ref _template, value);
+    }
+
+    [JsonProperty("threshold")]
+    [Category("识别器")]
     [Editor(typeof(NullableDoubleEditor), typeof(NullableDoubleEditor))]
-    public double? threshold
+    public double? Threshold
     {
         get => _threshold;
         set => SetNewProperty(ref _threshold, value);
     }
 
-    [Category("颜色匹配")]
+    [JsonProperty("order_by")]
+    [Category("识别器")]
+    [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
+    public string? Order_By
+    {
+        get => _order_by;
+        set => SetNewProperty(ref _order_by, value);
+    }
+
+    [JsonProperty("index")]
+    [Category("识别器")]
+    [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
+    public int? Index
+    {
+        get => _index;
+        set => SetNewProperty(ref _index, value);
+    }
+
+    [JsonProperty("method")]
+    [Category("识别器")]
+    [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
+    public int? Method
+    {
+        get => _method;
+        set => SetNewProperty(ref _method, value);
+    }
+
+    [JsonProperty("green_mask")]
+    [Category("识别器")]
+    [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
+    public bool? Green_Mask
+    {
+        get => _green_mask;
+        set => SetNewProperty(ref _green_mask, value);
+    }
+
+    [JsonProperty("count")]
+    [Category("识别器")]
+    [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
+    public int? Count
+    {
+        get => _count;
+        set => SetNewProperty(ref _count, value);
+    }
+
+    [JsonProperty("detector")]
+    [Category("识别器")]
+    [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
+    public string? Detector
+    {
+        get => _detector;
+        set => SetNewProperty(ref _detector, value);
+    }
+
+    [JsonProperty("ratio")]
+    [Category("识别器")]
+    [Editor(typeof(NullableDoubleEditor), typeof(NullableDoubleEditor))]
+    public double? Ratio
+    {
+        get => _ratio;
+        set => SetNewProperty(ref _ratio, value);
+    }
+
+    [JsonProperty("lower")]
+    [Category("识别器")]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
-    public object? lower
+    public object? Lower
     {
         get => _lower;
         set => SetNewProperty(ref _lower, value);
     }
 
-    [Category("颜色匹配")]
+    [JsonProperty("upper")]
+    [Category("识别器")]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
-    public object? upper
+    public object? Upper
     {
         get => _upper;
         set => SetNewProperty(ref _upper, value);
     }
 
-    [Category("颜色匹配")]
+    [JsonProperty("connected")]
+    [Category("识别器")]
     [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
-    public bool? connected
+    public bool? Connected
     {
         get => _connected;
         set => SetNewProperty(ref _connected, value);
+    }
+
+    [JsonProperty("expected")]
+    [Category("识别器")]
+    [JsonConverter(typeof(SingleOrListConverter))]
+    [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
+    public List<string>? Expected
+    {
+        get => _expected;
+        set => SetNewProperty(ref _expected, value);
+    }
+
+    [JsonProperty("replace")]
+    [Category("识别器")]
+    [JsonConverter(typeof(ReplaceConverter))]
+    [Editor(typeof(ListStringArrayEditor), typeof(ListStringArrayEditor))]
+    public List<string[]>? Replace
+    {
+        get => _replace;
+        set => SetNewProperty(ref _replace, value);
+    }
+
+    [JsonProperty("only_rec")]
+    [Category("识别器")]
+    [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
+    public bool? Only_Rec
+    {
+        get => _only_rec;
+        set => SetNewProperty(ref _only_rec, value);
+    }
+
+    [JsonProperty("model")]
+    [Category("识别器")]
+    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
+    public string? Model
+    {
+        get => _model;
+        set => SetNewProperty(ref _model, value);
+    }
+
+    [JsonProperty("labels")]
+    [Category("识别器")]
+    [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
+    public List<string>? Labels
+    {
+        get => _labels;
+        set => SetNewProperty(ref _labels, value);
+    }
+
+    [JsonProperty("custom_recognition")]
+    [Category("自定义")]
+    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
+    public string? Custom_Recognition
+    {
+        get => _custom_recognition;
+        set => SetNewProperty(ref _custom_recognition, value);
+    }
+
+    [JsonProperty("custom_recognition_param")]
+    [Category("自定义")]
+    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
+    public string? Custom_Recognition_Param
+    {
+        get => _custom_recognition_param;
+        set => SetNewProperty(ref _custom_recognition_param, value);
+    }
+
+    [JsonProperty("custom_action")]
+    [Category("自定义")]
+    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
+    public string? Custom_Action
+    {
+        get => _custom_action;
+        set => SetNewProperty(ref _custom_action, value);
+    }
+
+    [JsonProperty("custom_action_param")]
+    [Category("自定义")]
+    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
+    public string? Custom_Action_Param
+    {
+        get => _custom_action_param;
+        set => SetNewProperty(ref _custom_action_param, value);
+    }
+
+    [JsonProperty("target")]
+    [Category("动作")]
+    [JsonConverter(typeof(TrueStringOrArrayConverter))]
+    [Editor(typeof(ListTrueIntStringEditor), typeof(ListTrueIntStringEditor))]
+    public object? Target
+    {
+        get => _target;
+        set => SetNewProperty(ref _target, value);
+    }
+
+    [JsonProperty("target_offset")]
+    [Category("动作")]
+    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
+    public List<int>? Target_Offset
+    {
+        get => _target_offset;
+        set => SetNewProperty(ref _target_offset, value);
+    }
+
+    [JsonProperty("begin")]
+    [Category("动作")]
+    [JsonConverter(typeof(TrueStringOrArrayConverter))]
+    [Editor(typeof(ListTrueIntStringEditor), typeof(ListTrueIntStringEditor))]
+    public object? Begin
+    {
+        get => _begin;
+        set => SetNewProperty(ref _begin, value);
+    }
+
+    [JsonProperty("begin_offset")]
+    [Category("动作")]
+    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
+    public List<int>? Begin_Offset
+    {
+        get => _begin_offset;
+        set => SetNewProperty(ref _begin_offset, value);
+    }
+
+    [JsonProperty("end")]
+    [Category("动作")]
+    [JsonConverter(typeof(TrueStringOrArrayConverter))]
+    [Editor(typeof(ListTrueIntStringEditor), typeof(ListTrueIntStringEditor))]
+    public object? End
+    {
+        get => _end;
+        set => SetNewProperty(ref _end, value);
+    }
+
+    [JsonProperty("end_offset")]
+    [Category("动作")]
+    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
+    public List<int>? End_Offset
+    {
+        get => _end_offset;
+        set => SetNewProperty(ref _end_offset, value);
+    }
+
+    [JsonProperty("duration")]
+    [Category("动作")]
+    [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
+    public uint? Duration
+    {
+        get => _duration;
+        set => SetNewProperty(ref _duration, value);
+    }
+
+    [JsonProperty("key")]
+    [Category("动作")]
+    [JsonConverter(typeof(SingleOrIntListConverter))]
+    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
+    public List<int>? Key
+    {
+        get => _key;
+        set => SetNewProperty(ref _key, value);
+    }
+
+    [JsonProperty("input_text")]
+    [Category("动作")]
+    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
+    public string? Input_Text
+    {
+        get => _input_text;
+        set => SetNewProperty(ref _input_text, value);
+    }
+
+    [JsonProperty("package")]
+    [Category("动作")]
+    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
+    public string? Package
+    {
+        get => _package;
+        set => SetNewProperty(ref _package, value);
     }
 
     public override string ToString()
@@ -541,55 +597,38 @@ public class TaskModel : ObservableObject
 
     public TaskModel Reset()
     {
-        name = "未命名";
-        recognition = null;
-        action = null;
-        next = null;
-        is_sub = null;
-        inverse = null;
-        enabled = null;
-        timeout = null;
-        timeout_next = null;
-        times_limit = null;
-        runout_next = null;
-        pre_delay = null;
-        post_delay = null;
-        pre_wait_freezes = null;
-        post_wait_freezes = null;
-        focus = null;
-        focus_tip = null;
-        focus_tip_color = null;
-        expected = null;
-        only_rec = null;
-        labels = null;
-        model = null;
-        target = null;
-        target_offset = null;
-        begin = null;
-        begin_offset = null;
-        end = null;
-        end_offset = null;
-        duration = null;
-        key = null;
-        input_text = null;
-        package = null;
-        custom_recognition = null;
-        custom_recognition_param = null;
-        custom_action = null;
-        custom_action_param = null;
-        order_by = null;
-        index = null;
-        method = null;
-        count = null;
-        green_mask = null;
-        detector = null;
-        ratio = null;
-        template = null;
-        roi = null;
-        threshold = null;
-        lower = null;
-        upper = null;
-        connected = null;
+        var properties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(prop => prop.CanWrite);
+
+        foreach (var prop in properties)
+        {
+            var propType = prop.PropertyType;
+
+            if (propType.IsValueType)
+            {
+                if (Nullable.GetUnderlyingType(propType) != null)
+                {
+                    prop.SetValue(this, null);
+                }
+                else
+                {
+                    object defaultValue = Activator.CreateInstance(propType)!;
+                    prop.SetValue(this, defaultValue);
+                }
+            }
+            else
+            {
+                if (prop.Name.Equals(nameof(Name), StringComparison.OrdinalIgnoreCase))
+                {
+                    prop.SetValue(this, "未命名");
+                }
+                else
+                {
+                    prop.SetValue(this, null);
+                }
+            }
+        }
+
         return this;
     }
 

@@ -7,7 +7,7 @@ public class SingleOrNestedListConverter : JsonConverter
 {
     public override bool CanConvert(Type objectType)
     {
-        return objectType == typeof(List<int>) || objectType == typeof(List<List<int>>);
+        return objectType == typeof(List<int>) || objectType == typeof(List<List<int>>) || objectType == typeof(string);
     }
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
@@ -19,8 +19,13 @@ public class SingleOrNestedListConverter : JsonConverter
         {
             if (token.First is { Type: JTokenType.Array })
                 return token.ToObject<List<List<int>>>();
-            
+
             return token.ToObject<List<int>>();
+        }
+
+        if (token.Type == JTokenType.String)
+        {
+            return token.ToString();
         }
 
         throw new JsonSerializationException("Invalid JSON format for SingleOrNestedListConverter.");
@@ -35,6 +40,10 @@ public class SingleOrNestedListConverter : JsonConverter
         else if (value is List<int> singleList)
         {
             serializer.Serialize(writer, singleList);
+        }
+        else if (value is string s)
+        {
+            writer.WriteValue(s);
         }
         else
         {

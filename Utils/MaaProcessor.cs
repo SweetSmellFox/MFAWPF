@@ -22,7 +22,7 @@ namespace MFAWPF.Utils
         private static MaaProcessor? _instance;
         private CancellationTokenSource? _cancellationTokenSource;
         private bool _isStopped;
-        private MaaInstance? _currentInstance;
+        private MaaTasker? _currentTasker;
 
         public static string Resource => AppDomain.CurrentDomain.BaseDirectory + "Resource";
         public static string ModelResource => $"{Resource}/model/";
@@ -78,7 +78,7 @@ namespace MFAWPF.Utils
                 TaskQueue.Enqueue(task);
             OnTaskQueueChanged();
 
-            SetCurrentInstance();
+            SetCurrentTasker();
             if (MainWindow.Data != null)
                 MainWindow.Data.Idle = false;
 
@@ -90,7 +90,7 @@ namespace MFAWPF.Utils
                 MainWindow.Data?.AddLogByKey("ConnectingTo", null, MainWindow.Instance?.IsADB == true
                     ? "Simulator"
                     : "Window");
-                var instance = await Task.Run(GetCurrentInstance, token);
+                var instance = await Task.Run(GetCurrentTasker, token);
 
                 if (instance == null || !instance.Initialized)
                 {
@@ -116,7 +116,7 @@ namespace MFAWPF.Utils
                 TaskManager.RunTaskAsync(() =>
                 {
                     MainWindow.Data?.AddLogByKey("Stopping");
-                    if (_currentInstance == null || _currentInstance?.Abort() == true)
+                    if (_currentTasker == null || _currentTasker?.Abort() == true)
                     {
                         DisplayTaskCompletionMessage();
                         if (MainWindow.Data != null)
@@ -169,15 +169,15 @@ namespace MFAWPF.Utils
 
             foreach (var selectOption in options)
             {
-                if (MaaInterface.Instance?.option?.TryGetValue(selectOption.name ?? string.Empty,
+                if (MaaInterface.Instance?.Option?.TryGetValue(selectOption.Name ?? string.Empty,
                         out var interfaceOption) ==
                     true &&
                     MainWindow.Instance != null &&
-                    selectOption.index is int index &&
-                    interfaceOption.cases is { } cases &&
-                    cases[index]?.param != null)
+                    selectOption.Index is int index &&
+                    interfaceOption.Cases is { } cases &&
+                    cases[index]?.Pipeline_Override != null)
                 {
-                    var param = interfaceOption.cases[selectOption.index.Value].param;
+                    var param = interfaceOption.Cases[selectOption.Index.Value].Pipeline_Override;
                     MainWindow.Instance.TaskDictionary = MainWindow.Instance.TaskDictionary.MergeTaskModels(param);
                     taskModels = taskModels.MergeTaskModels(param);
                 }
@@ -232,7 +232,7 @@ namespace MFAWPF.Utils
 
         private async Task<bool> ExecuteTasks(CancellationToken token)
         {
-            MeasureExecutionTime(() => _currentInstance?.Controller.Screencap().Wait());
+            MeasureExecutionTime(() => _currentTasker?.Controller.Screencap().Wait());
             while (TaskQueue.Count > 0)
             {
                 if (token.IsCancellationRequested) return false;
@@ -244,7 +244,7 @@ namespace MFAWPF.Utils
                     {
                         var taskA = TaskQueue.Peek();
                         MainWindow.Data?.AddLogByKey("TaskStart", null, taskA.Name ?? string.Empty);
-                        if (!TryRunTasks(_currentInstance, taskA.Entry, taskA.Param))
+                        if (!TryRunTasks(_currentTasker, taskA.Entry, taskA.Param))
                         {
                             if (_isStopped) return false;
                             break;
@@ -279,14 +279,14 @@ namespace MFAWPF.Utils
             TaskStackChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        public MaaInstance? GetCurrentInstance()
+        public MaaTasker? GetCurrentTasker()
         {
-            return _currentInstance ??= InitializeMaaInstance();
+            return _currentTasker ??= InitializeMaaTasker();
         }
 
-        public void SetCurrentInstance(MaaInstance? instance = null)
+        public void SetCurrentTasker(MaaTasker? tasker = null)
         {
-            _currentInstance = instance;
+            _currentTasker = tasker;
         }
 
         public static string HandleStringsWithVariables(string content)
@@ -302,7 +302,7 @@ namespace MFAWPF.Utils
 
                     int value = AutoInitDictionary.GetValueOrDefault(counterKey, 0);
 
-                    // 前置操作符
+                    // 前置操作符7
                     if (prefix == "++")
                     {
                         value = ++AutoInitDictionary[counterKey];
@@ -353,7 +353,7 @@ namespace MFAWPF.Utils
             }
         }
 
-        private MaaInstance? InitializeMaaInstance()
+        private MaaTasker? InitializeMaaTasker()
         {
             AutoInitDictionary.Clear();
 
@@ -390,16 +390,16 @@ namespace MFAWPF.Utils
 
             LoggerService.LogInfo("InitControllerSuccess".GetLocalizationString());
 
-            var instance = new MaaInstance
+            var tasker = new MaaTasker()
             {
                 Controller = controller,
                 Resource = maaResource,
                 DisposeOptions = DisposeOptions.All,
             };
 
-            RegisterCustomRecognizersAndActions(instance);
+            RegisterCustomRecognizersAndActions(tasker);
 
-            return instance;
+            return tasker;
         }
 
         private IMaaController<nint> InitializeController()
@@ -408,44 +408,44 @@ namespace MFAWPF.Utils
                 ? new MaaAdbController(
                     Config.Adb.Adb,
                     Config.Adb.AdbAddress,
-                    Config.Adb.ControlType,
+                    Config.Adb.ScreenCap, Config.Adb.Input,
                     !string.IsNullOrWhiteSpace(Config.Adb.AdbConfig) ? Config.Adb.AdbConfig : AdbConfig,
                     $"{Resource}/MaaAgentBinary",
                     LinkOption.Start,
                     CheckStatusOption.None)
                 : new MaaWin32Controller(
                     Config.Win32.HWnd,
-                    Config.Win32.ControlType,
+                    Config.Win32.ScreenCap, Config.Win32.Input,
                     Config.Win32.Link,
                     Config.Win32.Check);
         }
 
-        private void RegisterCustomRecognizersAndActions(MaaInstance instance)
+        private void RegisterCustomRecognizersAndActions(MaaTasker instance)
         {
             if (MaaInterface.Instance == null) return;
             LoggerService.LogInfo("RegisteringCustomRecognizer".GetLocalizationString());
 
-            foreach (var recognizer in MaaInterface.Instance.CustomRecognizerExecutors)
-            {
-                LoggerService.LogInfo($"RegisterCustomRecognizer".GetLocalizationString().FormatWith(recognizer.Name));
-                instance.Toolkit.ExecAgent.Register(instance, recognizer);
-            }
+            // foreach (var recognizer in MaaInterface.Instance.CustomRecognizerExecutors)
+            // {
+            //     LoggerService.LogInfo($"RegisterCustomRecognizer".GetLocalizationString().FormatWith(recognizer.Name));
+            //     instance.Toolkit.ExecAgent.Register(instance, recognizer);
+            // }
+            //
+            // LoggerService.LogInfo("RegisteringCustomAction".GetLocalizationString());
+            // foreach (var action in MaaInterface.Instance.CustomActionExecutors)
+            // {
+            //     LoggerService.LogInfo("RegisterCustomAction".GetLocalizationString().FormatWith(action.Name));
+            //     instance.Toolkit.ExecAgent.Register(instance, action);
+            // }
 
-            LoggerService.LogInfo("RegisteringCustomAction".GetLocalizationString());
-            foreach (var action in MaaInterface.Instance.CustomActionExecutors)
-            {
-                LoggerService.LogInfo("RegisterCustomAction".GetLocalizationString().FormatWith(action.Name));
-                instance.Toolkit.ExecAgent.Register(instance, action);
-            }
-
-            instance.Register(new MoneyRecognizer());
-            instance.Register(new MoneyDetectRecognizer());
+            instance.Resource.Register(new MoneyRecognition());
+            instance.Resource.Register(new MoneyDetectRecognizer());
 
             instance.Callback += (_, args) =>
             {
                 var jObject = JObject.Parse(args.Details);
                 string name = jObject["name"]?.ToString() ?? string.Empty;
-                if (args.Message.Equals(MaaMsg.Task.Focus.Completed))
+                if (args.Message.Equals(MaaMsg.Task.Action.Succeeded))
                 {
                     if (MainWindow.Instance?.TaskDictionary.TryGetValue(name, out var taskModel) == true)
                     {
@@ -459,16 +459,16 @@ namespace MFAWPF.Utils
         {
             var converter = new BrushConverter();
 
-            if (taskModel.focus_tip != null)
+            if (taskModel.Focus_Tip != null)
             {
-                for (int i = 0; i < taskModel.focus_tip.Count; i++)
+                for (int i = 0; i < taskModel.Focus_Tip.Count; i++)
                 {
                     Brush? brush = null;
-                    var tip = taskModel.focus_tip[i];
+                    var tip = taskModel.Focus_Tip[i];
                     try
                     {
-                        if (taskModel.focus_tip_color != null && taskModel.focus_tip_color.Count > i)
-                            brush = converter.ConvertFromString(taskModel.focus_tip_color[i]) as Brush;
+                        if (taskModel.Focus_Tip_Color != null && taskModel.Focus_Tip_Color.Count > i)
+                            brush = converter.ConvertFromString(taskModel.Focus_Tip_Color[i]) as Brush;
                     }
                     catch (Exception e)
                     {
@@ -497,7 +497,7 @@ namespace MFAWPF.Utils
 
         public BitmapImage? GetBitmapImage()
         {
-            using var buffer = GetImage(GetCurrentInstance()?.Controller);
+            using var buffer = GetImage(GetCurrentTasker()?.Controller);
             if (buffer == null) return null;
 
             var encodedDataHandle = buffer.GetEncodedData(out var size);
@@ -531,11 +531,11 @@ namespace MFAWPF.Utils
             return bitmapImage;
         }
 
-        private bool TryRunTasks(MaaInstance? maa, string? task, string? taskParams)
+        private bool TryRunTasks(MaaTasker? maa, string? task, string? taskParams)
         {
             if (maa == null || task == null) return false;
             if (string.IsNullOrWhiteSpace(taskParams)) taskParams = "{}";
-            return maa.AppendTask(task, taskParams).Wait() == MaaJobStatus.Success;
+            return maa.AppendPipeline(task, taskParams).Wait() == MaaJobStatus.Succeeded;
         }
 
         private static MaaImageBuffer GetImage(IMaaController? maaController)
@@ -545,9 +545,9 @@ namespace MFAWPF.Utils
                 return buffer;
             var status = maaController.Screencap().Wait();
             Console.WriteLine(status);
-            if (status != MaaJobStatus.Success)
+            if (status != MaaJobStatus.Succeeded)
                 return buffer;
-            maaController.GetImage(buffer);
+            maaController.GetCachedImage(buffer);
             return buffer;
         }
     }

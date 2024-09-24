@@ -31,7 +31,22 @@ public class ListAutoStringEditor : PropertyEditorBase
     // 动态设置 ItemsSource，根据字段名称定制选项
     private IEnumerable? GetItemsSource(PropertyItem propertyItem)
     {
-        if (propertyItem.PropertyName.Contains("next"))
+        if (propertyItem.PropertyName.Equals("next"))
+        {
+            return MainWindow.TaskDialog?.Data?.DataList;
+        }
+
+        if (propertyItem.PropertyName.Equals("on_error"))
+        {
+            return MainWindow.TaskDialog?.Data?.DataList;
+        }
+
+        if (propertyItem.PropertyName.Equals("interrupt"))
+        {
+            return MainWindow.TaskDialog?.Data?.DataList;
+        }
+
+        if (propertyItem.PropertyName.Equals("roi"))
         {
             return MainWindow.TaskDialog?.Data?.DataList;
         }
@@ -47,7 +62,22 @@ public class ListAutoStringEditor : PropertyEditorBase
     // 根据属性的字段名称，动态返回不同的 DisplayMemberPath
     private string GetDisplayMemberPath(PropertyItem propertyItem)
     {
-        if (propertyItem.PropertyName.Contains("next"))
+        if (propertyItem.PropertyName.Equals("next"))
+        {
+            return "Name";
+        }
+
+        if (propertyItem.PropertyName.Equals("on_error"))
+        {
+            return "Name";
+        }
+
+        if (propertyItem.PropertyName.Equals("interrupt"))
+        {
+            return "Name";
+        }
+
+        if (propertyItem.PropertyName.Equals("roi"))
         {
             return "Name";
         }

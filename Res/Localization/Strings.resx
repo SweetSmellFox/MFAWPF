@@ -102,7 +102,7 @@
     <data name="LanguageOption" xml:space="preserve">
   <value>语言(Language)</value>
 </data>
-    <data name="TouchModeOption" xml:space="preserve">
+    <data name="InputModeOption" xml:space="preserve">
   <value>触控模式</value>
 </data>
     <data name="CaptureModeOption" xml:space="preserve">
@@ -129,7 +129,7 @@
     <data name="EmulatorSelectionMessage" xml:space="preserve">
   <value>已选择模拟器:{0}</value>
 </data>
-    <data name="AdbTouchMode" xml:space="preserve">
+    <data name="AdbInputMode" xml:space="preserve">
   <value>触控模式:</value>
 </data>
     <data name="AdbCaptureMode" xml:space="preserve">

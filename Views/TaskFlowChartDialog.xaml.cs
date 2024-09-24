@@ -40,9 +40,9 @@ public partial class TaskFlowChartDialog
                 _vertexTaskMapping[vertex.Name] = task;
             }
 
-            if (task.Task is { next: not null })
+            if (task.Task is { Next: not null })
             {
-                AddEdges(graph, vertexDictionary, task.Task.next, vertexDictionary[task.Name], "Normal");
+                AddEdges(graph, vertexDictionary, task.Task.Next, vertexDictionary[task.Name], "Normal");
             }
         }
 

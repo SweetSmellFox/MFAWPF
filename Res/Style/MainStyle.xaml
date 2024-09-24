@@ -16,9 +16,29 @@
                               Height="10" Width="10" Stretch="Uniform" />
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="Tag" Value="IsCloseButton">
-                            <Setter TargetName="bd" Property="CornerRadius" Value="8 0 0 0" />
-                        </Trigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition
+                                    Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    Value="Maximized" />
+                                <Condition Binding="{Binding Tag, RelativeSource={RelativeSource Self}}"
+                                           Value="IsCloseButton" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="bd" Property="CornerRadius" Value="0" />
+                        </MultiDataTrigger>
+
+                        <!-- 窗口正常状态，且为关闭按钮时，使用圆角 -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition
+                                    Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    Value="Normal" />
+                                <Condition Binding="{Binding Tag, RelativeSource={RelativeSource Self}}"
+                                           Value="IsCloseButton" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="bd" Property="CornerRadius" Value="8,0,0,0" />
+                        </MultiDataTrigger>
+
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Background" Value="{DynamicResource GrayColor5}" />
                         </Trigger>

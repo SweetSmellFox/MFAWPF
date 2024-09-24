@@ -112,7 +112,23 @@ public class CustomWindow : Window
 
     protected void btnRestore_Click(object sender, RoutedEventArgs e)
     {
-        WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
+        var titleBar = FindName("TitleBar") as FrameworkElement;
+        if (WindowState == WindowState.Normal)
+        {
+            var workingArea = SystemParameters.WorkArea;
+
+            MaxHeight = workingArea.Height + 8;
+
+            WindowState = WindowState.Maximized;
+
+            if (titleBar != null) titleBar.Margin = new Thickness(6, 5, 6, 0);
+        }
+        else
+        {
+            if (titleBar != null)
+                titleBar.Margin = new Thickness(0);
+            WindowState = WindowState.Normal;
+        }
     }
 
     protected void btnMinimize_Click(object sender, RoutedEventArgs e)

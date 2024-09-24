@@ -108,7 +108,7 @@ public class EditTaskDialogViewModel : ObservableObject
         {
             if (value?.Task != null && Dialog != null)
             {
-                Dialog.TaskName.Text = value.Task.name;
+                Dialog.TaskName.Text = value.Task.Name;
                 Dialog.PropertyGrid.SelectedObject = value.Task;
             }
 
@@ -147,7 +147,7 @@ public class EditTaskDialogViewModel : ObservableObject
                         return;
                     foreach (var VARIABLE in taskModels)
                     {
-                        VARIABLE.Value.name = VARIABLE.Key;
+                        VARIABLE.Value.Name = VARIABLE.Key;
                         var newItem = new TaskItemViewModel()
                         {
                             Name = VARIABLE.Key, Task = VARIABLE.Value

@@ -75,7 +75,7 @@ public class DragDropHandler : IDropTarget
                 }
 
                 if (MaaInterface.Instance != null)
-                    MaaInterface.Instance.task = tasks;
+                    MaaInterface.Instance.Task = tasks;
                 // 保存当前的 ItemsSource 到 JSON
                 JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory,"interface", MaaInterface.Instance);
             }

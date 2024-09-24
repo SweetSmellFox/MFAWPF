@@ -26,8 +26,8 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
                     {
                         list.Add(new MaaInterface.MaaInterfaceSelectOption
                         {
-                            name = item.ToString(),
-                            index = 0
+                            Name = item.ToString(),
+                            Index = 0
                         });
                     }
 
@@ -41,7 +41,7 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
                 {
                     new()
                     {
-                        name = oName ?? ""
+                        Name = oName ?? ""
                     }
                 };
         }
@@ -59,8 +59,8 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
             {
                 JObject obj = new JObject
                 {
-                    ["name"] = option.name,
-                    ["index"] = option.index ?? 1
+                    ["name"] = option.Name,
+                    ["index"] = option.Index ?? 1
                 };
                 array.Add(obj);
             }

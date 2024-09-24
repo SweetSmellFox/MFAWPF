@@ -32,7 +32,7 @@
         BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="30" />
+                <RowDefinition Height="34" />
                 <RowDefinition />
                 <RowDefinition Height="15" />
             </Grid.RowDefinitions>

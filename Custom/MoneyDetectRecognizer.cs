@@ -6,16 +6,15 @@ using MFAWPF.Views;
 
 namespace MFAWPF.Custom;
 
-public class MoneyDetectRecognizer : IMaaCustomRecognizer
+public class MoneyDetectRecognizer : IMaaCustomRecognition
 {
     public string Name { get; set; } = nameof(MoneyDetectRecognizer);
 
-    public bool Analyze(in IMaaSyncContext syncContext, IMaaImageBuffer image, string taskName,
-        string customRecognitionParam, in IMaaRectBuffer outBox, in IMaaStringBuffer outDetail)
+    public bool Analyze(in IMaaContext context, in AnalyzeArgs args, in AnalyzeResults results)
     {
-        MaaImageBuffer? imageBuffer = image as MaaImageBuffer;
+        MaaImageBuffer? imageBuffer = args.Image as MaaImageBuffer;
         string text =
-            OCRHelper.ReadTextFromMAASyncContext(syncContext, imageBuffer ?? new MaaImageBuffer(), 466, 299, 131, 63);
+            OCRHelper.ReadTextFromMAASyncContext(context, imageBuffer ?? new MaaImageBuffer(), 466, 299, 131, 63);
         if (int.TryParse(text, out var currentMoney))
         {
             Console.WriteLine($"存钱后余额：{currentMoney}");

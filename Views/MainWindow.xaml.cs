@@ -15,6 +15,7 @@ using MaaFramework.Binding;
 using MFAWPF.Controls;
 using MFAWPF.Data;
 using MFAWPF.Utils;
+using MFAWPF.Utils.Converters;
 using MFAWPF.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -79,34 +80,32 @@ namespace MFAWPF.Views
                     File.WriteAllText($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json",
                         JsonConvert.SerializeObject(new MaaInterface()
                         {
-                            version = new MaaInterface.MaaResourceVersion()
-                            {
-                                name = "Debug", version = "1.0"
-                            },
-                            task = new List<TaskInterfaceItem>(),
-                            resource = new List<MaaInterface.MaaCustomResource>
+                            Version = "1.0",
+                            Name = "Debug",
+                            Task = new List<TaskInterfaceItem>(),
+                            Resource = new List<MaaInterface.MaaCustomResource>
                             {
                                 new()
                                 {
-                                    name = "默认", path = new List<string> { "{PROJECT_DIR}/resource/base" }
+                                    Name = "默认", Path = new List<string> { "{PROJECT_DIR}/resource/base" }
                                 }
                             },
-                            recognizer = new Dictionary<string, MaaInterface.CustomExecutor>(),
-                            action = new Dictionary<string, MaaInterface.CustomExecutor>(),
-                            option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
+                            Recognition = new Dictionary<string, MaaInterface.CustomExecutor>(),
+                            Action = new Dictionary<string, MaaInterface.CustomExecutor>(),
+                            Option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
                             {
                                 {
                                     "测试", new MaaInterface.MaaInterfaceOption()
                                     {
-                                        cases = new List<MaaInterface.MaaInterfaceOptionCase>
+                                        Cases = new List<MaaInterface.MaaInterfaceOptionCase>
                                         {
                                             new()
                                             {
-                                                name = "测试1", param = new Dictionary<string, TaskModel>()
+                                                Name = "测试1", Pipeline_Override = new Dictionary<string, TaskModel>()
                                             },
                                             new()
                                             {
-                                                name = "测试2", param = new Dictionary<string, TaskModel>()
+                                                Name = "测试2", Pipeline_Override = new Dictionary<string, TaskModel>()
                                             }
                                         }
                                     }
@@ -132,7 +131,7 @@ namespace MFAWPF.Views
             if (MaaInterface.Instance != null)
             {
                 Data?.TasksSource.Clear();
-                LoadTasks(MaaInterface.Instance.task ?? new List<TaskInterfaceItem>());
+                LoadTasks(MaaInterface.Instance.Task ?? new List<TaskInterfaceItem>());
             }
 
             ConnectToMAA();
@@ -287,7 +286,7 @@ namespace MFAWPF.Views
                                     {
                                         "MFAWPF", new TaskModel()
                                         {
-                                            action = "DoNothing"
+                                            Action = "DoNothing"
                                         }
                                     }
                                 }, new JsonSerializerSettings()
@@ -324,7 +323,7 @@ namespace MFAWPF.Views
             TaskDictionary = taskDictionary;
             foreach (var task in taskDictionary)
             {
-                task.Value.name = task.Key;
+                task.Value.Name = task.Key;
                 ValidateTaskLinks(taskDictionary, task);
                 Data?.SourceItems.Add(new TaskItemViewModel { Task = task.Value });
             }
@@ -333,9 +332,9 @@ namespace MFAWPF.Views
         private void ValidateTaskLinks(Dictionary<string, TaskModel> taskDictionary,
             KeyValuePair<string, TaskModel> task)
         {
-            ValidateNextTasks(taskDictionary, task.Value.next);
-            ValidateNextTasks(taskDictionary, task.Value.runout_next, "runout_next");
-            ValidateNextTasks(taskDictionary, task.Value.timeout_next, "timeout_next");
+            ValidateNextTasks(taskDictionary, task.Value.Next);
+            ValidateNextTasks(taskDictionary, task.Value.On_Error, "on_error");
+            ValidateNextTasks(taskDictionary, task.Value.Interrupt, "interrupt");
         }
 
         private void ValidateNextTasks(Dictionary<string, TaskModel> taskDictionary, object? nextTasks,
@@ -377,10 +376,14 @@ namespace MFAWPF.Views
             if (IsFirstStart && "adb".Equals(MaaProcessor.Config.Adb.Adb) &&
                 DataSet.TryGetData<JObject>("Adb", out var jObject))
             {
-                var device = jObject?.ToObject<DeviceInfo>();
+                var settings = new JsonSerializerSettings();
+                settings.Converters.Add(new AdbInputMethodsConverter());
+                settings.Converters.Add(new AdbScreencapMethodsConverter());
+
+                var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
                 if (device != null)
                 {
-                    deviceComboBox.ItemsSource = new List<DeviceInfo> { device };
+                    deviceComboBox.ItemsSource = new List<AdbDeviceInfo> { device };
                     deviceComboBox.SelectedIndex = 0;
                     MaaProcessor.Config.IsConnected = true;
                     if (DataSet.GetData("AutoStartIndex", 0) == 1)
@@ -391,7 +394,7 @@ namespace MFAWPF.Views
             }
             else AutoDetectDevice();
 
-            MaaProcessor.Instance.SetCurrentInstance();
+            MaaProcessor.Instance.SetCurrentTasker();
             if (ConnectSettingButton.IsChecked == true)
             {
                 ConfigureSettingsPanel();
@@ -400,21 +403,21 @@ namespace MFAWPF.Views
 
         private void DeviceComboBox_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (deviceComboBox.SelectedItem is WindowInfo window)
+            if (deviceComboBox.SelectedItem is DesktopWindowInfo window)
             {
                 Growl.Info(string.Format(LocExtension.GetLocalizedValue<string>("WindowSelectionMessage"),
                     window.Name));
                 MaaProcessor.Config.Win32.HWnd = window.Handle;
-                MaaProcessor.Instance.SetCurrentInstance();
+                MaaProcessor.Instance.SetCurrentTasker();
             }
-            else if (deviceComboBox.SelectedItem is DeviceInfo device)
+            else if (deviceComboBox.SelectedItem is AdbDeviceInfo device)
             {
                 Growl.Info(string.Format(LocExtension.GetLocalizedValue<string>("EmulatorSelectionMessage"),
                     device.Name));
                 MaaProcessor.Config.Adb.Adb = device.AdbPath;
                 MaaProcessor.Config.Adb.AdbAddress = device.AdbSerial;
-                MaaProcessor.Config.Adb.AdbConfig = device.AdbConfig;
-                MaaProcessor.Instance.SetCurrentInstance();
+                MaaProcessor.Config.Adb.AdbConfig = device.Config;
+                MaaProcessor.Instance.SetCurrentTasker();
                 DataSet.SetData("Adb", device);
             }
         }
@@ -436,9 +439,9 @@ namespace MFAWPF.Views
                 MaaProcessor.Config.IsConnected = false;
                 if (IsADB)
                 {
-                    var devices = await _maaToolkit.Device.FindAsync();
+                    var devices = await _maaToolkit.AdbDevice.FindAsync();
                     deviceComboBox.ItemsSource = devices;
-                    MaaProcessor.Config.IsConnected = devices.Length > 0;
+                    MaaProcessor.Config.IsConnected = devices.Count > 0;
                     deviceComboBox.SelectedIndex = 0;
                     if (IsFirstStart && DataSet.GetData("AutoStartIndex", 0) == 1)
                     {
@@ -448,11 +451,11 @@ namespace MFAWPF.Views
                 }
                 else
                 {
-                    var windows = _maaToolkit.Win32.Window.ListWindows().ToList();
+                    var windows = _maaToolkit.Desktop.Window.Find();
                     deviceComboBox.ItemsSource = windows;
                     MaaProcessor.Config.IsConnected = windows.Count > 0;
                     deviceComboBox.SelectedIndex = windows.Count > 0
-                        ? windows.FindIndex(win => !string.IsNullOrWhiteSpace(win.Name))
+                        ? windows.ToList().FindIndex(win => !string.IsNullOrWhiteSpace(win.Name))
                         : 0;
                 }
 
@@ -468,6 +471,8 @@ namespace MFAWPF.Views
                 Growls.WarningGlobal(string.Format(LocExtension.GetLocalizedValue<string>("TaskStackError"),
                     IsADB ? "Simulator".GetLocalizationString() : "Window".GetLocalizationString(), ex.Message));
                 MaaProcessor.Config.IsConnected = false;
+                LoggerService.LogError(ex);
+                Console.WriteLine(ex);
             }
         }
 
@@ -495,24 +500,24 @@ namespace MFAWPF.Views
             {
                 AddSettingOption(s1, "CaptureModeOption",
                     [
-                        "ScreencapFastestLosslessWay", "ScreencapRawWithGzip", "ScreencapFastestWayCompatible",
-                        "ScreencapRawByNetcat", "ScreencapEncode", "ScreencapEncodeToFile", "ScreencapMinicapDirect",
-                        "ScreencapMinicapStream", "ScreencapEmulatorExtras", "ScreencapFastestWay"
+                        "Default", "RawWithGzip", "RawByNetcat",
+                        "Encode", "EncodeToFileAndPull", "MinicapDirect", "MinicapStream",
+                        "EmulatorExtras"
                     ],
                     "AdbControlScreenCapType", 0);
-                AddBindSettingOption(s1, "TouchModeOption",
+                AddBindSettingOption(s1, "InputModeOption",
                     ["MiniTouch", "MaaTouch", "AdbInput", "AutoDetect"],
-                    "AdbControlTouchType", 0);
+                    "AdbControlInputType", 0);
             }
             else
             {
                 AddSettingOption(s1, "CaptureModeOption",
-                    ["ScreencapDXGIFramePool", "ScreencapDXGIDesktopDup", "ScreencapGDI"],
+                    ["FramePool", "DXGIDesktopDup", "GDI"],
                     "Win32ControlScreenCapType", 0);
 
-                AddSettingOption(s1, "TouchModeOption",
+                AddSettingOption(s1, "InputModeOption",
                     ["Seize", "SendMessage"],
-                    "Win32ControlTouchType", 0);
+                    "Win32ControlInputType", 0);
             }
 
             AddThemeOption(s1);
@@ -576,8 +581,8 @@ namespace MFAWPF.Views
             comboBox.BindLocalization("ResourceOption");
             comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
-            if (MaaInterface.Instance?.resource != null)
-                comboBox.ItemsSource = MaaInterface.Instance.resource;
+            if (MaaInterface.Instance?.Resource != null)
+                comboBox.ItemsSource = MaaInterface.Instance.Resource;
             comboBox.SelectionChanged += (sender, _) =>
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
@@ -677,7 +682,7 @@ namespace MFAWPF.Views
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
                 DataSet.SetData(datatype, index);
-                MaaProcessor.Instance.SetCurrentInstance();
+                MaaProcessor.Instance.SetCurrentTasker();
             };
 
             panel?.Children.Add(comboBox);
@@ -712,7 +717,7 @@ namespace MFAWPF.Views
             {
                 var index = (sender as ComboBox)?.SelectedIndex ?? 0;
                 DataSet.SetData(datatype, index);
-                MaaProcessor.Instance.SetCurrentInstance();
+                MaaProcessor.Instance.SetCurrentTasker();
             };
 
             panel?.Children.Add(comboBox);
@@ -766,13 +771,13 @@ namespace MFAWPF.Views
 
         private void AddOption(MaaInterface.MaaInterfaceSelectOption option, DragItemViewModel source)
         {
-            if (MaaInterface.Instance != null && MaaInterface.Instance.option != null && option.name != null)
+            if (MaaInterface.Instance != null && MaaInterface.Instance.Option != null && option.Name != null)
             {
-                if (MaaInterface.Instance.option.TryGetValue(option.name, out var interfaceOption))
+                if (MaaInterface.Instance.Option.TryGetValue(option.Name, out var interfaceOption))
                 {
                     ComboBox comboBox = new ComboBox
                     {
-                        SelectedIndex = option.index ?? 0, Style = FindResource("ComboBoxExtend") as Style,
+                        SelectedIndex = option.Index ?? 0, Style = FindResource("ComboBoxExtend") as Style,
                         DisplayMemberPath = "name", Margin = new Thickness(5),
                     };
 
@@ -785,18 +790,18 @@ namespace MFAWPF.Views
                     multiBinding.Bindings.Add(new Binding("IsCheckedWithNull") { Source = source });
                     multiBinding.Bindings.Add(new Binding("Idle") { Source = Data });
 
-                    comboBox.SetBinding(ComboBox.IsEnabledProperty, multiBinding);
+                    comboBox.SetBinding(IsEnabledProperty, multiBinding);
 
-                    comboBox.ItemsSource = interfaceOption.cases;
+                    comboBox.ItemsSource = interfaceOption.Cases;
 
-                    comboBox.Tag = option.name;
+                    comboBox.Tag = option.Name;
                     comboBox.SelectionChanged += (_, _) =>
                     {
-                        option.index = comboBox.SelectedIndex;
+                        option.Index = comboBox.SelectedIndex;
 
                         DataSet.SetData("Tasks", Data?.TaskItemViewModels.ToList());
                     };
-                    comboBox.SetValue(InfoElement.TitleProperty, option.name);
+                    comboBox.SetValue(InfoElement.TitleProperty, option.Name);
                     comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
                     settingPanel.Children.Add(comboBox);
                 }
@@ -825,7 +830,7 @@ namespace MFAWPF.Views
                 numericUpDown.SetBinding(ComboBox.IsEnabledProperty, multiBinding);
 
                 numericUpDown.Tag = source.Name;
-                numericUpDown.ValueChanged += (sender, args) =>
+                numericUpDown.ValueChanged += (_, _) =>
                 {
                     source.InterfaceItem.repeat_count = Convert.ToInt16(numericUpDown.Value);
                     JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
@@ -900,14 +905,14 @@ namespace MFAWPF.Views
         {
             if (IsADB)
             {
-                var adbTouchType = ConfigureAdbControllerTypes();
+                var adbInputType = ConfigureAdbInputTypes();
                 var adbScreenCapType = ConfigureAdbScreenCapTypes();
 
-                MaaProcessor.Config.Adb.Touch = adbTouchType;
+                MaaProcessor.Config.Adb.Input = adbInputType;
                 MaaProcessor.Config.Adb.ScreenCap = adbScreenCapType;
 
                 Console.WriteLine(
-                    $"{LocExtension.GetLocalizedValue<string>("AdbTouchMode")}{adbTouchType},{LocExtension.GetLocalizedValue<string>("AdbCaptureMode")}{adbScreenCapType}");
+                    $"{LocExtension.GetLocalizedValue<string>("AdbInputMode")}{adbInputType},{LocExtension.GetLocalizedValue<string>("AdbCaptureMode")}{adbScreenCapType}");
             }
         }
 
@@ -918,32 +923,30 @@ namespace MFAWPF.Views
             return ConfigureWin32ScreenCapTypes().ToString();
         }
 
-        private AdbControllerTypes ConfigureAdbControllerTypes()
+        private AdbInputMethods ConfigureAdbInputTypes()
         {
-            return DataSet.GetData("AdbControlTouchType", 0) switch
+            return DataSet.GetData("AdbControlInputType", 0) switch
             {
-                0 => AdbControllerTypes.InputPresetMiniTouch,
-                1 => AdbControllerTypes.InputPresetMaaTouch,
-                2 => AdbControllerTypes.InputPresetAdb,
-                3 => AdbControllerTypes.InputPresetAutoDetect,
+                0 => AdbInputMethods.MinitouchAndAdbKey,
+                1 => AdbInputMethods.Maatouch,
+                2 => AdbInputMethods.AdbShell,
+                3 => AdbInputMethods.All,
                 _ => 0
             };
         }
 
-        private AdbControllerTypes ConfigureAdbScreenCapTypes()
+        private AdbScreencapMethods ConfigureAdbScreenCapTypes()
         {
             return DataSet.GetData("AdbControlScreenCapType", 0) switch
             {
-                0 => AdbControllerTypes.ScreencapFastestLosslessWay,
-                1 => AdbControllerTypes.ScreencapRawWithGzip,
-                2 => AdbControllerTypes.ScreencapFastestWayCompatible,
-                3 => AdbControllerTypes.ScreencapRawByNetcat,
-                4 => AdbControllerTypes.ScreencapEncode,
-                5 => AdbControllerTypes.ScreencapEncodeToFile,
-                6 => AdbControllerTypes.ScreencapMinicapDirect,
-                7 => AdbControllerTypes.ScreencapMinicapStream,
-                8 => AdbControllerTypes.ScreencapEmulatorExtras,
-                9 => AdbControllerTypes.ScreencapFastestWay,
+                0 => AdbScreencapMethods.Default,
+                1 => AdbScreencapMethods.RawWithGzip,
+                2 => AdbScreencapMethods.RawByNetcat,
+                3 => AdbScreencapMethods.Encode,
+                4 => AdbScreencapMethods.EncodeToFileAndPull,
+                5 => AdbScreencapMethods.MinicapDirect,
+                6 => AdbScreencapMethods.MinicapStream,
+                7 => AdbScreencapMethods.EmulatorExtras,
                 _ => 0
             };
         }
@@ -952,36 +955,36 @@ namespace MFAWPF.Views
         {
             if (!IsADB)
             {
-                var winTouchType = ConfigureWin32ControllerTypes();
+                var win32InputType = ConfigureWin32InputTypes();
                 var winScreenCapType = ConfigureWin32ScreenCapTypes();
 
-                MaaProcessor.Config.Win32.Touch = winTouchType;
+                MaaProcessor.Config.Win32.Input = win32InputType;
                 MaaProcessor.Config.Win32.ScreenCap = winScreenCapType;
 
                 Console.WriteLine(
-                    $"{"AdbTouchMode".GetLocalizationString()}{winTouchType},{"AdbCaptureMode".GetLocalizationString()}{winScreenCapType}");
+                    $"{"AdbInputMode".GetLocalizationString()}{win32InputType},{"AdbCaptureMode".GetLocalizationString()}{winScreenCapType}");
                 LoggerService.LogInfo(
-                    $"{"AdbTouchMode".GetLocalizationString()}{winTouchType},{"AdbCaptureMode".GetLocalizationString()}{winScreenCapType}");
+                    $"{"AdbInputMode".GetLocalizationString()}{win32InputType},{"AdbCaptureMode".GetLocalizationString()}{winScreenCapType}");
             }
         }
 
-        private Win32ControllerTypes ConfigureWin32ControllerTypes()
+        private Win32ScreencapMethod ConfigureWin32ScreenCapTypes()
         {
-            return DataSet.GetData("Win32ControlTouchType", 0) switch
+            return DataSet.GetData("Win32ControlScreenCapType", 0) switch
             {
-                0 => Win32ControllerTypes.ScreencapDXGIFramePool,
-                1 => Win32ControllerTypes.ScreencapDXGIDesktopDup,
-                2 => Win32ControllerTypes.ScreencapGDI,
+                0 => Win32ScreencapMethod.FramePool,
+                1 => Win32ScreencapMethod.DXGIDesktopDup,
+                2 => Win32ScreencapMethod.GDI,
                 _ => 0
             };
         }
 
-        private Win32ControllerTypes ConfigureWin32ScreenCapTypes()
+        private Win32InputMethod ConfigureWin32InputTypes()
         {
-            return DataSet.GetData("Win32ControlTouchType", 0) switch
+            return DataSet.GetData("Win32ControlInputType", 0) switch
             {
-                0 => Win32ControllerTypes.TouchSeize | Win32ControllerTypes.KeySeize,
-                1 => Win32ControllerTypes.TouchSendMessage | Win32ControllerTypes.KeySendMessage,
+                0 => Win32InputMethod.Seize,
+                1 => Win32InputMethod.SendMessage,
                 _ => 0
             };
         }
@@ -997,7 +1000,7 @@ namespace MFAWPF.Views
                     // 获取选中项的索引
                     int index = Data.TaskItemViewModels.IndexOf(taskItemViewModel);
                     Data.TaskItemViewModels?.RemoveAt(index);
-                    DataSet.SetData("Tasks", Data?.TaskItemViewModels.ToList());
+                    DataSet.SetData("Tasks", Data.TaskItemViewModels?.ToList());
                 }
             }
         }

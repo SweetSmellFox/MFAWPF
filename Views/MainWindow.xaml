@@ -59,8 +59,8 @@
                 </Grid.RowDefinitions>
                 <Border CornerRadius="10 10 0 0" VerticalAlignment="Top" x:Name="TitleBar"
                         Height="30" Background="{DynamicResource MainContentBackgroundBrush}"
-                        ClipToBounds="False">
-                    <Grid>
+                        ClipToBounds="True">
+                    <Grid ClipToBounds="True">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"></RowDefinition>
                         </Grid.RowDefinitions>
@@ -95,7 +95,7 @@
                                        Margin="2 4 4 0" x:Name="resourceVersion" Text="Debug">
                             </TextBlock>
                         </StackPanel>
-                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" FlowDirection="RightToLeft">
+                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" FlowDirection="RightToLeft" ClipToBounds="True">
 
                             <Button x:Name="btnClose" Style="{StaticResource IconButtonsStyle}" Width="40"
                                     ClipToBounds="True"

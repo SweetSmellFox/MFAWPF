@@ -11,10 +11,10 @@ public class DeviceWindowTemplateSelector : DataTemplateSelector
 
     public override DataTemplate? SelectTemplate(object? item, DependencyObject container)
     {
-        if (item is DeviceInfo)
+        if (item is AdbDeviceInfo)
             return DeviceInfoTemplate ?? base.SelectTemplate(item, container);
         
-        if (item is WindowInfo)
+        if (item is DesktopWindowInfo)
             return WindowInfoTemplate ?? base.SelectTemplate(item, container);
         
 

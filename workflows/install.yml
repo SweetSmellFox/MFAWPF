@@ -54,26 +54,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      
+    
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Download Latest MFAWPF  
-        uses: robinraju/release-downloader@v1.8  
-        with:  
-             repository: SweetSmellFox/MFAWPF  
-             latest: true  
-             out-file-path: gui  
-             extract: true  
+      - name: Download Latest MFAWPF
+        uses: robinraju/release-downloader@v1.8
+        with:
+          repository: SweetSmellFox/MFAWPF
+          latest: true
+          out-file-path: gui
+          extract: true
       ##在下面更改项目名称
-      - name: gui resources          
+      - name: gui resources
         shell: bash
-        run: |  
-           rm -f ./gui/*.zip
-           cp -r ./assets/resource/* ./gui/Resource/
-           jq --arg version_name "项目名称" --arg version ${{ needs.meta.outputs.tag }} '. + {"version": {"name": $version_name, "version": $version}}' ./assets/interface.json > ./gui/interface.json
-          
+        run: |
+          rm -f ./gui/*.zip
+          cp -r ./assets/resource/* ./gui/Resource/
+          jq --arg version_name "项目名称" --arg version ${{ needs.meta.outputs.tag }} '. + {"version": {"name": $version_name, "version": $version}}' ./assets/interface.json > ./gui/interface.json
+
       - uses: actions/upload-artifact@v3
         with:
           name: MAAxxx-win-x86_64-with-gui
@@ -84,7 +84,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        arch: [aarch64, x86_64]
+        arch: [ aarch64, x86_64 ]
       fail-fast: false
 
     steps:
@@ -116,7 +116,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [aarch64, x86_64]
+        arch: [ aarch64, x86_64 ]
       fail-fast: false
 
     steps:
@@ -148,7 +148,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        arch: [aarch64, x86_64]
+        arch: [ aarch64, x86_64 ]
       fail-fast: false
 
     steps:
@@ -177,7 +177,7 @@ jobs:
 
   release:
     if: ${{ needs.meta.outputs.is_release == 'true' }}
-    needs: [meta, windows, ubuntu, macos,gui]
+    needs: [ meta, windows, ubuntu, macos,gui ]
     runs-on: ubuntu-latest
     permissions:
       contents: write

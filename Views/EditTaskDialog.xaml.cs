@@ -63,7 +63,7 @@ public partial class EditTaskDialog
         if (Data?.CurrentTask?.Task is not null)
         {
             // Data.CurrentTask.Task.Reset();
-            Data.CurrentTask.Task.name = TaskName.Text;
+            Data.CurrentTask.Task.Name = TaskName.Text;
 
             // foreach (var button in Parts.Children.OfType<AttributeButton>())
             // {
@@ -117,7 +117,7 @@ public partial class EditTaskDialog
                     return;
                 foreach (var VARIABLE in taskDictionary)
                 {
-                    VARIABLE.Value.name = VARIABLE.Key;
+                    VARIABLE.Value.Name = VARIABLE.Key;
                     Data?.DataList?.Add(new TaskItemViewModel()
                     {
                         Task = VARIABLE.Value
@@ -204,10 +204,10 @@ public partial class EditTaskDialog
     {
         var searchText = e.Info?.ToLower() ?? string.Empty;
         var filteredTasks = Data?.DataList?.Where(t =>
-            t.Task?.name != null && t.Task.name.ToLower().Contains(searchText) ||
-            t.Task?.recognition != null && t.Task.recognition.ToLower().Contains(searchText) ||
-            t.Task?.action != null && t.Task.action.ToLower().Contains(searchText) ||
-            t.Task?.next != null && t.Task.next.Any(n => n.ToLower().Contains(searchText))
+            t.Task?.Name != null && t.Task.Name.ToLower().Contains(searchText) ||
+            t.Task?.Recognition != null && t.Task.Recognition.ToLower().Contains(searchText) ||
+            t.Task?.Action != null && t.Task.Action.ToLower().Contains(searchText) ||
+            t.Task?.Next != null && t.Task.Next.Any(n => n.ToLower().Contains(searchText))
         ).ToList();
 
         ListBoxDemo.ItemsSource = filteredTasks;
@@ -278,7 +278,7 @@ public partial class EditTaskDialog
                         return;
                     foreach (var VARIABLE in taskModels)
                     {
-                        VARIABLE.Value.name = VARIABLE.Key;
+                        VARIABLE.Value.Name = VARIABLE.Key;
                         var newItem = new TaskItemViewModel()
                         {
                             Name = VARIABLE.Key, Task = VARIABLE.Value
@@ -325,7 +325,7 @@ public partial class EditTaskDialog
                         return;
                     foreach (var VARIABLE in taskModels)
                     {
-                        VARIABLE.Value.name = VARIABLE.Key;
+                        VARIABLE.Value.Name = VARIABLE.Key;
                         var newItem = new TaskItemViewModel()
                         {
                             Name = VARIABLE.Key, Task = VARIABLE.Value
@@ -388,28 +388,33 @@ public partial class EditTaskDialog
                 {
                     if (imageDialog.IsRoi)
                     {
-                        if (Data.CurrentTask.Task.roi == null)
+                        if (Data.CurrentTask.Task.Roi == null)
                         {
-                            Data.CurrentTask.Task.roi = imageDialog.Output;
+                            Data.CurrentTask.Task.Roi = imageDialog.Output;
                         }
                         else
                         {
-                            if (Data.CurrentTask.Task?.roi is List<int> li)
+                            if (Data.CurrentTask.Task?.Roi is List<int> li)
                             {
                                 if (imageDialog.Output == null)
                                 {
-                                    Data.CurrentTask.Task.roi = new List<List<int>>() { li };
+                                    Data.CurrentTask.Task.Roi = new List<List<int>> { li };
                                 }
                                 else
                                 {
-                                    Data.CurrentTask.Task.roi = new List<List<int>>() { li, imageDialog.Output };
+                                    Data.CurrentTask.Task.Roi = new List<List<int>> { li, imageDialog.Output };
                                 }
                             }
-                            else if (Data.CurrentTask.Task?.roi is List<List<int>> lli)
+                            else if (Data.CurrentTask.Task?.Roi is List<List<int>> lli)
                             {
                                 if (imageDialog.Output != null)
                                     lli.Add(imageDialog.Output);
-                                Data.CurrentTask.Task.roi = lli;
+                                Data.CurrentTask.Task.Roi = lli;
+                            }
+                            else if (Data.CurrentTask.Task?.Roi is string s)
+                            {
+                                Data.CurrentTask.Task.Roi = Data.CurrentTask.Task.Roi =
+                                    new List<List<int>> { imageDialog.Output };
                             }
                         }
                     }
@@ -417,7 +422,7 @@ public partial class EditTaskDialog
                     {
                         if (Data.CurrentTask.Task != null)
                         {
-                            Data.CurrentTask.Task.target = imageDialog.Output;
+                            Data.CurrentTask.Task.Target = imageDialog.Output;
                             Console.WriteLine("怎么回事");
                         }
                     }
@@ -439,18 +444,17 @@ public partial class EditTaskDialog
             {
                 if (Data?.CurrentTask?.Task != null)
                 {
-                    if (Data.CurrentTask.Task.template == null && imageDialog.Output != null)
+                    if (Data.CurrentTask.Task.Template == null && imageDialog.Output != null)
                     {
-                        Data.CurrentTask.Task.template = new List<string> { imageDialog.Output };
+                        Data.CurrentTask.Task.Template = new List<string> { imageDialog.Output };
                     }
                     else
                     {
-                        Console.WriteLine(Data.CurrentTask.Task.template.GetType());
-                        if (Data.CurrentTask.Task.template is List<string> ls)
+                        if (Data.CurrentTask.Task.Template is List<string> ls)
                         {
                             if (imageDialog.Output != null)
                                 ls.Add(imageDialog.Output);
-                            Data.CurrentTask.Task.template = ls.ToList();
+                            Data.CurrentTask.Task.Template = ls.ToList();
                         }
                     }
 
@@ -471,8 +475,8 @@ public partial class EditTaskDialog
             {
                 if (Data?.CurrentTask?.Task != null)
                 {
-                    Data.CurrentTask.Task.begin = imageDialog.OutputBegin;
-                    Data.CurrentTask.Task.end = imageDialog.OutputEnd;
+                    Data.CurrentTask.Task.Begin = imageDialog.OutputBegin;
+                    Data.CurrentTask.Task.End = imageDialog.OutputEnd;
                     Data.CurrentTask = Data.CurrentTask;
                 }
             }
@@ -490,8 +494,8 @@ public partial class EditTaskDialog
             {
                 if (Data?.CurrentTask?.Task != null)
                 {
-                    Data.CurrentTask.Task.upper = imageDialog.OutputUpper;
-                    Data.CurrentTask.Task.lower = imageDialog.OutputLower;
+                    Data.CurrentTask.Task.Upper = imageDialog.OutputUpper;
+                    Data.CurrentTask.Task.Lower = imageDialog.OutputLower;
                     Data.CurrentTask = Data.CurrentTask;
                 }
             }
@@ -512,16 +516,16 @@ public partial class EditTaskDialog
                     string text = OCRHelper.ReadTextFromMAARecognition(
                         imageDialog.Output[0], imageDialog.Output[1],
                         imageDialog.Output[2], imageDialog.Output[3]);
-                    if (Data.CurrentTask.Task.expected == null)
+                    if (Data.CurrentTask.Task.Expected == null)
                     {
-                        Data.CurrentTask.Task.expected = new List<string> { text };
+                        Data.CurrentTask.Task.Expected = new List<string> { text };
                     }
                     else
                     {
-                        if (Data.CurrentTask.Task.expected is List<string> ls)
+                        if (Data.CurrentTask.Task.Expected is List<string> ls)
                         {
                             ls.Add(text);
-                            Data.CurrentTask.Task.expected = ls;
+                            Data.CurrentTask.Task.Expected = ls;
                         }
                     }
 

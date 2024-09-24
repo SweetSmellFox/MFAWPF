@@ -16,8 +16,20 @@ public partial class SwipeDialog
     private Polygon? _arrowHead;
     private Point StartPoint { get; set; }
     private Point EndPoint { get; set; }
-    public List<int>? OutputBegin { get; private set; }
-    public List<int>? OutputEnd { get; private set; }
+    private List<int>? _outputBegin { get; set; }
+    private List<int>? _outputEnd { get; set; }
+
+    public List<int>? OutputBegin
+    {
+        get => _outputBegin;
+        private set => _outputBegin = value?.Select(i => i < 0 ? 0 : i).ToList();
+    }
+
+    public List<int>? OutputEnd
+    {
+        get => _outputEnd;
+        private set => _outputEnd = value?.Select(i => i < 0 ? 0 : i).ToList();
+    }
 
     public SwipeDialog(BitmapImage bitmapImage)
     {
