@@ -566,7 +566,7 @@ namespace MFAWPF.Views
             panel ??= settingPanel;
             var comboBox = new ComboBox
             {
-                SelectedIndex = DataSet.GetData("ResourceIndex", defaultValue), DisplayMemberPath = "name",
+                SelectedIndex = DataSet.GetData("ResourceIndex", defaultValue), DisplayMemberPath = "Name",
                 Style = FindResource("ComboBoxExtend") as Style,
                 Margin = new Thickness(5)
             };
