@@ -6,9 +6,9 @@ using MFAWPF.Views;
 
 namespace MFAWPF.Custom;
 
-public class MoneyDetectRecognizer : IMaaCustomRecognition
+public class MoneyDetectRecognition : IMaaCustomRecognition
 {
-    public string Name { get; set; } = nameof(MoneyDetectRecognizer);
+    public string Name { get; set; } = nameof(MoneyDetectRecognition);
 
     public bool Analyze(in IMaaContext context, in AnalyzeArgs args, in AnalyzeResults results)
     {

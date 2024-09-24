@@ -439,7 +439,7 @@ namespace MFAWPF.Utils
             // }
 
             instance.Resource.Register(new MoneyRecognition());
-            instance.Resource.Register(new MoneyDetectRecognizer());
+            instance.Resource.Register(new MoneyDetectRecognition());
 
             instance.Callback += (_, args) =>
             {
