@@ -10,33 +10,37 @@ public class ReplaceConverter : JsonConverter
         return objectType == typeof(List<string[]>);
     }
 
-    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+        JsonSerializer serializer)
     {
-        JToken token = JToken.Load(reader);
+        var token = JToken.Load(reader);
         if (token.Type == JTokenType.Array)
         {
-            if (token.First.Type == JTokenType.Array)
+            if (token.First?.Type == JTokenType.Array)
             {
                 return token.ToObject<List<string[]>>();
             }
-            
-            var list = new List<string[]> { token.ToObject<string[]>() };
+
+            var list = new List<string[]> { token.ToObject<string[]>() ?? [] };
             return list;
         }
 
         throw new JsonSerializationException("Unexpected token type: " + token.Type);
     }
 
-    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        var list = (List<string[]>)value;
-        if (list.Count == 1)
+        if (value is List<string[]> list)
         {
-            serializer.Serialize(writer, list[0]);
+            if (list.Count == 1)
+            {
+                serializer.Serialize(writer, list[0]);
+            }
+            else
+            {
+                serializer.Serialize(writer, list);
+            }
         }
-        else
-        {
-            serializer.Serialize(writer, list);
-        }
+        writer.WriteValue(value?.ToString() ?? string.Empty);
     }
 }

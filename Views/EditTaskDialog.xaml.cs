@@ -411,7 +411,7 @@ public partial class EditTaskDialog
                                     lli.Add(imageDialog.Output);
                                 Data.CurrentTask.Task.Roi = lli;
                             }
-                            else if (Data.CurrentTask.Task?.Roi is string s)
+                            else if (Data.CurrentTask.Task?.Roi is string s && imageDialog.Output != null)
                             {
                                 Data.CurrentTask.Task.Roi = Data.CurrentTask.Task.Roi =
                                     new List<List<int>> { imageDialog.Output };

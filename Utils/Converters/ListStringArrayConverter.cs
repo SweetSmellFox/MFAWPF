@@ -26,9 +26,9 @@ public class ListStringArrayConverter : IValueConverter
         {
             var result = collection.Select(customValue =>
             {
-                var trimmed = customValue.Value.Trim('[', ']');
-                var splitArray = trimmed.Split(",");
-                return splitArray.Length == 2 ? splitArray : null;
+                var trimmed = customValue.Value?.Trim('[', ']');
+                var splitArray = trimmed?.Split(",") ?? null;
+                return splitArray?.Length == 2 ? splitArray : null;
             }).ToList();
 
             if (result.Any(array => array == null))
