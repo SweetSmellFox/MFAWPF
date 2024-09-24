@@ -1,4 +1,9 @@
+<div align="center">
+<img alt="LOGO" src="https://github.com/SweetSmellFox/MFAWPF/blob/master/logo.png" width="256" height="256" />
+
 # MFAWPF
+
+</div>
 
 ## 基本介绍
 
@@ -7,9 +12,10 @@
 ## 说明
 
 ### 使用需求
+
 - .NET8运行库
 - 一个基于maaframework的非集成项目
-  
+
 ### 如何使用
 
 #### 自动安装
@@ -25,6 +31,7 @@
 - 将maafw项目中assets/interface.json文件复制到MFAWPS/中
 - ***修改***刚刚复制的interface.json文件
 - 下面是一个例子
+
  ```
 {
   "resource": [
@@ -48,7 +55,9 @@
 ]
 }
 ```
- 修改为
+
+修改为
+
 ```
   {
   "version": {
@@ -76,13 +85,14 @@
 ]
 }
 ```
+
 - 运行
 
 ## 开发相关
 
 - 内置 MFATools 可以用来裁剪图片和获取 ROI
 - 目前一些地方并没有特别完善,欢迎各位大佬贡献代码
-
+- 注意，由于 `MaaFramework` 于 2.0 移除了Exec Agent，所以目前无法通过注册interface注册Custom Action和Custom Recognition
 ## 致谢
 
 ### 开源库
@@ -102,4 +112,4 @@
 
 ### v1.2
 
-- [ ] interface.json的GUI编辑界面
+- [ ] <strike>interface.json的GUI编辑界面</strike>
