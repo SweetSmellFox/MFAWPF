@@ -63,7 +63,7 @@ public class TaskModel : ObservableObject
     private List<string>? _template;
     private object? _roi;
     private object? _roi_offset;
-    private double? _threshold;
+    private object? _threshold;
     private object? _lower;
     private object? _upper;
     private bool? _connected;
@@ -128,7 +128,7 @@ public class TaskModel : ObservableObject
     [Category("基础属性")]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
-    public List<string>? On_Error
+    public List<string>? OnError
     {
         get => _on_error;
         set => SetNewProperty(ref _on_error, value);
@@ -155,7 +155,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("pre_delay")]
     [Category("基础属性")]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? Pre_Delay
+    public uint? PreDelay
     {
         get => _pre_delay;
         set => SetNewProperty(ref _pre_delay, value);
@@ -164,7 +164,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("post_delay")]
     [Category("基础属性")]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? Post_Delay
+    public uint? PostDelay
     {
         get => _post_delay;
         set => SetNewProperty(ref _post_delay, value);
@@ -172,8 +172,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("pre_wait_freezes")]
     [Category("延时设置")]
-    [Editor(typeof(NullableUIntStringEditor), typeof(NullableUIntStringEditor))]
-    public object? Pre_Wait_Freezes
+    [JsonConverter(typeof(UIntOrObjectConverter))]
+    [Editor(typeof(NullableUIntOrObjectEditor), typeof(NullableUIntOrObjectEditor))]
+    public object? PreWaitFreezes
     {
         get => _pre_wait_freezes;
         set => SetNewProperty(ref _pre_wait_freezes, value);
@@ -181,8 +182,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("post_wait_freezes")]
     [Category("延时设置")]
-    [Editor(typeof(NullableUIntStringEditor), typeof(NullableUIntStringEditor))]
-    public object? Post_Wait_Freezes
+    [JsonConverter(typeof(UIntOrObjectConverter))]
+    [Editor(typeof(NullableUIntOrObjectEditor), typeof(NullableUIntOrObjectEditor))]
+    public object? PostWaitFreezes
     {
         get => _post_wait_freezes;
         set => SetNewProperty(ref _post_wait_freezes, value);
@@ -201,7 +203,7 @@ public class TaskModel : ObservableObject
     [Category("任务回调")]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
-    public List<string>? Focus_Tip
+    public List<string>? FocusTip
     {
         get => _focus_tip;
         set => SetNewProperty(ref _focus_tip, value);
@@ -211,7 +213,7 @@ public class TaskModel : ObservableObject
     [Category("任务回调")]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
-    public List<string>? Focus_Tip_Color
+    public List<string>? FocusTipColor
     {
         get => _focus_tip_color;
         set => SetNewProperty(ref _focus_tip_color, value);
@@ -231,7 +233,7 @@ public class TaskModel : ObservableObject
     [Category("识别器")]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
-    public object? Roi_Offset
+    public object? RoiOffset
     {
         get => _roi_offset;
         set => SetNewProperty(ref _roi_offset, value);
@@ -249,8 +251,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("threshold")]
     [Category("识别器")]
-    [Editor(typeof(NullableDoubleEditor), typeof(NullableDoubleEditor))]
-    public double? Threshold
+    [JsonConverter(typeof(SingleOrDoubleListConverter))]
+    [Editor(typeof(ListDoubleStringEditor), typeof(ListDoubleStringEditor))]
+    public object? Threshold
     {
         get => _threshold;
         set => SetNewProperty(ref _threshold, value);
@@ -259,7 +262,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("order_by")]
     [Category("识别器")]
     [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
-    public string? Order_By
+    public string? OrderBy
     {
         get => _order_by;
         set => SetNewProperty(ref _order_by, value);
@@ -286,7 +289,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("green_mask")]
     [Category("识别器")]
     [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
-    public bool? Green_Mask
+    public bool? GreenMask
     {
         get => _green_mask;
         set => SetNewProperty(ref _green_mask, value);
@@ -371,7 +374,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("only_rec")]
     [Category("识别器")]
     [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
-    public bool? Only_Rec
+    public bool? OnlyRec
     {
         get => _only_rec;
         set => SetNewProperty(ref _only_rec, value);
@@ -398,7 +401,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("custom_recognition")]
     [Category("自定义")]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? Custom_Recognition
+    public string? CustomRecognition
     {
         get => _custom_recognition;
         set => SetNewProperty(ref _custom_recognition, value);
@@ -407,7 +410,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("custom_recognition_param")]
     [Category("自定义")]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? Custom_Recognition_Param
+    public string? CustomRecognitionParam
     {
         get => _custom_recognition_param;
         set => SetNewProperty(ref _custom_recognition_param, value);
@@ -416,7 +419,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("custom_action")]
     [Category("自定义")]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? Custom_Action
+    public string? CustomAction
     {
         get => _custom_action;
         set => SetNewProperty(ref _custom_action, value);
@@ -425,7 +428,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("custom_action_param")]
     [Category("自定义")]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? Custom_Action_Param
+    public string? CustomActionParam
     {
         get => _custom_action_param;
         set => SetNewProperty(ref _custom_action_param, value);
@@ -445,7 +448,7 @@ public class TaskModel : ObservableObject
     [Category("动作")]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
-    public List<int>? Target_Offset
+    public List<int>? TargetOffset
     {
         get => _target_offset;
         set => SetNewProperty(ref _target_offset, value);
@@ -465,7 +468,7 @@ public class TaskModel : ObservableObject
     [Category("动作")]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
-    public List<int>? Begin_Offset
+    public List<int>? BeginOffset
     {
         get => _begin_offset;
         set => SetNewProperty(ref _begin_offset, value);
@@ -485,7 +488,7 @@ public class TaskModel : ObservableObject
     [Category("动作")]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
-    public List<int>? End_Offset
+    public List<int>? EndOffset
     {
         get => _end_offset;
         set => SetNewProperty(ref _end_offset, value);
@@ -513,7 +516,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("input_text")]
     [Category("动作")]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? Input_Text
+    public string? InputText
     {
         get => _input_text;
         set => SetNewProperty(ref _input_text, value);

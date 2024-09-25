@@ -31,13 +31,13 @@ public class ListAutoStringEditor : PropertyEditorBase
     // 动态设置 ItemsSource，根据字段名称定制选项
     public static List<string> AutoProperty()
     {
-        return ["Roi", "Next", "On_Error", "Interrupt", "Begin", "End", "Target"];
+        return ["Roi", "Next", "OnError", "Interrupt", "Begin", "End", "Target"];
     }
 
     private IEnumerable? GetItemsSource(PropertyItem propertyItem)
     {
         if (propertyItem.PropertyName == "Roi" || propertyItem.PropertyName == "Next" ||
-            propertyItem.PropertyName == "On_Error" || propertyItem.PropertyName == "Interrupt")
+            propertyItem.PropertyName == "OnError" || propertyItem.PropertyName == "Interrupt")
         {
             return MainWindow.TaskDialog?.Data?.DataList;
         }

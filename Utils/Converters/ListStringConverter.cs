@@ -15,6 +15,14 @@ public class ListStringConverter : IValueConverter
                 .Select(s => new CustomValue<string>(s)).ToList());
         }
 
+        if (value is string s)
+        {
+            return new ObservableCollection<CustomValue<string>>
+            {
+                new(s)
+            };
+        }
+
         return new ObservableCollection<CustomValue<string>>();
     }
 
@@ -24,6 +32,9 @@ public class ListStringConverter : IValueConverter
         if (value is IEnumerable<CustomValue<string>> customValueList)
         {
             var list = customValueList.Select(cv => cv.Value).ToList();
+            if (list.Count == 1)
+                return list[0];
+
             return list.Count > 0 ? list : null;
         }
 
