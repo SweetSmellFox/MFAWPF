@@ -773,7 +773,7 @@ namespace MFAWPF.Views
                     ComboBox comboBox = new ComboBox
                     {
                         SelectedIndex = option.Index ?? 0, Style = FindResource("ComboBoxExtend") as Style,
-                        DisplayMemberPath = "name", Margin = new Thickness(5),
+                        DisplayMemberPath = "Name", Margin = new Thickness(5),
                     };
 
                     var multiBinding = new MultiBinding
