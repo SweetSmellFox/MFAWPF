@@ -73,62 +73,56 @@ namespace MFAWPF.Views
         private bool InitializeData()
         {
             DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
-
-            MaaInterface.Instance =
-                JsonHelper.ReadFromJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface", new MaaInterface(),
-                    () =>
+            if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json"))
+            {
+                Console.WriteLine("未找到interface文件，生成interface.json...");
+                LoggerService.LogInfo("未找到interface文件，生成interface.json...");
+                MaaInterface.Instance = new MaaInterface
+                {
+                    Version = "1.0",
+                    Name = "Debug",
+                    Task = new List<TaskInterfaceItem>(),
+                    Resource = new List<MaaInterface.MaaCustomResource>
                     {
-                        try
+                        new()
                         {
-                            File.WriteAllText($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json",
-                                JsonConvert.SerializeObject(new MaaInterface()
+                            Name = "默认", Path = new List<string> { "{PROJECT_DIR}/resource/base" }
+                        }
+                    },
+                    Recognition = new Dictionary<string, MaaInterface.CustomExecutor>(),
+                    Action = new Dictionary<string, MaaInterface.CustomExecutor>(),
+                    Option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
+                    {
+                        {
+                            "测试", new MaaInterface.MaaInterfaceOption()
+                            {
+                                Cases = new List<MaaInterface.MaaInterfaceOptionCase>
                                 {
-                                    Version = "1.0",
-                                    Name = "Debug",
-                                    Task = new List<TaskInterfaceItem>(),
-                                    Resource = new List<MaaInterface.MaaCustomResource>
+                                    new()
                                     {
-                                        new()
-                                        {
-                                            Name = "默认", Path = new List<string> { "{PROJECT_DIR}/resource/base" }
-                                        }
+                                        Name = "测试1", Pipeline_Override = new Dictionary<string, TaskModel>()
                                     },
-                                    Recognition = new Dictionary<string, MaaInterface.CustomExecutor>(),
-                                    Action = new Dictionary<string, MaaInterface.CustomExecutor>(),
-                                    Option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
+                                    new()
                                     {
-                                        {
-                                            "测试", new MaaInterface.MaaInterfaceOption()
-                                            {
-                                                Cases = new List<MaaInterface.MaaInterfaceOptionCase>
-                                                {
-                                                    new()
-                                                    {
-                                                        Name = "测试1",
-                                                        Pipeline_Override = new Dictionary<string, TaskModel>()
-                                                    },
-                                                    new()
-                                                    {
-                                                        Name = "测试2",
-                                                        Pipeline_Override = new Dictionary<string, TaskModel>()
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        Name = "测试2", Pipeline_Override = new Dictionary<string, TaskModel>()
                                     }
-                                }, new JsonSerializerSettings()
-                                {
-                                    Formatting = Formatting.Indented,
-                                    NullValueHandling = NullValueHandling.Ignore,
-                                    DefaultValueHandling = DefaultValueHandling.Include
-                                }));
+                                }
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"创建文件时发生错误: {ex.Message}");
-                            LoggerService.LogError(ex);
-                        }
-                    });
+                    }
+                };
+                JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
+                    MaaInterface.Instance);
+            }
+            else
+            {
+                MaaInterface.Instance =
+                    JsonHelper.ReadFromJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
+                        new MaaInterface(),
+                        () => { });
+            }
+
+
             if (MaaInterface.Instance != null)
             {
                 Data?.TasksSource.Clear();

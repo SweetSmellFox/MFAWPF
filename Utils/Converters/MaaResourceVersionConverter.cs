@@ -31,6 +31,7 @@ public class MaaResourceVersionConverter : JsonConverter
             writer.WriteValue(strValue);
         }
 
-        writer.WriteValue(value?.ToString() ?? String.Empty);
+        if (value is MaaInterface.MaaResourceVersion mrv)
+            writer.WriteValue(mrv.Version);
     }
 }

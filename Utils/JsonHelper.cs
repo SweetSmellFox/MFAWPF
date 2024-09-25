@@ -14,7 +14,7 @@ public static class JsonHelper
     /// <param name="defaultS"></param>
     /// <returns></returns>
     ///    //序列化到文件
-    public static T? ReadFromConfigJsonFile<T>(string file, T? defaultS = default)
+    public static T? ReadFromConfigJsonFile<T>(string file, T? defaultS = default, bool show = false)
     {
         // 从文件中读取 JSON 字符串
         string directory = $"{AppDomain.CurrentDomain.BaseDirectory}/config/{file}.json";
@@ -30,7 +30,8 @@ public static class JsonHelper
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
-            LoggerService.LogError(e);
+            if (show)
+                LoggerService.LogError(e);
             return defaultS;
         }
     }
