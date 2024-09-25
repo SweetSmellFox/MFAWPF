@@ -36,7 +36,8 @@ public class SingleIntListOrAutoEditor : PropertyEditorBase
             if (originalDataList != null)
             {
                 var newDataList = new ObservableCollection<TaskItemViewModel>(originalDataList);
-                newDataList.Add(new TaskItemViewModel { Name = "True" });
+                if (propertyItem.PropertyName != "Roi")
+                    newDataList.Add(new TaskItemViewModel { Name = "True" });
                 return newDataList;
             }
 
