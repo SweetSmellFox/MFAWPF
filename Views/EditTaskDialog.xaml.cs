@@ -487,7 +487,7 @@ public partial class EditTaskDialog
             {
                 if (Data?.CurrentTask?.Task != null && imageDialog.Output != null)
                 {
-                    string text = OCRHelper.ReadTextFromMAARecognition(
+                    string text = OCRHelper.ReadTextFromMAATasker(
                         imageDialog.Output[0], imageDialog.Output[1],
                         imageDialog.Output[2], imageDialog.Output[3]);
                     if (Data.CurrentTask.Task.Expected == null)

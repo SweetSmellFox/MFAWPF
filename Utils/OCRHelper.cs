@@ -29,7 +29,7 @@ public class OCRHelper
     {
     }
 
-    public static string ReadTextFromMAARecognition(int x, int y, int width, int height)
+    public static string ReadTextFromMAATasker(int x, int y, int width, int height)
     {
         string result = string.Empty;
         TaskItemViewModel taskItemViewModel = new TaskItemViewModel()
@@ -48,7 +48,7 @@ public class OCRHelper
             .AppendPipeline(taskItemViewModel.Name, taskItemViewModel.ToString());
         if (job?.Wait() == MaaJobStatus.Succeeded)
         {
-            RecognitionQuery? query =
+            var query =
                 JsonConvert.DeserializeObject<RecognitionQuery>(job.QueryRecognitionDetail()?
                     .Detail ?? string.Empty);
             if (!string.IsNullOrWhiteSpace(query?.Best?.Text))
@@ -63,7 +63,7 @@ public class OCRHelper
         return result;
     }
 
-    public static string ReadTextFromMAASyncContext(in IMaaContext syncContext, IMaaImageBuffer image, int x, int y,
+    public static string ReadTextFromMAAContext(in IMaaContext context, IMaaImageBuffer image, int x, int y,
         int width, int height)
     {
         var result = string.Empty;
@@ -80,8 +80,8 @@ public class OCRHelper
             Name = "AppendOCR",
         };
         var detail =
-            syncContext.RunRecognition(taskItemViewModel.Name, taskItemViewModel.ToString(), image) as
-                RecognitionDetail<IMaaImageBuffer>;
+            context.RunRecognition(taskItemViewModel.Name, taskItemViewModel.ToString(), image) as
+                RecognitionDetail<MaaImageBuffer>;
 
         if (detail != null)
         {

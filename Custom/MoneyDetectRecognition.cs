@@ -14,7 +14,7 @@ public class MoneyDetectRecognition : IMaaCustomRecognition
     {
         MaaImageBuffer? imageBuffer = args.Image as MaaImageBuffer;
         string text =
-            OCRHelper.ReadTextFromMAASyncContext(context, imageBuffer ?? new MaaImageBuffer(), 466, 299, 131, 63);
+            OCRHelper.ReadTextFromMAAContext(context, imageBuffer ?? new MaaImageBuffer(), 466, 299, 131, 63);
         if (int.TryParse(text, out var currentMoney))
         {
             Console.WriteLine($"存钱后余额：{currentMoney}");

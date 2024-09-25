@@ -15,7 +15,7 @@ public class MoneyRecognition : IMaaCustomRecognition
     public bool Analyze(in IMaaContext context, in AnalyzeArgs args, in AnalyzeResults results)
     {
         MaaImageBuffer? imageBuffer = args.Image as MaaImageBuffer;
-        string text = OCRHelper.ReadTextFromMAASyncContext(context, imageBuffer ?? new MaaImageBuffer(), 578,
+        string text = OCRHelper.ReadTextFromMAAContext(context, imageBuffer ?? new MaaImageBuffer(), 578,
             342,
             131,
             57);

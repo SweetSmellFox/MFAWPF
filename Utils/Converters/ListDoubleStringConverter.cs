@@ -36,7 +36,7 @@ public class ListDoubleStringConverter : IValueConverter
             try
             {
                 var result = list
-                    .Select(cv => double.Parse(cv.Value))
+                    .Select(cv => double.Parse(cv.Value ?? string.Empty))
                     .ToList();
                 if (result.Count == 1)
                     return result[0];

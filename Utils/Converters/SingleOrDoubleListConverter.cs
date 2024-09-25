@@ -7,7 +7,7 @@ public class SingleOrDoubleListConverter : JsonConverter
 {
     public override bool CanConvert(Type objectType)
     {
-        return objectType == typeof(object);
+        return objectType == typeof(object) || objectType == typeof(double);
     }
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
@@ -16,7 +16,7 @@ public class SingleOrDoubleListConverter : JsonConverter
         JToken token = JToken.Load(reader);
         if (token.Type == JTokenType.Float)
         {
-            return new List<double> { token.ToObject<double>() };
+            return token.ToObject<double>();
         }
 
         if (token.Type == JTokenType.Array)
@@ -29,6 +29,17 @@ public class SingleOrDoubleListConverter : JsonConverter
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
+        if (value is null)
+        {
+            return; 
+        }
+
+        if (value is double d)
+        {
+            writer.WriteValue(d);
+            return;
+        }
+
         if (value is List<double> list)
         {
             if (list.Count == 1)
