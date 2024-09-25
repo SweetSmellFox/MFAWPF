@@ -33,7 +33,7 @@ public class StringComboBoxEditor : PropertyEditorBase
     private IEnumerable<string> GetItemsSource(PropertyItem propertyItem)
     {
         // 根据字段名称，动态返回选项
-        if (propertyItem.PropertyName == "recognition")
+        if (propertyItem.PropertyName == "Recognition")
         {
             return new List<string>
             {
@@ -49,7 +49,7 @@ public class StringComboBoxEditor : PropertyEditorBase
             };
         }
 
-        if (propertyItem.PropertyName == "action")
+        if (propertyItem.PropertyName == "Action")
         {
             return new List<string>
             {
@@ -66,7 +66,7 @@ public class StringComboBoxEditor : PropertyEditorBase
             };
         }
 
-        if (propertyItem.PropertyName == "order_by")
+        if (propertyItem.PropertyName == "Order_By")
         {
             return new List<string>
             {
@@ -80,7 +80,7 @@ public class StringComboBoxEditor : PropertyEditorBase
             };
         }
 
-        if (propertyItem.PropertyName == "detector")
+        if (propertyItem.PropertyName == "Detector")
         {
             return new List<string>
             {

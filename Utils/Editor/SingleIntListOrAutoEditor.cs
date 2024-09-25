@@ -1,47 +1,35 @@
 using System.Collections;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
 using HandyControl.Controls;
 using MFAWPF.Controls;
-using MFAWPF.Utils.Converters;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
 
-namespace MFAWPF.Utils.Editor;
+namespace MFAWPF.Utils.Converters;
 
-public class ListAutoStringEditor : PropertyEditorBase
+public class SingleIntListOrAutoEditor : PropertyEditorBase
 {
     public override FrameworkElement CreateElement(PropertyItem propertyItem)
     {
-        var autoListControl = new CustomAutoListControl
+        var ctrl = new CustomAutoCompleteTextBox
         {
-            MinHeight = 50, TaskDialogDataList = GetItemsSource(propertyItem) ?? new ObservableCollection<string>(),
+            IsReadOnly = propertyItem.IsReadOnly, DataList = GetItemsSource(propertyItem),
             DisplayMemberPath = GetDisplayMemberPath(propertyItem)
         };
-        
-        return autoListControl;
+        InfoElement.SetShowClearButton(ctrl, true);
+        return ctrl;
     }
-
-    // 实现抽象方法，返回 ItemsProperty 作为绑定的 DependencyProperty
-    public override DependencyProperty GetDependencyProperty() => CustomAutoListControl.ItemsProperty;
 
     // 动态设置 ItemsSource，根据字段名称定制选项
     public static List<string> AutoProperty()
     {
-        return ["Roi", "Next", "On_Error", "Interrupt", "Begin", "End", "Target"];
+        return ["Roi", "Begin", "End", "Target"];
     }
 
     private IEnumerable? GetItemsSource(PropertyItem propertyItem)
     {
-        if (propertyItem.PropertyName == "Roi" || propertyItem.PropertyName == "Next" ||
-            propertyItem.PropertyName == "On_Error" || propertyItem.PropertyName == "Interrupt")
-        {
-            return MainWindow.TaskDialog?.Data?.DataList;
-        }
-
         if (AutoProperty().Contains(propertyItem.PropertyName))
         {
             var originalDataList = MainWindow.TaskDialog?.Data?.DataList;
@@ -55,11 +43,6 @@ public class ListAutoStringEditor : PropertyEditorBase
             return null;
         }
 
-        if (propertyItem.PropertyName.Contains("Color"))
-        {
-            return MainWindow.TaskDialog?.Data?.Colors;
-        }
-
         return new ObservableCollection<string>();
     }
 
@@ -71,14 +54,10 @@ public class ListAutoStringEditor : PropertyEditorBase
             return "Name";
         }
 
-        if (propertyItem.PropertyName.Contains("Color"))
-        {
-            return "Name";
-        }
-
-        return string.Empty; // 默认的 DisplayMemberPath
+        return string.Empty;
     }
 
+    public override DependencyProperty GetDependencyProperty() => CustomAutoCompleteTextBox.TextProperty;
 
-    protected override IValueConverter GetConverter(PropertyItem propertyItem) => new ListStringConverter();
+    protected override IValueConverter GetConverter(PropertyItem propertyItem) => new SingleIntListOrAutoConverter();
 }

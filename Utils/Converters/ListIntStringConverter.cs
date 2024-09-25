@@ -21,7 +21,7 @@ public class ListIntStringConverter : IValueConverter
         if (value is IEnumerable<IEnumerable<int>> intCCollection)
         {
             return new ObservableCollection<CustomValue<string>>(
-                intCCollection.Select(ic => new CustomValue<string>(string.Join(',', ic.ToList()))));
+                intCCollection.Select(ic => new CustomValue<string>(string.Join(",", ic.ToList()))));
         }
 
         return new ObservableCollection<CustomValue<string>>();
@@ -32,16 +32,23 @@ public class ListIntStringConverter : IValueConverter
     {
         if (value is IEnumerable<CustomValue<string>> customValueList)
         {
+            var list = customValueList.ToList();
+            if (list.Count == 1)
+            {
+                if (bool.TryParse(list[0].Value, out var result) && result)
+                    return result;
+            }
+
             try
             {
-                var result = customValueList
-                    .Select(cv => (cv.Value ?? string.Empty)
+                var result = list
+                    .Where(cv => cv.Value != null) 
+                    .Select(cv => cv.Value?
                         .Split(',')
                         .Select(int.Parse)
                         .ToList())
                     .ToList();
-
-                return result;
+                return result.Count > 0 ? result : null;
             }
             catch
             {

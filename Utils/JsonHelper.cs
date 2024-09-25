@@ -109,8 +109,6 @@ public static class JsonHelper
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
-            LoggerService.LogError(e);
-            Growls.Error(e.Message);
             action?.Invoke();
             return defaultS;
         }

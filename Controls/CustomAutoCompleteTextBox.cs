@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,12 +25,12 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
     private bool isSelectionChanging;
 
     public static readonly DependencyProperty DataListProperty = DependencyProperty
-        .Register(nameof(DataList), typeof(Collection<TaskItemViewModel>), typeof(CustomAutoCompleteTextBox),
+        .Register(nameof(DataList), typeof(IEnumerable), typeof(CustomAutoCompleteTextBox),
             new FrameworkPropertyMetadata(null, OnDataListChanged));
 
-    public Collection<TaskItemViewModel>? DataList
+    public IEnumerable? DataList
     {
-        get => GetValue(DataListProperty) as Collection<TaskItemViewModel>;
+        get => GetValue(DataListProperty) as IEnumerable;
         set =>
             SetValue(DataListProperty, value);
     }
@@ -172,9 +173,9 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
 
             Text = _searchTextBox?.Text ?? string.Empty;
 
-            if (DataList != null)
+            if (DataList is IEnumerable<TaskItemViewModel> ts)
             {
-                ItemsSource = DataList.Where(t => t.Name.ToLower().Contains(Text.ToLower()));
+                ItemsSource = ts.Where(t => t.Name.ToLower().Contains(Text.ToLower()));
             }
 
             if (_searchTextBox?.IsFocused == true)

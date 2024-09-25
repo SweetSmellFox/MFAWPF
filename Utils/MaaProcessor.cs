@@ -26,8 +26,6 @@ namespace MFAWPF.Utils
 
         public static string Resource => AppDomain.CurrentDomain.BaseDirectory + "Resource";
         public static string ModelResource => $"{Resource}/model/";
-        public static string AdbConfigFile => $"{Resource}/controller_config.json";
-        public static string AdbConfigFileFullPath => Path.GetFullPath(AdbConfigFile);
         public static string ResourceBase => $"{Resource}/base";
         public static string ResourcePipelineFilePath => $"{ResourceBase}/pipeline/";
 
@@ -35,7 +33,6 @@ namespace MFAWPF.Utils
         public static int Money { get; set; }
         public static int AllMoney { get; set; }
         public static Config Config { get; } = new();
-        public static string AdbConfig { get; set; } = string.Empty;
         public static List<string>? CurrentResources { get; set; }
         public static AutoInitDictionary AutoInitDictionary { get; } = new();
 
@@ -49,7 +46,6 @@ namespace MFAWPF.Utils
 
         public MaaProcessor()
         {
-            AdbConfig = File.ReadAllText(AdbConfigFileFullPath);
         }
 
         public class TaskAndParam
@@ -372,7 +368,7 @@ namespace MFAWPF.Utils
 
             LoggerService.LogInfo("Resources initialized successfully".GetLocalizationString());
             LoggerService.LogInfo("LoadingController".GetLocalizationString());
-            IMaaController<nint> controller;
+            MaaController controller;
             try
             {
                 controller = InitializeController();
@@ -390,37 +386,42 @@ namespace MFAWPF.Utils
 
             LoggerService.LogInfo("InitControllerSuccess".GetLocalizationString());
 
-            var tasker = new MaaTasker()
+
+            try
             {
-                Controller = controller,
-                Resource = maaResource,
-                DisposeOptions = DisposeOptions.All,
-            };
+                var tasker = new MaaTasker
+                {
+                    Controller = controller,
+                    Resource = maaResource,
+                    DisposeOptions = DisposeOptions.All,
+                };
+                RegisterCustomRecognitionsAndActions(tasker);
 
-            RegisterCustomRecognizersAndActions(tasker);
-
-            return tasker;
+                return tasker;
+            }
+            catch (Exception e)
+            {
+                LoggerService.LogError(e);
+                return null;
+            }
         }
 
-        private IMaaController<nint> InitializeController()
+        private MaaController InitializeController()
         {
             return MainWindow.Instance?.IsADB == true
                 ? new MaaAdbController(
-                    Config.Adb.Adb,
-                    Config.Adb.AdbAddress,
-                    Config.Adb.ScreenCap, Config.Adb.Input,
-                    !string.IsNullOrWhiteSpace(Config.Adb.AdbConfig) ? Config.Adb.AdbConfig : AdbConfig,
-                    $"{Resource}/MaaAgentBinary",
-                    LinkOption.Start,
-                    CheckStatusOption.None)
+                    Config.AdbDevice.AdbPath,
+                    Config.AdbDevice.AdbSerial,
+                    Config.AdbDevice.ScreenCap, Config.AdbDevice.Input,
+                    !string.IsNullOrWhiteSpace(Config.AdbDevice.Config) ? Config.AdbDevice.Config : "{}")
                 : new MaaWin32Controller(
-                    Config.Win32.HWnd,
-                    Config.Win32.ScreenCap, Config.Win32.Input,
-                    Config.Win32.Link,
-                    Config.Win32.Check);
+                    Config.DesktopWindow.HWnd,
+                    Config.DesktopWindow.ScreenCap, Config.DesktopWindow.Input,
+                    Config.DesktopWindow.Link,
+                    Config.DesktopWindow.Check);
         }
 
-        private void RegisterCustomRecognizersAndActions(MaaTasker instance)
+        private void RegisterCustomRecognitionsAndActions(MaaTasker instance)
         {
             if (MaaInterface.Instance == null) return;
             LoggerService.LogInfo("RegisteringCustomRecognizer".GetLocalizationString());

@@ -73,61 +73,62 @@ namespace MFAWPF.Views
         private bool InitializeData()
         {
             DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
-            if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json"))
-            {
-                try
-                {
-                    File.WriteAllText($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json",
-                        JsonConvert.SerializeObject(new MaaInterface()
-                        {
-                            Version = "1.0",
-                            Name = "Debug",
-                            Task = new List<TaskInterfaceItem>(),
-                            Resource = new List<MaaInterface.MaaCustomResource>
-                            {
-                                new()
-                                {
-                                    Name = "默认", Path = new List<string> { "{PROJECT_DIR}/resource/base" }
-                                }
-                            },
-                            Recognition = new Dictionary<string, MaaInterface.CustomExecutor>(),
-                            Action = new Dictionary<string, MaaInterface.CustomExecutor>(),
-                            Option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
-                            {
-                                {
-                                    "测试", new MaaInterface.MaaInterfaceOption()
-                                    {
-                                        Cases = new List<MaaInterface.MaaInterfaceOptionCase>
-                                        {
-                                            new()
-                                            {
-                                                Name = "测试1", Pipeline_Override = new Dictionary<string, TaskModel>()
-                                            },
-                                            new()
-                                            {
-                                                Name = "测试2", Pipeline_Override = new Dictionary<string, TaskModel>()
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }, new JsonSerializerSettings()
-                        {
-                            Formatting = Formatting.Indented,
-                            NullValueHandling = NullValueHandling.Ignore,
-                            DefaultValueHandling = DefaultValueHandling.Include
-                        }));
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"创建文件时发生错误: {ex.Message}");
-                    LoggerService.LogError(ex);
-                }
-            }
 
             MaaInterface.Instance =
                 JsonHelper.ReadFromJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface", new MaaInterface(),
-                    () => { });
+                    () =>
+                    {
+                        try
+                        {
+                            File.WriteAllText($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json",
+                                JsonConvert.SerializeObject(new MaaInterface()
+                                {
+                                    Version = "1.0",
+                                    Name = "Debug",
+                                    Task = new List<TaskInterfaceItem>(),
+                                    Resource = new List<MaaInterface.MaaCustomResource>
+                                    {
+                                        new()
+                                        {
+                                            Name = "默认", Path = new List<string> { "{PROJECT_DIR}/resource/base" }
+                                        }
+                                    },
+                                    Recognition = new Dictionary<string, MaaInterface.CustomExecutor>(),
+                                    Action = new Dictionary<string, MaaInterface.CustomExecutor>(),
+                                    Option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
+                                    {
+                                        {
+                                            "测试", new MaaInterface.MaaInterfaceOption()
+                                            {
+                                                Cases = new List<MaaInterface.MaaInterfaceOptionCase>
+                                                {
+                                                    new()
+                                                    {
+                                                        Name = "测试1",
+                                                        Pipeline_Override = new Dictionary<string, TaskModel>()
+                                                    },
+                                                    new()
+                                                    {
+                                                        Name = "测试2",
+                                                        Pipeline_Override = new Dictionary<string, TaskModel>()
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }, new JsonSerializerSettings()
+                                {
+                                    Formatting = Formatting.Indented,
+                                    NullValueHandling = NullValueHandling.Ignore,
+                                    DefaultValueHandling = DefaultValueHandling.Include
+                                }));
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"创建文件时发生错误: {ex.Message}");
+                            LoggerService.LogError(ex);
+                        }
+                    });
             if (MaaInterface.Instance != null)
             {
                 Data?.TasksSource.Clear();
@@ -373,8 +374,8 @@ namespace MFAWPF.Views
         {
             IsADB = adbTab.IsSelected;
 
-            if (IsFirstStart && "adb".Equals(MaaProcessor.Config.Adb.Adb) &&
-                DataSet.TryGetData<JObject>("Adb", out var jObject))
+            if (IsFirstStart && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) &&
+                DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
             {
                 var settings = new JsonSerializerSettings();
                 settings.Converters.Add(new AdbInputMethodsConverter());
@@ -407,18 +408,18 @@ namespace MFAWPF.Views
             {
                 Growl.Info(string.Format(LocExtension.GetLocalizedValue<string>("WindowSelectionMessage"),
                     window.Name));
-                MaaProcessor.Config.Win32.HWnd = window.Handle;
+                MaaProcessor.Config.DesktopWindow.HWnd = window.Handle;
                 MaaProcessor.Instance.SetCurrentTasker();
             }
             else if (deviceComboBox.SelectedItem is AdbDeviceInfo device)
             {
                 Growl.Info(string.Format(LocExtension.GetLocalizedValue<string>("EmulatorSelectionMessage"),
                     device.Name));
-                MaaProcessor.Config.Adb.Adb = device.AdbPath;
-                MaaProcessor.Config.Adb.AdbAddress = device.AdbSerial;
-                MaaProcessor.Config.Adb.AdbConfig = device.Config;
+                MaaProcessor.Config.AdbDevice.AdbPath = device.AdbPath;
+                MaaProcessor.Config.AdbDevice.AdbSerial = device.AdbSerial;
+                MaaProcessor.Config.AdbDevice.Config = device.Config;
                 MaaProcessor.Instance.SetCurrentTasker();
-                DataSet.SetData("Adb", device);
+                DataSet.SetData("AdbDevice", device);
             }
         }
 
@@ -908,8 +909,8 @@ namespace MFAWPF.Views
                 var adbInputType = ConfigureAdbInputTypes();
                 var adbScreenCapType = ConfigureAdbScreenCapTypes();
 
-                MaaProcessor.Config.Adb.Input = adbInputType;
-                MaaProcessor.Config.Adb.ScreenCap = adbScreenCapType;
+                MaaProcessor.Config.AdbDevice.Input = adbInputType;
+                MaaProcessor.Config.AdbDevice.ScreenCap = adbScreenCapType;
 
                 Console.WriteLine(
                     $"{LocExtension.GetLocalizedValue<string>("AdbInputMode")}{adbInputType},{LocExtension.GetLocalizedValue<string>("AdbCaptureMode")}{adbScreenCapType}");
@@ -958,8 +959,8 @@ namespace MFAWPF.Views
                 var win32InputType = ConfigureWin32InputTypes();
                 var winScreenCapType = ConfigureWin32ScreenCapTypes();
 
-                MaaProcessor.Config.Win32.Input = win32InputType;
-                MaaProcessor.Config.Win32.ScreenCap = winScreenCapType;
+                MaaProcessor.Config.DesktopWindow.Input = win32InputType;
+                MaaProcessor.Config.DesktopWindow.ScreenCap = winScreenCapType;
 
                 Console.WriteLine(
                     $"{"AdbInputMode".GetLocalizationString()}{win32InputType},{"AdbCaptureMode".GetLocalizationString()}{winScreenCapType}");

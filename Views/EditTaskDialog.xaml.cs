@@ -388,42 +388,16 @@ public partial class EditTaskDialog
                 {
                     if (imageDialog.IsRoi)
                     {
-                        if (Data.CurrentTask.Task.Roi == null)
+                        if (imageDialog.Output != null)
                         {
                             Data.CurrentTask.Task.Roi = imageDialog.Output;
-                        }
-                        else
-                        {
-                            if (Data.CurrentTask.Task?.Roi is List<int> li)
-                            {
-                                if (imageDialog.Output == null)
-                                {
-                                    Data.CurrentTask.Task.Roi = new List<List<int>> { li };
-                                }
-                                else
-                                {
-                                    Data.CurrentTask.Task.Roi = new List<List<int>> { li, imageDialog.Output };
-                                }
-                            }
-                            else if (Data.CurrentTask.Task?.Roi is List<List<int>> lli)
-                            {
-                                if (imageDialog.Output != null)
-                                    lli.Add(imageDialog.Output);
-                                Data.CurrentTask.Task.Roi = lli;
-                            }
-                            else if (Data.CurrentTask.Task?.Roi is string s && imageDialog.Output != null)
-                            {
-                                Data.CurrentTask.Task.Roi = Data.CurrentTask.Task.Roi =
-                                    new List<List<int>> { imageDialog.Output };
-                            }
                         }
                     }
                     else
                     {
-                        if (Data.CurrentTask.Task != null)
+                        if (imageDialog.Output != null)
                         {
                             Data.CurrentTask.Task.Target = imageDialog.Output;
-                            Console.WriteLine("怎么回事");
                         }
                     }
 

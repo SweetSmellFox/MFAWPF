@@ -267,7 +267,7 @@ namespace MFAWPF.Res.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Win32.
+        ///   Looks up a localized string similar to DesktopWindow.
         /// </summary>
         internal static string TabWin32 {
             get {

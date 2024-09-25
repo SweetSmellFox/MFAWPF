@@ -220,7 +220,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("roi")]
     [Category("识别器")]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
-    [Editor(typeof(AutoStringOrListIntStringEditor), typeof(AutoStringOrListIntStringEditor))]
+    [Editor(typeof(SingleIntListOrAutoEditor), typeof(SingleIntListOrAutoEditor))]
     public object? Roi
     {
         get => _roi;
@@ -230,7 +230,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("roi_offset")]
     [Category("识别器")]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
-    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
+    [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
     public object? Roi_Offset
     {
         get => _roi_offset;
@@ -433,8 +433,8 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("target")]
     [Category("动作")]
-    [JsonConverter(typeof(TrueStringOrArrayConverter))]
-    [Editor(typeof(ListTrueIntStringEditor), typeof(ListTrueIntStringEditor))]
+    [JsonConverter(typeof(SingleOrNestedListConverter))]
+    [Editor(typeof(SingleIntListOrAutoEditor), typeof(SingleIntListOrAutoEditor))]
     public object? Target
     {
         get => _target;
@@ -443,7 +443,8 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("target_offset")]
     [Category("动作")]
-    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
+    [JsonConverter(typeof(SingleOrNestedListConverter))]
+    [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
     public List<int>? Target_Offset
     {
         get => _target_offset;
@@ -452,8 +453,8 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("begin")]
     [Category("动作")]
-    [JsonConverter(typeof(TrueStringOrArrayConverter))]
-    [Editor(typeof(ListTrueIntStringEditor), typeof(ListTrueIntStringEditor))]
+    [JsonConverter(typeof(SingleOrNestedListConverter))]
+    [Editor(typeof(SingleIntListOrAutoEditor), typeof(SingleIntListOrAutoEditor))]
     public object? Begin
     {
         get => _begin;
@@ -462,7 +463,8 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("begin_offset")]
     [Category("动作")]
-    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
+    [JsonConverter(typeof(SingleOrNestedListConverter))]
+    [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
     public List<int>? Begin_Offset
     {
         get => _begin_offset;
@@ -471,8 +473,8 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("end")]
     [Category("动作")]
-    [JsonConverter(typeof(TrueStringOrArrayConverter))]
-    [Editor(typeof(ListTrueIntStringEditor), typeof(ListTrueIntStringEditor))]
+    [JsonConverter(typeof(SingleOrNestedListConverter))]
+    [Editor(typeof(SingleIntListOrAutoEditor), typeof(SingleIntListOrAutoEditor))]
     public object? End
     {
         get => _end;
@@ -481,7 +483,8 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("end_offset")]
     [Category("动作")]
-    [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
+    [JsonConverter(typeof(SingleOrNestedListConverter))]
+    [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
     public List<int>? End_Offset
     {
         get => _end_offset;
@@ -524,6 +527,7 @@ public class TaskModel : ObservableObject
         get => _package;
         set => SetNewProperty(ref _package, value);
     }
+
 
     public override string ToString()
     {
