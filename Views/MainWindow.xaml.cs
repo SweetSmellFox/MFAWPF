@@ -142,8 +142,8 @@ namespace MFAWPF.Views
             {
                 var dragItem = new DragItemViewModel(task)
                 {
-                    IsCheckedWithNull = task.check ?? false,
-                    SettingVisibility = task.repeatable == true || task.option?.Count > 0
+                    IsCheckedWithNull = task.Check ?? false,
+                    SettingVisibility = task.Repeatable == true || task.Option?.Count > 0
                         ? Visibility.Visible
                         : Visibility.Hidden
                 };
@@ -756,9 +756,9 @@ namespace MFAWPF.Views
             {
                 settingPanel.Children.Clear();
                 AddRepeatOption(dragItem);
-                if (dragItem.InterfaceItem.option != null)
+                if (dragItem.InterfaceItem.Option != null)
                 {
-                    foreach (var option in dragItem.InterfaceItem.option)
+                    foreach (var option in dragItem.InterfaceItem.Option)
                         AddOption(option, dragItem);
                 }
             }
@@ -805,11 +805,11 @@ namespace MFAWPF.Views
 
         private void AddRepeatOption(DragItemViewModel source)
         {
-            if (source.InterfaceItem is { repeatable: true })
+            if (source.InterfaceItem is { Repeatable: true })
             {
                 NumericUpDown numericUpDown = new NumericUpDown
                 {
-                    Value = source.InterfaceItem.repeat_count ?? 1, Style = FindResource("NumericUpDownPlus") as Style,
+                    Value = source.InterfaceItem.RepeatCount ?? 1, Style = FindResource("NumericUpDownPlus") as Style,
                     Margin = new Thickness(5), Increment = 1, Minimum = -1, DecimalPlaces = 0
                 };
 
@@ -827,7 +827,7 @@ namespace MFAWPF.Views
                 numericUpDown.Tag = source.Name;
                 numericUpDown.ValueChanged += (_, _) =>
                 {
-                    source.InterfaceItem.repeat_count = Convert.ToInt16(numericUpDown.Value);
+                    source.InterfaceItem.RepeatCount = Convert.ToInt16(numericUpDown.Value);
                     JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
                         MaaInterface.Instance);
                 };

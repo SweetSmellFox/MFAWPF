@@ -45,7 +45,7 @@ public partial class ErrorView : INotifyPropertyChanged
         while (true)
         {
             errorStr.Append(exc.Message);
-            if (exc.InnerException != null)
+            if (exc.InnerException is not null)
             {
                 errorStr.AppendLine();
                 exc = exc.InnerException;

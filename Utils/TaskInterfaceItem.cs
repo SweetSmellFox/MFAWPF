@@ -5,16 +5,16 @@ namespace MFAWPF.Utils;
 
 public class TaskInterfaceItem
 {
-    public string? name;
-    public string? entry;
-    public bool? check;
-    public bool? repeatable;
-    public int? repeat_count;
+    [JsonProperty("name")] public string? Name;
+    [JsonProperty("entry")] public string? Entry;
+    [JsonProperty("check")] public bool? Check;
+    [JsonProperty("repeatable")] public bool? Repeatable;
+    [JsonProperty("repeat_count")] public int? RepeatCount;
 
-    [JsonConverter(typeof(MaaInterfaceSelectOptionConverter))]
-    public List<MaaInterface.MaaInterfaceSelectOption>? option;
+    [JsonProperty("option")] [JsonConverter(typeof(MaaInterfaceSelectOptionConverter))]
+    public List<MaaInterface.MaaInterfaceSelectOption>? Option;
 
-    public Dictionary<string, TaskModel>? param;
+    [JsonProperty("pipeline_override")] public Dictionary<string, TaskModel>? PipelineOverride;
 
     public override string ToString()
     {

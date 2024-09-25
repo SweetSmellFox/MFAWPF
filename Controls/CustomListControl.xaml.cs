@@ -73,21 +73,21 @@ public partial class CustomListControl : UserControl
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         // 处理集合的增删改
-        if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
+        if (e is { Action: NotifyCollectionChangedAction.Add, NewItems: not null })
         {
             foreach (CustomValue<string> item in e.NewItems)
             {
                 item.PropertyChanged += Item_PropertyChanged;
             }
         }
-        else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems != null)
+        else if (e is { Action: NotifyCollectionChangedAction.Remove, OldItems: not null })
         {
             foreach (CustomValue<string> item in e.OldItems)
             {
                 item.PropertyChanged -= Item_PropertyChanged;
             }
         }
-        else if (e.Action == NotifyCollectionChangedAction.Reset)
+        else if (e is { Action: NotifyCollectionChangedAction.Reset })
         {
             foreach (CustomValue<string> item in Items)
             {
@@ -138,11 +138,14 @@ public partial class CustomListControl : UserControl
     // 查找父元素的方法
     private static T? FindParent<T>(DependencyObject child) where T : DependencyObject
     {
-        for (var parent = VisualTreeHelper.GetParent(child); parent != null; parent = VisualTreeHelper.GetParent(parent))
+        for (var parent = VisualTreeHelper.GetParent(child);
+             parent != null;
+             parent = VisualTreeHelper.GetParent(parent))
         {
             if (parent is T foundParent)
                 return foundParent;
         }
+
         return null;
     }
 

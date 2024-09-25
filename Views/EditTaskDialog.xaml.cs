@@ -25,7 +25,7 @@ public partial class EditTaskDialog
         InitializeComponent();
         tasks = new List<TaskModel>();
         Data = DataContext as EditTaskDialogViewModel;
-        if (Data != null)
+        if (Data is not null)
             Data.Dialog = this;
     }
 
@@ -34,13 +34,13 @@ public partial class EditTaskDialog
     {
         base.OnClosed(e);
         MainWindow.TaskDialog = null;
-        if (MainWindow.Data != null)
+        if (MainWindow.Data is not null)
             MainWindow.Data.Idle = true;
     }
 
     private void List_KeyDown(object sender, KeyEventArgs e)
     {
-        if (Data is not { CurrentTask: not null, DataList: not null } || e.Key != Key.Delete)
+        if (Data is not { CurrentTask: not null, DataList: not null } || e is not { Key: Key.Delete })
             return;
 
         var itemToDelete = Data.CurrentTask;
@@ -144,7 +144,7 @@ public partial class EditTaskDialog
 
     private void AddTask(object sender, RoutedEventArgs e)
     {
-        Data?.DataList?.Add(new TaskItemViewModel()
+        Data?.DataList?.Add(new TaskItemViewModel
         {
             Task = new TaskModel()
         });

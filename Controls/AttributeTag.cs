@@ -98,7 +98,7 @@ public class AttributeTag : Tag
     public AttributeTag(Attribute? attribute)
     {
         InitializeTag();
-        if (attribute != null)
+        if (attribute is not null)
             Attribute = attribute;
     }
 

@@ -140,17 +140,17 @@ namespace MFAWPF.Utils
 
         private TaskAndParam CreateTaskAndParam(DragItemViewModel task)
         {
-            var taskModels = task.InterfaceItem?.param ?? new Dictionary<string, TaskModel>();
+            var taskModels = task.InterfaceItem?.PipelineOverride ?? new Dictionary<string, TaskModel>();
 
-            UpdateTaskDictionary(ref taskModels, task.InterfaceItem?.option);
+            UpdateTaskDictionary(ref taskModels, task.InterfaceItem?.Option);
 
             var taskParams = SerializeTaskParams(taskModels);
 
             return new TaskAndParam
             {
-                Name = task.InterfaceItem?.name,
-                Entry = task.InterfaceItem?.entry,
-                Count = task.InterfaceItem?.repeatable == true ? (task.InterfaceItem?.repeat_count ?? 1) : 1,
+                Name = task.InterfaceItem?.Name,
+                Entry = task.InterfaceItem?.Entry,
+                Count = task.InterfaceItem?.Repeatable == true ? (task.InterfaceItem?.RepeatCount ?? 1) : 1,
                 Param = taskParams
             };
         }

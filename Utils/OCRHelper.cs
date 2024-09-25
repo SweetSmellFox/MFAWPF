@@ -13,16 +13,16 @@ public class OCRHelper
 {
     public class RecognitionQuery
     {
-        public List<RecognitionResult>? all;
-        public RecognitionResult? best;
-        public List<RecognitionResult>? filtered;
+        [JsonProperty("all")] public List<RecognitionResult>? All;
+        [JsonProperty("best")] public RecognitionResult? Best;
+        [JsonProperty("filtered")] public List<RecognitionResult>? Filtered;
     }
 
     public class RecognitionResult
     {
-        public List<int>? box;
-        public double? score;
-        public string? text;
+        [JsonProperty("box")] public List<int>? Box;
+        [JsonProperty("score")] public double? Score;
+        [JsonProperty("text")] public string? Text;
     }
 
     public static void Initialize()
@@ -46,13 +46,13 @@ public class OCRHelper
         };
         var job = MaaProcessor.Instance.GetCurrentTasker()?
             .AppendPipeline(taskItemViewModel.Name, taskItemViewModel.ToString());
-        if (job != null && job.Wait() == MaaJobStatus.Succeeded)
+        if (job?.Wait() == MaaJobStatus.Succeeded)
         {
             RecognitionQuery? query =
                 JsonConvert.DeserializeObject<RecognitionQuery>(job.QueryRecognitionDetail()?
                     .Detail ?? string.Empty);
-            if (!string.IsNullOrWhiteSpace(query?.best?.text))
-                result = query.best.text;
+            if (!string.IsNullOrWhiteSpace(query?.Best?.Text))
+                result = query.Best.Text;
         }
         else
         {
@@ -66,8 +66,8 @@ public class OCRHelper
     public static string ReadTextFromMAASyncContext(in IMaaContext syncContext, IMaaImageBuffer image, int x, int y,
         int width, int height)
     {
-        string result = string.Empty;
-        TaskItemViewModel taskItemViewModel = new TaskItemViewModel
+        var result = string.Empty;
+        var taskItemViewModel = new TaskItemViewModel
         {
             Task = new TaskModel
             {
@@ -75,20 +75,19 @@ public class OCRHelper
                 {
                     x, y,
                     width, height
-                },
-                Expected = ["^[0-9]*$"]
+                }
             },
             Name = "AppendOCR",
         };
         var detail =
             syncContext.RunRecognition(taskItemViewModel.Name, taskItemViewModel.ToString(), image) as
                 RecognitionDetail<IMaaImageBuffer>;
+
         if (detail != null)
         {
-            RecognitionQuery? query =
-                JsonConvert.DeserializeObject<RecognitionQuery>(detail.Detail);
-            if (query?.best != null && !string.IsNullOrWhiteSpace(query.best?.text))
-                result = query.best.text;
+            var query = JsonConvert.DeserializeObject<RecognitionQuery>(detail.Detail);
+            if (!string.IsNullOrWhiteSpace(query?.Best?.Text))
+                result = query.Best.Text;
         }
         else
         {
