@@ -1,4 +1,6 @@
-﻿using MFAWPF.ViewModels;
+﻿using System.Windows;
+using System.Windows.Threading;
+using MFAWPF.ViewModels;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using Newtonsoft.Json;
@@ -65,7 +67,7 @@ public class OCRHelper
         int width, int height)
     {
         string result = string.Empty;
-        TaskItemViewModel taskItemViewModel = new TaskItemViewModel()
+        TaskItemViewModel taskItemViewModel = new TaskItemViewModel
         {
             Task = new TaskModel
             {
@@ -73,17 +75,18 @@ public class OCRHelper
                 {
                     x, y,
                     width, height
-                }
+                },
+                Expected = ["^[0-9]*$"]
             },
             Name = "AppendOCR",
         };
-        IMaaStringBuffer outDetail = new MaaStringBuffer();
-        syncContext.RunRecognition(taskItemViewModel.Name, taskItemViewModel.ToString(), image);
-        string? json = outDetail.ToString();
-        if (!string.IsNullOrWhiteSpace(json))
+        var detail =
+            syncContext.RunRecognition(taskItemViewModel.Name, taskItemViewModel.ToString(), image) as
+                RecognitionDetail<IMaaImageBuffer>;
+        if (detail != null)
         {
             RecognitionQuery? query =
-                JsonConvert.DeserializeObject<RecognitionQuery>(json);
+                JsonConvert.DeserializeObject<RecognitionQuery>(detail.Detail);
             if (query?.best != null && !string.IsNullOrWhiteSpace(query.best?.text))
                 result = query.best.text;
         }

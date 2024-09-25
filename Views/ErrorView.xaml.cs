@@ -18,12 +18,23 @@ public partial class ErrorView : INotifyPropertyChanged
     protected bool ShouldExit { get; set; }
 
     public string ExceptionMessage { get; set; } = string.Empty;
-    
+
     public string ExceptionDetails { get; set; } = string.Empty;
 
     public ErrorView()
     {
         InitializeComponent();
+    }
+
+    public static void ShowException(Exception e, bool shouldExit = false)
+    {
+        if (Application.Current.Dispatcher.CheckAccess())
+        {
+            var errorView = new ErrorView(e, shouldExit);
+            errorView.Show();
+        }
+        else
+            Application.Current.Dispatcher.Invoke(() => { ShowException(e, shouldExit); });
     }
 
     public ErrorView(Exception exc, bool shouldExit)
@@ -59,7 +70,7 @@ public partial class ErrorView : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    
+
     protected override void OnClosed(EventArgs e)
     {
         if (ShouldExit)

@@ -66,7 +66,7 @@ public class StringComboBoxEditor : PropertyEditorBase
             };
         }
 
-        if (propertyItem.PropertyName == "Order_By")
+        if (propertyItem.PropertyName == "OrderBy")
         {
             return new List<string>
             {

@@ -238,7 +238,7 @@ public partial class CropImageDialog
                 return new PngBitmapEncoder();
         }
     }
-    
+
     private void Load(object sender, RoutedEventArgs e)
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
@@ -256,8 +256,7 @@ public partial class CropImageDialog
             }
             catch (Exception ex)
             {
-                ErrorView errorView = new ErrorView(ex, false);
-                errorView.Show();
+                ErrorView.ShowException(ex);
             }
         }
     }

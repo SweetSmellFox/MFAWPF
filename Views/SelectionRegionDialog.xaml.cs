@@ -194,8 +194,7 @@ public partial class SelectionRegionDialog
             }
             catch (Exception ex)
             {
-                ErrorView errorView = new ErrorView(ex, false);
-                errorView.Show();
+                ErrorView.ShowException(ex);
             }
         }
     }

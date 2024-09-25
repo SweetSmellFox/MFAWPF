@@ -343,8 +343,7 @@ namespace MFAWPF.Utils
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                ErrorView errorView = new ErrorView(e, false);
-                errorView.Show();
+                ErrorView.ShowException(e);
                 return content;
             }
         }
@@ -460,16 +459,16 @@ namespace MFAWPF.Utils
         {
             var converter = new BrushConverter();
 
-            if (taskModel.Focus_Tip != null)
+            if (taskModel.FocusTip != null)
             {
-                for (int i = 0; i < taskModel.Focus_Tip.Count; i++)
+                for (int i = 0; i < taskModel.FocusTip.Count; i++)
                 {
                     Brush? brush = null;
-                    var tip = taskModel.Focus_Tip[i];
+                    var tip = taskModel.FocusTip[i];
                     try
                     {
-                        if (taskModel.Focus_Tip_Color != null && taskModel.Focus_Tip_Color.Count > i)
-                            brush = converter.ConvertFromString(taskModel.Focus_Tip_Color[i]) as Brush;
+                        if (taskModel.FocusTipColor != null && taskModel.FocusTipColor.Count > i)
+                            brush = converter.ConvertFromString(taskModel.FocusTipColor[i]) as Brush;
                     }
                     catch (Exception e)
                     {

@@ -48,15 +48,13 @@ public partial class App : Application
             e.Handled = true; //把 Handled 属性设为true，表示此异常已处理，程序可以继续运行，不会强制退出      
             Console.WriteLine(e.Exception);
             LoggerService.LogError(e.Exception);
-            ErrorView errorView = new ErrorView(e.Exception, false);
-            errorView.Show();
+            ErrorView.ShowException(e.Exception, false);
         }
         catch (Exception ex)
         {
             //此时程序出现严重异常，将强制结束退出
             LoggerService.LogError(ex.ToString());
-            ErrorView errorView = new ErrorView(ex, true);
-            errorView.Show();
+            ErrorView.ShowException(ex, true);
         }
     }
 
@@ -73,8 +71,7 @@ public partial class App : Application
         {
             Console.WriteLine(ex);
             LoggerService.LogError(ex.ToString());
-            ErrorView errorView = new ErrorView(ex, false);
-            errorView.Show();
+            ErrorView.ShowException(ex);
             sbEx.Append((ex).Message);
         }
         else
@@ -90,8 +87,7 @@ public partial class App : Application
     {
         //task线程内未处理捕获
         LoggerService.LogError(e.Exception);
-        ErrorView errorView = new ErrorView(e.Exception, false);
-        errorView.Show();
+        ErrorView.ShowException(e.Exception);
         foreach (var item in e.Exception.InnerExceptions)
         {
             Console.WriteLine("异常类型：{0}{1}来自：{2}{3}异常内容：{4}",

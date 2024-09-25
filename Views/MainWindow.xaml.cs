@@ -328,7 +328,7 @@ namespace MFAWPF.Views
             KeyValuePair<string, TaskModel> task)
         {
             ValidateNextTasks(taskDictionary, task.Value.Next);
-            ValidateNextTasks(taskDictionary, task.Value.On_Error, "on_error");
+            ValidateNextTasks(taskDictionary, task.Value.OnError, "on_error");
             ValidateNextTasks(taskDictionary, task.Value.Interrupt, "interrupt");
         }
 

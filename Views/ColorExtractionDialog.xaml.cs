@@ -232,8 +232,7 @@ public partial class ColorExtractionDialog
             }
             catch (Exception ex)
             {
-                ErrorView errorView = new ErrorView(ex, false);
-                errorView.Show();
+                ErrorView.ShowException(ex);
             }
         }
     }
