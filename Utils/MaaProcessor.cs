@@ -112,7 +112,7 @@ namespace MFAWPF.Utils
                 TaskManager.RunTaskAsync(() =>
                 {
                     MainWindow.Data?.AddLogByKey("Stopping");
-                    if (_currentTasker == null || _currentTasker?.Abort() == true)
+                    if (_currentTasker == null || (_currentTasker?.Abort()).IsTrue())
                     {
                         DisplayTaskCompletionMessage();
                         if (MainWindow.Data != null)

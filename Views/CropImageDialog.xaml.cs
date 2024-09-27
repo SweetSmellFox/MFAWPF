@@ -205,7 +205,7 @@ public partial class CropImageDialog
                 DefaultExt = "png"
             };
 
-            if (saveFileDialog.ShowDialog() == true)
+            if (saveFileDialog.ShowDialog().IsTrue())
             {
                 var encoder = GetEncoderByExtension(saveFileDialog.FileName);
                 encoder.Frames.Add(BitmapFrame.Create(croppedBitmap));
@@ -243,11 +243,9 @@ public partial class CropImageDialog
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadImageTitle".GetLocalizationString()
+            Title = "LoadImageTitle".GetLocalizationString(),Filter = "ImageFilter".GetLocalizationString()
         };
-        openFileDialog.Filter = "ImageFilter".GetLocalizationString();
-
-        if (openFileDialog.ShowDialog() == true)
+        if (openFileDialog.ShowDialog().IsTrue())
         {
             try
             {

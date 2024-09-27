@@ -422,4 +422,19 @@
     <data name="AdbEditor" xml:space="preserve">
         <value>Adb Editor</value>
     </data>
+    <data name="AllFilter" xml:space="preserve">
+        <value>All Files (*.*)|*.*</value>
+    </data>
+    <data name="LoadFileTitle" xml:space="preserve">
+        <value>Select Any File</value>
+    </data>
+    <data name="AdbName" xml:space="preserve">
+        <value>Adb Name</value>
+    </data>
+    <data name="AdbSerial" xml:space="preserve">
+        <value>Adb Address</value>
+    </data>
+    <data name="AdbPath" xml:space="preserve">
+        <value>Adb Path</value>
+    </data>
 </root>

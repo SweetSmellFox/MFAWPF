@@ -20,6 +20,7 @@ public partial class ColorExtractionDialog
         get => _outputRoi;
         set => _outputRoi = value?.Select(i => i < 0 ? 0 : i).ToList();
     }
+
     public List<int>? OutputUpper { get; set; }
     public List<int>? OutputLower { get; set; }
 
@@ -219,11 +220,11 @@ public partial class ColorExtractionDialog
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadImageTitle".GetLocalizationString()
+            Title = "LoadImageTitle".GetLocalizationString(), Filter = "ImageFilter".GetLocalizationString()
         };
-        openFileDialog.Filter = "ImageFilter".GetLocalizationString();
 
-        if (openFileDialog.ShowDialog() == true)
+
+        if (openFileDialog.ShowDialog().IsTrue())
         {
             try
             {

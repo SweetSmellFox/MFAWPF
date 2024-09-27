@@ -180,11 +180,9 @@ public partial class SwipeDialog
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadImageTitle".GetLocalizationString()
+            Title = "LoadImageTitle".GetLocalizationString(), Filter = "ImageFilter".GetLocalizationString()
         };
-        openFileDialog.Filter = "ImageFilter".GetLocalizationString();
-
-        if (openFileDialog.ShowDialog() == true)
+        if (openFileDialog.ShowDialog().IsTrue())
         {
             try
             {

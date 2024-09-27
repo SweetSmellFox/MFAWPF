@@ -450,4 +450,19 @@
     <data name="AdbEditor" xml:space="preserve">
         <value>Adb 编辑器</value>
     </data>
+    <data name="AllFilter" xml:space="preserve">
+        <value>所有文件 (*.*)|*.*</value>
+    </data>
+    <data name="LoadFileTitle" xml:space="preserve">
+        <value>选择 任意 文件</value>
+    </data>
+    <data name="AdbName" xml:space="preserve">
+        <value>Adb名称</value>
+    </data>
+    <data name="AdbPath" xml:space="preserve">
+        <value>Adb路径</value>
+    </data>
+    <data name="AdbSerial" xml:space="preserve">
+        <value>Adb地址</value>
+    </data>
 </root>

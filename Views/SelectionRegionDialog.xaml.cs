@@ -20,6 +20,7 @@ public partial class SelectionRegionDialog
         get => _output;
         set => _output = value?.Select(i => i < 0 ? 0 : i).ToList();
     }
+
     public bool IsRoi { get; set; }
 
     public SelectionRegionDialog(BitmapImage bitmapImage)
@@ -175,16 +176,15 @@ public partial class SelectionRegionDialog
         IsRoi = SelectType.SelectedIndex == 0;
         Close();
     }
-    
+
     private void Load(object sender, RoutedEventArgs e)
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadImageTitle".GetLocalizationString()
+            Title = "LoadImageTitle".GetLocalizationString(), Filter = "ImageFilter".GetLocalizationString()
         };
-        openFileDialog.Filter = "ImageFilter".GetLocalizationString();
 
-        if (openFileDialog.ShowDialog() == true)
+        if (openFileDialog.ShowDialog().IsTrue())
         {
             try
             {

@@ -95,7 +95,7 @@ public partial class EditTaskDialog
             Filter = "JSONFilter".GetLocalizationString()
         };
 
-        if (openFileDialog.ShowDialog() == true)
+        if (openFileDialog.ShowDialog().IsTrue())
         {
             string filePath = openFileDialog.FileName;
             string fileName = Path.GetFileName(filePath);
@@ -183,7 +183,7 @@ public partial class EditTaskDialog
 
         bool? result = saveFileDialog.ShowDialog();
 
-        if (result == true)
+        if (result.IsTrue())
         {
             string filePath = saveFileDialog.FileName;
             string jsonString = JsonConvert.SerializeObject(taskModels, settings);
@@ -375,7 +375,7 @@ public partial class EditTaskDialog
         if (image != null)
         {
             SelectionRegionDialog imageDialog = new SelectionRegionDialog(image);
-            if (imageDialog.ShowDialog() == true)
+            if (imageDialog.ShowDialog().IsTrue())
             {
                 if (Data?.CurrentTask?.Task != null)
                 {
@@ -407,7 +407,7 @@ public partial class EditTaskDialog
         if (image != null)
         {
             CropImageDialog imageDialog = new CropImageDialog(image);
-            if (imageDialog.ShowDialog() == true)
+            if (imageDialog.ShowDialog().IsTrue())
             {
                 if (Data?.CurrentTask?.Task != null)
                 {
@@ -438,7 +438,7 @@ public partial class EditTaskDialog
         if (image != null)
         {
             SwipeDialog imageDialog = new SwipeDialog(image);
-            if (imageDialog.ShowDialog() == true)
+            if (imageDialog.ShowDialog().IsTrue())
             {
                 if (Data?.CurrentTask?.Task != null)
                 {
@@ -457,7 +457,7 @@ public partial class EditTaskDialog
         if (image != null)
         {
             ColorExtractionDialog imageDialog = new ColorExtractionDialog(image);
-            if (imageDialog.ShowDialog() == true)
+            if (imageDialog.ShowDialog().IsTrue())
             {
                 if (Data?.CurrentTask?.Task != null)
                 {
@@ -476,7 +476,7 @@ public partial class EditTaskDialog
         if (image != null)
         {
             RecognitionTextDialog imageDialog = new RecognitionTextDialog(image);
-            if (imageDialog.ShowDialog() == true)
+            if (imageDialog.ShowDialog().IsTrue())
             {
                 if (Data?.CurrentTask?.Task != null && imageDialog.Output != null)
                 {
