@@ -38,7 +38,7 @@
 
     <!-- 添加以下资源项 -->
     <data name="AppTitle" xml:space="preserve">
-        <value>Maa框架任务管理器</value>
+        <value>MFA 任务管理器</value>
     </data>
     <data name="TabADB" xml:space="preserve">
         <value>ADB</value>

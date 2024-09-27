@@ -14,9 +14,9 @@
            xmlns:utils="clr-namespace:MFAWPF.Utils"
            engine:ResxLocalizationProvider.DefaultAssembly="MFAWPF"
            engine:ResxLocalizationProvider.DefaultDictionary="Strings"
-           mc:Ignorable="d" x:Name="home" ShowTitle="False" Icon="../logo.ico"
+           mc:Ignorable="d" x:Name="home"
            Title="{lex:Loc AppTitle}" Height="520" Width="800" MinWidth="550" MinHeight="260"
-           WindowStartupLocation="CenterScreen"
+           ShowTitle="False" Icon="../logo.ico" WindowStartupLocation="CenterScreen"
            NonClientAreaBackground="{DynamicResource MainContentBackgroundBrush}"
            Background="{DynamicResource SecundaryBackgroundColor}"
            WindowState="Normal">

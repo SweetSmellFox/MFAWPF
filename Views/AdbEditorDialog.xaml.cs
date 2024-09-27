@@ -5,7 +5,7 @@ using Window = HandyControl.Controls.Window;
 
 namespace MFAWPF.Views;
 
-public partial class AdbEditorDialog : Window
+public partial class AdbEditorDialog
 {
     public AdbEditorDialog()
     {

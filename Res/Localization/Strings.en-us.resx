@@ -12,7 +12,7 @@
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
     <data name="AppTitle" xml:space="preserve">
-        <value>MFA Tools</value>
+        <value>MFA Task Manager</value>
     </data>
     <data name="DeselectAll" xml:space="preserve">
         <value>Deselect All</value>
