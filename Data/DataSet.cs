@@ -1,92 +1,91 @@
-﻿using System.Diagnostics;
-using MFAWPF.Utils;
+﻿using MFAWPF.Utils;
 using Newtonsoft.Json.Linq;
 
 namespace MFAWPF.Data
+
+;
+
+public class DataSet
 {
-    public class DataSet
+    public static Dictionary<string, object>? Data = new();
+
+    public static void SetData(string key, object? value)
     {
-        public static Dictionary<string, object>? Data = new();
+        if (Data == null || value == null) return;
+        Data[key] = value; // 如果 key 不存在，将自动添加条目；如果存在，将更新值
 
-        public static void SetData(string key, object? value)
+        JsonHelper.WriteToConfigJsonFile("config", Data);
+    }
+
+
+    public static bool TryGetData<T>(string key, out T? value)
+    {
+        if (Data?.TryGetValue(key, out var data) == true)
         {
-            if (Data == null || value == null) return;
-            Data[key] = value; // 如果 key 不存在，将自动添加条目；如果存在，将更新值
-
-            JsonHelper.WriteToConfigJsonFile("config", Data);
-        }
-
-
-        public static bool TryGetData<T>(string key, out T? value)
-        {
-            if (Data?.TryGetValue(key, out var data) == true)
+            try
             {
-                try
+                // Handle conversion between int and long
+                if (data is long longValue && typeof(T) == typeof(int))
                 {
-                    // Handle conversion between int and long
-                    if (data is long longValue && typeof(T) == typeof(int))
-                    {
-                        value = (T)(object)Convert.ToInt32(longValue); // Safe conversion
-                        return true;
-                    }
-
-                    if (data is JArray jArray)
-                    {
-                        // 将 JArray 转换为目标类型
-                        value = jArray.ToObject<T>();
-                        return true;
-                    }
-
-                    if (data is T t)
-                    {
-                        value = t;
-                        return true;
-                    }
+                    value = (T)(object)Convert.ToInt32(longValue); // Safe conversion
+                    return true;
                 }
-                catch (Exception e)
+
+                if (data is JArray jArray)
                 {
-                    Console.WriteLine("在进行类型转换时发生错误！");
-                    LoggerService.LogError("在进行类型转换时发生错误!");
-                    LoggerService.LogError(e);
+                    // 将 JArray 转换为目标类型
+                    value = jArray.ToObject<T>();
+                    return true;
+                }
+
+                if (data is T t)
+                {
+                    value = t;
+                    return true;
                 }
             }
-
-            value = default;
-            return false;
+            catch (Exception e)
+            {
+                Console.WriteLine("在进行类型转换时发生错误！");
+                LoggerService.LogError("在进行类型转换时发生错误!");
+                LoggerService.LogError(e);
+            }
         }
 
-        public static T? GetData<T>(string key, T defaultValue)
+        value = default;
+        return false;
+    }
+
+    public static T? GetData<T>(string key, T defaultValue)
+    {
+        if (Data?.TryGetValue(key, out var data) == true)
         {
-            if (Data?.TryGetValue(key, out var data) == true)
+            try
             {
-                try
+                if (data is long longValue && typeof(T) == typeof(int))
                 {
-
-                    if (data is long longValue && typeof(T) == typeof(int))
-                    {
-                        return (T)(object)Convert.ToInt32(longValue);
-                    }
-
-                    if (data is JArray jArray)
-                    {
-                        // 将 JArray 转换为目标类型
-                        return jArray.ToObject<T>();
-                    }
-
-                    if (data is T t)
-                    {
-                        return t;
-                    }
+                    return (T)(object)Convert.ToInt32(longValue);
                 }
-                catch (Exception e)
+
+                if (data is JArray jArray)
                 {
-                    Console.WriteLine("在进行类型转换时发生错误！");
-                    LoggerService.LogError("在进行类型转换时发生错误!");
-                    LoggerService.LogError(e);
+                    // 将 JArray 转换为目标类型
+                    return jArray.ToObject<T>();
+                }
+
+                if (data is T t)
+                {
+                    return t;
                 }
             }
-
-            return defaultValue;
+            catch (Exception e)
+            {
+                Console.WriteLine("在进行类型转换时发生错误！");
+                LoggerService.LogError("在进行类型转换时发生错误!");
+                LoggerService.LogError(e);
+            }
         }
+
+        return defaultValue;
     }
 }

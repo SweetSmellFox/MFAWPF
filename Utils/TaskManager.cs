@@ -1,5 +1,4 @@
 using HandyControl.Controls;
-using HandyControl.Data;
 
 namespace MFAWPF.Utils;
 
@@ -11,6 +10,7 @@ public static class TaskManager
     /// <param name="action">要执行的动作</param>
     /// <param name="name">日志显示名称</param>
     /// <param name="prompt">日志提示</param>
+    /// <param name="catchException">是否捕获异常</param>
     public static void RunTask(
         Action action,
         string name = nameof(Action),
@@ -40,8 +40,10 @@ public static class TaskManager
     /// 异步执行任务, 并带有更好的日志显示
     /// </summary>
     /// <param name="action">要执行的动作</param>
+    /// <param name="handleError">处理异常的方法</param>
     /// <param name="name">任务名称</param>
     /// <param name="prompt">日志提示</param>
+    /// <param name="catchException">是否捕获异常</param>
     public static async Task RunTaskAsync(
         Action action, Action? handleError = null,
         string name = nameof(Action),

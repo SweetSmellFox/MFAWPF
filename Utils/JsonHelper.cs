@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using MFAWPF.Utils.Converters;
 using Newtonsoft.Json;
 
 namespace MFAWPF.Utils;
@@ -12,6 +11,7 @@ public static class JsonHelper
     /// <typeparam name="T"></typeparam>
     /// <param name="file"></param>
     /// <param name="defaultS"></param>
+    /// <param name="show"></param>
     /// <returns></returns>
     ///    //序列化到文件
     public static T? ReadFromConfigJsonFile<T>(string file, T? defaultS = default, bool show = false)
@@ -64,9 +64,6 @@ public static class JsonHelper
             if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}"))
                 Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}");
             string jsonString = File.ReadAllText(directory);
-            // 创建 JsonSerializerSettings 并添加转换器
-            var settings = new JsonSerializerSettings();
-
             return JsonConvert.DeserializeObject<T>(jsonString) ?? defaultS;
         }
         catch (Exception e)

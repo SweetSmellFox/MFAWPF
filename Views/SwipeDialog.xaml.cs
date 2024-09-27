@@ -16,8 +16,8 @@ public partial class SwipeDialog
     private Polygon? _arrowHead;
     private Point StartPoint { get; set; }
     private Point EndPoint { get; set; }
-    private List<int>? _outputBegin { get; set; }
-    private List<int>? _outputEnd { get; set; }
+    private List<int>? _outputBegin;
+    private List<int>? _outputEnd;
 
     public List<int>? OutputBegin
     {

@@ -9,12 +9,6 @@ namespace MFAWPF.ViewModels;
 
 public class DragItemViewModel : ObservableObject
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DragItemViewModel"/> class.
-    /// </summary>
-    /// <param name="name">The name (viewed name).</param>
-    /// <param name="originalName">The original name (may not be the same as viewed name).</param>
-    /// <param name="storageKey">The storage key.</param>
     public DragItemViewModel(TaskInterfaceItem? interfaceItem)
     {
         InterfaceItem = interfaceItem;
@@ -34,7 +28,7 @@ public class DragItemViewModel : ObservableObject
     }
 
     private bool? _isCheckedWithNull = false;
-    private bool _isInitialized = false;
+    private bool _isInitialized;
 
     /// <summary>
     /// Gets or sets a value indicating whether gets or sets whether the key is checked with null.

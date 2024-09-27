@@ -14,12 +14,12 @@ public class SingleOrListConverter : JsonConverter
         JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
-        if (token.Type == JTokenType.String)
+        if (token is { Type: JTokenType.String })
         {
             return new List<string> { token.ToString() };
         }
 
-        if (token.Type == JTokenType.Array)
+        if (token is { Type: JTokenType.Array })
         {
             return token.ToObject<List<string>>();
         }

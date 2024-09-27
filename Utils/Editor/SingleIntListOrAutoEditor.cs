@@ -4,10 +4,12 @@ using System.Windows;
 using System.Windows.Data;
 using HandyControl.Controls;
 using MFAWPF.Controls;
+using MFAWPF.Utils.Converters;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
+using ComboBox = System.Windows.Controls.ComboBox;
 
-namespace MFAWPF.Utils.Converters;
+namespace MFAWPF.Utils.Editor;
 
 public class SingleIntListOrAutoEditor : PropertyEditorBase
 {
@@ -58,7 +60,7 @@ public class SingleIntListOrAutoEditor : PropertyEditorBase
         return string.Empty;
     }
 
-    public override DependencyProperty GetDependencyProperty() => CustomAutoCompleteTextBox.TextProperty;
+    public override DependencyProperty GetDependencyProperty() => ComboBox.TextProperty;
 
     protected override IValueConverter GetConverter(PropertyItem propertyItem) => new SingleIntListOrAutoConverter();
 }

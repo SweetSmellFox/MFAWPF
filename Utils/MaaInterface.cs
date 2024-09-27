@@ -1,4 +1,4 @@
-﻿using MaaFramework.Binding.Custom;
+﻿
 using MFAWPF.Utils.Converters;
 using MFAWPF.Views;
 using Newtonsoft.Json;
@@ -10,7 +10,7 @@ public class MaaInterface
     public class MaaInterfaceOptionCase
     {
         [JsonProperty("name")] public string? Name { get; set; }
-        [JsonProperty("pipeline_override")] public Dictionary<string, TaskModel>? Pipeline_Override { get; set; }
+        [JsonProperty("pipeline_override")] public Dictionary<string, TaskModel>? PipelineOverride { get; set; }
 
         public override string ToString()
         {
@@ -20,7 +20,7 @@ public class MaaInterface
                 NullValueHandling = NullValueHandling.Ignore,
                 DefaultValueHandling = DefaultValueHandling.Ignore
             };
-            return JsonConvert.SerializeObject(Pipeline_Override, settings);
+            return JsonConvert.SerializeObject(PipelineOverride, settings);
         }
     }
 
@@ -43,12 +43,12 @@ public class MaaInterface
 
     public class CustomExecutor
     {
-        [JsonIgnore] public string? name { get; set; }
-        [JsonProperty("exec_path")] public string? Exec_Path { get; set; }
+        [JsonIgnore]  public string? Name { get; set; }
+        [JsonProperty("exec_path")] public string? ExecPath { get; set; }
 
         [JsonConverter(typeof(SingleOrListConverter))]
         [JsonProperty("exec_param")]
-        public List<string>? Exec_Param { get; set; }
+        public List<string>? ExecParam { get; set; }
     }
 
     public class MaaCustomResource

@@ -10,11 +10,11 @@ using Newtonsoft.Json.Linq;
 
 public class VersionChecker
 {
-    private static VersionChecker CHECKER = new();
+    private static readonly VersionChecker Checker = new();
 
     public static void CheckVersion()
     {
-        TaskManager.RunTaskAsync(() => CHECKER.CheckForUpdatesAsync(), null, "检测版本");
+        TaskManager.RunTaskAsync(() => Checker.CheckForUpdatesAsync(), null, "检测版本");
     }
 
     public async Task CheckForUpdatesAsync(string owner = "SweetSmellFox", string repo = "MFAWPF")

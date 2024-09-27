@@ -17,7 +17,8 @@
     ResizeMode="CanResize"
     Topmost="True"
     WindowStartupLocation="CenterScreen"
-    WindowStyle="SingleBorderWindow"
+    WindowStyle="SingleBorderWindow" NonClientAreaBackground="{DynamicResource MainContentBackgroundBrush}"
+    Background="{DynamicResource SecundaryBackgroundColor}"
     mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>

@@ -3,14 +3,12 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
-using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Utils;
 
 namespace MFAWPF.Controls;
 
-public partial class CustomListControl : UserControl
+public partial class CustomListControl
 {
     public static readonly DependencyProperty ItemsProperty =
         DependencyProperty.Register(
@@ -65,9 +63,8 @@ public partial class CustomListControl : UserControl
         control.OnItemsSourceChanged((IEnumerable<CustomValue<string>>)e.NewValue);
     }
 
-    private void OnItemsSourceChanged(IEnumerable<CustomValue<string>> newValue)
+    private void OnItemsSourceChanged(IEnumerable<CustomValue<string>> _)
     {
-        // 可在此方法中执行对新集合的额外处理
     }
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

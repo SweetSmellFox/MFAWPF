@@ -105,7 +105,7 @@ namespace MFAWPF.ViewModels
                 var formatArgs = _formatArgsKeys.Select(key => key.GetLocalizedFormattedString()).ToArray();
 
                 // 使用本地化字符串更新内容
-                Content = _resourceKey.GetLocalizedFormattedString(formatArgs);
+                Content = _resourceKey.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray());
             }
         }
 

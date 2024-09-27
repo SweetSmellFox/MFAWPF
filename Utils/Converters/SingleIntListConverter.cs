@@ -1,7 +1,5 @@
 using System.Windows;
 using System.Windows.Data;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace MFAWPF.Utils.Converters;
 

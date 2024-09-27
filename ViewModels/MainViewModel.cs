@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
-using HandyControl.Collections;
 using MFAWPF.Utils;
 
 
@@ -39,9 +38,6 @@ public class MainViewModel : ObservableObject
         });
     }
 
-    public ManualObservableCollection<TaskItemViewModel> SourceItems { get; set; } =
-        new();
-
     public ObservableCollection<DragItemViewModel> TaskItemViewModels { get; set; } =
         new();
 
@@ -63,11 +59,19 @@ public class MainViewModel : ObservableObject
 
 
     private Brush _windowTopMostButtonForeground =
-        (Brush)Application.Current.FindResource("MainBackgroundBrush");
+        Application.Current.FindResource("MainBackgroundBrush") as Brush ?? Brushes.Gray;
 
     public Brush WindowTopMostButtonForeground
     {
         get => _windowTopMostButtonForeground;
         set => SetProperty(ref _windowTopMostButtonForeground, value);
+    }
+
+    private bool _isAdb = true;
+
+    public bool IsAdb
+    {
+        get => _isAdb;
+        set => SetProperty(ref _isAdb, value);
     }
 }

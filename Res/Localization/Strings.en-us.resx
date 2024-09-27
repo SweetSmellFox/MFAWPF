@@ -416,4 +416,10 @@
     <data name="StartupScript" xml:space="preserve">
         <value>Startup Script</value>
     </data>
+    <data name="Custom" xml:space="preserve">
+        <value>Custom</value>
+    </data>
+    <data name="AdbEditor" xml:space="preserve">
+        <value>Adb Editor</value>
+    </data>
 </root>

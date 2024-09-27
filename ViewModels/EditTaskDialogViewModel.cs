@@ -2,27 +2,24 @@
 using System.Drawing;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using MFAWPF.Controls;
 using MFAWPF.Utils;
 using MFAWPF.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using HandyControl.Tools.Command;
-using HandyControl.Tools.Extension;
 using Newtonsoft.Json;
-using Attribute = MFAWPF.Utils.Attribute;
 
 namespace MFAWPF.ViewModels;
 
 public class EditTaskDialogViewModel : ObservableObject
 {
-    private ObservableCollection<TaskItemViewModel>? dataList;
+    private ObservableCollection<TaskItemViewModel>? _dataList;
 
     public ObservableCollection<TaskItemViewModel>? DataList
     {
-        get => dataList;
-        set => SetProperty(ref dataList, value);
+        get => _dataList;
+        set => SetProperty(ref _dataList, value);
     }
 
     private ObservableCollection<TaskItemViewModel>? _colors;
@@ -50,13 +47,13 @@ public class EditTaskDialogViewModel : ObservableObject
         set => SetProperty(ref _colors, value);
     }
 
-    private int selectedIndex = 0;
+    private int _selectedIndex;
 
     public int SelectedIndex
     {
-        get => selectedIndex;
+        get => _selectedIndex;
         set =>
-            SetProperty(ref selectedIndex, value);
+            SetProperty(ref _selectedIndex, value);
     }
 
     public EditTaskDialog? Dialog;
@@ -69,12 +66,7 @@ public class EditTaskDialogViewModel : ObservableObject
 
     public ICommand SaveCommand { get; set; }
     public ICommand DeleteCommand { get; set; }
-
-    public ICommand SaveTaskCommand { get; set; }
-    public ICommand CopyTaskCommand { get; }
-    public ICommand PasteTaskCommand { get; }
-    public ICommand DeleteTaskCommand { get; }
-    public ICommand UndoTaskCommand { get; }
+    
 
     public EditTaskDialogViewModel()
     {
@@ -85,11 +77,6 @@ public class EditTaskDialogViewModel : ObservableObject
         SaveCommand = new RelayCommand(Save, CanExecute);
         UndoCommand = new RelayCommand(Undo, CanExecute);
         DeleteCommand = new RelayCommand(Delete, CanExecute);
-        SaveTaskCommand = new RelayCommand(SaveTask, CanExecuteTask);
-        CopyTaskCommand = new RelayCommand(CopyTask, CanExecuteTask);
-        PasteTaskCommand = new RelayCommand(PasteTask, CanExecutePaste);
-        DeleteTaskCommand = new RelayCommand(DeleteTask, CanExecuteTask);
-        UndoTaskCommand = new RelayCommand(UndoTask, CanExecute);
     }
 
     public ObservableCollection<TaskItemViewModel> GetDataList()
@@ -142,15 +129,15 @@ public class EditTaskDialogViewModel : ObservableObject
                 {
                     Dictionary<string, TaskModel>? taskModels =
                         JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(
-                            (string)iData.GetData(DataFormats.Text));
+                            iData.GetData(DataFormats.Text) as string ?? string.Empty);
                     if (taskModels == null || taskModels.Count == 0)
                         return;
-                    foreach (var VARIABLE in taskModels)
+                    foreach (var pair in taskModels)
                     {
-                        VARIABLE.Value.Name = VARIABLE.Key;
+                        pair.Value.Name = pair.Key;
                         var newItem = new TaskItemViewModel()
                         {
-                            Name = VARIABLE.Key, Task = VARIABLE.Value
+                            Name = pair.Key, Task = pair.Value
                         };
                         DataList?.Insert(index + 1, newItem);
                         UndoStack?.Push(new RelayCommand(_ => DataList?.Remove(newItem)));
@@ -202,84 +189,84 @@ public class EditTaskDialogViewModel : ObservableObject
         set => SetProperty(ref _selectedAttribute, value);
     }
 
-    private void SaveTask(object parameter)
-    {
-        Dialog?.Save(null, null);
-    }
-
-    private void CopyTask(object parameter)
-    {
-        if (SelectedAttribute != null && SelectedAttribute.Attribute != null)
-        {
-            var settings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.Indented,
-                NullValueHandling = NullValueHandling.Ignore,
-                DefaultValueHandling = DefaultValueHandling.Ignore
-            };
-
-            string json = JsonConvert.SerializeObject(SelectedAttribute.Attribute, settings);
-            Clipboard.SetDataObject(json);
-        }
-    }
-
-    private bool CanExecuteTask(object parameter)
-    {
-        return SelectedAttribute != null;
-    }
-
-    private void PasteTask(object parameter)
-    {
-        IDataObject iData = Clipboard.GetDataObject();
-        if (iData.GetDataPresent(DataFormats.Text))
-        {
-            try
-            {
-                var attribute =
-                    JsonConvert.DeserializeObject<Attribute>(
-                        (string)iData.GetData(DataFormats.Text));
-                // AttributeButton? button = Dialog?.AddAttribute(attribute);
-                // if (button != null)
-                //     UndoTaskStack.Push(new RelayCommand(_ => Dialog?.Parts.Children.Remove(button)));
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-                throw;
-            }
-        }
-        else
-        {
-            Growls.ErrorGlobal("目前剪贴板中数据不可转换为文本");
-        }
-    }
-
-    private bool CanExecutePaste(object parameter)
-    {
-        return Clipboard.GetDataObject() != null;
-    }
-
-    private void DeleteTask(object parameter)
-    {
-        if (SelectedAttribute != null)
-        {
-            var itemToDelete = SelectedAttribute.Attribute;
-
-            if (SelectedAttribute.Parent is Panel itemPanel)
-            {
-                int index = itemPanel.Children.IndexOf(SelectedAttribute);
-                itemPanel.Children.Remove(SelectedAttribute);
-                // UndoTaskStack.Push(new RelayCommand(_ => Dialog?.AddAttribute(itemToDelete, index)));
-            }
-        }
-    }
-
-    private void UndoTask(object parameter)
-    {
-        if (UndoTaskStack.Count > 0)
-        {
-            var undoCommand = UndoTaskStack.Pop();
-            undoCommand.Execute(null);
-        }
-    }
+    // private void SaveTask(object parameter)
+    // {
+    //     Dialog?.Save(null, null);
+    // }
+    //
+    // private void CopyTask(object parameter)
+    // {
+    //     if (SelectedAttribute != null && SelectedAttribute.Attribute != null)
+    //     {
+    //         var settings = new JsonSerializerSettings
+    //         {
+    //             Formatting = Formatting.Indented,
+    //             NullValueHandling = NullValueHandling.Ignore,
+    //             DefaultValueHandling = DefaultValueHandling.Ignore
+    //         };
+    //
+    //         string json = JsonConvert.SerializeObject(SelectedAttribute.Attribute, settings);
+    //         Clipboard.SetDataObject(json);
+    //     }
+    // }
+    //
+    // private bool CanExecuteTask(object parameter)
+    // {
+    //     return SelectedAttribute != null;
+    // }
+    //
+    // private void PasteTask(object parameter)
+    // {
+    //     IDataObject iData = Clipboard.GetDataObject();
+    //     if (iData.GetDataPresent(DataFormats.Text))
+    //     {
+    //         try
+    //         {
+    //             var attribute =
+    //                 JsonConvert.DeserializeObject<Attribute>(
+    //                     (string)iData.GetData(DataFormats.Text));
+    //             // AttributeButton? button = Dialog?.AddAttribute(attribute);
+    //             // if (button != null)
+    //             //     UndoTaskStack.Push(new RelayCommand(_ => Dialog?.Parts.Children.Remove(button)));
+    //         }
+    //         catch (Exception exception)
+    //         {
+    //             Console.WriteLine(exception);
+    //             throw;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         Growls.ErrorGlobal("目前剪贴板中数据不可转换为文本");
+    //     }
+    // }
+    //
+    // private bool CanExecutePaste(object parameter)
+    // {
+    //     return Clipboard.GetDataObject() != null;
+    // }
+    //
+    // private void DeleteTask(object parameter)
+    // {
+    //     if (SelectedAttribute != null)
+    //     {
+    //         var itemToDelete = SelectedAttribute.Attribute;
+    //
+    //         if (SelectedAttribute.Parent is Panel itemPanel)
+    //         {
+    //             int index = itemPanel.Children.IndexOf(SelectedAttribute);
+    //             itemPanel.Children.Remove(SelectedAttribute);
+    //             // UndoTaskStack.Push(new RelayCommand(_ => Dialog?.AddAttribute(itemToDelete, index)));
+    //         }
+    //     }
+    // }
+    //
+    // private void UndoTask(object parameter)
+    // {
+    //     if (UndoTaskStack.Count > 0)
+    //     {
+    //         var undoCommand = UndoTaskStack.Pop();
+    //         undoCommand.Execute(null);
+    //     }
+    // }
 }

@@ -7,7 +7,7 @@ namespace MFAWPF.Utils.Converters;
 
 public class ListStringArrayConverter : IValueConverter
 {
-    public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is IEnumerable<string[]> ls)
         {
@@ -20,7 +20,7 @@ public class ListStringArrayConverter : IValueConverter
     }
 
 
-    public object? ConvertBack(object? value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is IEnumerable<CustomValue<string>> collection)
         {

@@ -2,13 +2,12 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using MFAWPF.Controls;
 
 namespace MFAWPF.Utils.Converters;
 
 public class ListIntStringConverter : IValueConverter
 {
-    public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is IEnumerable<int> intCollection)
         {
@@ -28,7 +27,7 @@ public class ListIntStringConverter : IValueConverter
     }
 
 
-    public object? ConvertBack(object? value, Type targetType, object parameter, CultureInfo culture)
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is IEnumerable<CustomValue<string>> customValueList)
         {

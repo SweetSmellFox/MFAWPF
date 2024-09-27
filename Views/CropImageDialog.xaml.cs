@@ -16,7 +16,7 @@ public partial class CropImageDialog
     private Rectangle? _selectionRectangle;
 
     public string? Output { get; set; }
-    private List<int>? _outputRoi { get; set; }
+    private List<int>? _outputRoi;
 
     public List<int>? OutputRoi
     {
@@ -32,25 +32,25 @@ public partial class CropImageDialog
     }
 
     private double _scaleRatio;
-    private double originWidth;
-    private double originHeight;
+    private double _originWidth;
+    private double _originHeight;
 
-    private void UpdateImage(BitmapImage _imageSource)
+    private void UpdateImage(BitmapImage imageSource)
     {
-        image.Source = _imageSource;
+        image.Source = imageSource;
 
-        originWidth = _imageSource.PixelWidth;
-        originHeight = _imageSource.PixelHeight;
+        _originWidth = imageSource.PixelWidth;
+        _originHeight = imageSource.PixelHeight;
 
         double maxWidth = image.MaxWidth;
         double maxHeight = image.MaxHeight;
 
-        double widthRatio = maxWidth / originWidth;
-        double heightRatio = maxHeight / originHeight;
+        double widthRatio = maxWidth / _originWidth;
+        double heightRatio = maxHeight / _originHeight;
         _scaleRatio = Math.Min(widthRatio, heightRatio);
 
-        image.Width = originWidth * _scaleRatio;
-        image.Height = originHeight * _scaleRatio;
+        image.Width = _originWidth * _scaleRatio;
+        image.Height = _originHeight * _scaleRatio;
 
         SelectionCanvas.Width = image.Width;
         SelectionCanvas.Height = image.Height;

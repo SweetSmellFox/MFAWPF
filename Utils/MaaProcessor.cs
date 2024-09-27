@@ -61,7 +61,7 @@ namespace MFAWPF.Utils
             if (!Config.IsConnected)
             {
                 Growls.Warning("Warning_CannotConnect".GetLocalizationString()
-                    .FormatWith(MainWindow.Instance?.IsADB == true
+                    .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
                         ? "Simulator".GetLocalizationString()
                         : "Window".GetLocalizationString()));
                 return;
@@ -83,7 +83,7 @@ namespace MFAWPF.Utils
 
             TaskManager.RunTaskAsync(async () =>
             {
-                MainWindow.Data?.AddLogByKey("ConnectingTo", null, MainWindow.Instance?.IsADB == true
+                MainWindow.Data?.AddLogByKey("ConnectingTo", null, (MainWindow.Data?.IsAdb).IsTrue()
                     ? "Simulator"
                     : "Window");
                 var instance = await Task.Run(GetCurrentTasker, token);
@@ -171,9 +171,9 @@ namespace MFAWPF.Utils
                     MainWindow.Instance != null &&
                     selectOption.Index is int index &&
                     interfaceOption.Cases is { } cases &&
-                    cases[index]?.Pipeline_Override != null)
+                    cases[index]?.PipelineOverride != null)
                 {
-                    var param = interfaceOption.Cases[selectOption.Index.Value].Pipeline_Override;
+                    var param = interfaceOption.Cases[selectOption.Index.Value].PipelineOverride;
                     MainWindow.Instance.TaskDictionary = MainWindow.Instance.TaskDictionary.MergeTaskModels(param);
                     taskModels = taskModels.MergeTaskModels(param);
                 }
@@ -376,7 +376,7 @@ namespace MFAWPF.Utils
             {
                 HandleInitializationError(e,
                     "ConnectingSimulatorOrWindow".GetLocalizationString()
-                        .FormatWith(MainWindow.Instance?.IsADB == true
+                        .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
                             ? "Simulator".GetLocalizationString()
                             : "Window".GetLocalizationString()), true,
                     "InitControllerFailed".GetLocalizationString());
@@ -407,7 +407,7 @@ namespace MFAWPF.Utils
 
         private MaaController InitializeController()
         {
-            return MainWindow.Instance?.IsADB == true
+            return (MainWindow.Data?.IsAdb).IsTrue()
                 ? new MaaAdbController(
                     Config.AdbDevice.AdbPath,
                     Config.AdbDevice.AdbSerial,

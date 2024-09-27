@@ -4,9 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
-using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Utils;
 
 namespace MFAWPF.Controls;
@@ -104,6 +102,9 @@ public partial class CustomAutoListControl
 
     private void OnItemsSourceChanged(IEnumerable<CustomValue<string>> newValue)
     {
+        foreach (var _ in newValue)
+        {
+        }
         // 可在此方法中执行对新集合的额外处理
     }
 

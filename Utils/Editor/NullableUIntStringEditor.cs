@@ -1,4 +1,4 @@
-using System.Windows;
+
 using System.Windows.Data;
 using HandyControl.Controls;
 using MFAWPF.Utils.Converters;

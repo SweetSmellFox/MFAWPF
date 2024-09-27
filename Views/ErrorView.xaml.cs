@@ -1,12 +1,9 @@
 ﻿using System.Windows;
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Documents;
-using MFAWPF.Controls;
-using Window = HandyControl.Controls.Window;
 
 namespace MFAWPF.Views;
 

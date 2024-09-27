@@ -43,7 +43,7 @@
         <ApplicationVersion>1.1.0</ApplicationVersion>
         <Version>1.1</Version>
         <FileVersion>0.0.1</FileVersion>
-        <AssemblyVersion>1.2.0.2</AssemblyVersion>
+        <AssemblyVersion>1.2.0.3</AssemblyVersion>
         <InformationalVersion>0.0.1</InformationalVersion>
     </PropertyGroup>
   
@@ -202,11 +202,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Page Update="Views\EditAttributeDialog.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>Wpf</XamlRuntime>
-            <SubType>Designer</SubType>
-        </Page>
         <Page Update="Views\SelectionRegionDialog.xaml">
             <Generator>MSBuild:Compile</Generator>
             <XamlRuntime>Wpf</XamlRuntime>

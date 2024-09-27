@@ -107,13 +107,13 @@ public class AttributeTag : Tag
         Style = FindResource("TagBaseStyle") as Style;
         ContextMenu contextMenu = new ContextMenu();
         MenuItem copyItem = new();
-        copyItem.BindLocalization("Copy", MenuItem.HeaderProperty);
+        copyItem.BindLocalization("Copy", HeaderedItemsControl.HeaderProperty);
         copyItem.Click += Copy;
         MenuItem copyKeyItem = new();
-        copyKeyItem.BindLocalization("CopyKey", MenuItem.HeaderProperty);
+        copyKeyItem.BindLocalization("CopyKey", HeaderedItemsControl.HeaderProperty);
         copyKeyItem.Click += CopyKey;
         MenuItem copyValueItem = new();
-        copyValueItem.BindLocalization("CopyValue", MenuItem.HeaderProperty);
+        copyValueItem.BindLocalization("CopyValue", HeaderedItemsControl.HeaderProperty);
         copyValueItem.Click += CopyAttribute;
         contextMenu.Items.Add(copyItem);
         contextMenu.Items.Add(copyKeyItem);

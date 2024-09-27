@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:MFAWPF.Controls"
              xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:lex="http://wpflocalizeextension.codeplex.com"
              xmlns:hc="https://handyorg.github.io/handycontrol"
@@ -42,7 +41,7 @@
             </StackPanel>
         </Grid>
 
-        <ListBox Grid.Row="1" x:Name="listBox" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+        <ListBox Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl},Mode=TwoWay}"
                  HorizontalAlignment="Stretch"
                  VerticalAlignment="Stretch"

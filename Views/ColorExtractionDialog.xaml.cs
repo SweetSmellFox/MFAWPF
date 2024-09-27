@@ -13,7 +13,7 @@ public partial class ColorExtractionDialog
 {
     private Point _startPoint;
     private Rectangle? _selectionRectangle;
-    private List<int>? _outputRoi { get; set; }
+    private List<int>? _outputRoi;
 
     public List<int>? OutputRoi
     {
@@ -31,12 +31,12 @@ public partial class ColorExtractionDialog
 
     private double _scaleRatio;
 
-    private void UpdateImage(BitmapImage _imageSource)
+    private void UpdateImage(BitmapImage imageSource)
     {
-        image.Source = _imageSource;
+        image.Source = imageSource;
 
-        double imageWidth = _imageSource.PixelWidth;
-        double imageHeight = _imageSource.PixelHeight;
+        double imageWidth = imageSource.PixelWidth;
+        double imageHeight = imageSource.PixelHeight;
 
         double maxWidth = image.MaxWidth;
         double maxHeight = image.MaxHeight;

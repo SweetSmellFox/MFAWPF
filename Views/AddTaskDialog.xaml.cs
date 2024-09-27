@@ -1,7 +1,5 @@
 using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 using HandyControl.Data;
 using MFAWPF.Utils;
 using MFAWPF.ViewModels;
@@ -40,12 +38,11 @@ public partial class AddTaskDialog
         Close();
     }
 
-    protected override void Close(object? sender = null, RoutedEventArgs? e = null)
+    protected override void OnClosed(EventArgs e)
     {
         if (MainWindow.Data != null)
             MainWindow.Data.Idle = true;
-
-        base.Close();
+        base.OnClosed(e);
     }
 
     private void SearchBar_OnSearchStarted(object sender, FunctionEventArgs<string> e)

@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using MFAWPF.Controls;
 using MFAWPF.Utils;
 using MFAWPF.ViewModels;
 using HandyControl.Controls;
@@ -10,20 +9,17 @@ using HandyControl.Data;
 using HandyControl.Tools.Command;
 using Microsoft.Win32;
 using Newtonsoft.Json;
-using Attribute = MFAWPF.Utils.Attribute;
 using ScrollViewer = System.Windows.Controls.ScrollViewer;
 
 namespace MFAWPF.Views;
 
 public partial class EditTaskDialog
 {
-    private List<TaskModel> tasks;
     public EditTaskDialogViewModel? Data { get; set; }
 
     public EditTaskDialog()
     {
         InitializeComponent();
-        tasks = new List<TaskModel>();
         Data = DataContext as EditTaskDialogViewModel;
         if (Data is not null)
             Data.Dialog = this;
@@ -91,8 +87,6 @@ public partial class EditTaskDialog
         _chartDialog.Show();
     }
 
-    private string PipelineFilePath = MaaProcessor.ResourcePipelineFilePath;
-
     private void Load(object sender, RoutedEventArgs e)
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
@@ -105,7 +99,6 @@ public partial class EditTaskDialog
         {
             string filePath = openFileDialog.FileName;
             string fileName = Path.GetFileName(filePath);
-            PipelineFilePath = filePath.Replace(fileName, "");
             PipelineFileName.Text = fileName;
             try
             {
@@ -115,12 +108,12 @@ public partial class EditTaskDialog
                 Data?.DataList?.Clear();
                 if (taskDictionary == null || taskDictionary.Count == 0)
                     return;
-                foreach (var VARIABLE in taskDictionary)
+                foreach (var pair in taskDictionary)
                 {
-                    VARIABLE.Value.Name = VARIABLE.Key;
-                    Data?.DataList?.Add(new TaskItemViewModel()
+                    pair.Value.Name = pair.Key;
+                    Data?.DataList?.Add(new TaskItemViewModel
                     {
-                        Task = VARIABLE.Value
+                        Task = pair.Value
                     });
                 }
             }
@@ -168,9 +161,9 @@ public partial class EditTaskDialog
             DefaultValueHandling = DefaultValueHandling.Ignore
         };
         Dictionary<string, TaskModel> taskModels = new();
-        foreach (var VARIABLE in ListBoxDemo.ItemsSource)
+        foreach (var source in ListBoxDemo.ItemsSource)
         {
-            if (VARIABLE is TaskItemViewModel taskItemViewModel)
+            if (source is TaskItemViewModel taskItemViewModel)
             {
                 if (taskItemViewModel.Task != null &&
                     !taskModels.TryAdd(taskItemViewModel.Name, taskItemViewModel.Task))
@@ -204,9 +197,9 @@ public partial class EditTaskDialog
     {
         var searchText = e.Info?.ToLower() ?? string.Empty;
         var filteredTasks = Data?.DataList?.Where(t =>
-            t.Task?.Name != null && t.Task.Name.ToLower().Contains(searchText) ||
+            t.Task?.Name != null && t.Task.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
             t.Task?.Recognition != null && t.Task.Recognition.ToLower().Contains(searchText) ||
-            t.Task?.Action != null && t.Task.Action.ToLower().Contains(searchText) ||
+            t.Task?.Action != null && t.Task.Action.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
             t.Task?.Next != null && t.Task.Next.Any(n => n.ToLower().Contains(searchText))
         ).ToList();
 
@@ -271,17 +264,17 @@ public partial class EditTaskDialog
             {
                 try
                 {
-                    Dictionary<string, TaskModel>? taskModels =
+                    var taskModels =
                         JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(
-                            (string)iData.GetData(DataFormats.Text));
+                            iData.GetData(DataFormats.Text) as string ?? string.Empty);
                     if (taskModels == null || taskModels.Count == 0)
                         return;
-                    foreach (var VARIABLE in taskModels)
+                    foreach (var pair in taskModels)
                     {
-                        VARIABLE.Value.Name = VARIABLE.Key;
+                        pair.Value.Name = pair.Key;
                         var newItem = new TaskItemViewModel()
                         {
-                            Name = VARIABLE.Key, Task = VARIABLE.Value
+                            Name = pair.Key, Task = pair.Value
                         };
                         Data?.DataList?.Insert(index, newItem);
                         Data?.UndoStack?.Push(new RelayCommand(_ => Data?.DataList?.Remove(newItem)));
@@ -306,7 +299,7 @@ public partial class EditTaskDialog
             {
                 Parent: ContextMenu
                 {
-                    PlacementTarget: ListBoxItem { DataContext: TaskItemViewModel taskItemViewModel } item
+                    PlacementTarget: ListBoxItem { DataContext: TaskItemViewModel } item
                 }
             } &&
             ItemsControl.ItemsControlFromItemContainer(item) is ListBox listBox)
@@ -314,21 +307,21 @@ public partial class EditTaskDialog
             // 获取选中项的索引
             var index = listBox.Items.IndexOf(item.DataContext);
             var iData = Clipboard.GetDataObject();
-            if (iData.GetDataPresent(DataFormats.Text))
+            if ((iData?.GetDataPresent(DataFormats.Text)).IsTrue())
             {
                 try
                 {
                     var taskModels =
                         JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(
-                            (string)iData.GetData(DataFormats.Text));
+                            iData?.GetData(DataFormats.Text) as string ?? string.Empty);
                     if (taskModels == null || taskModels.Count == 0)
                         return;
-                    foreach (var VARIABLE in taskModels)
+                    foreach (var pair in taskModels)
                     {
-                        VARIABLE.Value.Name = VARIABLE.Key;
+                        pair.Value.Name = pair.Key;
                         var newItem = new TaskItemViewModel()
                         {
-                            Name = VARIABLE.Key, Task = VARIABLE.Value
+                            Name = pair.Key, Task = pair.Value
                         };
                         Data?.DataList?.Insert(index + 1, newItem);
                         Data?.UndoStack?.Push(new RelayCommand(_ => Data?.DataList?.Remove(newItem)));
@@ -424,7 +417,7 @@ public partial class EditTaskDialog
                     }
                     else
                     {
-                        if (Data.CurrentTask.Task.Template is List<string> ls)
+                        if (Data.CurrentTask.Task.Template is { } ls)
                         {
                             if (imageDialog.Output != null)
                                 ls.Add(imageDialog.Output);
@@ -496,7 +489,7 @@ public partial class EditTaskDialog
                     }
                     else
                     {
-                        if (Data.CurrentTask.Task.Expected is List<string> ls)
+                        if (Data.CurrentTask.Task.Expected is { } ls)
                         {
                             ls.Add(text);
                             Data.CurrentTask.Task.Expected = ls;

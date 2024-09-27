@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Threading;
+﻿
 using MFAWPF.ViewModels;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;

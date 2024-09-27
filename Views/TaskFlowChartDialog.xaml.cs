@@ -50,9 +50,9 @@ public partial class TaskFlowChartDialog
     }
 
     private void AddEdges(BidirectionalGraph<object, IEdge<object>> graph,
-        Dictionary<string, Vertex> vertexDictionary, List<string> nextTasks, Vertex sourceVertex, string edgeType)
+        Dictionary<string, Vertex> vertexDictionary, List<string>? nextTasks, Vertex sourceVertex, string edgeType)
     {
-        if (nextTasks != null)
+        if (nextTasks is not null)
         {
             foreach (var nextTask in nextTasks)
             {
@@ -199,9 +199,9 @@ public partial class TaskFlowChartDialog
     public void UpdateGraph()
     {
         _vertexTaskMapping = new Dictionary<string, TaskItemViewModel>();
-        var graph = CreateGraph(_editTaskDialog?.Data?.DataList?.ToList());
+        var graph = CreateGraph(_editTaskDialog.Data?.DataList?.ToList());
         graphLayout.Graph = graph;
-        if (_editTaskDialog?.Data != null)
+        if (_editTaskDialog.Data is not null)
             _editTaskDialog.Data.CurrentTask = null; // 更新完图形后，清空选择以防止不必要的误操作
     }
 }

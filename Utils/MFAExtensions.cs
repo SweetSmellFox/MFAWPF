@@ -35,7 +35,7 @@ public static class MFAExtensions
     public static void BindLocalization(this FrameworkElement control, string resourceKey,
         DependencyProperty? property = null)
     {
-        property ??= InfoElement.TitleProperty;
+        property ??= TitleElement.TitleProperty;
         var locExtension = new LocExtension(resourceKey);
         locExtension.SetBinding(control, property);
     }
@@ -66,5 +66,10 @@ public static class MFAExtensions
             return;
         foreach (var item in items)
             collection.Add(item);
+    }
+
+    public static bool IsTrue(this bool? value)
+    {
+        return value == true;
     }
 }

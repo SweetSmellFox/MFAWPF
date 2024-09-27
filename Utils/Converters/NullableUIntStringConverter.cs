@@ -1,4 +1,4 @@
-using System.Windows;
+
 using System.Windows.Data;
 
 namespace MFAWPF.Utils.Converters;

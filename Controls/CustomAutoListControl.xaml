@@ -8,7 +8,6 @@
              xmlns:lex="http://wpflocalizeextension.codeplex.com"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:converters="clr-namespace:MFAWPF.Utils.Converters"
-             xmlns:views="clr-namespace:MFAWPF.Views"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="340"
              x:Name="Control">
@@ -43,7 +42,7 @@
             </StackPanel>
         </Grid>
 
-        <ListBox Grid.Row="1" x:Name="listBox" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+        <ListBox Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
                  HorizontalAlignment="Stretch"
                  VerticalAlignment="Stretch"

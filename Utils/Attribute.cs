@@ -63,7 +63,7 @@ public class Attribute
 
         return $"{Value}";
     }
-    
+
     public static bool operator ==(Attribute? a1, object? a2)
     {
         return a2 is Attribute attribute && a1?.Key?.Equals(attribute.Key) == true && a1.Value == attribute.Value;
@@ -78,6 +78,8 @@ public class Attribute
     {
         return this == obj;
     }
+
+    private int? _cachedHashCode;
 
     public override int GetHashCode()
     {

@@ -5,21 +5,21 @@ namespace MFAWPF.ViewModels;
 
 public class AddTaskDialogViewModel: ObservableObject
 {
-    private ObservableCollection<DragItemViewModel> dataList = new ();
+    private ObservableCollection<DragItemViewModel> _dataList = new ();
 
     public ObservableCollection<DragItemViewModel> DataList
     {
-        get => dataList;
-        set => SetProperty(ref dataList, value);
+        get => _dataList;
+        set => SetProperty(ref _dataList, value);
     }
 
-    private int selectedIndex ;
+    private int _selectedIndex ;
 
     public int SelectedIndex
     {
-        get => selectedIndex;
+        get => _selectedIndex;
         set =>
-            SetProperty(ref selectedIndex, value);
+            SetProperty(ref _selectedIndex, value);
     }
 
 

@@ -68,10 +68,10 @@ public class DragDropHandler : IDropTarget
             if (targetCollection is ObservableCollection<DragItemViewModel> dragItemViewModels)
             {
                 List<TaskInterfaceItem> tasks = new();
-                foreach (var VARIABLE in dragItemViewModels)
+                foreach (var dragItem in dragItemViewModels)
                 {
-                    if (VARIABLE.InterfaceItem != null)
-                        tasks.Add(VARIABLE.InterfaceItem);
+                    if (dragItem.InterfaceItem != null)
+                        tasks.Add(dragItem.InterfaceItem);
                 }
 
                 if (MaaInterface.Instance != null)

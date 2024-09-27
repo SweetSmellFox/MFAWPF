@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using HandyControl.Controls;
 using MFAWPF.Utils.Converters;
@@ -26,7 +27,7 @@ public class StringComboBoxEditor : PropertyEditorBase
     }
 
     // 实现抽象方法，返回 ComboBox.SelectedItemProperty 作为绑定的 DependencyProperty
-    public override DependencyProperty GetDependencyProperty() => System.Windows.Controls.ComboBox.SelectedItemProperty;
+    public override DependencyProperty GetDependencyProperty() => Selector.SelectedItemProperty;
 
 
     // 根据属性的字段名称，设置不同的ItemsSource

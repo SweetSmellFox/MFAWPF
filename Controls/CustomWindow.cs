@@ -49,7 +49,7 @@ public class CustomWindow : Window
         base.OnSourceInitialized(e);
         var handle = (new WindowInteropHelper(this)).Handle;
         var hwndSource = HwndSource.FromHwnd(handle);
-        hwndSource.AddHook(WndProc);
+        hwndSource?.AddHook(WndProc);
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -162,7 +162,7 @@ public class CustomWindow : Window
         }
     }
 
-    private bool IsPointInElement(Point point, UIElement element)
+    private bool IsPointInElement(Point point, UIElement? element)
     {
         if (element == null) return false;
 
