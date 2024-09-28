@@ -44,17 +44,19 @@ public class DragItemViewModel : ObservableObject
                 // 这是初始化操作
                 _isInitialized = true; // 标记已初始化
                 SetProperty(ref _isCheckedWithNull, value); // 可以选择在初始化时不修改 value
+                if (InterfaceItem != null)
+                    InterfaceItem.Check = IsChecked;
             }
             else
             {
                 // 这是后续的 set 操作
                 value ??= false; // 只有在后续 set 时才将 null 设置为 false
                 SetProperty(ref _isCheckedWithNull, value);
-                DataSet.SetData("Tasks", MainWindow.Data?.TaskItemViewModels.ToList());
+                if (InterfaceItem != null)
+                    InterfaceItem.Check = IsChecked;
+                DataSet.SetData("TaskItems",
+                    MainWindow.Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
-
-            if (InterfaceItem != null)
-                InterfaceItem.Check = IsChecked;
         }
     }
 
@@ -91,13 +93,15 @@ public class DragItemViewModel : ObservableObject
         get => _interfaceItem;
         set
         {
-            if (_interfaceItem != null)
+            if (value != null)
             {
-                if (_interfaceItem.Name != null)
-                    Name = _interfaceItem.Name;
-                if ((_interfaceItem.Option == null || _interfaceItem.Option?.Count == 0) &&
-                    _interfaceItem.Repeatable == false)
+                if (value.Name != null)
+                    Name = value.Name;
+                if ((value.Option == null || value.Option?.Count == 0) &&
+                    value.Repeatable == false)
                     SettingVisibility = Visibility.Hidden;
+                if (value.Check.HasValue)
+                    IsChecked = value.Check.Value;
             }
 
             SetProperty(ref _interfaceItem, value);

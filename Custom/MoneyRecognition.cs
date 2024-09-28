@@ -24,15 +24,15 @@ public class MoneyRecognition : IMaaCustomRecognition
             MaaProcessor.AllMoney = i;
             Console.WriteLine($"存钱前余额：{i}");
         }
-        
+
 
         while (true)
         {
             context.Tasker.Controller.Click(980, 495);
             imageBuffer ??= new MaaImageBuffer();
+            context.Tasker.Controller.Screencap().Wait();
             context.Tasker.Controller.GetCachedImage(imageBuffer);
-            var rd1 =
-                context.RunRecognition(DiffEntry, new TaskItemViewModel()
+            TaskItemViewModel t1 = new()
                 {
                     Task = new TaskModel
                     {
@@ -41,48 +41,69 @@ public class MoneyRecognition : IMaaCustomRecognition
                             454, 191,
                             355, 279
                         },
-                        Template = new List<string> { "Roguelike@StageTraderInvestSystemError.png" },
+                        Template = ["Roguelike@StageTraderInvestSystemError.png"],
                         Threshold = 0.9
                     },
                     Name = DiffEntry,
-                }.ToString(), imageBuffer) as RecognitionDetail<MaaImageBuffer>;
-            if (rd1 != null)
-                break;
-            context.Tasker.Controller.Click(980, 495);
-            var rd2 = context.RunRecognition(DiffEntry, new TaskItemViewModel()
-            {
-                Task = new TaskModel
-                {
-                    Recognition = "TemplateMatch", Roi = new List<int>
-                    {
-                        787, 457,
-                        413, 80
-                    },
-                    Template = new List<string> { "notEnoughMoney.png" },
-                    Threshold = 0.9
                 },
-                Name = DiffEntry,
-            }.ToString(), imageBuffer);
-            if (rd2 != null)
+                t2 = new()
+                {
+                    Task = new TaskModel
+                    {
+                        Recognition = "TemplateMatch", Roi = new List<int>
+                        {
+                            787, 457,
+                            413, 80
+                        },
+                        Template = ["notEnoughMoney.png"],
+                        Threshold = 0.9
+                    },
+                    Name = DiffEntry,
+                },
+                t3 = new()
+                {
+                    Task = new TaskModel
+                    {
+                        Recognition = "TemplateMatch", Roi = new List<int>
+                        {
+                            728, 49,
+                            551, 475
+                        },
+                        Template = ["fullOfMoney.png"],
+                        Threshold = 0.9
+                    },
+                    Name = DiffEntry,
+                };
+            var rd1 =
+                context.RunRecognition(DiffEntry, t1.ToString(),
+                    imageBuffer);
+
+            if (rd1 is RecognitionDetail<MaaImageBuffer> r1)
+            {
+                Console.WriteLine(r1.Detail);
                 break;
+            }
+
+            context.Tasker.Controller.Click(980, 495);
+            var rd2 =
+                context.RunRecognition(DiffEntry, t2.ToString(), imageBuffer);
+            if (rd2 is RecognitionDetail<MaaImageBuffer> r2)
+            {
+                Console.WriteLine(r2.Detail);
+                break;
+            }
+
+
             context.Tasker.Controller.Click(980, 495);
 
-            var rd3 = context.RunRecognition(DiffEntry, new TaskItemViewModel()
+            var rd3 = context.RunRecognition(DiffEntry, t3.ToString(), imageBuffer);
+            if (rd3 is RecognitionDetail<MaaImageBuffer> r3)
             {
-                Task = new TaskModel
-                {
-                    Recognition = "TemplateMatch", Roi = new List<int>
-                    {
-                        728, 49,
-                        551, 475
-                    },
-                    Template = new List<string> { "fullOfMoney.png" },
-                    Threshold = 0.9
-                },
-                Name = DiffEntry,
-            }.ToString(), imageBuffer);
-            if (rd3 != null)
+                Console.WriteLine(r3.Detail);
                 break;
+            }
+
+
             context.Tasker.Controller.Click(980, 495);
         }
 

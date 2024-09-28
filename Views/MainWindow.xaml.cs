@@ -137,13 +137,7 @@ public partial class MainWindow
     {
         foreach (var task in tasks)
         {
-            var dragItem = new DragItemViewModel(task)
-            {
-                IsCheckedWithNull = task.Check ?? false,
-                SettingVisibility = task.Repeatable == true || task.Option?.Count > 0
-                    ? Visibility.Visible
-                    : Visibility.Hidden
-            };
+            var dragItem = new DragItemViewModel(task);
 
             if (FirstTask)
             {
@@ -161,8 +155,10 @@ public partial class MainWindow
 
         if (Data?.TaskItemViewModels.Count == 0)
         {
-            Data.TaskItemViewModels.AddRange(DataSet.GetData("Tasks",
-                new List<DragItemViewModel>()));
+            var items = DataSet.GetData("TaskItems",
+                new List<TaskInterfaceItem>()) ?? new List<TaskInterfaceItem>();
+            var dragItemViewModels = items.Select(interfaceItem => new DragItemViewModel(interfaceItem)).ToList();
+            Data.TaskItemViewModels.AddRange(dragItemViewModels);
             if (Data.TaskItemViewModels.Count == 0 && Data.TasksSource.Count != 0)
             {
                 foreach (var VARIABLE in Data.TasksSource)
@@ -831,7 +827,8 @@ public partial class MainWindow
                 {
                     option.Index = comboBox.SelectedIndex;
 
-                    DataSet.SetData("Tasks", Data?.TaskItemViewModels.ToList());
+                    DataSet.SetData("TaskItems",
+                        Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                 };
                 comboBox.SetValue(TitleElement.TitleProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
@@ -926,7 +923,7 @@ public partial class MainWindow
         if (addTaskDialog.OutputContent != null)
         {
             Data?.TaskItemViewModels.Add(addTaskDialog.OutputContent.Clone());
-            DataSet.SetData("Tasks", Data?.TaskItemViewModels.ToList());
+            DataSet.SetData("TaskItems", Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         }
     }
 
@@ -1035,7 +1032,7 @@ public partial class MainWindow
                 // 获取选中项的索引
                 int index = Data.TaskItemViewModels.IndexOf(taskItemViewModel);
                 Data.TaskItemViewModels.RemoveAt(index);
-                DataSet.SetData("Tasks", Data.TaskItemViewModels.ToList());
+                DataSet.SetData("TaskItems", Data.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }
     }
