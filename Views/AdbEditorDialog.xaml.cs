@@ -1,7 +1,6 @@
 using System.Windows;
 using MFAWPF.Utils;
 using Microsoft.Win32;
-using Window = HandyControl.Controls.Window;
 
 namespace MFAWPF.Views;
 

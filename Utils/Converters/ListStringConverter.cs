@@ -31,9 +31,6 @@ public class ListStringConverter : IValueConverter
         if (value is IEnumerable<CustomValue<string>> customValueList)
         {
             var list = customValueList.Select(cv => cv.Value).ToList();
-            if (list.Count == 1)
-                return list[0];
-
             return list.Count > 0 ? list : null;
         }
 

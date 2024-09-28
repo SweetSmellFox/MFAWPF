@@ -56,16 +56,7 @@ public class MainViewModel : ObservableObject
     }
 
     public GongSolutions.Wpf.DragDrop.IDropTarget DropHandler { get; } = new DragDropHandler();
-
-
-    private Brush _windowTopMostButtonForeground =
-        Application.Current.FindResource("MainBackgroundBrush") as Brush ?? Brushes.Gray;
-
-    public Brush WindowTopMostButtonForeground
-    {
-        get => _windowTopMostButtonForeground;
-        set => SetProperty(ref _windowTopMostButtonForeground, value);
-    }
+    
 
     private bool _isAdb = true;
 

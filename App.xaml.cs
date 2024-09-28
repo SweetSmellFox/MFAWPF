@@ -1,21 +1,16 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Globalization;
-using System.Text;
+﻿using System.Text;
 using System.Windows;
 using System.Windows.Threading;
 using MFAWPF.Utils;
-using HandyControl.Controls;
-using HandyControl.Tools;
 using MFAWPF.Views;
-using WPFLocalizeExtension.Engine;
+using Microsoft.Win32;
 
 namespace MFAWPF;
 
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application
+public partial class App 
 {
     public App()
     {
@@ -33,6 +28,17 @@ public partial class App : Application
         //非UI线程未捕获异常处理事件
         AppDomain.CurrentDomain.UnhandledException +=
             CurrentDomain_UnhandledException;
+        SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
+    }
+
+    private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
+    {
+        if (e.Category is UserPreferenceCategory.Color or
+            UserPreferenceCategory.VisualStyle or
+            UserPreferenceCategory.General)
+        {
+            Views.MainWindow.FollowSystemTheme();
+        }
     }
 
     void App_Exit(object sender, ExitEventArgs e)

@@ -437,4 +437,7 @@
     <data name="AdbPath" xml:space="preserve">
         <value>Adb Path</value>
     </data>
+    <data name="FollowingSystem" xml:space="preserve">
+        <value>Following System</value>
+    </data>
 </root>

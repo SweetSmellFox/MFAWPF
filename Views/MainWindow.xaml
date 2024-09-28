@@ -29,41 +29,42 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0"
+            <StackPanel Grid.Column="0" IsHitTestVisible="False"
                         HorizontalAlignment="Left" Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Margin="6 0 4 0" Text="{lex:Loc AppTitle}"
+
+                           IsHitTestVisible="False"
                            Foreground="{DynamicResource PrimaryTextBrush}">
 
                 </TextBlock>
-                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}"
+                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}" IsHitTestVisible="False"
                            Margin="2 0 4 0" x:Name="version" Text="Debug">
                 </TextBlock>
                 <TextBlock VerticalAlignment="Center" Margin="6 0 4 0" Text="{lex:Loc ResourceName}"
+                           IsHitTestVisible="False"
                            x:Name="resourceNameText" Visibility="Collapsed"
                            Foreground="{DynamicResource PrimaryTextBrush}">
 
                 </TextBlock>
-                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}"
+                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}" IsHitTestVisible="False"
                            Visibility="Collapsed"
                            Margin="2 0 4 0" x:Name="resourceName" Text="Debug">
                 </TextBlock>
                 <TextBlock VerticalAlignment="Center" Margin="6 0 4 0" Text="{lex:Loc ResourceVersion}"
+                           IsHitTestVisible="False"
                            x:Name="resourceVersionText" Visibility="Collapsed"
                            Foreground="{DynamicResource PrimaryTextBrush}">
 
                 </TextBlock>
-                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}"
+                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}" IsHitTestVisible="False"
                            Visibility="Collapsed"
                            Margin="2 0 4 0" x:Name="resourceVersion" Text="Debug">
                 </TextBlock>
             </StackPanel>
 
-            <Button Grid.Column="1" x:Name="btnPin" Padding="0 -2 0 0" Width="42"
-                    Content="📌" Click="ToggleWindowTopMost"
-                    Style="{StaticResource PushpinButtonStyle}"
-                    Foreground="{Binding WindowTopMostButtonForeground}">
-
-            </Button>
+            <controls:PinButton Grid.Column="1" x:Name="btnPin" Width="42" CheckedChanged="ToggleWindowTopMost"
+                                Content="📌">
+            </controls:PinButton>
         </Grid>
     </hc:Window.NonClientAreaContent>
     <hc:Window.Resources>

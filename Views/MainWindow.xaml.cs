@@ -12,6 +12,7 @@ using HandyControl.Data;
 using HandyControl.Interactivity;
 using HandyControl.Themes;
 using MaaFramework.Binding;
+using MFAWPF.Controls;
 using MFAWPF.Data;
 using MFAWPF.Utils;
 using MFAWPF.Utils.Converters;
@@ -616,8 +617,11 @@ public partial class MainWindow
         light.BindLocalization("LightColor", ContentProperty);
         var dark = new ComboBoxItem();
         dark.BindLocalization("DarkColor", ContentProperty);
+        var followSystem = new ComboBoxItem();
+        followSystem.BindLocalization("FollowingSystem", ContentProperty);
         comboBox.Items.Add(light);
         comboBox.Items.Add(dark);
+        comboBox.Items.Add(followSystem);
         var binding = new Binding("Idle")
         {
             Source = Data,
@@ -630,11 +634,31 @@ public partial class MainWindow
         comboBox.SelectionChanged += (sender, _) =>
         {
             var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+
+            switch (index)
+            {
+                case 0:
+                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
+                    break;
+                case 1:
+                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
+                    break;
+                default:
+                    FollowSystemTheme();
+                    break;
+            }
+
             ThemeManager.Current.ApplicationTheme = index == 0 ? ApplicationTheme.Light : ApplicationTheme.Dark;
             DataSet.SetData("ThemeIndex", index);
         };
         comboBox.SelectedIndex = DataSet.GetData("ThemeIndex", defaultValue);
         panel.Children.Add(comboBox);
+    }
+
+    public static void FollowSystemTheme()
+    {
+        ThemeManager.Current.ApplicationTheme =
+            ThemeHelper.IsLightTheme() ? ApplicationTheme.Light : ApplicationTheme.Dark;
     }
 
     private void AddLanguageOption(Panel? panel = null, int defaultValue = 0)
@@ -1054,13 +1078,8 @@ public partial class MainWindow
             Dispatcher.Invoke(LoadUI);
     }
 
-    private void ToggleWindowTopMost(object sender, RoutedEventArgs e)
+    private void ToggleWindowTopMost(object sender, RoutedPropertyChangedEventArgs<bool> e)
     {
-        if (Data == null) return;
-        Topmost = !Topmost;
-        if (Topmost)
-            Data.WindowTopMostButtonForeground = FindResource("PrimaryBrush") as Brush ?? Brushes.DarkGray;
-        else
-            Data.WindowTopMostButtonForeground = FindResource("ActionIconColor") as Brush ?? Brushes.DarkGray;
+        Topmost = e.NewValue;
     }
 }

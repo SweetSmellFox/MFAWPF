@@ -465,4 +465,7 @@
     <data name="AdbSerial" xml:space="preserve">
         <value>Adb地址</value>
     </data>
+    <data name="FollowingSystem" xml:space="preserve">
+        <value>跟随系统</value>
+    </data>
 </root>
