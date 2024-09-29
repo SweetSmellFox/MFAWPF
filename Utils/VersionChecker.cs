@@ -14,10 +14,11 @@ public class VersionChecker
 
     public static void CheckVersion()
     {
-        TaskManager.RunTaskAsync(() => Checker.CheckForUpdatesAsync(), null, "检测版本");
+        TaskManager.RunTaskAsync(() => Checker.CheckForGUIUpdatesAsync(), null, "检测MFA版本");
+        TaskManager.RunTaskAsync(() => Checker.CheckForResourceUpdatesAsync(), null, "检测资源版本");
     }
 
-    public async Task CheckForUpdatesAsync(string owner = "SweetSmellFox", string repo = "MFAWPF")
+    public async Task CheckForGUIUpdatesAsync(string owner = "SweetSmellFox", string repo = "MFAWPF")
     {
         try
         {
@@ -25,16 +26,80 @@ public class VersionChecker
             string localVersion = GetLocalVersion();
             if (IsNewVersionAvailable(latestVersion, localVersion))
             {
-                Growl.Info("新版本可用！最新版本: " + latestVersion);
+                Growl.Info("MFA有新版本可用！最新版本: " + latestVersion);
             }
         }
         catch (Exception ex)
         {
-            Growls.Error($"检查最新版时发生错误: {ex.Message}");
+            Growls.Error($"检查MFA最新版时发生错误: {ex.Message}");
             LoggerService.LogError(ex);
         }
     }
 
+    public async Task CheckForResourceUpdatesAsync()
+    {
+        string url = MaaInterface.Instance?.Url ?? string.Empty;
+        try
+        {
+            string latestVersion = await GetLatestVersionFromGitHubUrl(url);
+            if (string.IsNullOrWhiteSpace(latestVersion))
+            {
+                return;
+            }
+
+            string localVersion = GetResourceVersion();
+            if (string.IsNullOrWhiteSpace(localVersion))
+            {
+                return;
+            }
+
+            if (IsNewVersionAvailable(latestVersion, localVersion))
+            {
+                Growl.Info("资源有新版本可用！最新版本: " + latestVersion);
+            }
+        }
+        catch (Exception ex)
+        {
+            Growls.Error($"检查资源最新版时发生错误: {ex.Message}");
+            LoggerService.LogError(ex);
+        }
+    }
+
+    private async Task<string> GetLatestVersionFromGitHubUrl(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url))
+            return string.Empty;
+        using HttpClient client = new HttpClient();
+        client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
+
+        try
+        {
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            string jsonResponse = await response.Content.ReadAsStringAsync();
+            JObject releaseData = JObject.Parse(jsonResponse);
+            return releaseData["tag_name"]?.ToString() ?? string.Empty;
+        }
+        catch (HttpRequestException e) when (e.Message.Contains("403"))
+        {
+            Console.WriteLine("GitHub API速率限制已超出，请稍后再试。");
+            LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
+            throw new Exception("GitHub API速率限制已超出，请稍后再试。");
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine($"请求GitHub时发生错误: {e.Message}");
+            LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
+            throw new Exception("请求GitHub时发生错误。");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"处理GitHub响应时发生错误: {e.Message}");
+            LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
+            throw new Exception("处理GitHub响应时发生错误。");
+        }
+    }
 
     private async Task<string> GetLatestVersionFromGitHub(string owner, string repo)
     {
@@ -75,6 +140,11 @@ public class VersionChecker
     private string GetLocalVersion()
     {
         return Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "DEBUG";
+    }
+
+    private string GetResourceVersion()
+    {
+        return MaaInterface.Instance?.Version ?? "DEBUG";
     }
 
     private bool IsNewVersionAvailable(string latestVersion, string localVersion)
