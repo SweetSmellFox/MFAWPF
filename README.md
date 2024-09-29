@@ -62,7 +62,7 @@
   {
   "name": "项目名称",
   "version":  "项目版本",
-  "url":  "项目链接(目前应该只支持Github)",
+  "url":  "项目链接(目前应该只支持Github)", //比如 https://api.github.com/repos/{Github账户}/{Github项目}/releases/latest
   "resource": [
     {
       "name": "官服",
