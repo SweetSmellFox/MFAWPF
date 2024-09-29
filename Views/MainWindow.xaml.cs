@@ -611,7 +611,7 @@ public partial class MainWindow
             },
             s2 = new()
             {
-                Orientation = Orientation.Horizontal, Margin = new Thickness(3)
+                Orientation = Orientation.Horizontal, Margin = new Thickness(3),  HorizontalAlignment = HorizontalAlignment.Center
             };
         var t1 = new TextBlock
         {
