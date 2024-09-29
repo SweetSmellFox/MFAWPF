@@ -60,10 +60,9 @@
 
 ```
   {
-  "version": {
-    "name": "项目名称",
-    "version": "项目版本"
-  },
+  "name": "项目名称",
+  "version":  "项目版本",
+  "url":  "项目链接(目前应该只支持Github)",
   "resource": [
     {
       "name": "官服",
@@ -80,7 +79,10 @@
   "task": [
     {
       "name": "任务",
-      "entry": "任务"
+      "entry": "任务接口",
+      “checked”: True,  //任务默认是否被选中
+      “repeatable”: True,  //任务可不可以重复运行
+      “repeat_count”: 1,  //任务重复运行次数，需要repeatable为True
     }
 ]
 }
@@ -93,6 +95,14 @@
 - 内置 MFATools 可以用来裁剪图片和获取 ROI
 - 目前一些地方并没有特别完善,欢迎各位大佬贡献代码
 - 注意，由于 `MaaFramework` 于 2.0 移除了Exec Agent，所以目前无法通过注册interface注册Custom Action和Custom Recognition
+
+**注：在MFA中，于Pipeline中任务新增了俩个属性字段，分别为 `focus_tip` 和 `focus_tip_color`。**
+
+- `focus_tip` : *string* | *list<string, >*  
+  当执行某任务时，在MFA右侧日志输出的内容。可选，默认空。
+- `focus_tip_color` : *string* | *list<string, >*  
+  当执行某任务时，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。
+
 ## 致谢
 
 ### 开源库
