@@ -440,4 +440,25 @@
     <data name="FollowingSystem" xml:space="preserve">
         <value>Following System</value>
     </data>
+    <data name="SimulatorPath" xml:space="preserve">
+        <value>Simulator Path</value>
+    </data>
+    <data name="WaitSimulator" xml:space="preserve">
+        <value>Wait time for simulator to start (seconds)</value>
+    </data>
+    <data name="StartSimulator" xml:space="preserve">
+        <value>Start the emulator after starting the MFA</value>
+    </data>
+    <data name="Select" xml:space="preserve">
+        <value>Select</value>
+    </data>
+    <data name="ExeFilter" xml:space="preserve">
+        <value>Executable files (*.exe*)|*.exe*</value>
+    </data>
+    <data name="SelectExecutableFile" xml:space="preserve">
+        <value>Select Executable File</value>
+    </data>
+    <data name="WaitSimulatorTime" xml:space="preserve">
+        <value>Wait time for simulator to start (seconds): {0}(s)</value>
+    </data>
 </root>

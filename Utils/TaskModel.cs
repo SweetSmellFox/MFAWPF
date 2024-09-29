@@ -114,6 +114,15 @@ public class TaskModel : ObservableObject
         set => SetNewProperty(ref _interrupt, value);
     }
 
+    [JsonProperty("is_sub")]
+    [Category("基础属性")]
+    [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
+    public bool? IsSub
+    {
+        get => _is_sub;
+        set => SetNewProperty(ref _is_sub, value);
+    }
+
     [JsonProperty("timeout")]
     [Category("基础属性")]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]

@@ -76,30 +76,27 @@ public class MoneyRecognition : IMaaCustomRecognition
                 };
             var rd1 =
                 context.RunRecognition(DiffEntry, t1.ToString(),
-                    imageBuffer);
-
-            if (rd1 is RecognitionDetail<MaaImageBuffer> r1)
+                    imageBuffer) as RecognitionDetail<MaaImageBuffer>;
+            if (rd1.IsHit())
             {
-                Console.WriteLine(r1.HitBox == null);
                 break;
             }
 
             context.Tasker.Controller.Click(980, 495);
             var rd2 =
-                context.RunRecognition(DiffEntry, t2.ToString(), imageBuffer);
-            if (rd2 is RecognitionDetail<MaaImageBuffer> r2)
+                context.RunRecognition(DiffEntry, t2.ToString(), imageBuffer) as RecognitionDetail<MaaImageBuffer>;
+            if (rd2.IsHit())
             {
-                Console.WriteLine(r2.HitBox);
                 break;
             }
 
 
             context.Tasker.Controller.Click(980, 495);
 
-            var rd3 = context.RunRecognition(DiffEntry, t3.ToString(), imageBuffer);
-            if (rd3 is RecognitionDetail<MaaImageBuffer> r3)
+            var rd3 =
+                context.RunRecognition(DiffEntry, t3.ToString(), imageBuffer) as RecognitionDetail<MaaImageBuffer>;
+            if (rd3.IsHit())
             {
-                Console.WriteLine(r3.HitBox == null);
                 break;
             }
 

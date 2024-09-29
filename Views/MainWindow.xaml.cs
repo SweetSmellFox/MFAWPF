@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -12,11 +13,11 @@ using HandyControl.Data;
 using HandyControl.Interactivity;
 using HandyControl.Themes;
 using MaaFramework.Binding;
-using MFAWPF.Controls;
 using MFAWPF.Data;
 using MFAWPF.Utils;
 using MFAWPF.Utils.Converters;
 using MFAWPF.ViewModels;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WPFLocalizeExtension.Extensions;
@@ -24,6 +25,7 @@ using ComboBox = HandyControl.Controls.ComboBox;
 using ScrollViewer = HandyControl.Controls.ScrollViewer;
 using TabControl = System.Windows.Controls.TabControl;
 using TabItem = System.Windows.Controls.TabItem;
+using TextBox = HandyControl.Controls.TextBox;
 
 namespace MFAWPF.Views;
 
@@ -161,8 +163,8 @@ public partial class MainWindow
             Data.TaskItemViewModels.AddRange(dragItemViewModels);
             if (Data.TaskItemViewModels.Count == 0 && Data.TasksSource.Count != 0)
             {
-                foreach (var VARIABLE in Data.TasksSource)
-                    Data.TaskItemViewModels.Add(VARIABLE);
+                foreach (var item in Data.TasksSource)
+                    Data.TaskItemViewModels.Add(item);
             }
         }
     }
@@ -356,12 +358,48 @@ public partial class MainWindow
         MaaProcessor.Instance.Stop();
     }
 
-    private void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async Task StartSimulator()
+    {
+        await StartRunnableFile(DataSet.GetData("SimulatorPath", string.Empty),
+            DataSet.GetData("WaitSimulatorTime", 60.0));
+    }
+
+    private async Task StartRunnableFile(string exePath, double waitTimeInSeconds)
+    {
+        if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
+            return;
+        try
+        {
+            Process.Start(exePath);
+
+            for (double remainingTime = waitTimeInSeconds; remainingTime > 0; remainingTime -= 1)
+            {
+                if (remainingTime % 10 == 0)
+                {
+                    Data.AddLogByKey("WaitSimulatorTime", null, remainingTime.ToString());
+                }
+
+                await Task.Delay(1000);
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorView.ShowException(ex);
+            LoggerService.LogError(ex);
+        }
+    }
+
+    private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (Data is not null)
         {
             Data.IsAdb = adbTab.IsSelected;
             btnCustom.Visibility = adbTab.IsSelected ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        if (IsFirstStart && DataSet.GetData("StartSimulator", false))
+        {
+            await StartSimulator();
         }
 
         if (IsFirstStart && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) &&
@@ -485,14 +523,24 @@ public partial class MainWindow
     {
         settingPanel.Children.Clear();
 // Create a new TabControl instance
-        TabControl tabControl = new TabControl
+        var tabControl = new TabControl
         {
             TabStripPlacement = Dock.Bottom,
             Background = Brushes.Transparent,
-            Height = 350,
             BorderThickness = new Thickness(0),
             Style = (Style)FindResource("TabControlCapsule") // Assuming 'TabControlCapsule' is a style in resources
         };
+
+        Binding binding = new Binding("ActualHeight")
+        {
+            RelativeSource =
+                new RelativeSource(RelativeSourceMode.FindAncestor, typeof(StackPanel), 1),
+            Converter = new SubtractConverter(),
+            ConverterParameter = 20 
+        };
+
+        // 将绑定应用到控件的 Height 属性
+        tabControl.SetBinding(HeightProperty, binding);
         // var binding = new Binding("Idle")
         // {
         //     Source = Data,
@@ -501,6 +549,7 @@ public partial class MainWindow
         // tabControl.SetBinding(IsEnabledProperty, binding);
         StackPanel s1 = new(), s2 = new();
         AddResourcesOption(s1);
+        AddAutoStartOption(s2);
         if ((Data?.IsAdb).IsTrue())
         {
             AddSettingOption(s1, "CaptureModeOption",
@@ -513,6 +562,7 @@ public partial class MainWindow
             AddBindSettingOption(s1, "InputModeOption",
                 ["MiniTouch", "MaaTouch", "AdbInput", "AutoDetect"],
                 "AdbControlInputType");
+            AddStartSettingOption(s2);
         }
         else
         {
@@ -527,7 +577,7 @@ public partial class MainWindow
 
         AddThemeOption(s1);
         AddLanguageOption(s1);
-        AddAutoStartOption(s2);
+
         ScrollViewer sv1 = new()
             {
                 Content = s1, VerticalScrollBarVisibility = ScrollBarVisibility.Auto
@@ -765,12 +815,7 @@ public partial class MainWindow
         c2.BindLocalization("StartupScript", ContentProperty);
         comboBox.Items.Add(c1);
         comboBox.Items.Add(c2);
-        var binding = new Binding("Idle")
-        {
-            Source = Data,
-            Mode = BindingMode.OneWay
-        };
-        comboBox.SetBinding(IsEnabledProperty, binding);
+
         comboBox.BindLocalization("AutoStartOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
@@ -781,6 +826,102 @@ public partial class MainWindow
         };
         comboBox.SelectedIndex = DataSet.GetData("AutoStartIndex", defaultValue);
         panel.Children.Add(comboBox);
+    }
+
+    private void AddStartSettingOption(Panel? panel = null)
+    {
+        panel ??= settingPanel;
+        // var binding = new Binding("Idle")
+        // {
+        //     Source = Data,
+        //     Mode = BindingMode.OneWay
+        // };
+
+        var checkBox = new CheckBox
+        {
+            IsChecked = DataSet.GetData("StartSimulator", false), Margin = new Thickness(5)
+        };
+        checkBox.BindLocalization("StartSimulator", ContentProperty);
+        checkBox.Click += (_, _) => { DataSet.SetData("StartSimulator", checkBox.IsChecked); };
+        // checkBox.SetBinding(IsEnabledProperty, binding);
+
+
+        var grid = new Grid { Margin = new Thickness(5) };
+
+        var col1 = new ColumnDefinition
+        {
+            Width = new GridLength(1, GridUnitType.Star)
+        };
+        var col2 = new ColumnDefinition
+        {
+            Width = new GridLength(40)
+        };
+
+        grid.ColumnDefinitions.Add(col1);
+        grid.ColumnDefinitions.Add(col2);
+
+        var t1 = new TextBox
+        {
+            Text = DataSet.GetData("SimulatorPath", string.Empty), HorizontalAlignment = HorizontalAlignment.Stretch
+        };
+        t1.TextChanged += (sender, _) =>
+        {
+            var text = (sender as TextBox)?.Text ?? string.Empty;
+            DataSet.SetData("SimulatorPath", text);
+        };
+        t1.SetValue(InfoElement.ShowClearButtonProperty, true);
+        t1.BindLocalization("SimulatorPath");
+        Grid.SetColumn(t1, 0);
+
+
+        var path = new System.Windows.Shapes.Path
+        {
+            Width = 15, MaxWidth = 15, Stretch = Stretch.Uniform, Data = FindResource("LoadGeometry") as Geometry,
+            Fill = FindResource("GrayColor4") as Brush
+        };
+
+        // var b1 = new Binding("GrayColor4")
+        // {
+        //     Source = this
+        // };
+        // button.SetBinding(System.Windows.Shapes.Path.FillProperty, b1);
+        var button = new Button { Content = path, VerticalAlignment = VerticalAlignment.Bottom };
+        button.Click += (_, _) =>
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = "SelectExecutableFile".GetLocalizationString(),
+                Filter = "ExeFilter".GetLocalizationString()
+            };
+
+            if (openFileDialog.ShowDialog().IsTrue())
+            {
+                t1.Text = openFileDialog.FileName;
+            }
+        };
+        button.BindLocalization("Select", ToolTipProperty);
+        Grid.SetColumn(button, 1);
+
+        grid.Children.Add(t1);
+        grid.Children.Add(button);
+
+        var numericUpDown = new NumericUpDown
+        {
+            Margin = new Thickness(5), Value = DataSet.GetData("WaitSimulatorTime", 60.0),
+            Style = FindResource("NumericUpDownExtend") as Style
+        };
+
+        numericUpDown.BindLocalization("WaitSimulator");
+        numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+        // numericUpDown.SetBinding(IsEnabledProperty, binding);
+        numericUpDown.ValueChanged += (sender, _) =>
+        {
+            var value = (sender as NumericUpDown)?.Value ?? 60;
+            DataSet.SetData("WaitSimulatorTime", value);
+        };
+        panel.Children.Add(checkBox);
+        panel.Children.Add(grid);
+        panel.Children.Add(numericUpDown);
     }
 
     public void SetOption(DragItemViewModel dragItem, bool value)

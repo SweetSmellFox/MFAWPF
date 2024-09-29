@@ -99,7 +99,7 @@
                             <ColumnDefinition Width="40" />
                             <ColumnDefinition Width="40" />
                         </Grid.ColumnDefinitions>
-                        <hc:TextBox Grid.Column="0" VerticalAlignment="Center"
+                        <hc:TextBox Grid.Column="0" VerticalAlignment="Center" 
                                     hc:InfoElement.TitleWidth="50"
                                     x:Name="PipelineFileName" hc:InfoElement.ShowClearButton="True"
                                     hc:InfoElement.Placeholder="{lex:Loc EditTaskDialog_PipelineFileName_Placeholder}" />

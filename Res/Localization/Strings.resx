@@ -468,4 +468,25 @@
     <data name="FollowingSystem" xml:space="preserve">
         <value>跟随系统</value>
     </data>
+    <data name="SimulatorPath" xml:space="preserve">
+        <value>模拟器路径</value>
+    </data>
+    <data name="WaitSimulator" xml:space="preserve">
+        <value>等待模拟器启动时间(秒)</value>
+    </data>
+    <data name="StartSimulator" xml:space="preserve">
+        <value>启动MFA后启动模拟器</value>
+    </data>
+    <data name="Select" xml:space="preserve">
+        <value>选择</value>
+    </data>
+    <data name="ExeFilter" xml:space="preserve">
+        <value>可运行文件 (*.exe*)|*.exe*</value>
+    </data>
+    <data name="SelectExecutableFile" xml:space="preserve">
+        <value>选择可运行文件</value>
+    </data>
+    <data name="WaitSimulatorTime" xml:space="preserve">
+        <value>等待模拟器启动时间(秒): {0}(s)</value>
+    </data>
 </root>

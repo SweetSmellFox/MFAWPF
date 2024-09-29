@@ -26,12 +26,17 @@
                         Text="{Binding AdbName, RelativeSource={RelativeSource AncestorType=hc:Window}}"
                         hc:InfoElement.TitlePlacement="Left"
                         hc:InfoElement.Title="{lex:Loc AdbName}" />
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 10">
-                <hc:TextBox HorizontalAlignment="Center" Width="285" hc:InfoElement.ShowClearButton="True"
+            <Grid Width="320" Margin="0 10 0 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/> 
+                    <ColumnDefinition Width="40"/> 
+                </Grid.ColumnDefinitions>
+                <hc:TextBox Grid.Column="0" HorizontalAlignment="Stretch"
+                            hc:InfoElement.ShowClearButton="True"
                             hc:InfoElement.TitlePlacement="Left"
                             Text="{Binding AdbPath, RelativeSource={RelativeSource AncestorType=hc:Window}}"
                             hc:InfoElement.Title="{lex:Loc AdbPath}" />
-                <Button ToolTip="{lex:Loc Load}" Click="Load"
+                <Button Grid.Column="1" ToolTip="{lex:Loc Load}" Click="Load"
                         hc:TipElement.Placement="Top">
                     <Button.Content>
                         <Path Width="15" Data="{StaticResource LoadGeometry}"
@@ -39,7 +44,8 @@
                               MaxWidth="15" Stretch="Uniform" />
                     </Button.Content>
                 </Button>
-            </StackPanel>
+            </Grid>
+
             <hc:TextBox HorizontalAlignment="Center" Width="320" hc:InfoElement.ShowClearButton="True"
                         Text="{Binding AdbSerial, RelativeSource={RelativeSource AncestorType=hc:Window}}"
                         Margin="0 10 0 10"

@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using HandyControl.Controls;
+using MaaFramework.Binding;
+using MaaFramework.Binding.Buffers;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Extensions;
 
@@ -71,5 +73,18 @@ public static class MFAExtensions
     public static bool IsTrue(this bool? value)
     {
         return value == true;
+    }
+
+    public static bool IsHit(
+        this RecognitionDetail<MaaImageBuffer>? detail)
+    {
+        if (detail is null || detail.HitBox.IsDefaultHitBox())
+            return false;
+        return true;
+    }
+
+    private static bool IsDefaultHitBox(this IMaaRectBuffer? hitBox)
+    {
+        return hitBox is null or { X: 0, Y: 0, Width: 0, Height: 0 };
     }
 }
