@@ -360,7 +360,7 @@ public partial class MainWindow
 
     private async Task StartSimulator()
     {
-        await StartRunnableFile(DataSet.GetData("SimulatorPath", string.Empty),
+        await StartRunnableFile(DataSet.GetData("SimulatorPath", string.Empty) ?? string.Empty,
             DataSet.GetData("WaitSimulatorTime", 60.0));
     }
 
@@ -376,7 +376,7 @@ public partial class MainWindow
             {
                 if (remainingTime % 10 == 0)
                 {
-                    Data.AddLogByKey("WaitSimulatorTime", null, remainingTime.ToString());
+                    Data?.AddLogByKey("WaitSimulatorTime", null, remainingTime.ToString());
                 }
 
                 await Task.Delay(1000);
@@ -536,7 +536,7 @@ public partial class MainWindow
             RelativeSource =
                 new RelativeSource(RelativeSourceMode.FindAncestor, typeof(StackPanel), 1),
             Converter = new SubtractConverter(),
-            ConverterParameter = 20 
+            ConverterParameter = 20
         };
 
         // 将绑定应用到控件的 Height 属性
