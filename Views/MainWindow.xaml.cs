@@ -607,13 +607,41 @@ public partial class MainWindow
     private void About(object? sender = null, RoutedEventArgs? e = null)
     {
         settingPanel.Children.Clear();
-        settingPanel.Children.Add(new Shield
+        StackPanel s1 = new()
+            {
+                Orientation = Orientation.Horizontal, Margin = new Thickness(5)
+            },
+            s2 = new()
+            {
+                Orientation = Orientation.Horizontal, Margin = new Thickness(5)
+            };
+        var t1 = new TextBlock();
+        t1.BindLocalization("ProjectLink", TextBlock.TextProperty);
+        s1.Children.Add(t1);
+        s1.Children.Add(new Shield
         {
             Status = "MFAWPF", Subject = "Github", Margin = new Thickness(0, 10, 0, 10),
             HorizontalAlignment = HorizontalAlignment.Center,
             Command = ControlCommands.OpenLink,
             CommandParameter = "https://github.com/SweetSmellFox/MFAWPF"
         });
+        var resourceLink = MaaInterface.Instance?.Url;
+        if (!string.IsNullOrWhiteSpace(resourceLink))
+        {
+            var t2 = new TextBlock();
+            t2.BindLocalization("ResourceLink", TextBlock.TextProperty);
+            s1.Children.Add(t2);
+            s1.Children.Add(new Shield
+            {
+                Status = MaaInterface.Instance?.Name ?? "Resource", Subject = "Github",
+                Margin = new Thickness(0, 10, 0, 10),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Command = ControlCommands.OpenLink,
+                CommandParameter = resourceLink
+            });
+        }
+
+        settingPanel.Children.Add(s1);
     }
 
     private void AddResourcesOption(Panel? panel = null, int defaultValue = 0)
