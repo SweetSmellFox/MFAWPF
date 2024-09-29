@@ -299,15 +299,14 @@
                         </StackPanel>
 
                     </Grid>
-                    <ScrollViewer Margin="10" Grid.Column="1" x:Name="CS">
-                        <StackPanel Orientation="Vertical" x:Name="settingPanel">
-                            <StackPanel.RenderTransform>
-                                <TranslateTransform Y="-5" />
 
-                            </StackPanel.RenderTransform>
-                          
-                        </StackPanel>
-                    </ScrollViewer>
+                    <hc:SimpleStackPanel Margin="10" Grid.Column="1" Orientation="Vertical" x:Name="settingPanel">
+                        <hc:SimpleStackPanel.RenderTransform>
+                            <TranslateTransform Y="-5" />
+
+                        </hc:SimpleStackPanel.RenderTransform>
+
+                    </hc:SimpleStackPanel>
 
 
                     <hc:ScrollViewer Grid.Column="2" Margin="10 0 10 0"

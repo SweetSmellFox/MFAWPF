@@ -462,9 +462,9 @@
         <value>Wait time for simulator to start (seconds): {0}(s)</value>
     </data>
     <data name="ProjectLink" xml:space="preserve">
-        <value>Project Link</value>
+        <value>Project Link: </value>
     </data>
     <data name="ResourceLink" xml:space="preserve">
-        <value>Resource Link</value>
+        <value>Resource Link: </value>
     </data>
 </root>

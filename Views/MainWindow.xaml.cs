@@ -522,33 +522,26 @@ public partial class MainWindow
     private void ConfigureSettingsPanel(object? sender = null, RoutedEventArgs? e = null)
     {
         settingPanel.Children.Clear();
-// Create a new TabControl instance
+
+
         var tabControl = new TabControl
         {
-            TabStripPlacement = Dock.Bottom,
+            TabStripPlacement = Dock.Bottom, Height = 400,
             Background = Brushes.Transparent,
-            BorderThickness = new Thickness(0),
-            Style = (Style)FindResource("TabControlCapsule") // Assuming 'TabControlCapsule' is a style in resources
+            BorderThickness = new Thickness(0), VerticalAlignment = VerticalAlignment.Stretch,
+            Style = (Style)FindResource("TabControlCapsule")
         };
-
-        Binding binding = new Binding("ActualHeight")
+        Binding heightBinding = new Binding("ActualHeight")
         {
-            RelativeSource =
-                new RelativeSource(RelativeSourceMode.FindAncestor, typeof(StackPanel), 1),
+            Source = settingPanel,
             Converter = new SubtractConverter(),
-            ConverterParameter = 20
+            ConverterParameter = "20"
         };
+        tabControl.SetBinding(HeightProperty, heightBinding);
 
-        // 将绑定应用到控件的 Height 属性
-        tabControl.SetBinding(HeightProperty, binding);
-        // var binding = new Binding("Idle")
-        // {
-        //     Source = Data,
-        //     Mode = BindingMode.OneWay
-        // };
-        // tabControl.SetBinding(IsEnabledProperty, binding);
         StackPanel s1 = new(), s2 = new();
         AddResourcesOption(s1);
+
         AddAutoStartOption(s2);
         if ((Data?.IsAdb).IsTrue())
         {
@@ -580,11 +573,15 @@ public partial class MainWindow
 
         ScrollViewer sv1 = new()
             {
-                Content = s1, VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                Content = s1, VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch
             },
             sv2 = new()
             {
-                Content = s2, VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                Content = s2, VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch
             };
         var commonSettingTabItem = new TabItem
         {
@@ -609,18 +606,23 @@ public partial class MainWindow
         settingPanel.Children.Clear();
         StackPanel s1 = new()
             {
-                Orientation = Orientation.Horizontal, Margin = new Thickness(5)
+                Orientation = Orientation.Horizontal, Margin = new Thickness(3),
+                HorizontalAlignment = HorizontalAlignment.Center
             },
             s2 = new()
             {
-                Orientation = Orientation.Horizontal, Margin = new Thickness(5)
+                Orientation = Orientation.Horizontal, Margin = new Thickness(3)
             };
-        var t1 = new TextBlock();
+        var t1 = new TextBlock
+        {
+            VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2),
+            HorizontalAlignment = HorizontalAlignment.Center
+        };
         t1.BindLocalization("ProjectLink", TextBlock.TextProperty);
         s1.Children.Add(t1);
         s1.Children.Add(new Shield
         {
-            Status = "MFAWPF", Subject = "Github", Margin = new Thickness(0, 10, 0, 10),
+            Status = "MFAWPF", Subject = "Github", Margin = new Thickness(2),
             HorizontalAlignment = HorizontalAlignment.Center,
             Command = ControlCommands.OpenLink,
             CommandParameter = "https://github.com/SweetSmellFox/MFAWPF"
@@ -628,13 +630,13 @@ public partial class MainWindow
         var resourceLink = MaaInterface.Instance?.Url;
         if (!string.IsNullOrWhiteSpace(resourceLink))
         {
-            var t2 = new TextBlock();
+            var t2 = new TextBlock { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2) };
             t2.BindLocalization("ResourceLink", TextBlock.TextProperty);
-            s1.Children.Add(t2);
-            s1.Children.Add(new Shield
+            s2.Children.Add(t2);
+            s2.Children.Add(new Shield
             {
                 Status = MaaInterface.Instance?.Name ?? "Resource", Subject = "Github",
-                Margin = new Thickness(0, 10, 0, 10),
+                Margin = new Thickness(2),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Command = ControlCommands.OpenLink,
                 CommandParameter = resourceLink
@@ -642,6 +644,7 @@ public partial class MainWindow
         }
 
         settingPanel.Children.Add(s1);
+        settingPanel.Children.Add(s2);
     }
 
     private void AddResourcesOption(Panel? panel = null, int defaultValue = 0)
@@ -957,16 +960,31 @@ public partial class MainWindow
         if (dragItem.InterfaceItem != null && value)
         {
             settingPanel.Children.Clear();
-            AddRepeatOption(dragItem);
+            var s1 = new StackPanel();
+
+            AddRepeatOption(s1, dragItem);
             if (dragItem.InterfaceItem.Option != null)
             {
                 foreach (var option in dragItem.InterfaceItem.Option)
-                    AddOption(option, dragItem);
+                    AddOption(s1, option, dragItem);
             }
+
+            var sc1 = new ScrollViewer
+            {
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Content = s1
+            };
+            Binding heightBinding = new Binding("ActualHeight")
+            {
+                Source = settingPanel,
+                Converter = new SubtractConverter(),
+                ConverterParameter = "20"
+            };
+            sc1.SetBinding(HeightProperty, heightBinding);
+            settingPanel.Children.Add(sc1);
         }
     }
 
-    private void AddOption(MaaInterface.MaaInterfaceSelectOption option, DragItemViewModel source)
+    private void AddOption(Panel panel, MaaInterface.MaaInterfaceSelectOption option, DragItemViewModel source)
     {
         if (MaaInterface.Instance != null && MaaInterface.Instance.Option != null && option.Name != null)
         {
@@ -1001,12 +1019,12 @@ public partial class MainWindow
                 };
                 comboBox.SetValue(TitleElement.TitleProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-                settingPanel.Children.Add(comboBox);
+                panel.Children.Add(comboBox);
             }
         }
     }
 
-    private void AddRepeatOption(DragItemViewModel source)
+    private void AddRepeatOption(Panel panel, DragItemViewModel source)
     {
         if (source.InterfaceItem is { Repeatable: true })
         {
@@ -1036,7 +1054,7 @@ public partial class MainWindow
             };
             numericUpDown.BindLocalization("RepeatOption");
             numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-            settingPanel.Children.Add(numericUpDown);
+            panel.Children.Add(numericUpDown);
         }
     }
 
