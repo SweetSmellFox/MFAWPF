@@ -80,7 +80,7 @@ public class MoneyRecognition : IMaaCustomRecognition
 
             if (rd1 is RecognitionDetail<MaaImageBuffer> r1)
             {
-                Console.WriteLine(r1.Detail);
+                Console.WriteLine(r1.HitBox == null);
                 break;
             }
 
@@ -89,7 +89,7 @@ public class MoneyRecognition : IMaaCustomRecognition
                 context.RunRecognition(DiffEntry, t2.ToString(), imageBuffer);
             if (rd2 is RecognitionDetail<MaaImageBuffer> r2)
             {
-                Console.WriteLine(r2.Detail);
+                Console.WriteLine(r2.HitBox);
                 break;
             }
 
@@ -99,7 +99,7 @@ public class MoneyRecognition : IMaaCustomRecognition
             var rd3 = context.RunRecognition(DiffEntry, t3.ToString(), imageBuffer);
             if (rd3 is RecognitionDetail<MaaImageBuffer> r3)
             {
-                Console.WriteLine(r3.Detail);
+                Console.WriteLine(r3.HitBox == null);
                 break;
             }
 
