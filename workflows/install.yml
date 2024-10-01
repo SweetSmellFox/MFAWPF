@@ -63,6 +63,7 @@ jobs:
         uses: robinraju/release-downloader@v1
         with:
           repository: SweetSmellFox/MFAWPF
+          filename: MFAWPF*
           latest: true
           out-file-path: gui
           extract: true
