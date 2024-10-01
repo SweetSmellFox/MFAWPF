@@ -49,7 +49,7 @@ jobs:
       tag: ${{ steps.set_tag.outputs.tag }}
       is_release: ${{ steps.set_tag.outputs.is_release }}
 
-  gui:
+  update:
     needs: meta
     runs-on: ubuntu-latest
     strategy:
@@ -59,20 +59,45 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Download Latest MFAWPF
-        uses: robinraju/release-downloader@v1
-        with:
-          repository: SweetSmellFox/MFAWPF
-          latest: true
-          out-file-path: gui
-          extract: true
-      ##在下面更改项目名称和项目地址
-      - name: gui resources
+
+      - name: update
         shell: bash
         run: |
-          rm -f ./gui/*.zip
-          cp -r ./assets/resource/* ./gui/Resource/
-          jq --arg version_name "项目名称" --arg url "项目地址" --arg version ${{ needs.meta.outputs.tag }} '. + {"name": $version_name, "url": $url,"version": $version}' ./assets/interface.json > ./gui/interface.json
+          mkdir -p ./update
+          rsync -av --exclude='MaaCommonAssets' ./assets/ ./update/
+
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: update
+          path: "update"
+
+  gui:
+    needs: meta
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          
+      - name: Download Latest MFAWPF  
+        uses: robinraju/release-downloader@v1  
+        with:  
+             repository: SweetSmellFox/MFAWPF  
+             filename: MFAWPF*
+             latest: true  
+             out-file-path: gui  
+             extract: true  
+  
+      - name: gui resources          
+        shell: bash
+        run: |  
+           rm -f ./gui/*.zip
+           cp -r ./assets/resource/* ./gui/Resource/
+           jq --arg version_name "项目名称" --arg url "项目地址" --arg version ${{ needs.meta.outputs.tag }} '. + {"name": $version_name, "url": $url,"version": $version}' ./assets/interface.json > ./gui/interface.json
 
       - uses: actions/upload-artifact@v4
         with:
@@ -84,7 +109,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        arch: [ aarch64, x86_64 ]
+        arch: [aarch64, x86_64]
       fail-fast: false
 
     steps:
@@ -116,7 +141,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        arch: [ aarch64, x86_64 ]
+        arch: [aarch64, x86_64]
       fail-fast: false
 
     steps:
@@ -148,7 +173,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        arch: [ aarch64, x86_64 ]
+        arch: [aarch64, x86_64]
       fail-fast: false
 
     steps:
@@ -208,14 +233,10 @@ jobs:
           name: MAAxxx-android-${{ matrix.arch }}
           path: "install"
 
-
-
   release:
     if: ${{ needs.meta.outputs.is_release == 'true' }}
-    needs: [ meta, windows, ubuntu, macos, gui, android]
+    needs: [meta, windows, ubuntu, macos, android]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
