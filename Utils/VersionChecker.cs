@@ -1,4 +1,5 @@
-﻿using HandyControl.Controls;
+using System.Text.RegularExpressions;
+using HandyControl.Controls;
 
 namespace MFAWPF.Utils;
 
@@ -36,9 +37,30 @@ public class VersionChecker
         }
     }
 
+    private static string ConvertToApiUrl(string githubUrl)
+    {
+        string pattern = @"^https://github\.com/(?<owner>[^/]+)/(?<repo>[^/]+)$";
+        var match = Regex.Match(githubUrl, pattern);
+
+        if (match.Success)
+        {
+            string owner = match.Groups["owner"].Value;
+            string repo = match.Groups["repo"].Value;
+
+            return $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
+        }
+
+        throw new FormatException("输入的 GitHub URL 格式不正确: " + githubUrl);
+    }
+
     public async Task CheckForResourceUpdatesAsync()
     {
         string url = MaaInterface.Instance?.Url ?? string.Empty;
+        if (!string.IsNullOrWhiteSpace(url))
+        {
+            url = ConvertToApiUrl(url);
+        }
+
         try
         {
             string latestVersion = await GetLatestVersionFromGitHubUrl(url);
@@ -169,12 +191,24 @@ public class VersionChecker
 
     private string ExtractVersionNumber(string versionString)
     {
-        string[] parts = versionString.Replace(" v", " ").Split(' ');
+        string pattern = @"^[vV]?(?<version>\d+(\.\d+){0,3})([-_][a-zA-Z0-9]+)?$";
+        var match = Regex.Match(versionString, pattern);
 
-        foreach (var part in parts)
+        if (match.Success)
         {
-            if (Version.TryParse(part, out _))
-                return part;
+            string versionPart = match.Groups["version"].Value;
+
+            string[] versionComponents = versionPart.Split('.');
+            while (versionComponents.Length < 4)
+            {
+                versionPart += ".0";
+                versionComponents = versionPart.Split('.');
+            }
+
+            if (Version.TryParse(versionPart, out _))
+            {
+                return versionPart;
+            }
         }
 
         throw new FormatException("无法解析版本号: " + versionString);
