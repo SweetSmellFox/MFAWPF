@@ -169,7 +169,7 @@ public class MaaProcessor
 
     private void CloseEmulator()
     {
-        var emulatorPath = (string)DataSet.GetData("EmulatorPath", string.Empty);
+        var emulatorPath = DataSet.GetData("EmulatorPath", string.Empty);
 
         if (!string.IsNullOrEmpty(emulatorPath))
         {
@@ -191,7 +191,7 @@ public class MaaProcessor
 
     private void ShutDown()
     {
-        Process.Start("shutdown", "/s /t 0"); 
+        Process.Start("shutdown", "/s /t 0");
     }
 
     private TaskAndParam CreateTaskAndParam(DragItemViewModel task)
@@ -469,7 +469,8 @@ public class MaaProcessor
                 Config.AdbDevice.AdbSerial,
                 Config.AdbDevice.ScreenCap, Config.AdbDevice.Input,
                 !string.IsNullOrWhiteSpace(Config.AdbDevice.Config) && Config.AdbDevice.Config != "{}" &&
-                DataSet.GetData("AdbConfig", "{\"extras\":{}}") == "{\"extras\":{}}"
+                (DataSet.GetData("AdbConfig", "{\"extras\":{}}") == "{\"extras\":{}}" ||
+                 string.IsNullOrWhiteSpace(DataSet.GetData("AdbConfig", "{\"extras\":{}}")))
                     ? Config.AdbDevice.Config
                     : DataSet.GetData("AdbConfig", "{\"extras\":{}}"))
             : new MaaWin32Controller(
