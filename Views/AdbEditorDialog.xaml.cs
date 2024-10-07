@@ -42,7 +42,7 @@ public partial class AdbEditorDialog
             typeof(string),
             typeof(AdbEditorDialog),
             new FrameworkPropertyMetadata(
-                "Simulator".GetLocalizationString(), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+                "Emulator".GetLocalizationString(), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
     public string AdbName
     {

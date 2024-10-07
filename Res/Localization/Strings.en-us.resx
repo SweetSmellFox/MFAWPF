@@ -260,7 +260,7 @@
     <data name="LoadingController" xml:space="preserve">
     <value>Initializing the controller</value>
 </data>
-    <data name="ConnectingSimulatorOrWindow" xml:space="preserve">
+    <data name="ConnectingEmulatorOrWindow" xml:space="preserve">
     <value>Error connecting to {0}!</value>
 </data>
     <data name="InitControllerFailed" xml:space="preserve">
@@ -281,8 +281,8 @@
     <data name="RegisterCustomAction" xml:space="preserve">
     <value>Register custom action: {0}</value>
 </data>
-    <data name="Simulator" xml:space="preserve">
-        <value>Simulator</value>
+    <data name="Emulator" xml:space="preserve">
+        <value>Emulator</value>
     </data>
     <data name="Window" xml:space="preserve">
         <value>Window</value>
@@ -440,13 +440,13 @@
     <data name="FollowingSystem" xml:space="preserve">
         <value>Following System</value>
     </data>
-    <data name="SimulatorPath" xml:space="preserve">
-        <value>Simulator Path</value>
+    <data name="EmulatorPath" xml:space="preserve">
+        <value>Emulator Path</value>
     </data>
-    <data name="WaitSimulator" xml:space="preserve">
-        <value>Wait time for simulator to start (seconds)</value>
+    <data name="WaitEmulator" xml:space="preserve">
+        <value>Wait time for Emulator to start (seconds)</value>
     </data>
-    <data name="StartSimulator" xml:space="preserve">
+    <data name="StartEmulator" xml:space="preserve">
         <value>Start the emulator after starting the MFA</value>
     </data>
     <data name="Select" xml:space="preserve">
@@ -458,13 +458,31 @@
     <data name="SelectExecutableFile" xml:space="preserve">
         <value>Select Executable File</value>
     </data>
-    <data name="WaitSimulatorTime" xml:space="preserve">
-        <value>Wait time for simulator to start (seconds): {0}(s)</value>
+    <data name="WaitEmulatorTime" xml:space="preserve">
+        <value>Wait time for Emulator to start (seconds): {0}(s)</value>
     </data>
     <data name="ProjectLink" xml:space="preserve">
         <value>Project Link: </value>
     </data>
     <data name="ResourceLink" xml:space="preserve">
         <value>Resource Link: </value>
+    </data>
+    <data name="StartupParameter" xml:space="preserve">
+        <value>Startup Parameter</value>
+    </data>
+    <data name="AfterTaskOption" xml:space="preserve">
+        <value>Post-task Actions</value>
+    </data>
+    <data name="CloseMFA" xml:space="preserve">
+        <value>Disable MFA</value>
+    </data>
+    <data name="CloseEmulator" xml:space="preserve">
+        <value>Disable Emulator</value>
+    </data>
+    <data name="CloseEmulatorAndMFA" xml:space="preserve">
+        <value>Disable MFA and Emulator</value>
+    </data>
+    <data name="ShutDown" xml:space="preserve">
+        <value>Shut Down</value>
     </data>
 </root>

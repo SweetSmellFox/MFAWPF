@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using HandyControl.Controls;
@@ -62,7 +63,7 @@ public class MaaProcessor
         {
             Growls.Warning("Warning_CannotConnect".GetLocalizationString()
                 .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
-                    ? "Simulator".GetLocalizationString()
+                    ? "Emulator".GetLocalizationString()
                     : "Window".GetLocalizationString()));
             return;
         }
@@ -84,7 +85,7 @@ public class MaaProcessor
         TaskManager.RunTaskAsync(async () =>
         {
             MainWindow.Data?.AddLogByKey("ConnectingTo", null, (MainWindow.Data?.IsAdb).IsTrue()
-                ? "Simulator"
+                ? "Emulator"
                 : "Window");
             var instance = await Task.Run(GetCurrentTasker, token);
 
@@ -111,12 +112,14 @@ public class MaaProcessor
             _cancellationTokenSource?.Cancel();
             TaskManager.RunTaskAsync(() =>
             {
-                MainWindow.Data?.AddLogByKey("Stopping");
+                if (_isStopped)
+                    MainWindow.Data?.AddLogByKey("Stopping");
                 if (_currentTasker == null || (_currentTasker?.Abort()).IsTrue())
                 {
                     DisplayTaskCompletionMessage();
                     if (MainWindow.Data != null)
                         MainWindow.Data.Idle = true;
+                    HandleAfterTaskOperation();
                 }
                 else
                 {
@@ -136,6 +139,59 @@ public class MaaProcessor
                 OnTaskQueueChanged();
             }
         }
+    }
+
+    public void HandleAfterTaskOperation()
+    {
+        if (_isStopped) return;
+        int afterTaskIndex = DataSet.GetData("AfterTaskIndex", 0);
+        switch (afterTaskIndex)
+        {
+            case 1:
+                CloseMFA();
+                break;
+            case 2:
+                CloseEmulator();
+                break;
+            case 3:
+                CloseEmulatorAndMFA();
+                break;
+            case 4:
+                ShutDown();
+                break;
+        }
+    }
+
+    private void CloseMFA()
+    {
+        Growls.Process(Application.Current.Shutdown);
+    }
+
+    private void CloseEmulator()
+    {
+        var emulatorPath = (string)DataSet.GetData("EmulatorPath", string.Empty);
+
+        if (!string.IsNullOrEmpty(emulatorPath))
+        {
+            string processName = Path.GetFileNameWithoutExtension(emulatorPath);
+
+            var processes = Process.GetProcessesByName(processName);
+            foreach (var process in processes)
+            {
+                process.Kill();
+            }
+        }
+    }
+
+    private void CloseEmulatorAndMFA()
+    {
+        CloseEmulator();
+        CloseMFA();
+    }
+
+    private void ShutDown()
+    {
+        Process.Start("shutdown", "/s /t 0"); 
     }
 
     private TaskAndParam CreateTaskAndParam(DragItemViewModel task)
@@ -375,9 +431,9 @@ public class MaaProcessor
         catch (Exception e)
         {
             HandleInitializationError(e,
-                "ConnectingSimulatorOrWindow".GetLocalizationString()
+                "ConnectingEmulatorOrWindow".GetLocalizationString()
                     .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
-                        ? "Simulator".GetLocalizationString()
+                        ? "Emulator".GetLocalizationString()
                         : "Window".GetLocalizationString()), true,
                 "InitControllerFailed".GetLocalizationString());
             return null;
@@ -412,7 +468,10 @@ public class MaaProcessor
                 Config.AdbDevice.AdbPath,
                 Config.AdbDevice.AdbSerial,
                 Config.AdbDevice.ScreenCap, Config.AdbDevice.Input,
-                !string.IsNullOrWhiteSpace(Config.AdbDevice.Config) ? Config.AdbDevice.Config : "{}")
+                !string.IsNullOrWhiteSpace(Config.AdbDevice.Config) && Config.AdbDevice.Config != "{}" &&
+                DataSet.GetData("AdbConfig", "{\"extras\":{}}") == "{\"extras\":{}}"
+                    ? Config.AdbDevice.Config
+                    : DataSet.GetData("AdbConfig", "{\"extras\":{}}"))
             : new MaaWin32Controller(
                 Config.DesktopWindow.HWnd,
                 Config.DesktopWindow.ScreenCap, Config.DesktopWindow.Input,
@@ -551,4 +610,3 @@ public class MaaProcessor
         return buffer;
     }
 }
-

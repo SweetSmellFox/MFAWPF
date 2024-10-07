@@ -1,4 +1,4 @@
-﻿
+
 using MFAWPF.Utils.Converters;
 using MFAWPF.Views;
 using Newtonsoft.Json;

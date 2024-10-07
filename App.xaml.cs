@@ -10,7 +10,7 @@ namespace MFAWPF;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App 
+public partial class App
 {
     public App()
     {
@@ -54,7 +54,7 @@ public partial class App
             e.Handled = true; //把 Handled 属性设为true，表示此异常已处理，程序可以继续运行，不会强制退出      
             Console.WriteLine(e.Exception);
             LoggerService.LogError(e.Exception);
-            ErrorView.ShowException(e.Exception, false);
+            ErrorView.ShowException(e.Exception);
         }
         catch (Exception ex)
         {

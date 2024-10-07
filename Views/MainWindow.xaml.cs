@@ -358,10 +358,10 @@ public partial class MainWindow
         MaaProcessor.Instance.Stop();
     }
 
-    private async Task StartSimulator()
+    private async Task StartEmulator()
     {
-        await StartRunnableFile(DataSet.GetData("SimulatorPath", string.Empty) ?? string.Empty,
-            DataSet.GetData("WaitSimulatorTime", 60.0));
+        await StartRunnableFile(DataSet.GetData("EmulatorPath", string.Empty) ?? string.Empty,
+            DataSet.GetData("WaitEmulatorTime", 60.0));
     }
 
     private async Task StartRunnableFile(string exePath, double waitTimeInSeconds)
@@ -376,7 +376,7 @@ public partial class MainWindow
             {
                 if (remainingTime % 10 == 0)
                 {
-                    Data?.AddLogByKey("WaitSimulatorTime", null, remainingTime.ToString());
+                    Data?.AddLogByKey("WaitEmulatorTime", null, remainingTime.ToString());
                 }
 
                 await Task.Delay(1000);
@@ -397,9 +397,9 @@ public partial class MainWindow
             btnCustom.Visibility = adbTab.IsSelected ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        if (IsFirstStart && DataSet.GetData("StartSimulator", false))
+        if (IsFirstStart && DataSet.GetData("StartEmulator", false))
         {
-            await StartSimulator();
+            await StartEmulator();
         }
 
         if (IsFirstStart && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) &&
@@ -511,7 +511,7 @@ public partial class MainWindow
         catch (Exception ex)
         {
             Growls.WarningGlobal(string.Format(LocExtension.GetLocalizedValue<string>("TaskStackError"),
-                (Data?.IsAdb).IsTrue() ? "Simulator".GetLocalizationString() : "Window".GetLocalizationString(),
+                (Data?.IsAdb).IsTrue() ? "Emulator".GetLocalizationString() : "Window".GetLocalizationString(),
                 ex.Message));
             MaaProcessor.Config.IsConnected = false;
             LoggerService.LogError(ex);
@@ -555,7 +555,9 @@ public partial class MainWindow
             AddBindSettingOption(s1, "InputModeOption",
                 ["MiniTouch", "MaaTouch", "AdbInput", "AutoDetect"],
                 "AdbControlInputType");
+            AddAfterTaskOption(s2);
             AddStartSettingOption(s2);
+            AddStartExtrasOption(s2);
         }
         else
         {
@@ -611,7 +613,8 @@ public partial class MainWindow
             },
             s2 = new()
             {
-                Orientation = Orientation.Horizontal, Margin = new Thickness(3),  HorizontalAlignment = HorizontalAlignment.Center
+                Orientation = Orientation.Horizontal, Margin = new Thickness(3),
+                HorizontalAlignment = HorizontalAlignment.Center
             };
         var t1 = new TextBlock
         {
@@ -832,6 +835,27 @@ public partial class MainWindow
         panel?.Children.Add(comboBox);
     }
 
+    private void AddStartExtrasOption(Panel? panel = null)
+    {
+        panel ??= settingPanel;
+        var textBox = new TextBox
+        {
+            Text = DataSet.GetData("AdbConfig", "{\"extras\":{}}"), HorizontalAlignment = HorizontalAlignment.Stretch,
+            Margin = new Thickness(5)
+        };
+
+
+        textBox.BindLocalization("StartupParameter");
+        textBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+
+        textBox.TextChanged += (sender, _) =>
+        {
+            var text = (sender as TextBox)?.Text ?? string.Empty;
+            DataSet.SetData("AdbConfig", text);
+        };
+        panel.Children.Add(textBox);
+    }
+
     private void AddAutoStartOption(Panel? panel = null, int defaultValue = 0)
     {
         panel ??= settingPanel;
@@ -859,6 +883,41 @@ public partial class MainWindow
         panel.Children.Add(comboBox);
     }
 
+    private void AddAfterTaskOption(Panel? panel = null, int defaultValue = 0)
+    {
+        panel ??= settingPanel;
+        var comboBox = new ComboBox
+        {
+            Style = FindResource("ComboBoxExtend") as Style,
+            Margin = new Thickness(5)
+        };
+        var c1 = new ComboBoxItem();
+        c1.BindLocalization("None", ContentProperty);
+        var c2 = new ComboBoxItem();
+        c2.BindLocalization("CloseMFA", ContentProperty);
+        var c3 = new ComboBoxItem();
+        c3.BindLocalization("CloseEmulator", ContentProperty);
+        var c4 = new ComboBoxItem();
+        c4.BindLocalization("CloseEmulatorAndMFA", ContentProperty);
+        var c5 = new ComboBoxItem();
+        c5.BindLocalization("ShutDown", ContentProperty);
+        comboBox.Items.Add(c1);
+        comboBox.Items.Add(c2);
+        comboBox.Items.Add(c3);
+        comboBox.Items.Add(c4);
+        comboBox.Items.Add(c5);
+        comboBox.BindLocalization("AfterTaskOption");
+        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+
+        comboBox.SelectionChanged += (sender, _) =>
+        {
+            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+            DataSet.SetData("AfterTaskIndex", index);
+        };
+        comboBox.SelectedIndex = DataSet.GetData("AfterTaskIndex", defaultValue);
+        panel.Children.Add(comboBox);
+    }
+
     private void AddStartSettingOption(Panel? panel = null)
     {
         panel ??= settingPanel;
@@ -870,10 +929,10 @@ public partial class MainWindow
 
         var checkBox = new CheckBox
         {
-            IsChecked = DataSet.GetData("StartSimulator", false), Margin = new Thickness(5)
+            IsChecked = DataSet.GetData("StartEmulator", false), Margin = new Thickness(5)
         };
-        checkBox.BindLocalization("StartSimulator", ContentProperty);
-        checkBox.Click += (_, _) => { DataSet.SetData("StartSimulator", checkBox.IsChecked); };
+        checkBox.BindLocalization("StartEmulator", ContentProperty);
+        checkBox.Click += (_, _) => { DataSet.SetData("StartEmulator", checkBox.IsChecked); };
         // checkBox.SetBinding(IsEnabledProperty, binding);
 
 
@@ -893,15 +952,15 @@ public partial class MainWindow
 
         var t1 = new TextBox
         {
-            Text = DataSet.GetData("SimulatorPath", string.Empty), HorizontalAlignment = HorizontalAlignment.Stretch
+            Text = DataSet.GetData("EmulatorPath", string.Empty), HorizontalAlignment = HorizontalAlignment.Stretch
         };
         t1.TextChanged += (sender, _) =>
         {
             var text = (sender as TextBox)?.Text ?? string.Empty;
-            DataSet.SetData("SimulatorPath", text);
+            DataSet.SetData("EmulatorPath", text);
         };
         t1.SetValue(InfoElement.ShowClearButtonProperty, true);
-        t1.BindLocalization("SimulatorPath");
+        t1.BindLocalization("EmulatorPath");
         Grid.SetColumn(t1, 0);
 
 
@@ -938,17 +997,17 @@ public partial class MainWindow
 
         var numericUpDown = new NumericUpDown
         {
-            Margin = new Thickness(5), Value = DataSet.GetData("WaitSimulatorTime", 60.0),
+            Margin = new Thickness(5), Value = DataSet.GetData("WaitEmulatorTime", 60.0),
             Style = FindResource("NumericUpDownExtend") as Style
         };
 
-        numericUpDown.BindLocalization("WaitSimulator");
+        numericUpDown.BindLocalization("WaitEmulator");
         numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
         // numericUpDown.SetBinding(IsEnabledProperty, binding);
         numericUpDown.ValueChanged += (sender, _) =>
         {
             var value = (sender as NumericUpDown)?.Value ?? 60;
-            DataSet.SetData("WaitSimulatorTime", value);
+            DataSet.SetData("WaitEmulatorTime", value);
         };
         panel.Children.Add(checkBox);
         panel.Children.Add(grid);
@@ -1077,7 +1136,7 @@ public partial class MainWindow
         {
             Growls.Warning(
                 "Warning_CannotConnect".GetLocalizedFormattedString((Data?.IsAdb).IsTrue()
-                    ? "Simulator"
+                    ? "Emulator"
                     : "Window"));
             return;
         }
