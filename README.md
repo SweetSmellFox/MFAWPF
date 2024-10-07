@@ -27,8 +27,8 @@
 #### 手动安装
 
 - 下载最新发行版并解压
-- 将maafw项目中assets/resource中所有内容复制到MFAWPS/Resource中
-- 将maafw项目中assets/interface.json文件复制到MFAWPS/中
+- 将maafw项目中assets/resource中所有内容复制到MFAWPF/Resource中
+- 将maafw项目中assets/interface.json文件复制到MFAWPF/中
 - ***修改***刚刚复制的interface.json文件
 - 下面是一个例子
 
