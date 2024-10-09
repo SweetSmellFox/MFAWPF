@@ -290,7 +290,7 @@ public class MaaProcessor
             if (token.IsCancellationRequested) return false;
 
             var task = TaskQueue.Peek();
-            for (int i = 0; i < task.Count; i++)
+            for (var i = 0; i < task.Count; i++)
             {
                 if (TaskQueue.Count > 0)
                 {
@@ -504,7 +504,7 @@ public class MaaProcessor
         instance.Callback += (_, args) =>
         {
             var jObject = JObject.Parse(args.Details);
-            string name = jObject["name"]?.ToString() ?? string.Empty;
+            var name = jObject["name"]?.ToString() ?? string.Empty;
             if (args.Message.Equals(MaaMsg.Task.Action.Succeeded))
             {
                 if (MainWindow.Instance?.TaskDictionary.TryGetValue(name, out var taskModel) == true)

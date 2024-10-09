@@ -80,13 +80,32 @@
     {
       "name": "任务",
       "entry": "任务接口",
-      “checked”: True,  //任务默认是否被选中
-      “repeatable”: True,  //任务可不可以重复运行
-      “repeat_count”: 1,  //任务重复运行次数，需要repeatable为True
+      "checked": true,  //任务默认是否被选中
+      "doc": "文档介绍",  //显示在任务设置选项底下，可支持富文本，格式在下方
+      "repeatable": true,  //任务可不可以重复运行
+      "repeat_count": 1,  //任务默认重复运行次数，需要repeatable为true
     }
   ]
 }
 ```
+### `doc`字符串格式：
+
+#### 使用类似`[color:red]`文本内容`[/color]`的标记来定义文本样式。
+
+#### 支持的标记包括：
+
+- `[color:color_name]`：颜色，例如`[color:red]`。
+
+- `[size:font_size]`：字号，例如`[size:20]`。
+
+- `[b]`：粗体。
+
+- `[i]`：斜体。
+
+- `[u]`：下划线。
+
+- `[s]`：删除线。
+
 **注：上面注释内容为文档介绍用，实际运行时不建议写入。**
 
 - 运行

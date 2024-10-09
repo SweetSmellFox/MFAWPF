@@ -2,9 +2,11 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -539,7 +541,7 @@ public partial class MainWindow
         };
         tabControl.SetBinding(HeightProperty, heightBinding);
 
-        StackPanel s1 = new(), s2 = new();
+        StackPanel s1 = new() { Margin = new Thickness(2) }, s2 = new() { Margin = new Thickness(2) };
         AddResourcesOption(s1);
 
         AddAutoStartOption(s2);
@@ -558,6 +560,8 @@ public partial class MainWindow
             AddAfterTaskOption(s2);
             AddStartSettingOption(s2);
             AddStartExtrasOption(s2);
+            // AddIntroduction(s2,
+            //     "[size:24][b][color:blue]这是一个蓝色的大标题[/color][/b][/size]\n[color:green][i]这是绿色的斜体文本。[/i][/color]\n[u]这是带有下划线的文本。[/u]\n[s]这是带有删除线的文本。[/s]\n[b][color:red]这是红色的粗体文本。[/color][/b]\n[size:18]这是一个较小的字号文本，字号为18。[/size]\n");
         }
         else
         {
@@ -856,6 +860,108 @@ public partial class MainWindow
         panel.Children.Add(textBox);
     }
 
+
+    private void AddIntroduction(Panel? panel = null, string input = "")
+    {
+        panel ??= settingPanel;
+
+        RichTextBox richTextBox = new RichTextBox
+        {
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Background = Brushes.Transparent,
+            BorderThickness = new Thickness(0),
+            IsReadOnly = true
+        };
+
+        FlowDocument flowDocument = new FlowDocument();
+        Paragraph paragraph = new Paragraph();
+
+        string pattern = @"\[(?<tag>[^\]]+):?(?<value>[^\]]*)\](?<content>.*?)\[/\k<tag>\]";
+        Regex regex = new Regex(pattern);
+        int lastIndex = 0;
+
+        void ParseAndApplyTags(string text, Span currentSpan)
+        {
+            List<Inline> inlinesToAdd = new List<Inline>();
+            lastIndex = 0;
+
+            foreach (Match match in regex.Matches(text))
+            {
+                if (match.Index > lastIndex)
+                {
+                    string textBeforeMatch = text.Substring(lastIndex, match.Index - lastIndex);
+
+                    textBeforeMatch = textBeforeMatch.Replace("\n", Environment.NewLine);
+                    inlinesToAdd.Add(new Run(textBeforeMatch));
+                }
+
+
+                string tag = match.Groups["tag"].Value.ToLower();
+                string value = match.Groups["value"].Value.ToLower();
+                string content = match.Groups["content"].Value;
+
+                Span span = new Span();
+                ParseAndApplyTags(content, span);
+
+
+                switch (tag)
+                {
+                    case "color":
+                        span.Foreground = (Brush)new BrushConverter().ConvertFromString(value);
+                        break;
+                    case "size":
+                        if (double.TryParse(value, out double fontSize))
+                        {
+                            span.FontSize = fontSize;
+                        }
+
+                        break;
+                    case "b":
+                        span.FontWeight = FontWeights.Bold;
+                        break;
+                    case "i":
+                        span.FontStyle = FontStyles.Italic;
+                        break;
+                    case "u":
+                        span.TextDecorations = TextDecorations.Underline;
+                        break;
+                    case "s":
+                        span.TextDecorations = TextDecorations.Strikethrough;
+                        break;
+                }
+
+                inlinesToAdd.Add(span);
+
+                lastIndex = match.Index + match.Length;
+            }
+
+            if (lastIndex < text.Length)
+            {
+                string textAfterMatch = text.Substring(lastIndex);
+
+                textAfterMatch = textAfterMatch.Replace("\n", Environment.NewLine);
+                inlinesToAdd.Add(new Run(textAfterMatch));
+            }
+
+            foreach (var inline in inlinesToAdd)
+            {
+                currentSpan.Inlines.Add(inline);
+            }
+        }
+
+
+        Span rootSpan = new Span();
+
+        ParseAndApplyTags(input, rootSpan);
+
+        paragraph.Inlines.Add(rootSpan);
+
+        flowDocument.Blocks.Add(paragraph);
+        richTextBox.Document = flowDocument;
+        panel.Children.Add(richTextBox);
+    }
+
+
     private void AddAutoStartOption(Panel? panel = null, int defaultValue = 0)
     {
         panel ??= settingPanel;
@@ -1028,6 +1134,11 @@ public partial class MainWindow
                     AddOption(s1, option, dragItem);
             }
 
+            if (!string.IsNullOrWhiteSpace(dragItem.InterfaceItem.Document))
+            {
+                AddIntroduction(s1, Regex.Unescape(dragItem.InterfaceItem.Document));
+            }
+
             var sc1 = new ScrollViewer
             {
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Content = s1
@@ -1069,6 +1180,7 @@ public partial class MainWindow
                 comboBox.ItemsSource = interfaceOption.Cases;
 
                 comboBox.Tag = option.Name;
+
                 comboBox.SelectionChanged += (_, _) =>
                 {
                     option.Index = comboBox.SelectedIndex;
@@ -1076,8 +1188,10 @@ public partial class MainWindow
                     DataSet.SetData("TaskItems",
                         Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                 };
+                comboBox.SetValue(ToolTipProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitleProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+
                 panel.Children.Add(comboBox);
             }
         }
@@ -1108,8 +1222,8 @@ public partial class MainWindow
             numericUpDown.ValueChanged += (_, _) =>
             {
                 source.InterfaceItem.RepeatCount = Convert.ToInt16(numericUpDown.Value);
-                JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
-                    MaaInterface.Instance);
+                DataSet.SetData("TaskItems",
+                    Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             };
             numericUpDown.BindLocalization("RepeatOption");
             numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);

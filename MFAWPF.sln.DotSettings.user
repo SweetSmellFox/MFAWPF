@@ -1,4 +1,5 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ANumericUpDown_002Ecs_002Fl_003AE_0021_003FRoaming_003FJetBrains_003FRider2024_002E2_003Fresharper_002Dhost_003FSourcesCache_003Fc3fa59ff4764d1b88750297df334f7e10cf3d8d8c9afdd0e58651ba4aed8_003FNumericUpDown_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=MFAWPF_002FRes_002FLocalization_002FStrings/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=Miscellaneous_0020Files_002FNarezav/@EntryIndexedValue">True</s:Boolean>
 	
