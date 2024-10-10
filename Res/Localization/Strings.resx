@@ -513,4 +513,10 @@
     <data name="ShutDown" xml:space="preserve">
         <value>关机</value>
     </data>
+    <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
+        <value>重启MFA和关闭模拟器</value>
+    </data>
+    <data name="Restart" xml:space="preserve">
+        <value>重启</value>
+    </data>
 </root>

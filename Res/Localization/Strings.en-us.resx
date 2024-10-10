@@ -485,4 +485,10 @@
     <data name="ShutDown" xml:space="preserve">
         <value>Shut Down</value>
     </data>
+    <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
+        <value>Disable MFA and Restart Emulator</value>
+    </data>
+    <data name="Restart" xml:space="preserve">
+        <value>Restart</value>
+    </data>
 </root>
