@@ -1008,9 +1008,9 @@ public partial class MainWindow
         var c5 = new ComboBoxItem();
         c5.BindLocalization("ShutDown", ContentProperty);
         var c6 = new ComboBoxItem();
-        c5.BindLocalization("CloseEmulatorAndRestartMFA", ContentProperty);
+        c6.BindLocalization("CloseEmulatorAndRestartMFA", ContentProperty);
         var c7 = new ComboBoxItem();
-        c5.BindLocalization("Restart", ContentProperty);
+        c7.BindLocalization("Restart", ContentProperty);
         comboBox.Items.Add(c1);
         comboBox.Items.Add(c2);
         comboBox.Items.Add(c3);
