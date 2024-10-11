@@ -203,11 +203,11 @@ public class MaaProcessor
     private void CloseEmulatorAndRestartMFA()
     {
         CloseEmulator();
-        Growls.Process(System.Windows.Forms.Application.Restart);
+        Process.Start(Process.GetCurrentProcess().MainModule.FileName);
         Growls.Process(Application.Current.Shutdown);
     }
 
-    private void ()
+    private void Restart()
     {
         Process.Start("shutdown", "/r /t 0");
     }
