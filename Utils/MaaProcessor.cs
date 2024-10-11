@@ -199,7 +199,7 @@ public class MaaProcessor
     {
         Process.Start("shutdown", "/s /t 0");
     }
-
+    
     private void CloseEmulatorAndRestartMFA()
     {
         CloseEmulator();
