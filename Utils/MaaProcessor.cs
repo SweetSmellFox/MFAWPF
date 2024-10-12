@@ -159,6 +159,12 @@ public class MaaProcessor
             case 4:
                 ShutDown();
                 break;
+            case 5:
+                CloseEmulatorAndRestartMFA();
+                break;
+            case 6:
+                Restart();
+                break;
         }
     }
 
@@ -192,6 +198,18 @@ public class MaaProcessor
     private void ShutDown()
     {
         Process.Start("shutdown", "/s /t 0");
+    }
+    
+    private void CloseEmulatorAndRestartMFA()
+    {
+        CloseEmulator();
+        Process.Start(Process.GetCurrentProcess().MainModule.FileName);
+        Growls.Process(Application.Current.Shutdown);
+    }
+
+    private void Restart()
+    {
+        Process.Start("shutdown", "/r /t 0");
     }
 
     private TaskAndParam CreateTaskAndParam(DragItemViewModel task)

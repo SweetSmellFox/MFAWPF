@@ -1007,11 +1007,17 @@ public partial class MainWindow
         c4.BindLocalization("CloseEmulatorAndMFA", ContentProperty);
         var c5 = new ComboBoxItem();
         c5.BindLocalization("ShutDown", ContentProperty);
+        var c6 = new ComboBoxItem();
+        c6.BindLocalization("CloseEmulatorAndRestartMFA", ContentProperty);
+        var c7 = new ComboBoxItem();
+        c7.BindLocalization("Restart", ContentProperty);
         comboBox.Items.Add(c1);
         comboBox.Items.Add(c2);
         comboBox.Items.Add(c3);
         comboBox.Items.Add(c4);
         comboBox.Items.Add(c5);
+        comboBox.Items.Add(c6);
+        comboBox.Items.Add(c7);
         comboBox.BindLocalization("AfterTaskOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
