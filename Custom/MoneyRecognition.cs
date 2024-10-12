@@ -2,6 +2,7 @@
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Custom;
+using MaaFramework.Binding.Interop.Native;
 using MFAWPF.ViewModels;
 
 namespace MFAWPF.Custom;

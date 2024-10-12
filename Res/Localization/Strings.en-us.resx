@@ -222,7 +222,7 @@
     <value>Failed to initialize MAA instance, a connection error or resource file corruption occurred, please refer to the logs.</value>
 </data>
     <data name="InstanceInitFailedLog" xml:space="preserve">
-    <value>MAA instance initialization failed</value>
+    <value>Connection failure</value>
 </data>
     <data name="TaskStart" xml:space="preserve">
     <value>Starting task: {0}</value>

@@ -23,6 +23,13 @@ public class MaaProcessor
     private static MaaProcessor? _instance;
     private CancellationTokenSource? _cancellationTokenSource;
     private bool _isStopped;
+
+    public bool IsStopped
+    {
+        get => _isStopped;
+        set => _isStopped = value;
+    }
+
     private MaaTasker? _currentTasker;
 
     public static string Resource => AppDomain.CurrentDomain.BaseDirectory + "Resource";
@@ -76,8 +83,7 @@ public class MaaProcessor
         OnTaskQueueChanged();
 
         SetCurrentTasker();
-        if (MainWindow.Data != null)
-            MainWindow.Data.Idle = false;
+        MainWindow.Data?.SetIdle(false);
 
         _cancellationTokenSource = new CancellationTokenSource();
         var token = _cancellationTokenSource.Token;
@@ -94,32 +100,44 @@ public class MaaProcessor
                 Growls.ErrorGlobal("InitInstanceFailed".GetLocalizationString());
                 LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
                 MainWindow.Data?.AddLogByKey("InstanceInitFailedLog");
-                Stop(false);
+                Stop();
                 return;
             }
 
             bool run = await ExecuteTasks(token);
             if (run)
-                Stop(_isStopped);
+                Stop(IsStopped);
         }, null, "启动任务");
     }
 
     public void Stop(bool setIsStopped = true)
     {
-        if (_cancellationTokenSource != null)
+        if (_emulatorCancellationTokenSource != null)
         {
-            _isStopped = setIsStopped;
+            _emulatorCancellationTokenSource?.Cancel();
+            MainWindow.Data?.AddLogByKey("Stopping");
+
+            if (DataSet.GetData("AutoStartIndex", 0) != 1)
+            {
+                TaskQueue.Clear();
+                OnTaskQueueChanged();
+                MainWindow.Data?.SetIdle(true);
+                _emulatorCancellationTokenSource = null;
+                MainWindow.Data?.AddLogByKey("TaskAbandoned");
+            }
+        }
+        else if (_cancellationTokenSource != null)
+        {
+            IsStopped = setIsStopped;
             _cancellationTokenSource?.Cancel();
             TaskManager.RunTaskAsync(() =>
             {
-                if (_isStopped)
+                if (IsStopped)
                     MainWindow.Data?.AddLogByKey("Stopping");
                 if (_currentTasker == null || (_currentTasker?.Abort()).IsTrue())
                 {
                     DisplayTaskCompletionMessage();
-                    if (MainWindow.Data != null)
-                        MainWindow.Data.Idle = true;
-                    HandleAfterTaskOperation();
+                    MainWindow.Data?.SetIdle(true);
                 }
                 else
                 {
@@ -143,7 +161,7 @@ public class MaaProcessor
 
     public void HandleAfterTaskOperation()
     {
-        if (_isStopped) return;
+        if (IsStopped) return;
         int afterTaskIndex = DataSet.GetData("AfterTaskIndex", 0);
         switch (afterTaskIndex)
         {
@@ -165,6 +183,58 @@ public class MaaProcessor
             case 6:
                 Restart();
                 break;
+        }
+    }
+
+    private CancellationTokenSource? _emulatorCancellationTokenSource;
+
+    public bool ShouldAutoStart => _emulatorCancellationTokenSource == null ||
+                                   _emulatorCancellationTokenSource is { IsCancellationRequested: false };
+
+    public void EndAutoStart()
+    {
+        _emulatorCancellationTokenSource = null;
+        TaskQueue.Clear();
+        OnTaskQueueChanged();
+        MainWindow.Data?.AddLogByKey("TaskAbandoned");
+        MainWindow.Data?.SetIdle(true);
+    }
+
+    public async Task StartEmulator()
+    {
+        _emulatorCancellationTokenSource = new CancellationTokenSource();
+        MainWindow.Instance?.ToggleTaskButtonsVisibility(true);
+        MainWindow.Data?.SetIdle(false);
+        await StartRunnableFile(DataSet.GetData("EmulatorPath", string.Empty) ?? string.Empty,
+            DataSet.GetData("WaitEmulatorTime", 60.0), _emulatorCancellationTokenSource.Token);
+    }
+
+    private async Task StartRunnableFile(string exePath, double waitTimeInSeconds, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
+            return;
+
+        Process.Start(exePath);
+
+        for (double remainingTime = waitTimeInSeconds; remainingTime > 0; remainingTime -= 1)
+        {
+            if (token.IsCancellationRequested)
+            {
+                return;
+            }
+
+            if (remainingTime % 10 == 0)
+            {
+                MainWindow.Data?.AddLogByKey("WaitEmulatorTime", null, remainingTime.ToString());
+            }
+
+            try
+            {
+                await Task.Delay(1000, token);
+            }
+            catch
+            {
+            }
         }
     }
 
@@ -199,11 +269,11 @@ public class MaaProcessor
     {
         Process.Start("shutdown", "/s /t 0");
     }
-    
+
     private void CloseEmulatorAndRestartMFA()
     {
         CloseEmulator();
-        Process.Start(Process.GetCurrentProcess().MainModule.FileName);
+        Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
         Growls.Process(Application.Current.Shutdown);
     }
 
@@ -302,7 +372,7 @@ public class MaaProcessor
 
     private async Task<bool> ExecuteTasks(CancellationToken token)
     {
-        MeasureExecutionTime(() => _currentTasker?.Controller.Screencap().Wait());
+        MeasureExecutionTime(() => _currentTasker?.Controller.LinkStart().Wait());
         while (TaskQueue.Count > 0)
         {
             if (token.IsCancellationRequested) return false;
@@ -316,7 +386,7 @@ public class MaaProcessor
                     MainWindow.Data?.AddLogByKey("TaskStart", null, taskA.Name ?? string.Empty);
                     if (!TryRunTasks(_currentTasker, taskA.Entry, taskA.Param))
                     {
-                        if (_isStopped) return false;
+                        if (IsStopped) return false;
                         break;
                     }
                 }
@@ -332,15 +402,17 @@ public class MaaProcessor
 
     private void DisplayTaskCompletionMessage()
     {
-        if (_isStopped)
+        if (IsStopped)
         {
             Growl.Info("TaskStopped".GetLocalizationString());
             MainWindow.Data?.AddLogByKey("TaskAbandoned");
+            IsStopped = false;
         }
         else
         {
             Growl.Info("TaskCompleted".GetLocalizationString());
             MainWindow.Data?.AddLogByKey("TaskAllCompleted");
+            HandleAfterTaskOperation();
         }
     }
 

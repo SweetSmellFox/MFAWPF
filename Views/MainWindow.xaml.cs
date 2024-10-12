@@ -176,22 +176,15 @@ public partial class MainWindow
         ToggleTaskButtonsVisibility(isRunning: MaaProcessor.Instance.TaskQueue.Count > 0);
     }
 
-    private void ToggleTaskButtonsVisibility(bool isRunning)
+    public void ToggleTaskButtonsVisibility(bool isRunning)
     {
-        // 检查是否需要使用 Dispatcher
-        if (Dispatcher.CheckAccess())
+        Growls.Process(() =>
         {
-            // 当前线程是 UI 线程，直接执行
             startButton.Visibility = isRunning ? Visibility.Collapsed : Visibility.Visible;
             startButton.IsEnabled = !isRunning;
             stopButton.Visibility = isRunning ? Visibility.Visible : Visibility.Collapsed;
             stopButton.IsEnabled = isRunning;
-        }
-        else
-        {
-            // 如果当前线程不是 UI 线程，通过 Dispatcher 调度到 UI 线程执行
-            Dispatcher.Invoke(() => ToggleTaskButtonsVisibility(isRunning));
-        }
+        });
     }
 
     protected override void OnClosed(EventArgs e)
@@ -360,37 +353,6 @@ public partial class MainWindow
         MaaProcessor.Instance.Stop();
     }
 
-    private async Task StartEmulator()
-    {
-        await StartRunnableFile(DataSet.GetData("EmulatorPath", string.Empty) ?? string.Empty,
-            DataSet.GetData("WaitEmulatorTime", 60.0));
-    }
-
-    private async Task StartRunnableFile(string exePath, double waitTimeInSeconds)
-    {
-        if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
-            return;
-        try
-        {
-            Process.Start(exePath);
-
-            for (double remainingTime = waitTimeInSeconds; remainingTime > 0; remainingTime -= 1)
-            {
-                if (remainingTime % 10 == 0)
-                {
-                    Data?.AddLogByKey("WaitEmulatorTime", null, remainingTime.ToString());
-                }
-
-                await Task.Delay(1000);
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorView.ShowException(ex);
-            LoggerService.LogError(ex);
-        }
-    }
-
     private async void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (Data is not null)
@@ -401,7 +363,7 @@ public partial class MainWindow
 
         if (IsFirstStart && DataSet.GetData("StartEmulator", false))
         {
-            await StartEmulator();
+            await MaaProcessor.Instance.StartEmulator();
         }
 
         if (IsFirstStart && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) &&
@@ -418,7 +380,16 @@ public partial class MainWindow
                 deviceComboBox.SelectedIndex = 0;
                 MaaProcessor.Config.IsConnected = true;
                 if (DataSet.GetData("AutoStartIndex", 0) == 1)
-                    Start(null, null);
+                {
+                    if (MaaProcessor.Instance.ShouldAutoStart)
+                    {
+                        Start(null, null);
+                    }
+                    else
+                    {
+                        MaaProcessor.Instance.EndAutoStart();
+                    }
+                }
             }
 
             IsFirstStart = false;
@@ -489,8 +460,16 @@ public partial class MainWindow
                 deviceComboBox.SelectedIndex = 0;
                 if (IsFirstStart && DataSet.GetData("AutoStartIndex", 0) == 1)
                 {
-                    Start(null, null);
-                    IsFirstStart = false;
+                    if (MaaProcessor.Instance.ShouldAutoStart)
+                    {
+                        Start(null, null);
+                        IsFirstStart = false;
+                    }
+                    else
+                    {
+                        MaaProcessor.Instance.EndAutoStart();
+                        IsFirstStart = false;
+                    }
                 }
             }
             else
@@ -907,7 +886,7 @@ public partial class MainWindow
                 switch (tag)
                 {
                     case "color":
-                        span.Foreground = (Brush)new BrushConverter().ConvertFromString(value);
+                        span.Foreground = new BrushConverter().ConvertFromString(value) as Brush ?? span.Foreground;
                         break;
                     case "size":
                         if (double.TryParse(value, out double fontSize))

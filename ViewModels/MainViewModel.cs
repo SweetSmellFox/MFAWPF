@@ -55,6 +55,11 @@ public class MainViewModel : ObservableObject
         set => SetProperty(ref _idle, value);
     }
 
+    public void SetIdle(bool value)
+    {
+        Idle = value;
+    }
+    
     public GongSolutions.Wpf.DragDrop.IDropTarget DropHandler { get; } = new DragDropHandler();
     
 

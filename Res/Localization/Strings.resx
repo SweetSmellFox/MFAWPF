@@ -259,7 +259,7 @@
     <value>初始化MAA实例失败，发生连接错误或资源文件损坏，请参阅日志.</value>
 </data>
     <data name="InstanceInitFailedLog" xml:space="preserve">
-    <value>MAA实例初始化失败</value>
+    <value>连接失败</value>
 </data>
     <data name="TaskStart" xml:space="preserve">
     <value>开始任务: {0}</value>

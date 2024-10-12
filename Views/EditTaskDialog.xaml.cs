@@ -30,8 +30,7 @@ public partial class EditTaskDialog
     {
         base.OnClosed(e);
         MainWindow.TaskDialog = null;
-        if (MainWindow.Data is not null)
-            MainWindow.Data.Idle = true;
+        MainWindow.Data?.SetIdle(true);
     }
 
     private void List_KeyDown(object sender, KeyEventArgs e)
