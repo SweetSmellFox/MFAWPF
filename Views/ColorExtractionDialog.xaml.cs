@@ -172,7 +172,7 @@ public partial class ColorExtractionDialog
 
     private void GetColorRange(double x, double y, double width, double height)
     {
-        if (width < 1 || !double.IsOddInteger(width)) width = 1;
+        if (width < 1 || !double.IsNormal(width)) width = 1;
         if (height < 1|| !double.IsNormal(height)) height = 1;
         // 创建BitmapImage对象
         if (image.Source is BitmapImage bitmapImage)
