@@ -823,7 +823,8 @@ public partial class MainWindow
         panel ??= settingPanel;
         var textBox = new TextBox
         {
-            Text = DataSet.GetData("AdbConfig", "{\"extras\":{}}"), HorizontalAlignment = HorizontalAlignment.Stretch,
+            //Text = DataSet.GetData("AdbConfig", "{\"extras\":{}}"), HorizontalAlignment = HorizontalAlignment.Stretch,
+            Text = DataSet.GetData("AdbConfig", "mumu是-v 多开号(从0开始),雷电是index=多开号(也是0)"), HorizontalAlignment = HorizontalAlignment.Stretch,
             Margin = new Thickness(5)
         };
 
