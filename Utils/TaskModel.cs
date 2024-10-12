@@ -78,6 +78,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("recognition")]
     [Category("基础属性")]
+    // [DisplayName("识别算法类型")]
+    [Description(
+        "识别算法类型。可选，默认 DirectHit 。\n可选的值：DirectHit | TemplateMatch | FeatureMatch | ColorMatch | OCR | NeuralNetworkClassify | NeuralNetworkDetect | Custom")]
     [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
     public string? Recognition
     {
@@ -87,6 +90,8 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("action")]
     [Category("基础属性")]
+    [Description(
+        "执行的动作。可选，默认 DoNothing 。\n可选的值：DoNothing | Click | Swipe | Key | Text | StartApp | StopApp | StopTask | Custom")]
     [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
     public string? Action
     {
@@ -96,6 +101,7 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("next")]
     [Category("基础属性")]
+    [Description("接下来要执行的任务列表。可选，默认空。\n按顺序识别 next 中的每个任务，只执行第一个识别到的。")]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
     public List<string>? Next
@@ -106,6 +112,8 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("interrupt")]
     [Category("基础属性")]
+    [Description(
+        "next 中全部未识别到时的候补任务列表，会执行类似中断操作。可选，默认空。\n若 next 中的任务全部未识别到，则会按序识别该中断列表中的每个任务，并执行第一个识别到的。在后续任务全部执行完成后，重新跳转到该任务来再次尝试识别。\n例如: A: { next: [B, C], interrupt: [D, E] }\n当 B, C 未识别到而识别到 D 时，会去完整的执行 D 及 D.next。但当 D 的流水线完全执行完毕后。会再次回到任务 A，继续尝试识别 B, C, D, E 。\n该字段多用于异常处理，例如 D 是识别 “网络断开提示框”，在点击确认并等待网络连接成功后，继续之前的任务流程。")]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
     public List<string>? Interrupt
@@ -116,6 +124,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("is_sub")]
     [Category("基础属性")]
+    [Description(
+        "（已在 2.x 版本中废弃，但保留兼容性，推荐使用 interrupt 替代）\n是否是子任务。可选，默认 false 。\n如果是子任务，执行完本任务（及后续 next 等）后，会返回来再次识别本任务 所在的 next 列表。\n例如：A.next = [B, Sub_C, D]，这里的 Sub_C.is_sub = true，\n若匹配上了 Sub_C，在完整执行完 Sub_C 及后续任务后，会返回来再次识别 [B, Sub_C, D] 并执行命中项及后续任务。"
+    )]
     [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
     public bool? IsSub
     {
@@ -125,6 +136,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("timeout")]
     [Category("基础属性")]
+    [Description(
+        "next + interrupt 识别超时时间，毫秒。默认 20 * 1000 。\n具体逻辑为 while(!timeout) { foreach(next + interrupt); sleep_until(rate_limit); } 。"
+    )]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
     public uint? Timeout
     {
@@ -134,6 +148,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("on_error")]
     [Category("基础属性")]
+    [Description(
+        "当识别超时，或动作执行失败后，接下来会执行该列表中的任务。可选，默认空。"
+    )]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
     public List<string>? OnError
@@ -144,6 +161,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("inverse")]
     [Category("基础属性")]
+    [Description(
+        "反转识别结果，识别到了当做没识别到，没识别到的当做识别到了。可选，默认 false 。\n请注意由此识别出的任务，Click 等动作的点击自身将失效（因为实际并没有识别到东西），若有需求可单独设置 target 。"
+    )]
     [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
     public bool? Inverse
     {
@@ -153,6 +173,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("enabled")]
     [Category("基础属性")]
+    [Description(
+        "是否启用该 task。可选，默认 true 。\n若为 false，其他 task 的 next 列表中的该 task 会被跳过，既不会被识别也不会被执行。"
+    )]
     [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
     public bool? Enabled
     {
@@ -162,6 +185,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("pre_delay")]
     [Category("基础属性")]
+    [Description(
+        "识别到 到 执行动作前 的延迟，毫秒。可选，默认 200 。\n推荐尽可能增加中间过程任务，少用延迟，不然既慢还不稳定。"
+    )]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
     public uint? PreDelay
     {
@@ -171,6 +197,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("post_delay")]
     [Category("基础属性")]
+    [Description(
+        "执行动作后 到 识别 next 的延迟，毫秒。可选，默认 200 。\n推荐尽可能增加中间过程任务，少用延迟，不然既慢还不稳定。"
+    )]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
     public uint? PostDelay
     {
@@ -180,6 +209,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("pre_wait_freezes")]
     [Category("延时设置")]
+    [Description(
+        "识别到 到 执行动作前，等待画面不动了的时间，毫秒。可选，默认 0 ，即不等待。\n连续 pre_wait_freezes 毫秒 画面 没有较大变化 才会退出动作。"
+    )]
     [JsonConverter(typeof(UIntOrObjectConverter))]
     [Editor(typeof(NullableUIntOrObjectEditor), typeof(NullableUIntOrObjectEditor))]
     public object? PreWaitFreezes
@@ -190,6 +222,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("post_wait_freezes")]
     [Category("延时设置")]
+    [Description(
+        "行动动作后 到 识别 next，等待画面不动了的时间，毫秒。可选，默认 0 ，即不等待。\n其余逻辑同 pre_wait_freezes。"
+    )]
     [JsonConverter(typeof(UIntOrObjectConverter))]
     [Editor(typeof(NullableUIntOrObjectEditor), typeof(NullableUIntOrObjectEditor))]
     public object? PostWaitFreezes
@@ -200,6 +235,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("focus")]
     [Category("任务回调")]
+    [Description(
+        "是否关注任务，会额外产生部分回调消息。可选，默认 false ，即不产生。\n开启后，focus_tip 和 focus_tip_color 才会生效。"
+    )]
     [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
     public bool? Focus
     {
@@ -209,6 +247,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("focus_tip")]
     [Category("任务回调")]
+    [Description(
+        "当执行某任务时，在MFA右侧日志输出的内容。可选，默认空。\n需要 focus 开启才会生效。"
+    )]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
     public List<string>? FocusTip
@@ -219,6 +260,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("focus_tip_color")]
     [Category("任务回调")]
+    [Description(
+        "当执行某任务时，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。\n需要 focus 开启才会生效。"
+    )]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
     public List<string>? FocusTipColor
@@ -229,6 +273,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("roi")]
     [Category("识别器")]
+    [Description(
+        "识别区域坐标。可选，默认 [0, 0, 0, 0] ，即全屏。\n  array<int, 4>: 识别区域坐标，[x, y, w, h]，若希望全屏可设为 [0, 0, 0, 0] 。\n  string: 填写任务名，在之前执行过的某任务识别到的目标范围内识别。"
+    )]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListOrAutoEditor), typeof(SingleIntListOrAutoEditor))]
     public object? Roi
@@ -239,6 +286,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("roi_offset")]
     [Category("识别器")]
+    [Description(
+        "在 roi 的基础上额外移动再作为范围，四个值分别相加。可选，默认 [0, 0, 0, 0] 。"
+    )]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
     public object? RoiOffset
@@ -249,6 +299,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("template")]
     [Category("识别器")]
+    [Description(
+        "模板图片路径，需要 image 文件夹的相对路径。必选。\n 所使用的图片需要是无损原图缩放到 720p 后的裁剪。"
+    )]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
     public List<string>? Template
@@ -259,6 +312,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("threshold")]
     [Category("识别器")]
+    [Description(
+        "模板匹配阈值。可选，默认 0.7 。\n 若为数组，长度需和 template 数组长度相同。"
+    )]
     [JsonConverter(typeof(SingleOrDoubleListConverter))]
     [Editor(typeof(ListDoubleStringEditor), typeof(ListDoubleStringEditor))]
     public object? Threshold
@@ -269,6 +325,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("order_by")]
     [Category("识别器")]
+    [Description(
+        "结果排序方式。可选，默认 Horizontal。\n 可选的值：Horizontal | Vertical | Score | Area | Random 。 \n 可结合 index 字段使用。"
+    )]
     [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
     public string? OrderBy
     {
@@ -278,6 +337,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("index")]
     [Category("识别器")]
+    [Description(
+        "命中第几个结果。可选，默认 0 。\n 假设共有 N 个结果，则 index 的取值范围为 [-N, N - 1] ，其中负数使用类 Python 的规则转换为 N - index 。若超出范围，则视为当前识别无结果。"
+    )]
     [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
     public int? Index
     {
@@ -287,6 +349,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("method")]
     [Category("识别器")]
+    [Description(
+        "匹配算法。"
+    )]
     [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
     public int? Method
     {
@@ -296,6 +361,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("green_mask")]
     [Category("识别器")]
+    [Description(
+        "是否进行绿色掩码。可选，默认 false 。\n 若为 true，可以将图片中不希望匹配的部分涂绿 RGB: (0, 255, 0)，则不对绿色部分进行匹配。"
+    )]
     [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
     public bool? GreenMask
     {
@@ -305,6 +373,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("count")]
     [Category("识别器")]
+    [Description(
+        "匹配的点的数量要求（阈值）。"
+    )]
     [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
     public int? Count
     {
@@ -314,6 +385,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("detector")]
     [Category("识别器")]
+    [Description(
+        "特征检测器。可选，默认 SIFT 。\n目前支持以下算法：\nSIFT\n计算复杂度高，具有尺度不变性、旋转不变性。效果最好。\nKAZE\n适用于2D和3D图像，具有尺度不变性、旋转不变性。\nAKAZE\n计算速度较快，具有尺度不变性、旋转不变性。\nBRISK\n计算速度非常快，具有尺度不变性、旋转不变性。\nORB\n计算速度非常快，具有旋转不变性。但不具有尺度不变性。"
+    )]
     [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
     public string? Detector
     {
@@ -323,6 +397,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("ratio")]
     [Category("识别器")]
+    [Description(
+        "KNN 匹配算法的距离比值，[0 - 1.0] , 越大则匹配越宽松（更容易连线）。可选，默认 0.6 。"
+    )]
     [Editor(typeof(NullableDoubleEditor), typeof(NullableDoubleEditor))]
     public double? Ratio
     {
@@ -332,6 +409,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("lower")]
     [Category("识别器")]
+    [Description(
+        "颜色下限值。必选。最内层 list 长度需和 method 的通道数一致。"
+    )]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
     public object? Lower
@@ -342,6 +422,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("upper")]
     [Category("识别器")]
+    [Description(
+        "颜色上限值。必选。最内层 list 长度需和 method 的通道数一致。"
+    )]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
     public object? Upper
@@ -352,6 +435,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("connected")]
     [Category("识别器")]
+    [Description(
+        "是否是相连的点才会被计数。可选，默认 false 。\n若为是，在完成颜色过滤后，则只会计数像素点 全部相连 的最大块。\n若为否，则不考虑这些像素点是否相连。"
+    )]
     [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
     public bool? Connected
     {
@@ -361,6 +447,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("expected")]
     [Category("识别器")]
+    [Description(
+        "期望的结果，支持正则。必选。"
+    )]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
     public List<string>? Expected
@@ -371,6 +460,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("replace")]
     [Category("识别器")]
+    [Description(
+        "部分文字识别结果不准确，进行替换。可选。"
+    )]
     [JsonConverter(typeof(ReplaceConverter))]
     [Editor(typeof(ListStringArrayEditor), typeof(ListStringArrayEditor))]
     public List<string[]>? Replace
@@ -381,6 +473,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("only_rec")]
     [Category("识别器")]
+    [Description(
+        "是否仅识别（不进行检测，需要精确设置 roi）。可选，默认 false 。"
+    )]
     [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
     public bool? OnlyRec
     {
@@ -390,6 +485,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("model")]
     [Category("识别器")]
+    [Description(
+        "模型 文件夹 路径。使用 model/ocr 文件夹的相对路径。可选，默认为空。\n若为空，则为 model/ocr 根目录下的模型文件。\n文件夹中需要包含 rec.onnx, det.onnx, keys.txt 三个文件。"
+    )]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
     public string? Model
     {
@@ -399,6 +497,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("labels")]
     [Category("识别器")]
+    [Description(
+        "标注，即每个分类的名字。可选。\n仅影响调试图片及日志等，若未填写则会填充 \"Unknown\" 。"
+    )]
     [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
     public List<string>? Labels
     {
@@ -408,6 +509,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("custom_recognition")]
     [Category("自定义")]
+    [Description(
+        "识别名，同注册接口传入的识别名。同时会通过 MaaCustomRecognitionCallback.custom_recognition_name 传出。必选。"
+    )]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
     public string? CustomRecognition
     {
@@ -417,6 +521,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("custom_recognition_param")]
     [Category("自定义")]
+    [Description(
+        "识别参数，任意类型，会通过 MaaCustomRecognitionCallback.custom_recognition_param 传出。可选，默认空 json，即 {} 。"
+    )]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
     public string? CustomRecognitionParam
     {
@@ -426,6 +533,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("custom_action")]
     [Category("自定义")]
+    [Description(
+        "动作名，同注册接口传入的识别器名。同时会通过 MaaCustomActionCallback.custom_action_name 传出。必选。"
+    )]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
     public string? CustomAction
     {
@@ -435,6 +545,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("custom_action_param")]
     [Category("自定义")]
+    [Description(
+        "动作参数，任意类型，会通过 MaaCustomActionCallback.custom_action_param 传出。可选，默认空 json，即 {} 。"
+    )]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
     public string? CustomActionParam
     {
@@ -444,6 +557,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("target")]
     [Category("动作")]
+    [Description(
+        "点击的位置。可选，默认 true 。\n\ntrue: 点击本任务中刚刚识别到的目标（即点击自身）。\nstring: 填写任务名，点击之前执行过的某任务识别到的目标。\narray<int, 4>: 点击固定坐标区域内随机一点，[x, y, w, h]，若希望全屏可设为 [0, 0, 0, 0] 。"
+    )]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListOrAutoEditor), typeof(SingleIntListOrAutoEditor))]
     public object? Target
@@ -454,6 +570,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("target_offset")]
     [Category("动作")]
+    [Description(
+        "在 target 的基础上额外移动再点击，四个值分别相加。可选，默认 [0, 0, 0, 0] 。"
+    )]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
     public List<int>? TargetOffset
@@ -464,6 +583,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("begin")]
     [Category("动作")]
+    [Description(
+        "滑动起点。可选，默认 true 。值同上述 Click.target 。"
+    )]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListOrAutoEditor), typeof(SingleIntListOrAutoEditor))]
     public object? Begin
@@ -474,6 +596,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("begin_offset")]
     [Category("动作")]
+    [Description(
+        "在 begin 的基础上额外移动再作为起点，四个值分别相加。可选，默认 [0, 0, 0, 0] 。"
+    )]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
     public List<int>? BeginOffset
@@ -484,6 +609,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("end")]
     [Category("动作")]
+    [Description(
+        "滑动终点。必选。值同上述 Click.target 。"
+    )]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListOrAutoEditor), typeof(SingleIntListOrAutoEditor))]
     public object? End
@@ -494,6 +622,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("end_offset")]
     [Category("动作")]
+    [Description(
+        "在 end 的基础上额外移动再作为终点，四个值分别相加。可选，默认 [0, 0, 0, 0] 。"
+    )]
     [JsonConverter(typeof(SingleOrNestedListConverter))]
     [Editor(typeof(SingleIntListEditor), typeof(SingleIntListEditor))]
     public List<int>? EndOffset
@@ -504,6 +635,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("duration")]
     [Category("动作")]
+    [Description(
+        "滑动持续时间，单位毫秒。可选，默认 200 。"
+    )]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
     public uint? Duration
     {
@@ -513,6 +647,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("key")]
     [Category("动作")]
+    [Description(
+        "要按的键，仅支持对应控制器的虚拟按键码。"
+    )]
     [JsonConverter(typeof(SingleOrIntListConverter))]
     [Editor(typeof(ListIntStringEditor), typeof(ListIntStringEditor))]
     public List<int>? Key
@@ -523,6 +660,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("input_text")]
     [Category("动作")]
+    [Description(
+        "要输入的文本，部分控制器仅支持 ascii 。"
+    )]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
     public string? InputText
     {
@@ -532,6 +672,9 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("package")]
     [Category("动作")]
+    [Description(
+        "启动入口 或 要关闭的程序。必选。\n 需要填入 package name ，例如 com.hypergryph.arknights "
+    )]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
     public string? Package
     {

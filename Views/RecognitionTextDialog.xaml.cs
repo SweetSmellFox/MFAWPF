@@ -177,7 +177,7 @@ public partial class RecognitionTextDialog
             var roiY = Math.Max(y - 5, 0);
             var roiW = Math.Min(w + 10, bitmapImage.PixelWidth - roiX);
             var roiH = Math.Min(h + 10, bitmapImage.PixelHeight - roiY);
-            OutputRoi = new List<int> { roiX, roiY, roiW, roiH };
+            OutputRoi = [roiX, roiY, roiW, roiH];
         }
 
         DialogResult = true;

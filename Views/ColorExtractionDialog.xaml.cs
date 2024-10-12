@@ -172,10 +172,9 @@ public partial class ColorExtractionDialog
 
     private void GetColorRange(double x, double y, double width, double height)
     {
-        if (width < 1) width = 1;
-        if (height < 1) height = 1;
+        if (width < 1 || !double.IsOddInteger(width)) width = 1;
+        if (height < 1|| !double.IsNormal(height)) height = 1;
         // 创建BitmapImage对象
-
         if (image.Source is BitmapImage bitmapImage)
         {
             var roiX = Math.Max(x - 5, 0);
@@ -184,7 +183,7 @@ public partial class ColorExtractionDialog
             var roiH = Math.Min(height + 10, bitmapImage.PixelHeight - roiY);
             var writeableBitmap = new WriteableBitmap(bitmapImage);
 
-            OutputRoi = new List<int> { (int)roiX, (int)roiY, (int)roiW, (int)roiH };
+            OutputRoi = [(int)roiX, (int)roiY, (int)roiW, (int)roiH];
 
             var croppedBitmap =
                 new CroppedBitmap(writeableBitmap, new Int32Rect((int)x, (int)y, (int)width, (int)height));
