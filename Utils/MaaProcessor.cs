@@ -213,8 +213,8 @@ public class MaaProcessor
     {
         if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
             return;
-
-        Process.Start(exePath,DataSet.GetData("EmulatorConfig",string.Empty));
+        
+        Process.Start(exePath,DataSet.GetData("EmulatorConfig",string.Empty)??string.Empty);
 
         for (double remainingTime = waitTimeInSeconds; remainingTime > 0; remainingTime -= 1)
         {
