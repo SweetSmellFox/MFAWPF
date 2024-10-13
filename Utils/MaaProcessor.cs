@@ -214,7 +214,7 @@ public class MaaProcessor
         if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
             return;
 
-        Process.Start(exePath,DataSet.GetData("AdbConfig",string.Empty));
+        Process.Start(exePath,DataSet.GetData("EmulatorConfig",string.Empty));
 
         for (double remainingTime = waitTimeInSeconds; remainingTime > 0; remainingTime -= 1)
         {
@@ -558,11 +558,12 @@ public class MaaProcessor
                 Config.AdbDevice.AdbPath,
                 Config.AdbDevice.AdbSerial,
                 Config.AdbDevice.ScreenCap, Config.AdbDevice.Input,
-                !string.IsNullOrWhiteSpace(Config.AdbDevice.Config) && Config.AdbDevice.Config != "{}" &&
-                (DataSet.GetData("AdbConfig", "{\"extras\":{}}") == "{\"extras\":{}}" ||
-                 string.IsNullOrWhiteSpace(DataSet.GetData("AdbConfig", "{\"extras\":{}}")))
-                    ? Config.AdbDevice.Config
-                    : DataSet.GetData("AdbConfig", "{\"extras\":{}}"))
+                !string.IsNullOrWhiteSpace(Config.AdbDevice.Config) ? Config.AdbDevice.Config : "{}")
+                //!string.IsNullOrWhiteSpace(Config.AdbDevice.Config) && Config.AdbDevice.Config != "{}" &&
+                //(DataSet.GetData("AdbConfig", "{\"extras\":{}}") == "{\"extras\":{}}" ||
+                //string.IsNullOrWhiteSpace(DataSet.GetData("AdbConfig", "{\"extras\":{}}")))
+                //   ? Config.AdbDevice.Config
+                //   : DataSet.GetData("AdbConfig", "{\"extras\":{}}"))
             : new MaaWin32Controller(
                 Config.DesktopWindow.HWnd,
                 Config.DesktopWindow.ScreenCap, Config.DesktopWindow.Input,
