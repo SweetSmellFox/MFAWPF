@@ -538,7 +538,8 @@ public partial class MainWindow
                 "AdbControlInputType");
             AddAfterTaskOption(s2);
             AddStartSettingOption(s2);
-            AddStartExtrasOption(s2);
+            //AddStartExtrasOption(s2);
+            AddStartEmulatorOption(s2);
             // AddIntroduction(s2,
             //     "[size:24][b][color:blue]这是一个蓝色的大标题[/color][/b][/size]\n[color:green][i]这是绿色的斜体文本。[/i][/color]\n[u]这是带有下划线的文本。[/u]\n[s]这是带有删除线的文本。[/s]\n[b][color:red]这是红色的粗体文本。[/color][/b]\n[size:18]这是一个较小的字号文本，字号为18。[/size]\n");
         }
@@ -818,12 +819,13 @@ public partial class MainWindow
         panel?.Children.Add(comboBox);
     }
 
-    private void AddStartExtrasOption(Panel? panel = null)
+    private void AddStartEmulatorOption(Panel? panel = null)
     {
         panel ??= settingPanel;
         var textBox = new TextBox
         {
-            Text = DataSet.GetData("AdbConfig", "{\"extras\":{}}"), HorizontalAlignment = HorizontalAlignment.Stretch,
+            //Text = DataSet.GetData("AdbConfig", "{\"extras\":{}}"), HorizontalAlignment = HorizontalAlignment.Stretch,
+            Text = DataSet.GetData("EmulatorConfig", "mumu是-v 多开号(从0开始),雷电是index=多开号(也是0)"), HorizontalAlignment = HorizontalAlignment.Stretch,
             Margin = new Thickness(5)
         };
 
@@ -834,7 +836,7 @@ public partial class MainWindow
         textBox.TextChanged += (sender, _) =>
         {
             var text = (sender as TextBox)?.Text ?? string.Empty;
-            DataSet.SetData("AdbConfig", text);
+            DataSet.SetData("EmulatorConfig", text);
         };
         panel.Children.Add(textBox);
     }
