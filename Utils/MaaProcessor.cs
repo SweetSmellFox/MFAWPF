@@ -265,7 +265,19 @@ public class MaaProcessor
             else if (!string.IsNullOrEmpty(Config.AdbDevice.Name))
             {
                 var windowName = Config.AdbDevice.Name;
-                var processes = Process.GetProcesses().Where(p => p.MainWindowTitle.Contains(windowName));
+                if (windowName.Contains("MuMu"))
+                    windowName = "MuMuPlayer";
+                else if (windowName.Contains("Nox"))
+                    windowName = "Nox";
+                else if (windowName.Contains("LDPlayer"))
+                    windowName = "LDPlayer";
+                else if (windowName.Contains("XYAZ"))
+                    windowName = "MEmu";
+                else if (windowName.Contains("BlueStacks"))
+                    windowName = "HD-Player";
+                var processes = Process.GetProcesses().Where(p =>
+                    // p.MainWindowTitle.StartsWith(windowName) || 
+                    p.ProcessName.StartsWith(windowName));
                 foreach (var process in processes)
                 {
                     process.Kill();
