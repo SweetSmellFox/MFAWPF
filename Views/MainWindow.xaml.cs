@@ -113,14 +113,14 @@ public partial class MainWindow
                 }
             };
             JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
-                MaaInterface.Instance);
+                MaaInterface.Instance, new MaaInterfaceSelectOptionConverter(true));
         }
         else
         {
             MaaInterface.Instance =
                 JsonHelper.ReadFromJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
                     new MaaInterface(),
-                    () => { });
+                    () => { }, new MaaInterfaceSelectOptionConverter(false));
         }
 
 
@@ -381,13 +381,13 @@ public partial class MainWindow
                 MaaProcessor.Config.IsConnected = true;
                 if (DataSet.GetData("AutoStartIndex", 0) == 1)
                 {
-                    if (MaaProcessor.Instance.ShouldAutoStart)
+                    if (MaaProcessor.Instance.ShouldEndStart)
                     {
-                        Start(null, null);
+                      MaaProcessor.Instance.EndAutoStart();
                     }
                     else
                     {
-                        MaaProcessor.Instance.EndAutoStart();
+                        Start(null, null);
                     }
                 }
             }
@@ -460,16 +460,15 @@ public partial class MainWindow
                 deviceComboBox.SelectedIndex = 0;
                 if (IsFirstStart && DataSet.GetData("AutoStartIndex", 0) == 1)
                 {
-                    if (MaaProcessor.Instance.ShouldAutoStart)
+                    if (MaaProcessor.Instance.ShouldEndStart)
                     {
-                        Start(null, null);
-                        IsFirstStart = false;
+                        MaaProcessor.Instance.EndAutoStart();
                     }
                     else
                     {
-                        MaaProcessor.Instance.EndAutoStart();
-                        IsFirstStart = false;
+                        Start(null, null);
                     }
+                    IsFirstStart = false;
                 }
             }
             else
@@ -825,7 +824,8 @@ public partial class MainWindow
         var textBox = new TextBox
         {
             //Text = DataSet.GetData("AdbConfig", "{\"extras\":{}}"), HorizontalAlignment = HorizontalAlignment.Stretch,
-            Text = DataSet.GetData("EmulatorConfig", "mumu是-v 多开号(从0开始),雷电是index=多开号(也是0)"), HorizontalAlignment = HorizontalAlignment.Stretch,
+            Text = DataSet.GetData("EmulatorConfig", "mumu是-v 多开号(从0开始),雷电是index=多开号(也是0)"),
+            HorizontalAlignment = HorizontalAlignment.Stretch,
             Margin = new Thickness(5)
         };
 
@@ -1175,6 +1175,7 @@ public partial class MainWindow
                     DataSet.SetData("TaskItems",
                         Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                 };
+                
                 comboBox.SetValue(ToolTipProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitleProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);

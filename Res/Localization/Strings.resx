@@ -277,7 +277,10 @@
     <value>任务已完成</value>
 </data>
     <data name="TaskAllCompleted" xml:space="preserve">
-    <value>已完成全部任务</value>
+    <value>任务已全部完成！</value>
+</data>
+    <data name="TaskAllCompletedWithTime" xml:space="preserve">
+    <value>任务已全部完成！\n(用时 {0}h {1}m {2}s)</value>
 </data>
     <data name="StoppingFailed" xml:space="preserve">
     <value>停止任务失败</value>

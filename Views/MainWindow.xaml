@@ -15,10 +15,10 @@
            engine:ResxLocalizationProvider.DefaultAssembly="MFAWPF"
            engine:ResxLocalizationProvider.DefaultDictionary="Strings"
            mc:Ignorable="d" x:Name="home"
-           Title="{lex:Loc AppTitle}" Height="520" Width="800" MinWidth="550" MinHeight="260"
+           Title="{lex:Loc AppTitle}" Height="550" Width="850" MinWidth="550" MinHeight="260"
            ShowTitle="False" Icon="../logo.ico" WindowStartupLocation="CenterScreen"
            NonClientAreaBackground="{DynamicResource MainContentBackgroundBrush}"
-           Background="{DynamicResource SecundaryBackgroundColor}"
+           Background="{DynamicResource MainContentBackgroundBrush}"
            WindowState="Normal">
     <hc:Window.DataContext>
         <viewModels:MainViewModel />
@@ -95,13 +95,51 @@
     </hc:Window.Resources>
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <Grid Grid.Row="1" Grid.Column="0" Margin="5 0 5 5">
+            <hc:SideMenu BorderThickness="1" Width="120" Margin="0" HorizontalAlignment="Center"
+                         HorizontalContentAlignment="Center" Background="{DynamicResource MainContentBackgroundBrush}"
+                         BorderBrush="Transparent" SideBrush="{DynamicResource PrimaryBrush}">
+                <hc:SideMenu.Resources>
+
+                </hc:SideMenu.Resources>
+                <hc:Interaction.Triggers>
+                    <hc:EventTrigger EventName="SelectionChanged">
+                        <hc:EventToCommand Command="{Binding SwitchItemCmd}" PassEventArgsToCommand="True" />
+                    </hc:EventTrigger>
+                </hc:Interaction.Triggers>
+                <hc:SideMenuItem Header="主页" Height="50" Background="Transparent" IsSelected="True">
+                    <hc:SideMenuItem.Icon>
+
+                        <Path Data="{StaticResource HomeGeometry}"
+                              Fill="{DynamicResource GrayColor4}"
+                              MaxWidth="20" Stretch="Uniform" />
+                    </hc:SideMenuItem.Icon>
+                </hc:SideMenuItem>
+                <hc:SideMenuItem Header="设置" Background="Transparent">
+                    <hc:SideMenuItem.Icon>
+                        <Path Data="{StaticResource SettingsRegular}"
+                              Fill="{DynamicResource GrayColor4}"
+                              MaxWidth="20" Stretch="Uniform" />
+
+                    </hc:SideMenuItem.Icon>
+                </hc:SideMenuItem>
+            </hc:SideMenu>
+        </Grid>
+        <Border Grid.Row="1" Grid.Column="1" Margin="2 2 2 2" Background="{DynamicResource SecundaryBackgroundColor}"
+                CornerRadius="5" 
+                
+                >
+            <!-- BorderBrush="#ededed" BorderThickness="1" -->
+            <Grid Margin="5 0 5 5">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="36" />
+                    <RowDefinition Height="45" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <hc:SimpleStackPanel Orientation="Horizontal" Margin="15,2,10,0" Height="30">
+                <hc:SimpleStackPanel Orientation="Horizontal" Margin="15,6,10,0" Height="30" >
                     <TabControl TabStripPlacement="Top" Background="Transparent"
                                 SelectionChanged="TabControl_OnSelectionChanged" IsEnabled="{Binding Idle}"
                                 BorderThickness="0" x:Name="TabControl"
@@ -150,9 +188,9 @@
                 </hc:SimpleStackPanel>
                 <Grid Grid.Row="1" ClipToBounds="False" Margin="15 0 0 0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="6*" MaxWidth="330" />
+                        <ColumnDefinition Width="7*" MaxWidth="330" />
                         <ColumnDefinition Width="6*" MaxWidth="300" />
-                        <ColumnDefinition Width="7*" />
+                        <ColumnDefinition Width="8*" />
                     </Grid.ColumnDefinitions>
 
                     <Grid Grid.Column="0">
@@ -320,7 +358,7 @@
                                      IsInertiaEnabled="True"
                                      PanningMode="VerticalOnly">
                         <hc:ScrollViewer.RenderTransform>
-                            <TranslateTransform Y="-8" />
+                            <TranslateTransform Y="4" />
                         </hc:ScrollViewer.RenderTransform>
                         <ItemsControl ItemsSource="{Binding Path=LogItemViewModels}">
                             <ItemsControl.ItemTemplate>
@@ -357,9 +395,9 @@
 
 
             </Grid>
+        </Border>
 
-        </Grid>
-        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Right"
+        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Right"
                       VerticalAlignment="Top"
                       Margin="0,20,0, 0">
             <StackPanel hc:Growl.GrowlParent="True" VerticalAlignment="Top" Margin="0,0,10,10" x:Name="stackPanel"

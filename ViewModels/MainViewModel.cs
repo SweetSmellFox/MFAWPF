@@ -2,6 +2,9 @@
 using System.Windows;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
+using HandyControl.Controls;
+using HandyControl.Data;
+using HandyControl.Tools.Command;
 using MFAWPF.Utils;
 
 
@@ -59,9 +62,9 @@ public class MainViewModel : ObservableObject
     {
         Idle = value;
     }
-    
+
     public GongSolutions.Wpf.DragDrop.IDropTarget DropHandler { get; } = new DragDropHandler();
-    
+
 
     private bool _isAdb = true;
 
@@ -69,5 +72,14 @@ public class MainViewModel : ObservableObject
     {
         get => _isAdb;
         set => SetProperty(ref _isAdb, value);
+    }
+
+    public RelayCommand<FunctionEventArgs<object>> SwitchItemCmd => new Lazy<RelayCommand<FunctionEventArgs<object>>>(
+        () =>
+            new RelayCommand<FunctionEventArgs<object>>(SwitchItem)).Value;
+
+    private void SwitchItem(FunctionEventArgs<object> info)
+    {
+        Growl.Info((info.Info as SideMenuItem)?.Header.ToString(), "InfoMessage");
     }
 }

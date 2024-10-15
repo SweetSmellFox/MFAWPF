@@ -240,7 +240,10 @@
     <value>Task has been completed</value>
 </data>
     <data name="TaskAllCompleted" xml:space="preserve">
-    <value>All tasks have been completed</value>
+    <value>All tasks have been completed!</value>
+</data>
+    <data name="TaskAllCompletedWithTime" xml:space="preserve">
+    <value>All tasks have been completed!\n(Elapsed time {0}h {1}m {2}s)</value>
 </data>
     <data name="StoppingFailed" xml:space="preserve">
     <value>Failed to stop the task</value>

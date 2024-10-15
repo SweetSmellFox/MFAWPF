@@ -3,7 +3,7 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
     <Color x:Key="MainBackgroundColor">#FF262E2F</Color>
     <Color x:Key="MainContentForegroundColor">#FFF0F0F0</Color>
-    <Color x:Key="MainContentBackgroundColor">#FFF5F5F5</Color>
+    <Color x:Key="MainContentBackgroundColor">#f3f3f3</Color>
 
     <Color x:Key="PrimaryTextColor">#FF212121</Color>
     <Color x:Key="SecondaryTextColor">LightGray</Color>

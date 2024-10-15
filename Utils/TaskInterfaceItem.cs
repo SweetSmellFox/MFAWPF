@@ -12,7 +12,7 @@ public class TaskInterfaceItem
     [JsonProperty("repeatable")] public bool? Repeatable;
     [JsonProperty("repeat_count")] public int? RepeatCount;
 
-    [JsonProperty("option")] [JsonConverter(typeof(MaaInterfaceSelectOptionConverter))]
+    [JsonProperty("option")] 
     public List<MaaInterface.MaaInterfaceSelectOption>? Option;
 
     [JsonProperty("pipeline_override")] public Dictionary<string, TaskModel>? PipelineOverride;
