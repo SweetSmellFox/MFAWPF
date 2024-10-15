@@ -24,6 +24,7 @@ public class DesktopWindowCoreConfig
 
 public class AdbDeviceCoreConfig
 {
+    public string Name { get; set; } = string.Empty;
     public string AdbPath { get; set; } = "adb";
     public string AdbSerial { get; set; } = "127.0.0.1:5555";
     public string Config { get; set; } = "{}";

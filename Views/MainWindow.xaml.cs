@@ -416,6 +416,7 @@ public partial class MainWindow
         {
             Growl.Info(string.Format(LocExtension.GetLocalizedValue<string>("EmulatorSelectionMessage"),
                 device.Name));
+            MaaProcessor.Config.AdbDevice.Name = device.Name;
             MaaProcessor.Config.AdbDevice.AdbPath = device.AdbPath;
             MaaProcessor.Config.AdbDevice.AdbSerial = device.AdbSerial;
             MaaProcessor.Config.AdbDevice.Config = device.Config;

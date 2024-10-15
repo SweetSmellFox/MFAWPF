@@ -111,7 +111,6 @@ public class MaaProcessor
             bool run = await ExecuteTasks(token);
             if (run)
                 Stop(IsStopped);
-
         }, null, "启动任务");
     }
 
@@ -158,7 +157,6 @@ public class MaaProcessor
                 OnTaskQueueChanged();
             }
         }
-
     }
 
     public void HandleAfterTaskOperation()
@@ -210,12 +208,14 @@ public class MaaProcessor
             DataSet.GetData("WaitEmulatorTime", 60.0), _emulatorCancellationTokenSource.Token);
     }
 
+    private Process? _emulatorProcess;
+
     private async Task StartRunnableFile(string exePath, double waitTimeInSeconds, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
             return;
 
-        Process.Start(exePath, DataSet.GetData("EmulatorConfig", string.Empty) ?? string.Empty);
+        _emulatorProcess = Process.Start(exePath, DataSet.GetData("EmulatorConfig", string.Empty) ?? string.Empty);
 
         for (double remainingTime = waitTimeInSeconds; remainingTime > 0; remainingTime -= 1)
         {
@@ -241,26 +241,45 @@ public class MaaProcessor
         _emulatorCancellationTokenSource = null;
     }
 
+    private void CloseEmulator()
+    {
+        if (_emulatorProcess is { HasExited: false })
+        {
+            _emulatorProcess.Kill();
+        }
+        else
+        {
+            var emulatorPath = DataSet.GetData("EmulatorPath", string.Empty);
+
+            if (!string.IsNullOrEmpty(emulatorPath))
+            {
+                string processName = Path.GetFileNameWithoutExtension(emulatorPath);
+
+                var processes = Process.GetProcessesByName(processName);
+                foreach (var process in processes)
+                {
+                    process.Kill();
+                    break;
+                }
+            }
+            else if (!string.IsNullOrEmpty(Config.AdbDevice.Name))
+            {
+                var windowName = Config.AdbDevice.Name;
+                var processes = Process.GetProcesses().Where(p => p.MainWindowTitle.Contains(windowName));
+                foreach (var process in processes)
+                {
+                    process.Kill();
+                    break;
+                }
+            }
+        }
+    }
+
     private void CloseMFA()
     {
         Growls.Process(Application.Current.Shutdown);
     }
 
-    private void CloseEmulator()
-    {
-        var emulatorPath = DataSet.GetData("EmulatorPath", string.Empty);
-
-        if (!string.IsNullOrEmpty(emulatorPath))
-        {
-            string processName = Path.GetFileNameWithoutExtension(emulatorPath);
-
-            var processes = Process.GetProcessesByName(processName);
-            foreach (var process in processes)
-            {
-                process.Kill();
-            }
-        }
-    }
 
     private void CloseEmulatorAndMFA()
     {
@@ -405,7 +424,6 @@ public class MaaProcessor
 
     private void DisplayTaskCompletionMessage()
     {
-
         if (IsStopped)
         {
             Growl.Info("TaskStopped".GetLocalizationString());
@@ -417,15 +435,18 @@ public class MaaProcessor
             Growl.Info("TaskCompleted".GetLocalizationString());
             if (_startTime != null)
             {
-                TimeSpan elapsedTime = DateTime.Now - (DateTime) _startTime;
-                MainWindow.Data?.AddLogByKey("TaskAllCompletedWithTime",null,((int)elapsedTime.TotalHours).ToString(),((int)elapsedTime.TotalMinutes % 60).ToString(),((int)elapsedTime.TotalSeconds % 60).ToString());
+                TimeSpan elapsedTime = DateTime.Now - (DateTime)_startTime;
+                MainWindow.Data?.AddLogByKey("TaskAllCompletedWithTime", null, ((int)elapsedTime.TotalHours).ToString(),
+                    ((int)elapsedTime.TotalMinutes % 60).ToString(), ((int)elapsedTime.TotalSeconds % 60).ToString());
             }
             else
             {
                 MainWindow.Data?.AddLogByKey("TaskAllCompleted");
             }
+
             HandleAfterTaskOperation();
         }
+
         _startTime = null;
     }
 
