@@ -14,7 +14,7 @@ public class AdbInputMethodsConverter : JsonConverter<AdbInputMethods>
             return (AdbInputMethods)value;
         }
 
-        throw new ArgumentException($"Invalid value for AdbInputMethods: {value}");
+        return AdbInputMethods.MinitouchAndAdbKey;
     }
 
     public override void WriteJson(JsonWriter writer, AdbInputMethods value, JsonSerializer serializer)

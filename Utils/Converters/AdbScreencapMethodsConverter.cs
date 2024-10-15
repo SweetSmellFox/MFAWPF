@@ -14,7 +14,7 @@ public class AdbScreencapMethodsConverter : JsonConverter<AdbScreencapMethods>
             return (AdbScreencapMethods)value;
         }
 
-        throw new ArgumentException($"Invalid value for AdbScreenCapMethods: {value}");
+        return AdbScreencapMethods.Default;
     }
 
     public override void WriteJson(JsonWriter writer, AdbScreencapMethods value, JsonSerializer serializer)
