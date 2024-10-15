@@ -64,6 +64,8 @@ public class MaaProcessor
         public string? Param { get; set; }
     }
 
+    private DateTime? _startTime;
+
     public void Start(List<DragItemViewModel>? tasks)
     {
         if (!Config.IsConnected)
@@ -75,6 +77,8 @@ public class MaaProcessor
             return;
         }
 
+        _startTime = DateTime.Now;
+        IsStopped = false;
         tasks ??= new List<DragItemViewModel>();
         var taskAndParams = tasks.Select(CreateTaskAndParam).ToList();
 
@@ -107,6 +111,7 @@ public class MaaProcessor
             bool run = await ExecuteTasks(token);
             if (run)
                 Stop(IsStopped);
+
         }, null, "启动任务");
     }
 
@@ -119,11 +124,7 @@ public class MaaProcessor
 
             if (DataSet.GetData("AutoStartIndex", 0) != 1)
             {
-                TaskQueue.Clear();
-                OnTaskQueueChanged();
-                MainWindow.Data?.SetIdle(true);
-                _emulatorCancellationTokenSource = null;
-                MainWindow.Data?.AddLogByKey("TaskAbandoned");
+                EndAutoStart();
             }
         }
         else if (_cancellationTokenSource != null)
@@ -157,6 +158,7 @@ public class MaaProcessor
                 OnTaskQueueChanged();
             }
         }
+
     }
 
     public void HandleAfterTaskOperation()
@@ -186,10 +188,9 @@ public class MaaProcessor
         }
     }
 
-    private CancellationTokenSource? _emulatorCancellationTokenSource;
 
-    public bool ShouldAutoStart => _emulatorCancellationTokenSource == null ||
-                                   _emulatorCancellationTokenSource is { IsCancellationRequested: false };
+    private CancellationTokenSource? _emulatorCancellationTokenSource;
+    public bool ShouldEndStart => _emulatorCancellationTokenSource is { IsCancellationRequested: true };
 
     public void EndAutoStart()
     {
@@ -213,8 +214,8 @@ public class MaaProcessor
     {
         if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
             return;
-        
-        Process.Start(exePath,DataSet.GetData("EmulatorConfig",string.Empty)??string.Empty);
+
+        Process.Start(exePath, DataSet.GetData("EmulatorConfig", string.Empty) ?? string.Empty);
 
         for (double remainingTime = waitTimeInSeconds; remainingTime > 0; remainingTime -= 1)
         {
@@ -236,6 +237,8 @@ public class MaaProcessor
             {
             }
         }
+
+        _emulatorCancellationTokenSource = null;
     }
 
     private void CloseMFA()
@@ -372,7 +375,7 @@ public class MaaProcessor
 
     private async Task<bool> ExecuteTasks(CancellationToken token)
     {
-        MeasureExecutionTime(() => _currentTasker?.Controller.LinkStart().Wait());
+        MeasureExecutionTime(() => _currentTasker?.Controller.Screencap().Wait());
         while (TaskQueue.Count > 0)
         {
             if (token.IsCancellationRequested) return false;
@@ -402,6 +405,7 @@ public class MaaProcessor
 
     private void DisplayTaskCompletionMessage()
     {
+
         if (IsStopped)
         {
             Growl.Info("TaskStopped".GetLocalizationString());
@@ -411,9 +415,18 @@ public class MaaProcessor
         else
         {
             Growl.Info("TaskCompleted".GetLocalizationString());
-            MainWindow.Data?.AddLogByKey("TaskAllCompleted");
+            if (_startTime != null)
+            {
+                TimeSpan elapsedTime = DateTime.Now - (DateTime) _startTime;
+                MainWindow.Data?.AddLogByKey("TaskAllCompletedWithTime",null,((int)elapsedTime.TotalHours).ToString(),((int)elapsedTime.TotalMinutes % 60).ToString(),((int)elapsedTime.TotalSeconds % 60).ToString());
+            }
+            else
+            {
+                MainWindow.Data?.AddLogByKey("TaskAllCompleted");
+            }
             HandleAfterTaskOperation();
         }
+        _startTime = null;
     }
 
     protected virtual void OnTaskQueueChanged()
@@ -559,11 +572,11 @@ public class MaaProcessor
                 Config.AdbDevice.AdbSerial,
                 Config.AdbDevice.ScreenCap, Config.AdbDevice.Input,
                 !string.IsNullOrWhiteSpace(Config.AdbDevice.Config) ? Config.AdbDevice.Config : "{}")
-                //!string.IsNullOrWhiteSpace(Config.AdbDevice.Config) && Config.AdbDevice.Config != "{}" &&
-                //(DataSet.GetData("AdbConfig", "{\"extras\":{}}") == "{\"extras\":{}}" ||
-                //string.IsNullOrWhiteSpace(DataSet.GetData("AdbConfig", "{\"extras\":{}}")))
-                //   ? Config.AdbDevice.Config
-                //   : DataSet.GetData("AdbConfig", "{\"extras\":{}}"))
+            //!string.IsNullOrWhiteSpace(Config.AdbDevice.Config) && Config.AdbDevice.Config != "{}" &&
+            //(DataSet.GetData("AdbConfig", "{\"extras\":{}}") == "{\"extras\":{}}" ||
+            //string.IsNullOrWhiteSpace(DataSet.GetData("AdbConfig", "{\"extras\":{}}")))
+            //   ? Config.AdbDevice.Config
+            //   : DataSet.GetData("AdbConfig", "{\"extras\":{}}"))
             : new MaaWin32Controller(
                 Config.DesktopWindow.HWnd,
                 Config.DesktopWindow.ScreenCap, Config.DesktopWindow.Input,
