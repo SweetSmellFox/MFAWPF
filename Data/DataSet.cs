@@ -1,4 +1,5 @@
 ﻿using MFAWPF.Utils;
+using MFAWPF.Utils.Converters;
 using Newtonsoft.Json.Linq;
 
 namespace MFAWPF.Data
@@ -14,7 +15,7 @@ public class DataSet
         if (Data == null || value == null) return;
         Data[key] = value; // 如果 key 不存在，将自动添加条目；如果存在，将更新值
 
-        JsonHelper.WriteToConfigJsonFile("config", Data);
+        JsonHelper.WriteToConfigJsonFile("config", Data, new MaaInterfaceSelectOptionConverter(false));
     }
 
 

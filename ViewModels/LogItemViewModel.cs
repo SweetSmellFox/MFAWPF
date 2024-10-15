@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Utils;
@@ -27,7 +28,6 @@ namespace MFAWPF.ViewModels
             }
             else
                 Content = resourceKey;
-            
         }
 
         public LogItemViewModel(string content, Brush color, string weight = "Regular",
@@ -105,7 +105,15 @@ namespace MFAWPF.ViewModels
                 var formatArgs = _formatArgsKeys.Select(key => key.GetLocalizedFormattedString()).ToArray();
 
                 // 使用本地化字符串更新内容
-                Content = _resourceKey.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray());
+                try
+                {
+                    Content = Regex.Unescape(
+                        _resourceKey.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray()));
+                }
+                catch
+                {
+                    Content = _resourceKey.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray());
+                }
             }
         }
 

@@ -18,9 +18,9 @@
     <RestoreSources>$(RestoreSources);https://api.nuget.org/v3/index.json;https://maaxyz.github.io/pkg/nuget/index.json;</RestoreSources>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Maa.Framework.Native" Version="2.0.1-rc.1.1.gb9872e0" />
-    <PackageReference Include="Maa.Framework.Runtime.win-arm64" Version="2.0.2" />
-    <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="2.0.2" />
+    <PackageReference Include="Maa.Framework.Native" Version="2.0.3" />
+    <PackageReference Include="Maa.Framework.Runtime.win-arm64" Version="2.1.0" />
+    <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="2.1.0" />
   </ItemGroup>
     <!-- Info -->
     <PropertyGroup>
