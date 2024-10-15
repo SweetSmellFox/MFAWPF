@@ -5,10 +5,18 @@ namespace MFAWPF.Utils.Converters;
 
 public class MaaInterfaceSelectOptionConverter : JsonConverter
 {
+    private readonly bool _serializeAsStringArray;
+
+    public MaaInterfaceSelectOptionConverter(bool serializeAsStringArray)
+    {
+        _serializeAsStringArray = serializeAsStringArray;
+    }
+
     public override bool CanConvert(Type objectType)
     {
-        return objectType == typeof(object);
+        return objectType == typeof(List<MaaInterface.MaaInterfaceSelectOption>);
     }
+
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
         JsonSerializer serializer)
@@ -33,15 +41,18 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
 
                     return list;
                 }
-
-                return token.ToObject<List<MaaInterface.MaaInterfaceSelectOption>>(serializer);
+                if (firstElement?.Type == JTokenType.Object)
+                {
+                    return token.ToObject<List<MaaInterface.MaaInterfaceSelectOption>>(serializer);
+                }
+                break;
             case JTokenType.String:
                 string? oName = token.ToObject<string>(serializer);
                 return new List<MaaInterface.MaaInterfaceSelectOption>
                 {
                     new()
                     {
-                        Name = oName ?? ""
+                        Name = oName ?? "", Index = 0
                     }
                 };
         }
@@ -51,21 +62,31 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        JArray array = new JArray();
+        var array = new JArray();
 
         if (value is List<MaaInterface.MaaInterfaceSelectOption> selectOptions)
         {
-            foreach (var option in selectOptions)
+            if (_serializeAsStringArray)
             {
-                JObject obj = new JObject
+                foreach (var option in selectOptions)
                 {
-                    ["name"] = option.Name,
-                    ["index"] = option.Index ?? 1
-                };
-                array.Add(obj);
+                    array.Add(option.Name);
+                }
             }
-        }
+            else
+            {
+                foreach (var option in selectOptions)
+                {
+                    JObject obj = new JObject
+                    {
+                        ["name"] = option.Name,
+                        ["index"] = option.Index ?? 0
+                    };
+                    array.Add(obj);
+                }
+            }
 
-        array.WriteTo(writer);
+            array.WriteTo(writer);
+        }
     }
 }
