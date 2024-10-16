@@ -520,6 +520,6 @@
         <value>重启MFA和关闭模拟器</value>
     </data>
     <data name="Restart" xml:space="preserve">
-        <value>重启</value>
+        <value>重启系统</value>
     </data>
 </root>
