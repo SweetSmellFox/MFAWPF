@@ -20,7 +20,7 @@
 
 #### 自动安装
 
-- 下载项目中workflows/install.yml并修改```项目名称```和```MAAxxx```
+- 下载项目中workflows/install.yml并修改```项目名称```,```作者名```,```项目名```,```MAAxxx```
 - 将修改后的install.yml替换MAA项目模板.github/workflows/install.yml
 - 推送新版本
 
