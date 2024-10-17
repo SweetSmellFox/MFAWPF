@@ -10,9 +10,9 @@
            Icon="../logo.ico"
            Title="{lex:Loc AdbEditor}"
            Width="350"
-           Height="250"
+           Height="285"
            MinWidth="350"
-           MinHeight="250"
+           MinHeight="285"
            ResizeMode="NoResize"
            Topmost="True"
            WindowStartupLocation="CenterScreen"
@@ -28,8 +28,8 @@
                         hc:InfoElement.Title="{lex:Loc AdbName}" />
             <Grid Width="320" Margin="0 10 0 10">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/> 
-                    <ColumnDefinition Width="40"/> 
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="40" />
                 </Grid.ColumnDefinitions>
                 <hc:TextBox Grid.Column="0" HorizontalAlignment="Stretch"
                             hc:InfoElement.ShowClearButton="True"
@@ -51,6 +51,11 @@
                         Margin="0 10 0 10"
                         hc:InfoElement.TitlePlacement="Left"
                         hc:InfoElement.Title="{lex:Loc AdbSerial}" />
+            <hc:TextBox HorizontalAlignment="Center" Width="320" hc:InfoElement.ShowClearButton="True"
+                        Text="{Binding AdbConfig, RelativeSource={RelativeSource AncestorType=hc:Window}}"
+                        Margin="0 10 0 10"
+                        hc:InfoElement.TitlePlacement="Left"
+                        hc:InfoElement.Title="{lex:Loc AdbConfig}" />
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 10 0 10">
 
                 <Button HorizontalAlignment="Stretch"

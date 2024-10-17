@@ -522,4 +522,7 @@
     <data name="Restart" xml:space="preserve">
         <value>重启系统</value>
     </data>
+    <data name="AdbConfig" xml:space="preserve">
+        <value>额外参数</value>
+    </data>
 </root>

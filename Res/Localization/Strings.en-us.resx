@@ -494,4 +494,7 @@
     <data name="Restart" xml:space="preserve">
         <value>RestartDevice</value>
     </data>
+    <data name="AdbConfig" xml:space="preserve">
+        <value>Extras</value>
+    </data>
 </root>

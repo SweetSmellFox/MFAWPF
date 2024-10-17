@@ -1,4 +1,5 @@
 using System.Windows;
+using MaaFramework.Binding;
 using MFAWPF.Utils;
 using Microsoft.Win32;
 
@@ -6,9 +7,16 @@ namespace MFAWPF.Views;
 
 public partial class AdbEditorDialog
 {
-    public AdbEditorDialog()
+    public AdbEditorDialog(AdbDeviceInfo info = null)
     {
         InitializeComponent();
+        if (info != null)
+        {
+            AdbName = info.Name;
+            AdbPath = info.AdbPath;
+            AdbSerial = info.AdbSerial;
+            AdbConfig = info.Config;
+        }
     }
 
     private void Load(object sender, RoutedEventArgs e)
@@ -77,4 +85,21 @@ public partial class AdbEditorDialog
         get => (string)GetValue(AdbSerialProperty);
         set => SetValue(AdbSerialProperty, value);
     }
+
+    public static readonly DependencyProperty AdbConfigProperty =
+        DependencyProperty.Register(
+            nameof(AdbConfig),
+            typeof(string),
+            typeof(AdbEditorDialog),
+            new FrameworkPropertyMetadata(
+                "{}", FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+    public string AdbConfig
+    {
+        get => (string)GetValue(AdbConfigProperty);
+        set => SetValue(AdbConfigProperty, value);
+    }
+
+    public AdbDeviceInfo Output => new AdbDeviceInfo(Name, AdbPath, AdbSerial, AdbScreencapMethods.Default,
+        AdbInputMethods.MinitouchAndAdbKey, AdbConfig);
 }
