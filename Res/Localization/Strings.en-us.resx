@@ -492,6 +492,6 @@
         <value>Disable MFA and Restart Emulator</value>
     </data>
     <data name="Restart" xml:space="preserve">
-        <value>Restart</value>
+        <value>RestartDevice</value>
     </data>
 </root>

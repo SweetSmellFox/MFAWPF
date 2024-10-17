@@ -301,6 +301,7 @@ public class MaaProcessor
 
     private void ShutDown()
     {
+        CloseEmulator();
         Process.Start("shutdown", "/s /t 0");
     }
 
@@ -313,6 +314,7 @@ public class MaaProcessor
 
     private void Restart()
     {
+        CloseEmulator();
         Process.Start("shutdown", "/r /t 0");
     }
 
