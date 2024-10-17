@@ -41,10 +41,12 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
 
                     return list;
                 }
+
                 if (firstElement?.Type == JTokenType.Object)
                 {
                     return token.ToObject<List<MaaInterface.MaaInterfaceSelectOption>>(serializer);
                 }
+
                 break;
             case JTokenType.String:
                 string? oName = token.ToObject<string>(serializer);
@@ -55,9 +57,12 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
                         Name = oName ?? "", Index = 0
                     }
                 };
+            case JTokenType.None:
+                return null;
         }
 
-        throw new JsonSerializationException("Invalid JSON format for MaaInterfaceSelectOptionConverter.");
+        Console.WriteLine($"Invalid JSON format for MaaInterfaceSelectOptionConverter. Unexpected type {objectType}.");
+        return null;
     }
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
