@@ -172,4 +172,16 @@ public class CustomWindow : Window
 
         return elementRect.Contains(point);
     }
+    
+    public void CenterWindow()
+    {
+        var screenWidth = SystemParameters.PrimaryScreenWidth;
+        var screenHeight = SystemParameters.PrimaryScreenHeight;
+        
+        var left = (screenWidth - Width) / 2;
+        var top = (screenHeight - Height) / 2;
+        
+        this.Left = left;
+        this.Top = top;
+    }
 }

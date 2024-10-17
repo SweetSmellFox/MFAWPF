@@ -28,16 +28,22 @@ public partial class RecognitionTextDialog
         set => _outputRoi = value?.Select(i => i < 0 ? 0 : i).ToList();
     }
 
-    public RecognitionTextDialog(BitmapImage bitmapImage)
+    public RecognitionTextDialog()
     {
         InitializeComponent();
-        UpdateImage(bitmapImage);
+        Task.Run(() =>
+        {
+            var image = MaaProcessor.Instance.GetBitmapImage();
+            Growls.Process(() => { UpdateImage(image); });
+        });
     }
 
-    private double _scaleRatio;
-
-    private void UpdateImage(BitmapImage imageSource)
+    public void UpdateImage(BitmapImage? imageSource)
     {
+        if (imageSource == null)
+            return;
+        LoadingCircle.Visibility = Visibility.Collapsed;
+        ImageArea.Visibility = Visibility.Visible;
         image.Source = imageSource;
 
         double imageWidth = imageSource.PixelWidth;
@@ -57,8 +63,11 @@ public partial class RecognitionTextDialog
         SelectionCanvas.Height = image.Height;
         Width = image.Width + 20;
         Height = image.Height + 100;
+        CenterWindow();
     }
 
+    private double _scaleRatio;
+    
     private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
     {
         var position = e.GetPosition(image);

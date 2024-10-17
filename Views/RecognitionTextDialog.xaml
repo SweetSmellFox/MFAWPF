@@ -4,7 +4,7 @@
                     xmlns:hc="https://handyorg.github.io/handycontrol"
                     xmlns:local="clr-namespace:MFAWPF.Views" IsResizable="True"
                     xmlns:controls="clr-namespace:MFAWPF.Controls"
-                    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+                    xmlns:lex="http://wpflocalizeextension.codeplex.com"  Height="200" Width="400"
                     Title="{lex:Loc TextRecognizerTitle}">
        <Border CornerRadius="10" Background="{DynamicResource WhiteColor}" BorderBrush="{DynamicResource GrayColor10}" BorderThickness="1"  MouseDown="Canvas_MouseDown" >
         <Grid>
@@ -28,7 +28,8 @@
                             Padding="0" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,0" />
                 </Grid>
             </Border>
-            <Viewbox Grid.Row="1" HorizontalAlignment="Center">
+            <hc:LoadingCircle Grid.Row="1" x:Name="LoadingCircle" Margin="10 5 5 0" Width="50" Height="50" />
+            <Viewbox x:Name="ImageArea" Visibility="Collapsed" Grid.Row="1" HorizontalAlignment="Center">
                 <Grid>
                     <Grid>
                         <Image Grid.Row="0" Grid.Column="0" x:Name="image" Stretch="Uniform" MaxHeight="720"

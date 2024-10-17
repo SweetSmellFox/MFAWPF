@@ -370,31 +370,28 @@ public partial class EditTaskDialog
     private void SelectionRegion(object sender, RoutedEventArgs e)
     {
         MainWindow.Instance?.ConnectToMAA();
-        var image = MaaProcessor.Instance.GetBitmapImage();
-        if (image != null)
-        {
-            SelectionRegionDialog imageDialog = new SelectionRegionDialog(image);
-            if (imageDialog.ShowDialog().IsTrue())
-            {
-                if (Data?.CurrentTask?.Task != null)
-                {
-                    if (imageDialog.IsRoi)
-                    {
-                        if (imageDialog.Output != null)
-                        {
-                            Data.CurrentTask.Task.Roi = imageDialog.Output;
-                        }
-                    }
-                    else
-                    {
-                        if (imageDialog.Output != null)
-                        {
-                            Data.CurrentTask.Task.Target = imageDialog.Output;
-                        }
-                    }
 
-                    Data.CurrentTask = Data.CurrentTask;
+        SelectionRegionDialog imageDialog = new SelectionRegionDialog();
+        if (imageDialog.ShowDialog().IsTrue())
+        {
+            if (Data?.CurrentTask?.Task != null)
+            {
+                if (imageDialog.IsRoi)
+                {
+                    if (imageDialog.Output != null)
+                    {
+                        Data.CurrentTask.Task.Roi = imageDialog.Output;
+                    }
                 }
+                else
+                {
+                    if (imageDialog.Output != null)
+                    {
+                        Data.CurrentTask.Task.Target = imageDialog.Output;
+                    }
+                }
+
+                Data.CurrentTask = Data.CurrentTask;
             }
         }
     }
@@ -402,30 +399,27 @@ public partial class EditTaskDialog
     private void Screenshot(object sender, RoutedEventArgs e)
     {
         MainWindow.Instance?.ConnectToMAA();
-        var image = MaaProcessor.Instance.GetBitmapImage();
-        if (image != null)
-        {
-            CropImageDialog imageDialog = new CropImageDialog(image);
-            if (imageDialog.ShowDialog().IsTrue())
-            {
-                if (Data?.CurrentTask?.Task != null)
-                {
-                    if (Data.CurrentTask.Task.Template == null && imageDialog.Output != null)
-                    {
-                        Data.CurrentTask.Task.Template = new List<string> { imageDialog.Output };
-                    }
-                    else
-                    {
-                        if (Data.CurrentTask.Task.Template is { } ls)
-                        {
-                            if (imageDialog.Output != null)
-                                ls.Add(imageDialog.Output);
-                            Data.CurrentTask.Task.Template = ls.ToList();
-                        }
-                    }
 
-                    Data.CurrentTask = Data.CurrentTask;
+        CropImageDialog imageDialog = new CropImageDialog();
+        if (imageDialog.ShowDialog().IsTrue())
+        {
+            if (Data?.CurrentTask?.Task != null)
+            {
+                if (Data.CurrentTask.Task.Template == null && imageDialog.Output != null)
+                {
+                    Data.CurrentTask.Task.Template = new List<string> { imageDialog.Output };
                 }
+                else
+                {
+                    if (Data.CurrentTask.Task.Template is { } ls)
+                    {
+                        if (imageDialog.Output != null)
+                            ls.Add(imageDialog.Output);
+                        Data.CurrentTask.Task.Template = ls.ToList();
+                    }
+                }
+
+                Data.CurrentTask = Data.CurrentTask;
             }
         }
     }
@@ -433,18 +427,15 @@ public partial class EditTaskDialog
     private void Swipe(object sender, RoutedEventArgs e)
     {
         MainWindow.Instance?.ConnectToMAA();
-        var image = MaaProcessor.Instance.GetBitmapImage();
-        if (image != null)
+
+        SwipeDialog imageDialog = new SwipeDialog();
+        if (imageDialog.ShowDialog().IsTrue())
         {
-            SwipeDialog imageDialog = new SwipeDialog(image);
-            if (imageDialog.ShowDialog().IsTrue())
+            if (Data?.CurrentTask?.Task != null)
             {
-                if (Data?.CurrentTask?.Task != null)
-                {
-                    Data.CurrentTask.Task.Begin = imageDialog.OutputBegin;
-                    Data.CurrentTask.Task.End = imageDialog.OutputEnd;
-                    Data.CurrentTask = Data.CurrentTask;
-                }
+                Data.CurrentTask.Task.Begin = imageDialog.OutputBegin;
+                Data.CurrentTask.Task.End = imageDialog.OutputEnd;
+                Data.CurrentTask = Data.CurrentTask;
             }
         }
     }
@@ -452,18 +443,15 @@ public partial class EditTaskDialog
     private void ColorExtraction(object sender, RoutedEventArgs e)
     {
         MainWindow.Instance?.ConnectToMAA();
-        var image = MaaProcessor.Instance.GetBitmapImage();
-        if (image != null)
+
+        ColorExtractionDialog imageDialog = new ColorExtractionDialog();
+        if (imageDialog.ShowDialog().IsTrue())
         {
-            ColorExtractionDialog imageDialog = new ColorExtractionDialog(image);
-            if (imageDialog.ShowDialog().IsTrue())
+            if (Data?.CurrentTask?.Task != null)
             {
-                if (Data?.CurrentTask?.Task != null)
-                {
-                    Data.CurrentTask.Task.Upper = imageDialog.OutputUpper;
-                    Data.CurrentTask.Task.Lower = imageDialog.OutputLower;
-                    Data.CurrentTask = Data.CurrentTask;
-                }
+                Data.CurrentTask.Task.Upper = imageDialog.OutputUpper;
+                Data.CurrentTask.Task.Lower = imageDialog.OutputLower;
+                Data.CurrentTask = Data.CurrentTask;
             }
         }
     }
@@ -471,32 +459,29 @@ public partial class EditTaskDialog
     private void RecognitionText(object sender, RoutedEventArgs e)
     {
         MainWindow.Instance?.ConnectToMAA();
-        var image = MaaProcessor.Instance.GetBitmapImage();
-        if (image != null)
-        {
-            RecognitionTextDialog imageDialog = new RecognitionTextDialog(image);
-            if (imageDialog.ShowDialog().IsTrue())
-            {
-                if (Data?.CurrentTask?.Task != null && imageDialog.Output != null)
-                {
-                    string text = OCRHelper.ReadTextFromMAATasker(
-                        imageDialog.Output[0], imageDialog.Output[1],
-                        imageDialog.Output[2], imageDialog.Output[3]);
-                    if (Data.CurrentTask.Task.Expected == null)
-                    {
-                        Data.CurrentTask.Task.Expected = new List<string> { text };
-                    }
-                    else
-                    {
-                        if (Data.CurrentTask.Task.Expected is { } ls)
-                        {
-                            ls.Add(text);
-                            Data.CurrentTask.Task.Expected = ls;
-                        }
-                    }
 
-                    Data.CurrentTask = Data.CurrentTask;
+        RecognitionTextDialog imageDialog = new RecognitionTextDialog();
+        if (imageDialog.ShowDialog().IsTrue())
+        {
+            if (Data?.CurrentTask?.Task != null && imageDialog.Output != null)
+            {
+                string text = OCRHelper.ReadTextFromMAATasker(
+                    imageDialog.Output[0], imageDialog.Output[1],
+                    imageDialog.Output[2], imageDialog.Output[3]);
+                if (Data.CurrentTask.Task.Expected == null)
+                {
+                    Data.CurrentTask.Task.Expected = new List<string> { text };
                 }
+                else
+                {
+                    if (Data.CurrentTask.Task.Expected is { } ls)
+                    {
+                        ls.Add(text);
+                        Data.CurrentTask.Task.Expected = ls;
+                    }
+                }
+
+                Data.CurrentTask = Data.CurrentTask;
             }
         }
     }

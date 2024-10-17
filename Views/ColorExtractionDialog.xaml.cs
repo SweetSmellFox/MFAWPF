@@ -24,16 +24,22 @@ public partial class ColorExtractionDialog
     public List<int>? OutputUpper { get; set; }
     public List<int>? OutputLower { get; set; }
 
-    public ColorExtractionDialog(BitmapImage bitmapImage)
+    public ColorExtractionDialog()
     {
         InitializeComponent();
-        UpdateImage(bitmapImage);
+        Task.Run(() =>
+        {
+            var image = MaaProcessor.Instance.GetBitmapImage();
+            Growls.Process(() => { UpdateImage(image); });
+        });
     }
 
-    private double _scaleRatio;
-
-    private void UpdateImage(BitmapImage imageSource)
+    public void UpdateImage(BitmapImage? imageSource)
     {
+        if (imageSource == null)
+            return;
+        LoadingCircle.Visibility = Visibility.Collapsed;
+        ImageArea.Visibility = Visibility.Visible;
         image.Source = imageSource;
 
         double imageWidth = imageSource.PixelWidth;
@@ -53,7 +59,11 @@ public partial class ColorExtractionDialog
         SelectionCanvas.Height = image.Height;
         Width = image.Width + 20;
         Height = image.Height + 100;
+        CenterWindow();
     }
+
+    private double _scaleRatio;
+    
 
     private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
     {

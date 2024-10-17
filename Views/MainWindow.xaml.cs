@@ -1244,8 +1244,8 @@ public partial class MainWindow
         {
             Growls.Warning(
                 "Warning_CannotConnect".GetLocalizedFormattedString((Data?.IsAdb).IsTrue()
-                    ? "Emulator"
-                    : "Window"));
+                    ? "Emulator".GetLocalizationString()
+                    : "Window".GetLocalizationString()));
             return;
         }
 
