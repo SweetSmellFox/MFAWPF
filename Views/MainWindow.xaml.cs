@@ -434,7 +434,7 @@ public partial class MainWindow
 
     private void CustomAdb(object sender, RoutedEventArgs e)
     {
-        AdbDeviceInfo deviceInfo =
+        var deviceInfo =
             deviceComboBox.Items.Count > 0 && deviceComboBox.SelectedItem is AdbDeviceInfo device
                 ? device
                 : null;
@@ -1429,10 +1429,11 @@ public partial class MainWindow
     {
         Growls.Process(() =>
         {
-            TabControl.SelectedIndex = MaaInterface.Instance.DefaultController == "win32" ? 1 : 0;
+            TabControl.SelectedIndex = MaaInterface.Instance?.DefaultController == "win32" ? 1 : 0;
             AutoDetectDevice();
             TabControl.SelectionChanged += TabControl_OnSelectionChanged;
-            Data.NotLock = MaaInterface.Instance?.LockController != true;
+            if (Data != null)
+                Data.NotLock = MaaInterface.Instance?.LockController != true;
             ConnectSettingButton.IsChecked = true;
             var value = DataSet.GetData("EnableEdit", true);
             if (!value)
