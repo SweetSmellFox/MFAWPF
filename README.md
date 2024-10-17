@@ -60,9 +60,12 @@
 
 ```
   {
-  "name": "项目名称",
-  "version":  "项目版本",
-  "url":  "项目链接(目前应该只支持Github)", //比如 https://github.com/{Github账户}/{Github项目}
+  "name": "项目名称", //默认为null
+  "version":  "项目版本", //默认为null
+  "url":  "项目链接(目前应该只支持Github)", //默认为null , 比如 https://github.com/{Github账户}/{Github项目}
+  "custom_title": "自定义标题", //默认为null, 使用该字段后，标题栏将只显示custom_title和version
+  "default_controller": "adb", //默认为adb, 启动后的默认控制器，可选项 adb , win32 
+  "lock_controller":false, //默认为false, 是否锁定控制器，开启后用户不能在adb和win32中切换控制器
   "resource": [
     {
       "name": "官服",
@@ -80,9 +83,9 @@
     {
       "name": "任务",
       "entry": "任务接口",
-      "checked": true,  //任务默认是否被选中
-      "doc": "文档介绍",  //显示在任务设置选项底下，可支持富文本，格式在下方
-      "repeatable": true,  //任务可不可以重复运行
+      "checked": true,  //默认为false，任务默认是否被选中
+      "doc": "文档介绍",  //默认为null，显示在任务设置选项底下，可支持富文本，格式在下方
+      "repeatable": true,  //默认为false，任务可不可以重复运行
       "repeat_count": 1,  //任务默认重复运行次数，需要repeatable为true
     }
   ]
@@ -115,6 +118,7 @@
 - 内置 MFATools 可以用来裁剪图片和获取 ROI
 - 目前一些地方并没有特别完善,欢迎各位大佬贡献代码
 - 注意，由于 `MaaFramework` 于 2.0 移除了Exec Agent，所以目前无法通过注册interface注册Custom Action和Custom Recognition
+- 在exe同级目录中放置logo.ico后可以替换窗口的图标
 
 **注：在MFA中，于Pipeline中任务新增了俩个属性字段，分别为 `focus_tip` 和 `focus_tip_color`。**
 
