@@ -100,6 +100,6 @@ public partial class AdbEditorDialog
         set => SetValue(AdbConfigProperty, value);
     }
 
-    public AdbDeviceInfo Output => new AdbDeviceInfo(Name, AdbPath, AdbSerial, AdbScreencapMethods.Default,
+    public AdbDeviceInfo Output => new (AdbName, AdbPath, AdbSerial, AdbScreencapMethods.Default,
         AdbInputMethods.MinitouchAndAdbKey, AdbConfig);
 }
