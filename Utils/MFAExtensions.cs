@@ -75,6 +75,11 @@ public static class MFAExtensions
         return value == true;
     }
 
+    public static bool IsFalse(this bool? value)
+    {
+        return value == false;
+    }
+    
     public static bool IsHit(
         this RecognitionDetail<MaaImageBuffer>? detail)
     {

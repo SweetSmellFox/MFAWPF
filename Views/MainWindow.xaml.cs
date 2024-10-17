@@ -50,11 +50,11 @@ public partial class MainWindow
         version.Text = Version;
         _maaToolkit = new MaaToolkit(init: true);
         Data = DataContext as MainViewModel;
-
+        Loaded += (_, _) => { LoadUI(); };
         InitializeData();
         OCRHelper.Initialize();
         VersionChecker.CheckVersion();
-        LoadUI();
+
         MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
 
         SetIconFromExeDirectory();
@@ -366,7 +366,9 @@ public partial class MainWindow
             await MaaProcessor.Instance.StartEmulator();
         }
 
-        if (IsFirstStart && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) &&
+        if (IsFirstStart &&
+            MaaInterface.Instance?.DefaultController != "win32" &&
+            "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) &&
             DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
         {
             var settings = new JsonSerializerSettings();
@@ -383,7 +385,7 @@ public partial class MainWindow
                 {
                     if (MaaProcessor.Instance.ShouldEndStart)
                     {
-                      MaaProcessor.Instance.EndAutoStart();
+                        MaaProcessor.Instance.EndAutoStart();
                     }
                     else
                     {
@@ -469,6 +471,7 @@ public partial class MainWindow
                     {
                         Start(null, null);
                     }
+
                     IsFirstStart = false;
                 }
             }
@@ -1176,7 +1179,7 @@ public partial class MainWindow
                     DataSet.SetData("TaskItems",
                         Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                 };
-                
+
                 comboBox.SetValue(ToolTipProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitleProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
@@ -1388,40 +1391,52 @@ public partial class MainWindow
 
     public void ShowResourceName(string name)
     {
-        if (Dispatcher.CheckAccess())
+        Growls.Process(() =>
         {
             resourceName.Visibility = Visibility.Visible;
             resourceNameText.Visibility = Visibility.Visible;
             resourceName.Text = name;
-        }
-        else
-            Dispatcher.Invoke(() => ShowResourceName(name));
+        });
     }
 
     public void ShowResourceVersion(string v)
     {
-        if (Dispatcher.CheckAccess())
+        Growls.Process(() =>
         {
             resourceVersion.Visibility = Visibility.Visible;
             resourceVersionText.Visibility = Visibility.Visible;
             resourceVersion.Text = v;
-        }
-        else
-            Dispatcher.Invoke(() => ShowResourceVersion(v));
+        });
+    }
+
+    public void ShowCustomTitle(string v)
+    {
+        Growls.Process(() =>
+        {
+            title.Visibility = Visibility.Collapsed;
+            version.Visibility = Visibility.Collapsed;
+            resourceName.Visibility = Visibility.Collapsed;
+            resourceNameText.Visibility = Visibility.Collapsed;
+            resourceVersionText.Visibility = Visibility.Collapsed;
+            customTitle.Visibility = Visibility.Visible;
+            customTitle.Text = v;
+        });
     }
 
     public void LoadUI()
     {
-        if (Dispatcher.CheckAccess())
+        Growls.Process(() =>
         {
+            TabControl.SelectedIndex = MaaInterface.Instance.DefaultController == "win32" ? 1 : 0;
+            AutoDetectDevice();
+            TabControl.SelectionChanged += TabControl_OnSelectionChanged;
+            Data.NotLock = MaaInterface.Instance?.LockController != true;
             ConnectSettingButton.IsChecked = true;
             var value = DataSet.GetData("EnableEdit", true);
             if (!value)
                 EditButton.Visibility = Visibility.Collapsed;
             DataSet.SetData("EnableEdit", value);
-        }
-        else
-            Dispatcher.Invoke(LoadUI);
+        });
     }
 
     private void ToggleWindowTopMost(object sender, RoutedPropertyChangedEventArgs<bool> e)

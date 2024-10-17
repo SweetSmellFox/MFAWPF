@@ -32,8 +32,7 @@
             <StackPanel Grid.Column="0" IsHitTestVisible="False"
                         HorizontalAlignment="Left" Orientation="Horizontal">
                 <TextBlock VerticalAlignment="Center" Margin="6 0 4 0" Text="{lex:Loc AppTitle}"
-
-                           IsHitTestVisible="False"
+                           IsHitTestVisible="False" x:Name="title"
                            Foreground="{DynamicResource PrimaryTextBrush}">
 
                 </TextBlock>
@@ -56,6 +55,12 @@
                            Foreground="{DynamicResource PrimaryTextBrush}">
 
                 </TextBlock>
+                <TextBlock VerticalAlignment="Center" Margin="6 0 4 0"
+                           IsHitTestVisible="False"
+                           x:Name="customTitle" Visibility="Collapsed"
+                           Foreground="{DynamicResource PrimaryTextBrush}">
+
+                </TextBlock>
                 <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}" IsHitTestVisible="False"
                            Visibility="Collapsed"
                            Margin="2 0 4 0" x:Name="resourceVersion" Text="Debug">
@@ -69,6 +74,7 @@
     </hc:Window.NonClientAreaContent>
     <hc:Window.Resources>
         <converters:SubtractConverter x:Key="SubtractConverter" />
+        <converters:MultiBoolAndOrConverter x:Key="MultiBoolAndOrConverter" />
         <converters:CustomIsEnabledConverter x:Key="CustomIsEnabledConverter" />
         <DataTemplate x:Key="DeviceInfoTemplate">
             <TextBlock>
@@ -130,20 +136,23 @@
             </hc:SideMenu>
         </Grid>
         <Border Grid.Row="1" Grid.Column="1" Margin="2 2 2 2" Background="{DynamicResource SecundaryBackgroundColor}"
-                CornerRadius="5" 
-                
-                >
+                CornerRadius="5">
             <!-- BorderBrush="#ededed" BorderThickness="1" -->
             <Grid Margin="5 0 5 5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="45" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <hc:SimpleStackPanel Orientation="Horizontal" Margin="15,6,10,0" Height="30" >
+                <hc:SimpleStackPanel Orientation="Horizontal" Margin="15,6,10,0" Height="30">
                     <TabControl TabStripPlacement="Top" Background="Transparent"
-                                SelectionChanged="TabControl_OnSelectionChanged" IsEnabled="{Binding Idle}"
-                                BorderThickness="0" x:Name="TabControl"
+                                BorderThickness="0" x:Name="TabControl" 
                                 Style="{StaticResource TabControlCapsuleSolid}">
+                        <TabControl.IsEnabled>
+                            <MultiBinding Converter="{StaticResource MultiBoolAndOrConverter}" ConverterParameter="And">
+                                <Binding Path="Idle" />
+                                <Binding Path="NotLock" />
+                            </MultiBinding>
+                        </TabControl.IsEnabled>
                         <TabItem Header="{lex:Loc TabADB}" x:Name="adbTab"></TabItem>
                         <TabItem Header="{lex:Loc TabWin32}" x:Name="win32Tab"></TabItem>
                     </TabControl>

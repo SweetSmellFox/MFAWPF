@@ -1,4 +1,3 @@
-
 using MFAWPF.Utils.Converters;
 using MFAWPF.Views;
 using Newtonsoft.Json;
@@ -43,7 +42,7 @@ public class MaaInterface
 
     public class CustomExecutor
     {
-        [JsonIgnore]  public string? Name { get; set; }
+        [JsonIgnore] public string? Name { get; set; }
         [JsonProperty("exec_path")] public string? ExecPath { get; set; }
 
         [JsonConverter(typeof(SingleOrListConverter))]
@@ -80,12 +79,20 @@ public class MaaInterface
     public string? Version { get; set; }
 
     [JsonProperty("url")] public string? Url { get; set; }
+
+    [JsonProperty("custom_title")] public string? CustomTitle { get; set; }
+
+    [JsonProperty("default_controller")] public string? DefaultController { get; set; }
+
+    [JsonProperty("lock_controller")] public bool? LockController { get; set; }
+
     [JsonProperty("resource")] public List<MaaCustomResource>? Resource { get; set; }
     [JsonProperty("task")] public List<TaskInterfaceItem>? Task { get; set; }
     [JsonProperty("recognition")] public Dictionary<string, CustomExecutor>? Recognition { get; set; }
     [JsonProperty("action")] public Dictionary<string, CustomExecutor>? Action { get; set; }
     [JsonProperty("option")] public Dictionary<string, MaaInterfaceOption>? Option { get; set; }
 
+    [JsonExtensionData] public Dictionary<string, object> AdditionalData { get; set; } = new();
     private static MaaInterface? _instance;
 
     // [JsonIgnore] public List<MaaCustomRecognizerExecutor> CustomRecognizerExecutors { get; } = new();
@@ -162,6 +169,8 @@ public class MaaInterface
                 MainWindow.Instance?.ShowResourceName(value.Name);
             if (value.Version != null)
                 MainWindow.Instance?.ShowResourceVersion(value.Version);
+            if (value.CustomTitle != null)
+                MainWindow.Instance?.ShowCustomTitle(value.CustomTitle);
         }
     }
 

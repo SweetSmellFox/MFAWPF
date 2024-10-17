@@ -58,6 +58,14 @@ public class MainViewModel : ObservableObject
         set => SetProperty(ref _idle, value);
     }
 
+    private bool _notLock = true;
+
+    public bool NotLock
+    {
+        get => _notLock;
+        set => SetProperty(ref _notLock, value);
+    }
+
     public void SetIdle(bool value)
     {
         Idle = value;
