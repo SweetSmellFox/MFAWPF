@@ -682,7 +682,7 @@ public class TaskModel : ObservableObject
         set => SetNewProperty(ref _package, value);
     }
 
-    [JsonExtensionData] public Dictionary<string, object> AdditionalData { get; set; } = new();
+    [Browsable(false)] [JsonExtensionData] public Dictionary<string, object> AdditionalData { get; set; } = new();
 
     public override string ToString()
     {
