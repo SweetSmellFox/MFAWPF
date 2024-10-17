@@ -34,7 +34,7 @@ public class SingleOrNestedListConverter : JsonConverter
             return token.ToString();
         }
 
-        throw new JsonSerializationException("Invalid JSON format for SingleOrNestedListConverter.");
+        throw new JsonSerializationException($"Invalid JSON format for SingleOrNestedListConverter. Unexpected Type \"{objectType}\"");
     }
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
@@ -61,7 +61,7 @@ public class SingleOrNestedListConverter : JsonConverter
         }
         else
         {
-            throw new JsonSerializationException("Unexpected value type for SingleOrNestedListConverter.");
+            throw new JsonSerializationException($"Unexpected value type \"{value?.GetType()}\" for SingleOrNestedListConverter.");
         }
     }
 }

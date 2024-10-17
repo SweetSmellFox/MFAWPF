@@ -45,7 +45,7 @@ public class AutoConverter : JsonConverter
                 break;
         }
 
-        throw new JsonSerializationException("Invalid JSON format for AutoConverter.");
+        throw new JsonSerializationException($"Invalid JSON format for AutoConverter. Unexpected Type \"{objectType}\"");
     }
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
@@ -85,7 +85,7 @@ public class AutoConverter : JsonConverter
                 break;
 
             default:
-                throw new JsonSerializationException("Unexpected value type for AutoConverter.");
+                throw new JsonSerializationException($"Unexpected value type \"{value?.GetType()}\" for AutoConverter.");
         }
     }
 }

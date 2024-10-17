@@ -40,7 +40,7 @@ namespace MFAWPF.Styles.Properties
             else if (d is ListBox listBox)
             {
                 INotifyCollectionChanged view = listBox.Items;
-                view.CollectionChanged += (sender, arg) =>
+                view.CollectionChanged += (_, arg) =>
                 {
                     switch (arg.Action)
                     {
