@@ -361,42 +361,7 @@ public partial class MainWindow
             btnCustom.Visibility = adbTab.IsSelected ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        if (IsFirstStart && DataSet.GetData("StartEmulator", false))
-        {
-            await MaaProcessor.Instance.StartEmulator();
-        }
-
-        if (IsFirstStart &&
-            MaaInterface.Instance?.DefaultController != "win32" &&
-            "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) &&
-            DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
-        {
-            var settings = new JsonSerializerSettings();
-            settings.Converters.Add(new AdbInputMethodsConverter());
-            settings.Converters.Add(new AdbScreencapMethodsConverter());
-
-            var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
-            if (device != null)
-            {
-                deviceComboBox.ItemsSource = new List<AdbDeviceInfo> { device };
-                deviceComboBox.SelectedIndex = 0;
-                MaaProcessor.Config.IsConnected = true;
-                if (DataSet.GetData("AutoStartIndex", 0) == 1)
-                {
-                    if (MaaProcessor.Instance.ShouldEndStart)
-                    {
-                        MaaProcessor.Instance.EndAutoStart();
-                    }
-                    else
-                    {
-                        Start(null, null);
-                    }
-                }
-            }
-
-            IsFirstStart = false;
-        }
-        else AutoDetectDevice();
+        AutoDetectDevice();
 
         MaaProcessor.Instance.SetCurrentTasker();
         if (ConnectSettingButton.IsChecked.IsTrue())
@@ -463,19 +428,6 @@ public partial class MainWindow
                 deviceComboBox.ItemsSource = devices;
                 MaaProcessor.Config.IsConnected = devices.Count > 0;
                 deviceComboBox.SelectedIndex = 0;
-                if (IsFirstStart && DataSet.GetData("AutoStartIndex", 0) == 1)
-                {
-                    if (MaaProcessor.Instance.ShouldEndStart)
-                    {
-                        MaaProcessor.Instance.EndAutoStart();
-                    }
-                    else
-                    {
-                        Start(null, null);
-                    }
-
-                    IsFirstStart = false;
-                }
             }
             else
             {
@@ -1430,7 +1382,8 @@ public partial class MainWindow
         Growls.Process(() =>
         {
             TabControl.SelectedIndex = MaaInterface.Instance?.DefaultController == "win32" ? 1 : 0;
-            AutoDetectDevice();
+            WaitEmulator();
+
             TabControl.SelectionChanged += TabControl_OnSelectionChanged;
             if (Data != null)
                 Data.NotLock = MaaInterface.Instance?.LockController != true;
@@ -1440,6 +1393,65 @@ public partial class MainWindow
                 EditButton.Visibility = Visibility.Collapsed;
             DataSet.SetData("EnableEdit", value);
         });
+    }
+
+    public void WaitEmulator()
+    {
+        Task.Run(
+            async () =>
+            {
+                if (DataSet.GetData("StartEmulator", false))
+                {
+                    await MaaProcessor.Instance.StartEmulator();
+                }
+
+                if ((Data?.IsAdb).IsTrue() &&
+                    "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) &&
+                    DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
+                {
+                    var settings = new JsonSerializerSettings();
+                    settings.Converters.Add(new AdbInputMethodsConverter());
+                    settings.Converters.Add(new AdbScreencapMethodsConverter());
+
+                    var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
+                    if (device != null)
+                    {
+                        Growls.Process(() =>
+                        {
+                            deviceComboBox.ItemsSource = new List<AdbDeviceInfo> { device };
+                            deviceComboBox.SelectedIndex = 0;
+                            MaaProcessor.Config.IsConnected = true;
+                            if (DataSet.GetData("AutoStartIndex", 0) == 1)
+                            {
+                                if (MaaProcessor.Instance.ShouldEndStart)
+                                {
+                                    MaaProcessor.Instance.EndAutoStart();
+                                }
+                                else
+                                {
+                                    Start(null, null);
+                                }
+                            }
+                        });
+                    }
+                }
+                else
+                    Growls.Process(() =>
+                    {
+                        AutoDetectDevice();
+                        if ((Data?.IsAdb).IsTrue() && DataSet.GetData("AutoStartIndex", 0) == 1)
+                        {
+                            if (MaaProcessor.Instance.ShouldEndStart)
+                            {
+                                MaaProcessor.Instance.EndAutoStart();
+                            }
+                            else
+                            {
+                                Start(null, null);
+                            }
+                        }
+                    });
+            });
     }
 
     private void ToggleWindowTopMost(object sender, RoutedPropertyChangedEventArgs<bool> e)

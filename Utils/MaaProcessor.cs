@@ -190,12 +190,13 @@ public class MaaProcessor
     private CancellationTokenSource? _emulatorCancellationTokenSource;
     public bool ShouldEndStart => _emulatorCancellationTokenSource is { IsCancellationRequested: true };
 
-    public void EndAutoStart()
+    public void EndAutoStart(bool showTip = true)
     {
         _emulatorCancellationTokenSource = null;
         TaskQueue.Clear();
         OnTaskQueueChanged();
-        MainWindow.Data?.AddLogByKey("TaskAbandoned");
+        if (showTip)
+            MainWindow.Data?.AddLogByKey("TaskAbandoned");
         MainWindow.Data?.SetIdle(true);
     }
 
@@ -215,8 +216,10 @@ public class MaaProcessor
         if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
             return;
 
-        _emulatorProcess = Process.Start(exePath, DataSet.GetData("EmulatorConfig", string.Empty) ?? string.Empty);
-
+        if (!string.IsNullOrWhiteSpace(DataSet.GetData("EmulatorConfig", string.Empty)))
+            _emulatorProcess = Process.Start(exePath, DataSet.GetData("EmulatorConfig", string.Empty) ?? string.Empty);
+        else
+            _emulatorProcess = Process.Start(exePath);
         for (double remainingTime = waitTimeInSeconds; remainingTime > 0; remainingTime -= 1)
         {
             if (token.IsCancellationRequested)
@@ -238,7 +241,10 @@ public class MaaProcessor
             }
         }
 
-        _emulatorCancellationTokenSource = null;
+        if (DataSet.GetData("AutoStartIndex", 0) == 0)
+            EndAutoStart(false);
+        else
+            _emulatorCancellationTokenSource = null;
     }
 
     private void CloseEmulator()
