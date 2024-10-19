@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,6 +25,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WPFLocalizeExtension.Extensions;
 using ComboBox = HandyControl.Controls.ComboBox;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using ScrollViewer = HandyControl.Controls.ScrollViewer;
 using TabControl = System.Windows.Controls.TabControl;
 using TabItem = System.Windows.Controls.TabItem;
@@ -414,6 +416,41 @@ public partial class MainWindow
 
     public bool IsFirstStart = true;
 
+    public bool TryGetIndexFromConfig(string config, out int index)
+    {
+        try
+        {
+            using JsonDocument doc = JsonDocument.Parse(config);
+            if (doc.RootElement.TryGetProperty("extras", out JsonElement extras) &&
+                extras.TryGetProperty("mumu", out JsonElement mumu) &&
+                mumu.TryGetProperty("index", out JsonElement indexElement))
+            {
+                index = indexElement.GetInt32();
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"解析 Config 时出错: {ex.Message}");
+            LoggerService.LogError(ex);
+        }
+
+        index = 0;
+        return false;
+    }
+
+    public static int ExtractNumberFromEmulatorConfig(string emulatorConfig)
+    {
+        var match = Regex.Match(emulatorConfig, @"\d+");
+
+        if (match.Success)
+        {
+            return int.Parse(match.Value);
+        }
+
+        return 0;
+    }
+
     public async void AutoDetectDevice()
     {
         try
@@ -427,7 +464,25 @@ public partial class MainWindow
                 var devices = await _maaToolkit.AdbDevice.FindAsync();
                 deviceComboBox.ItemsSource = devices;
                 MaaProcessor.Config.IsConnected = devices.Count > 0;
-                deviceComboBox.SelectedIndex = 0;
+                var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
+                if (!string.IsNullOrWhiteSpace(emulatorConfig))
+                {
+                    var extractedNumber = ExtractNumberFromEmulatorConfig(emulatorConfig);
+
+                    foreach (var device in devices)
+                    {
+                        if (TryGetIndexFromConfig(device.Config, out int index))
+                        {
+                            if (index == extractedNumber)
+                            {
+                                deviceComboBox.SelectedIndex = devices.IndexOf(device);
+                            }
+                        }
+                        else deviceComboBox.SelectedIndex = 0;
+                    }
+                }
+                else
+                    deviceComboBox.SelectedIndex = 0;
             }
             else
             {
@@ -497,6 +552,7 @@ public partial class MainWindow
             AddStartSettingOption(s2);
             //AddStartExtrasOption(s2);
             AddStartEmulatorOption(s2);
+            AddRememberAdbOption(s2);
             // AddIntroduction(s2,
             //     "[size:24][b][color:blue]这是一个蓝色的大标题[/color][/b][/size]\n[color:green][i]这是绿色的斜体文本。[/i][/color]\n[u]这是带有下划线的文本。[/u]\n[s]这是带有删除线的文本。[/s]\n[b][color:red]这是红色的粗体文本。[/color][/b]\n[size:18]这是一个较小的字号文本，字号为18。[/size]\n");
         }
@@ -782,8 +838,9 @@ public partial class MainWindow
         var textBox = new TextBox
         {
             //Text = DataSet.GetData("AdbConfig", "{\"extras\":{}}"), HorizontalAlignment = HorizontalAlignment.Stretch,
-            Text = DataSet.GetData("EmulatorConfig", "mumu是-v 多开号(从0开始),雷电是index=多开号(也是0)"),
+            Text = DataSet.GetData("EmulatorConfig", ""),
             HorizontalAlignment = HorizontalAlignment.Stretch,
+            ToolTip = "mumu是-v 多开号(从0开始),雷电是index=多开号(也是0)",
             Margin = new Thickness(5)
         };
 
@@ -967,6 +1024,18 @@ public partial class MainWindow
         };
         comboBox.SelectedIndex = DataSet.GetData("AfterTaskIndex", defaultValue);
         panel.Children.Add(comboBox);
+    }
+
+    private void AddRememberAdbOption(Panel? panel = null)
+    {
+        panel ??= settingPanel;
+        var checkBox = new CheckBox
+        {
+            IsChecked = DataSet.GetData("RememberAdb", true), Margin = new Thickness(5)
+        };
+        checkBox.BindLocalization("RememberAdb", ContentProperty);
+        checkBox.Click += (_, _) => { DataSet.SetData("RememberAdb", checkBox.IsChecked); };
+        panel.Children.Add(checkBox);
     }
 
     private void AddStartSettingOption(Panel? panel = null)
@@ -1405,7 +1474,7 @@ public partial class MainWindow
                     await MaaProcessor.Instance.StartEmulator();
                 }
 
-                if ((Data?.IsAdb).IsTrue() &&
+                if ((Data?.IsAdb).IsTrue() && DataSet.GetData("RememberAdb", true) &&
                     "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) &&
                     DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
                 {
