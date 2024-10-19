@@ -497,4 +497,7 @@
     <data name="AdbConfig" xml:space="preserve">
         <value>Extras</value>
     </data>
+    <data name="RememberAdb" xml:space="preserve">
+        <value>Remember Connection</value>
+    </data>
 </root>

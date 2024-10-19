@@ -525,4 +525,7 @@
     <data name="AdbConfig" xml:space="preserve">
         <value>额外参数</value>
     </data>
+    <data name="RememberAdb" xml:space="preserve">
+        <value>记住连接</value>
+    </data>
 </root>

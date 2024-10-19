@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Management;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -215,11 +216,23 @@ public class MaaProcessor
     {
         if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
             return;
-
-        if (!string.IsNullOrWhiteSpace(DataSet.GetData("EmulatorConfig", string.Empty)))
-            _emulatorProcess = Process.Start(exePath, DataSet.GetData("EmulatorConfig", string.Empty) ?? string.Empty);
+        var processName = Path.GetFileNameWithoutExtension(exePath);
+        if (Process.GetProcessesByName(processName).Length == 0)
+        {
+            if (!string.IsNullOrWhiteSpace(DataSet.GetData("EmulatorConfig", string.Empty)))
+                _emulatorProcess =
+                    Process.Start(exePath, DataSet.GetData("EmulatorConfig", string.Empty) ?? string.Empty);
+            else
+                _emulatorProcess = Process.Start(exePath);
+        }
         else
-            _emulatorProcess = Process.Start(exePath);
+        {
+            if (!string.IsNullOrWhiteSpace(DataSet.GetData("EmulatorConfig", string.Empty)))
+                Process.Start(exePath, DataSet.GetData("EmulatorConfig", string.Empty) ?? string.Empty);
+            else
+                Process.Start(exePath);
+        }
+
         for (double remainingTime = waitTimeInSeconds; remainingTime > 0; remainingTime -= 1)
         {
             if (token.IsCancellationRequested)
@@ -247,11 +260,35 @@ public class MaaProcessor
             _emulatorCancellationTokenSource = null;
     }
 
+// 获取进程的命令行参数的辅助方法
+    private static string GetCommandLine(Process process)
+    {
+        return GetCommandLine(process.Id); // 这里可能需要用 WMI 方法获取参数
+    }
+
+    private static string GetCommandLine(int processId)
+    {
+        var commandLine = string.Empty;
+
+        // 使用 WMI 查询命令行参数
+        var query = $"SELECT CommandLine FROM Win32_Process WHERE ProcessId = {processId}";
+        using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(query))
+        {
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                commandLine = obj["CommandLine"]?.ToString() ?? string.Empty;
+            }
+        }
+
+        return commandLine;
+    }
+
     private void CloseEmulator()
     {
-        if (_emulatorProcess is { HasExited: false })
+        if (_emulatorProcess != null)
         {
             _emulatorProcess.Kill();
+            _emulatorProcess = null;
         }
         else
         {
@@ -260,12 +297,20 @@ public class MaaProcessor
             if (!string.IsNullOrEmpty(emulatorPath))
             {
                 string processName = Path.GetFileNameWithoutExtension(emulatorPath);
+                var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
 
                 var processes = Process.GetProcessesByName(processName);
                 foreach (var process in processes)
                 {
-                    process.Kill();
-                    break;
+                    var commandLine = GetCommandLine(process);
+                    if (string.IsNullOrEmpty(emulatorConfig) ||
+                        MainWindow.ExtractNumberFromEmulatorConfig(emulatorConfig) == 0 &&
+                        commandLine.Split(" ").Length == 1 ||
+                        commandLine.ToLower().Contains(emulatorConfig.ToLower()))
+                    {
+                        process.Kill();
+                        break;
+                    }
                 }
             }
             else if (!string.IsNullOrEmpty(Config.AdbDevice.Name))
@@ -281,13 +326,29 @@ public class MaaProcessor
                     windowName = "MEmu";
                 else if (windowName.Contains("BlueStacks"))
                     windowName = "HD-Player";
+
+                var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
+
                 var processes = Process.GetProcesses().Where(p =>
-                    // p.MainWindowTitle.StartsWith(windowName) || 
                     p.ProcessName.StartsWith(windowName));
+
                 foreach (var process in processes)
                 {
-                    process.Kill();
-                    break;
+                    try
+                    {
+                        var commandLine = GetCommandLine(process);
+
+                        if (string.IsNullOrEmpty(emulatorConfig) ||
+                            commandLine.ToLower().Contains(emulatorConfig.ToLower()))
+                        {
+                            process.Kill();
+                            break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"关闭进程时出错: {ex.Message}");
+                    }
                 }
             }
         }
