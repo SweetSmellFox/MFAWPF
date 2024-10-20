@@ -2,6 +2,7 @@
 <img alt="LOGO" src="https://github.com/SweetSmellFox/MFAWPF/blob/master/logo.png" width="256" height="256" />
 
 # MFAWPF
+[English](./README_en.md) | [简体中文](./README.md)
 
 </div>
 
@@ -118,7 +119,7 @@
 - 内置 MFATools 可以用来裁剪图片和获取 ROI
 - 目前一些地方并没有特别完善,欢迎各位大佬贡献代码
 - 注意，由于 `MaaFramework` 于 2.0 移除了Exec Agent，所以目前无法通过注册interface注册Custom Action和Custom Recognition
-- 在exe同级目录中放置logo.ico后可以替换窗口的图标
+- 在exe同级目录中放置 `logo.ico` 后可以替换窗口的图标
 
 **注：在MFA中，于Pipeline中任务新增了俩个属性字段，分别为 `focus_tip` 和 `focus_tip_color`。**
 
