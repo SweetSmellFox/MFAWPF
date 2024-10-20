@@ -549,10 +549,13 @@ public partial class MainWindow
                 ["MiniTouch", "MaaTouch", "AdbInput", "AutoDetect"],
                 "AdbControlInputType");
             AddAfterTaskOption(s2);
+
             AddStartSettingOption(s2);
+            AddSwitchConfiguration(s2);
             //AddStartExtrasOption(s2);
             AddStartEmulatorOption(s2);
             AddRememberAdbOption(s2);
+            
             // AddIntroduction(s2,
             //     "[size:24][b][color:blue]这是一个蓝色的大标题[/color][/b][/size]\n[color:green][i]这是绿色的斜体文本。[/i][/color]\n[u]这是带有下划线的文本。[/u]\n[s]这是带有删除线的文本。[/s]\n[b][color:red]这是红色的粗体文本。[/color][/b]\n[size:18]这是一个较小的字号文本，字号为18。[/size]\n");
         }
@@ -598,6 +601,69 @@ public partial class MainWindow
         tabControl.Items.Add(advancedSettingTabItem);
 
         settingPanel.Children.Add(tabControl);
+    }
+    private void AddSwitchConfiguration(Panel? panel = null, int defaultValue = 0)
+    {
+        panel ??= settingPanel;
+        var comboBox = new ComboBox
+        {
+            Style = FindResource("ComboBoxExtend") as Style,
+            Margin = new Thickness(5)
+        };
+        string folderPath = Path.Combine(Environment.CurrentDirectory, "config");
+        foreach (string file in Directory.GetFiles(folderPath))
+        {
+            // files.Add(Path.GetFileName(file));
+            string fileName = Path.GetFileName(file);
+            comboBox.Items.Add(fileName);
+        }
+
+
+        comboBox.BindLocalization("SwitchConfiguration");
+        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+
+        comboBox.SelectionChanged += (sender, _) =>
+        {
+            // var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+            // DataSet.SetData("SwitchConfigurationIndex", index);
+            string selectedItem = (string)comboBox.SelectedItem;
+            if (selectedItem == "config.json")
+            {
+                //
+            }
+            else if (selectedItem == "maa_option.json")
+            {
+                // 什么都不做，等待后续添加逻辑
+            }
+            else
+            {
+                // 恢复成绝对路径
+                string _currentFile = Path.Combine(folderPath, "config.json");
+                string _selectedItem = Path.Combine(folderPath, selectedItem);
+                SwapFiles(_currentFile, _selectedItem);
+                RestartMFA();
+            }
+        };
+        // comboBox.SelectedIndex = DataSet.GetData("SwitchConfigurationIndex", defaultValue);
+        panel.Children.Add(comboBox);
+    }
+    private void SwapFiles(string file1Path, string file2Path)
+    {
+        // 备份文件
+        string backupFilePath = $"{file1Path}.bak";
+        File.Copy(file1Path, backupFilePath, true);
+
+        // 读取文件内容
+        string file1Content = File.ReadAllText(file1Path);
+        string file2Content = File.ReadAllText(file2Path);
+
+        // 只更换 config.json 的内容
+        File.WriteAllText(file1Path, file2Content);
+    }
+    private void RestartMFA()
+    {
+        Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
+        Growls.Process(Application.Current.Shutdown);
     }
 
     private void About(object? sender = null, RoutedEventArgs? e = null)
