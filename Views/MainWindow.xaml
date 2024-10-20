@@ -14,11 +14,11 @@
            xmlns:utils="clr-namespace:MFAWPF.Utils"
            engine:ResxLocalizationProvider.DefaultAssembly="MFAWPF"
            engine:ResxLocalizationProvider.DefaultDictionary="Strings"
-           mc:Ignorable="d" x:Name="home"
+           mc:Ignorable="d" x:Name="home" ResizeMode="CanResize"
            Title="{lex:Loc AppTitle}" Height="550" Width="850" MinWidth="550" MinHeight="260"
            ShowTitle="False" Icon="../logo.ico" WindowStartupLocation="CenterScreen"
            NonClientAreaBackground="{DynamicResource MainContentBackgroundBrush}"
-           Background="{DynamicResource MainContentBackgroundBrush}"
+           Background="{DynamicResource MainContentBackgroundBrush}" WindowStyle="SingleBorderWindow"
            WindowState="Normal">
     <hc:Window.DataContext>
         <viewModels:MainViewModel />
