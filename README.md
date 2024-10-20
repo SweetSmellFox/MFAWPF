@@ -60,7 +60,7 @@
 修改为
 
 ```
-  {
+{
   "name": "项目名称", //默认为null
   "version":  "项目版本", //默认为null
   "url":  "项目链接(目前应该只支持Github)", //默认为null , 比如 https://github.com/{Github账户}/{Github项目}
