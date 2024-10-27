@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Management;
+using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
@@ -16,6 +18,13 @@ using MFAWPF.ViewModels;
 using MFAWPF.Views;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
+using System.Security.Policy;
+using System;
+using System.Runtime.Intrinsics.Arm;
+using System.Collections;
+using System.Net;
+using System.Web;
 
 namespace MFAWPF.Utils;
 
@@ -183,6 +192,9 @@ public class MaaProcessor
                 break;
             case 6:
                 Restart();
+                break;
+            case 7:
+                DingTalkMessageAsync();
                 break;
         }
     }
@@ -383,6 +395,105 @@ public class MaaProcessor
     {
         CloseEmulator();
         Process.Start("shutdown", "/r /t 0");
+    }
+    private static async Task DingTalkMessageAsync()
+    {
+
+        // 从文件中读取配置信息
+        string configFilePath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "config"), "auth.txt");
+        var config = ReadConfigFile(configFilePath);
+        // 配置文件样例：
+        // accessToken=65ff4c133
+        // secret=SEC9eca40f06x
+
+        // 钉钉机器人配置信息
+        string accessToken = config["accessToken"];
+        string secret = config["secret"];
+
+        // 生成时间戳（Unix时间戳，单位为秒）
+        string timestamp = GetTimestamp();
+
+        string sign = CalculateSignature(timestamp, secret);
+
+        // 要发送的消息
+        var message = new
+        {
+            msgtype = "text",
+            text = new
+            {
+                content = "任务已全部完成"
+            }
+        };
+
+        // 发送消息
+        try
+        {
+            string apiUrl = $"https://oapi.dingtalk.com/robot/send?access_token={accessToken}&timestamp={timestamp}&sign={sign}";
+            using (HttpClient client = new HttpClient())
+            {
+                var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PostAsync(apiUrl, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("消息发送成功");
+                }
+                else
+                {
+                    Console.WriteLine($"消息发送失败：{response.StatusCode} {await response.Content.ReadAsStringAsync()}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"发送消息出错：{ex.Message}");
+        }
+
+    }
+    
+    static string GetTimestamp()
+    {
+        return ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds().ToString();
+    }
+    private static string CalculateSignature(string timestamp, string secret)
+    {
+        string stringToSign = $"{timestamp}\n{secret}";
+
+        byte[] secretBytes = Encoding.UTF8.GetBytes(secret);
+        byte[] stringToSignBytes = Encoding.UTF8.GetBytes(stringToSign);
+
+        byte[] hmacCode = ComputeHmacSha256(secretBytes, stringToSignBytes);
+        string base64Encoded = Convert.ToBase64String(hmacCode);
+        //string sign = HttpUtility.UrlEncode(Convert.ToBase64String(hmacCode));
+        string sign = WebUtility.UrlEncode(base64Encoded).Replace("+", "%20").Replace("/", "%2F").Replace("=", "%3D");
+        return sign;
+        Console.WriteLine(timestamp);
+        Console.WriteLine(sign);
+        
+    }
+    static byte[] ComputeHmacSha256(byte[] key, byte[] data)
+    {
+        using (var hmacsha256 = new HMACSHA256(key))
+        {
+            return hmacsha256.ComputeHash(data);
+        }
+    }
+
+    static Dictionary<string, string> ReadConfigFile(string filePath)
+    {
+        var config = new Dictionary<string, string>();
+        string[] lines = File.ReadAllLines(filePath);
+
+        foreach (var line in lines)
+        {
+            var parts = line.Split('=');
+            if (parts.Length == 2)
+            {
+                config[parts[0].Trim()] = parts[1].Trim();
+            }
+        }
+
+        return config;
     }
 
     private TaskAndParam CreateTaskAndParam(DragItemViewModel task)

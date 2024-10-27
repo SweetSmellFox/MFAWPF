@@ -265,7 +265,7 @@
     <ItemGroup>
       <EmbeddedResource Update="Res\Localization\Strings.resx">
         <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>Resources.zh-CN.Designer.cs</LastGenOutput>
+        <LastGenOutput>Strings.Designer.cs</LastGenOutput>
       </EmbeddedResource>
       <EmbeddedResource Remove="obj\**" />
     </ItemGroup>

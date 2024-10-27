@@ -610,12 +610,15 @@ public partial class MainWindow
             Style = FindResource("ComboBoxExtend") as Style,
             Margin = new Thickness(5)
         };
-        string folderPath = Path.Combine(Environment.CurrentDirectory, "config");
-        foreach (string file in Directory.GetFiles(folderPath))
+        string configPath = Path.Combine(Environment.CurrentDirectory, "config");
+        foreach (string file in Directory.GetFiles(configPath))
         {
-            // files.Add(Path.GetFileName(file));
-            string fileName = Path.GetFileName(file);
-            comboBox.Items.Add(fileName);
+            // string fileName = Path.GetFileName(file);
+            // comboBox.Items.Add(fileName);
+            if (fileName.EndsWith(".json") && fileName != "maa_option.json")
+            {
+                comboBox.Items.Add(fileName);
+            }
         }
 
 
@@ -624,22 +627,28 @@ public partial class MainWindow
 
         comboBox.SelectionChanged += (sender, _) =>
         {
-            // var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-            // DataSet.SetData("SwitchConfigurationIndex", index);
             string selectedItem = (string)comboBox.SelectedItem;
             if (selectedItem == "config.json")
             {
                 //
             }
-            else if (selectedItem == "maa_option.json")
+            // else if (selectedItem == "maa_option.json")
+            // {
+            //     // 什么都不做，等待后续添加逻辑
+            // }
+            else if (selectedItem == "config.json.bak")
             {
-                // 什么都不做，等待后续添加逻辑
+                string _currentFile = Path.Combine(configPath, "config.json");
+                string _selectedItem = Path.Combine(configPath, "config.json.bak");
+                string _bakContent = File.ReadAllText(_selectedItem);
+                File.WriteAllText(_currentFile, _bakContent);
+                RestartMFA();
             }
             else
             {
                 // 恢复成绝对路径
-                string _currentFile = Path.Combine(folderPath, "config.json");
-                string _selectedItem = Path.Combine(folderPath, selectedItem);
+                string _currentFile = Path.Combine(configPath, "config.json");
+                string _selectedItem = Path.Combine(configPath, selectedItem);
                 SwapFiles(_currentFile, _selectedItem);
                 RestartMFA();
             }
@@ -1073,6 +1082,8 @@ public partial class MainWindow
         c6.BindLocalization("CloseEmulatorAndRestartMFA", ContentProperty);
         var c7 = new ComboBoxItem();
         c7.BindLocalization("Restart", ContentProperty);
+        var c8 = new ComboBoxItem();
+        c8.BindLocalization("DingTalkMessageAsync", ContentProperty);
         comboBox.Items.Add(c1);
         comboBox.Items.Add(c2);
         comboBox.Items.Add(c3);
@@ -1080,6 +1091,7 @@ public partial class MainWindow
         comboBox.Items.Add(c5);
         comboBox.Items.Add(c6);
         comboBox.Items.Add(c7);
+        comboBox.Items.Add(c8);
         comboBox.BindLocalization("AfterTaskOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 

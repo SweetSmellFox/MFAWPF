@@ -612,4 +612,7 @@
   <data name="RestartMFA" xml:space="preserve">
     <value>重启MFA</value>
   </data>
+  <data name="DingTalkMessageAsync" xml:space="preserve">
+    <value>钉钉群发送消息通知</value>
+  </data>
 </root>
