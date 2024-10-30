@@ -123,6 +123,7 @@ App_Data/*.ldf
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
+.vs
 
 # Folder config file
 Desktop.ini
@@ -134,3 +135,7 @@ $RECYCLE.BIN/
 .DS_Store
 
 _NCrunch*
+
+
+# 钉钉的token和secret
+auth.txt

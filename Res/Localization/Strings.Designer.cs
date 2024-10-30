@@ -439,6 +439,15 @@ namespace MFAWPF.Res.Localization {
         }
         
         /// <summary>
+        ///   查找类似 钉钉群发送消息通知 的本地化字符串。
+        /// </summary>
+        internal static string DingTalkMessageAsync {
+            get {
+                return ResourceManager.GetString("DingTalkMessageAsync", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Pipeline文件中存在重复的任务名称:&quot;{0}&quot;！ 的本地化字符串。
         /// </summary>
         internal static string DuplicateTaskError {
