@@ -396,9 +396,9 @@ public class MaaProcessor
         CloseEmulator();
         Process.Start("shutdown", "/r /t 0");
     }
+
     private static async Task DingTalkMessageAsync()
     {
-
         // 从文件中读取配置信息
         string configFilePath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "config"), "auth.txt");
         var config = ReadConfigFile(configFilePath);
@@ -428,10 +428,12 @@ public class MaaProcessor
         // 发送消息
         try
         {
-            string apiUrl = $"https://oapi.dingtalk.com/robot/send?access_token={accessToken}&timestamp={timestamp}&sign={sign}";
+            string apiUrl =
+                $"https://oapi.dingtalk.com/robot/send?access_token={accessToken}&timestamp={timestamp}&sign={sign}";
             using (HttpClient client = new HttpClient())
             {
-                var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8, "application/json");
+                var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8,
+                    "application/json");
                 HttpResponseMessage response = await client.PostAsync(apiUrl, content);
 
                 if (response.IsSuccessStatusCode)
@@ -448,13 +450,13 @@ public class MaaProcessor
         {
             Console.WriteLine($"发送消息出错：{ex.Message}");
         }
-
     }
-    
+
     static string GetTimestamp()
     {
         return ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds().ToString();
     }
+
     private static string CalculateSignature(string timestamp, string secret)
     {
         string stringToSign = $"{timestamp}\n{secret}";
@@ -469,8 +471,8 @@ public class MaaProcessor
         return sign;
         Console.WriteLine(timestamp);
         Console.WriteLine(sign);
-        
     }
+
     static byte[] ComputeHmacSha256(byte[] key, byte[] data)
     {
         using (var hmacsha256 = new HMACSHA256(key))
@@ -767,7 +769,8 @@ public class MaaProcessor
                 DisposeOptions = DisposeOptions.All,
             };
             RegisterCustomRecognitionsAndActions(tasker);
-
+            if (!DataSet.GetData("EnableGPU", true))
+                tasker.Resource.SetOptionInferenceDevice(InferenceDevice.CPU);
             return tasker;
         }
         catch (Exception e)

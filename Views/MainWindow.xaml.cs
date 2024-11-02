@@ -551,11 +551,11 @@ public partial class MainWindow
             AddAfterTaskOption(s2);
 
             AddStartSettingOption(s2);
-            AddSwitchConfiguration(s2);
+            // AddSwitchConfiguration(s2);
             //AddStartExtrasOption(s2);
             AddStartEmulatorOption(s2);
             AddRememberAdbOption(s2);
-            
+
             // AddIntroduction(s2,
             //     "[size:24][b][color:blue]这是一个蓝色的大标题[/color][/b][/size]\n[color:green][i]这是绿色的斜体文本。[/i][/color]\n[u]这是带有下划线的文本。[/u]\n[s]这是带有删除线的文本。[/s]\n[b][color:red]这是红色的粗体文本。[/color][/b]\n[size:18]这是一个较小的字号文本，字号为18。[/size]\n");
         }
@@ -572,7 +572,7 @@ public partial class MainWindow
 
         AddThemeOption(s1);
         AddLanguageOption(s1);
-
+        AddGpuOption(s2);
         ScrollViewer sv1 = new()
             {
                 Content = s1, VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
@@ -602,6 +602,7 @@ public partial class MainWindow
 
         settingPanel.Children.Add(tabControl);
     }
+
     private void AddSwitchConfiguration(Panel? panel = null, int defaultValue = 0)
     {
         panel ??= settingPanel;
@@ -611,7 +612,7 @@ public partial class MainWindow
             Margin = new Thickness(5)
         };
         string configPath = Path.Combine(Environment.CurrentDirectory, "config");
-        foreach (string file in Directory.GetFiles(configPath))
+        foreach (string fileName in Directory.GetFiles(configPath))
         {
             // string fileName = Path.GetFileName(file);
             // comboBox.Items.Add(fileName);
@@ -656,6 +657,7 @@ public partial class MainWindow
         // comboBox.SelectedIndex = DataSet.GetData("SwitchConfigurationIndex", defaultValue);
         panel.Children.Add(comboBox);
     }
+
     private void SwapFiles(string file1Path, string file2Path)
     {
         // 备份文件
@@ -669,6 +671,7 @@ public partial class MainWindow
         // 只更换 config.json 的内容
         File.WriteAllText(file1Path, file2Content);
     }
+
     private void RestartMFA()
     {
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
@@ -1102,6 +1105,18 @@ public partial class MainWindow
         };
         comboBox.SelectedIndex = DataSet.GetData("AfterTaskIndex", defaultValue);
         panel.Children.Add(comboBox);
+    }
+
+    private void AddGpuOption(Panel? panel = null)
+    {
+        panel ??= settingPanel;
+        var checkBox = new CheckBox
+        {
+            IsChecked = DataSet.GetData("EnableGPU", true), Margin = new Thickness(5)
+        };
+        checkBox.BindLocalization("EnableGPU", ContentProperty);
+        checkBox.Click += (_, _) => { DataSet.SetData("EnableGPU", checkBox.IsChecked); };
+        panel.Children.Add(checkBox);
     }
 
     private void AddRememberAdbOption(Panel? panel = null)

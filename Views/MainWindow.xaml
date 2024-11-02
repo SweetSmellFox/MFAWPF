@@ -18,7 +18,7 @@
            Title="{lex:Loc AppTitle}" Height="550" Width="850" MinWidth="550" MinHeight="260"
            ShowTitle="False" Icon="../logo.ico" WindowStartupLocation="CenterScreen"
            NonClientAreaBackground="{DynamicResource MainContentBackgroundBrush}"
-           Background="{DynamicResource MainContentBackgroundBrush}" WindowStyle="SingleBorderWindow"
+           Background="{DynamicResource MainContentBackgroundBrush}" WindowStyle="None"
            WindowState="Normal">
     <hc:Window.DataContext>
         <viewModels:MainViewModel />
