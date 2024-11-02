@@ -615,4 +615,7 @@
   <data name="DingTalkMessageAsync" xml:space="preserve">
     <value>钉钉群发送消息通知</value>
   </data>
+  <data name="EnableGPU" xml:space="preserve">
+    <value>启用GPU加速</value>
+  </data>
 </root>

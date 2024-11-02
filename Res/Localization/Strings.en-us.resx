@@ -500,4 +500,7 @@
     <data name="RememberAdb" xml:space="preserve">
         <value>Remember Connection</value>
     </data>
+    <data name="EnableGPU" xml:space="preserve">
+        <value>Enable GPU acceleration</value>
+    </data>
 </root>
