@@ -612,9 +612,9 @@ public partial class MainWindow
             Margin = new Thickness(5)
         };
         string configPath = Path.Combine(Environment.CurrentDirectory, "config");
-        foreach (string fileName in Directory.GetFiles(configPath))
+        foreach (string file in Directory.GetFiles(configPath))
         {
-             string fileName = Path.GetFileName(file);
+            string fileName = Path.GetFileName(file);
             if (fileName.EndsWith(".json") && fileName != "maa_option.json")
             {
                 comboBox.Items.Add(fileName);
