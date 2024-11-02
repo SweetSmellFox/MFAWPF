@@ -614,8 +614,7 @@ public partial class MainWindow
         string configPath = Path.Combine(Environment.CurrentDirectory, "config");
         foreach (string fileName in Directory.GetFiles(configPath))
         {
-            // string fileName = Path.GetFileName(file);
-            // comboBox.Items.Add(fileName);
+             string fileName = Path.GetFileName(file);
             if (fileName.EndsWith(".json") && fileName != "maa_option.json")
             {
                 comboBox.Items.Add(fileName);
