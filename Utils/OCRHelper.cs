@@ -79,8 +79,7 @@ public class OCRHelper
             Name = "AppendOCR",
         };
         var detail =
-            context.RunRecognition(taskItemViewModel.Name, taskItemViewModel.ToString(), image) as
-                RecognitionDetail<MaaImageBuffer>;
+            context.RunRecognition(taskItemViewModel.Name, taskItemViewModel.ToString(), image) ;
 
         if (detail != null)
         {

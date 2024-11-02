@@ -81,7 +81,7 @@ public static class MFAExtensions
     }
     
     public static bool IsHit(
-        this RecognitionDetail<MaaImageBuffer>? detail)
+        this RecognitionDetail? detail)
     {
         if (detail is null || detail.HitBox.IsDefaultHitBox())
             return false;

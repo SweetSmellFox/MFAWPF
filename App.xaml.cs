@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Windows;
 using System.Windows.Threading;
+using Lierda.WPFHelper;
 using MFAWPF.Utils;
 using MFAWPF.Views;
 using Microsoft.Win32;
@@ -16,6 +17,7 @@ public partial class App
     {
         Startup += App_Startup;
         Exit += App_Exit;
+      
     }
 
     void App_Startup(object sender, StartupEventArgs e)
@@ -29,6 +31,8 @@ public partial class App
         AppDomain.CurrentDomain.UnhandledException +=
             CurrentDomain_UnhandledException;
         SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
+        LierdaCracker cracker = new LierdaCracker();
+        cracker.Cracker();
     }
 
     private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
