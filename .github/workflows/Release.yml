@@ -1,22 +1,22 @@
 name: Release
 
-on:  
-  push:  
-    tags:  
-      - 'v*' # 匹配以'v'开头的tag
+on:
+  push:
+    tags:
+      - "v*" # 匹配以'v'开头的tag
 
 permissions:
-  contents: write  # 给工作流写入仓库内容的权限
-  
-jobs:  
-  build:  
-    runs-on: ubuntu-latest  
+  contents: write # 给工作流写入仓库内容的权限
 
-    steps:  
-      - name: Checkout code  
-        uses: actions/checkout@v3  
-        with:  
-          fetch-depth: 0 # 获取完整历史记录以访问所有tags  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # 获取完整历史记录以访问所有tags
 
       - name: .NET Core
         uses: actions/setup-dotnet@v1
@@ -26,18 +26,18 @@ jobs:
       - name: Install dependencies
         run: dotnet restore
 
-      - name: Build 
-        run: dotnet build --configuration Release 
+      - name: Publish Project as Framework-dependent
+        run: dotnet publish -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true
 
-      - name: Zip   
-        run: |  
-          cd /home/runner/work/MFAWPF/bin/AnyCPU/Release/
-          zip -r ../MFAWPF-${{ github.ref_name }}.zip *  
-   
+      - name: Zip
+        run: |
+          cd /home/runner/work/MFAWPF/MFAWPF/bin/Release/net8.0/win-x64/publish/
+          zip -r ../../MFAWPF-${{ github.ref_name }}.zip *
+
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           tag_name: ${{ github.ref_name }}
           files: |
-            /home/runner/work/MFAWPF/bin/AnyCPU/*.zip
+            //home/runner/work/MFAWPF/MFAWPF/bin/Release/net8.0/win-x64/publish/*.zip
