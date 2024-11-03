@@ -27,7 +27,7 @@ jobs:
         run: dotnet restore
 
       - name: Publish Project as Framework-dependent
-        run: dotnet publish ./MFAWPF/MFAWPF.csproj -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true -o ./output
+        run: dotnet publish ./MFAWPF.csproj -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true -o ./output
 
       - name: Zip
         run: |
