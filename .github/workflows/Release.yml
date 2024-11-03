@@ -27,12 +27,12 @@ jobs:
         run: dotnet restore
 
       - name: Publish Project as Framework-dependent
-        run: dotnet publish -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true
+        run: dotnet publish -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true -o ./output
 
       - name: Zip
         run: |
-          cd /home/runner/work/MFAWPF/MFAWPF/bin/Release/net8.0/win-x64/publish/
-          zip -r ../../MFAWPF-${{ github.ref_name }}.zip *
+          cd ./output
+          zip -r ../MFAWPF-${{ github.ref_name }}.zip *
 
       - name: Release
         uses: softprops/action-gh-release@v1
