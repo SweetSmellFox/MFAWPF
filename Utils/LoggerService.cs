@@ -1,4 +1,5 @@
 ﻿using NLog;
+using System.IO;
 
 namespace MFAWPF.Utils;
 
@@ -9,10 +10,16 @@ public static class LoggerService
 
     static LoggerService()
     {
-        // 确保存档目录存在
         if (!Directory.Exists(ArchivePath))
         {
             Directory.CreateDirectory(ArchivePath);
+        }
+
+        // 确保NLog配置生效
+        var config = new NLog.Config.XmlLoaderAccessor().Load("nlog.config");
+        if (config != null)
+        {
+            LogManager.Configuration = config;
         }
     }
 
