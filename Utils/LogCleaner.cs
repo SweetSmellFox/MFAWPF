@@ -32,24 +32,26 @@ public static class LogCleaner
             {
                 try
                 {
+                    if (Path.GetFileName(logFile).StartsWith("old_"))
+                    {
+                        continue;
+                    }
+
                     var fileInfo = new FileInfo(logFile);
                     if (fileInfo.Length > MaxSizeInBytes)
                     {
-                        // 尝试移动而不是直接删除
                         string backupName = Path.Combine(
-                            debugPath, 
+                            debugPath,
                             $"old_{DateTime.Now:yyyyMMdd_HHmmss}_{Path.GetFileName(logFile)}");
-                            
+
                         File.Move(logFile, backupName);
                         LoggerService.LogInfo($"已备份大型日志文件: {logFile} -> {backupName}");
-                        
-                        // 创建新的日志文件
+
                         File.Create(logFile).Dispose();
                     }
                 }
                 catch (IOException)
                 {
-                    // 文件正在使用，跳过
                     continue;
                 }
                 catch (Exception ex)
@@ -58,12 +60,10 @@ public static class LogCleaner
                 }
             }
 
-            // 清理旧的备份文件
             var oldFiles = Directory.GetFiles(debugPath, "old_*.log")
-                                  .OrderByDescending(f => File.GetCreationTime(f))
-                                  .Skip(5); // 保留最近5个备份
-
-            foreach (var oldFile in oldFiles)
+                                  .OrderByDescending(f => File.GetCreationTime(f));
+            
+            foreach (var oldFile in oldFiles.Skip(3))
             {
                 try
                 {
