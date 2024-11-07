@@ -1,5 +1,6 @@
 ﻿using NLog;
 using System.IO;
+using NLog.Config;
 
 namespace MFAWPF.Utils;
 
@@ -15,11 +16,11 @@ public static class LoggerService
             Directory.CreateDirectory(ArchivePath);
         }
 
-        // 确保NLog配置生效
-        var config = new NLog.Config.XmlLoaderAccessor().Load("nlog.config");
-        if (config != null)
+        // 使用 XmlLoggingConfiguration 替代 XmlLoaderAccessor
+        var configPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "nlog.config");
+        if (File.Exists(configPath))
         {
-            LogManager.Configuration = config;
+            LogManager.Configuration = new XmlLoggingConfiguration(configPath);
         }
     }
 
