@@ -1,5 +1,5 @@
 using System.IO;
-using System.Timers;
+using Timer = System.Timers.Timer; // 明确指定使用 System.Timers.Timer
 
 namespace MFAWPF.Utils;
 
