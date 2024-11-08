@@ -1,5 +1,5 @@
 using System.IO;
-using Timer = System.Timers.Timer; // 明确指定使用 System.Timers.Timer
+using Timer = System.Timers.Timer;
 
 namespace MFAWPF.Utils;
 
@@ -22,37 +22,34 @@ public static class LogCleaner
         try
         {
             string debugPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug");
-            if (!Directory.Exists(debugPath))
+            string archivePath = Path.Combine(debugPath, "archive");
+            
+            if (!Directory.Exists(debugPath) || !Directory.Exists(archivePath))
             {
                 return;
             }
 
-            var logFiles = Directory.GetFiles(debugPath, "*.log");
+            // 处理当前目录中的大文件
+            var logFiles = Directory.GetFiles(debugPath, "*.log")
+                                  .Where(f => !Path.GetFileName(f).StartsWith("old_"));
+                              
             foreach (var logFile in logFiles)
             {
                 try
                 {
-                    if (Path.GetFileName(logFile).StartsWith("old_"))
-                    {
-                        continue;
-                    }
-
                     var fileInfo = new FileInfo(logFile);
                     if (fileInfo.Length > MaxSizeInBytes)
                     {
-                        string backupName = Path.Combine(
-                            debugPath,
-                            $"old_{DateTime.Now:yyyyMMdd_HHmmss}_{Path.GetFileName(logFile)}");
+                        string archiveName = Path.Combine(
+                            archivePath,
+                            $"log.{DateTime.Now:yyyy-MM-dd}.txt");
 
-                        File.Move(logFile, backupName);
-                        LoggerService.LogInfo($"已备份大型日志文件: {logFile} -> {backupName}");
-
-                        File.Create(logFile).Dispose();
+                        // 复制到归档目录
+                        File.Copy(logFile, archiveName, true);
+                        // 清空原文件
+                        File.WriteAllText(logFile, string.Empty);
+                        LoggerService.LogInfo($"已归档大型日志文件: {logFile} -> {archiveName}");
                     }
-                }
-                catch (IOException)
-                {
-                    continue;
                 }
                 catch (Exception ex)
                 {
@@ -60,19 +57,21 @@ public static class LogCleaner
                 }
             }
 
-            var oldFiles = Directory.GetFiles(debugPath, "old_*.log")
-                                  .OrderByDescending(f => File.GetCreationTime(f));
-            
-            foreach (var oldFile in oldFiles.Skip(3))
+            // 清理旧的归档文件
+            var archiveFiles = Directory.GetFiles(archivePath, "log.*.txt")
+                                      .OrderByDescending(f => File.GetCreationTime(f))
+                                      .Skip(2); // 保持与 nlog.config 中的 maxArchiveFiles 一致
+
+            foreach (var oldFile in archiveFiles)
             {
                 try
                 {
                     File.Delete(oldFile);
-                    LoggerService.LogInfo($"已删除旧的备份日志文件: {oldFile}");
+                    LoggerService.LogInfo($"已删除旧的归档文件: {oldFile}");
                 }
                 catch (Exception ex)
                 {
-                    LoggerService.LogError($"删除旧备份文件失败: {oldFile}, 错误: {ex.Message}");
+                    LoggerService.LogError($"删除归档文件失败: {oldFile}, 错误: {ex.Message}");
                 }
             }
         }
