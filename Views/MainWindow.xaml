@@ -218,6 +218,24 @@
 
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="2 2 0 0"
                                         HorizontalAlignment="Right">
+                                <Button ToolTip="保存预设" Width="15" Height="15"
+                                        Style="{StaticResource textBoxButton}"
+                                        Foreground="{DynamicResource GrayColor4}"
+                                        Click="SavePreset"
+                                        IsEnabled="{Binding Idle}"
+                                        Padding="0" Margin="7 0 0 0" 
+                                        hc:IconElement.Width="12"
+                                        hc:IconElement.Height="12"
+                                        hc:IconElement.Geometry="{StaticResource SaveAsGeometry}" />
+                                <Button ToolTip="加载预设" Width="15" Height="15"
+                                        Style="{StaticResource textBoxButton}"
+                                        Foreground="{DynamicResource GrayColor4}"
+                                        Click="LoadPreset"
+                                        IsEnabled="{Binding Idle}"
+                                        Padding="0" Margin="7 0 0 0"
+                                        hc:IconElement.Width="12"
+                                        hc:IconElement.Height="12"
+                                        hc:IconElement.Geometry="{StaticResource FolderGeometry}" />
                                 <Button ToolTip="{lex:Loc SelectAll}" Width="15" Height="15" Margin="7 0 0 0"
                                         Style="{StaticResource textBoxButton}"
                                         Foreground="{DynamicResource GrayColor4}"

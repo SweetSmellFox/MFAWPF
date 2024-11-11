@@ -817,4 +817,17 @@ public class TaskModel : ObservableObject
 
         return attributes;
     }
+
+    public TaskModel Clone()
+    {
+        var settings = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        };
+        
+        string json = JsonConvert.SerializeObject(this, settings);
+        return JsonConvert.DeserializeObject<TaskModel>(json) ?? new TaskModel();
+    }
 }

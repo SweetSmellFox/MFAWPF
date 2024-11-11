@@ -30,6 +30,8 @@ using ScrollViewer = HandyControl.Controls.ScrollViewer;
 using TabControl = System.Windows.Controls.TabControl;
 using TabItem = System.Windows.Controls.TabItem;
 using TextBox = HandyControl.Controls.TextBox;
+using System.Collections.ObjectModel;
+using MFAWPF.Controls;
 
 namespace MFAWPF.Views;
 
@@ -44,6 +46,8 @@ public partial class MainWindow
         $"v{Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "DEBUG"}";
 
     public Dictionary<string, TaskModel> TaskDictionary = new();
+
+    private readonly MFAWPF.Utils.PresetManager _presetManager = new();
 
     public MainWindow()
     {
@@ -551,13 +555,13 @@ public partial class MainWindow
             AddAfterTaskOption(s2);
 
             AddStartSettingOption(s2);
-            // AddSwitchConfiguration(s2);
+            //AddSwitchConfiguration(s2);
             //AddStartExtrasOption(s2);
             AddStartEmulatorOption(s2);
             AddRememberAdbOption(s2);
 
-            // AddIntroduction(s2,
-            //     "[size:24][b][color:blue]这是一个蓝色的大标题[/color][/b][/size]\n[color:green][i]这是绿色的斜体文本。[/i][/color]\n[u]这是带有下划线的文本。[/u]\n[s]这是带有删除线的文本。[/s]\n[b][color:red]这是红色的粗体文本。[/color][/b]\n[size:18]这是一个较小的字号文本，字号为18。[/size]\n");
+            //AddIntroduction(s2,
+            //"[size:24][b][color:blue]这是一个蓝色的大标题[/color][/b][/size]\n[color:green][i]这是绿色的斜体文本。[/i][/color]\n[u]这是带有下划线的文本。[/u]\n[s]这是带有删除线的文本。[/s]\n[b][color:red]这是红色的粗体文本。[/color][/b]\n[size:18]这是一个较小的字号文本，字号为18。[/size]\n");
         }
         else
         {
@@ -611,7 +615,7 @@ public partial class MainWindow
             Style = FindResource("ComboBoxExtend") as Style,
             Margin = new Thickness(5)
         };
-        string configPath = Path.Combine(Environment.CurrentDirectory, "config");
+        string configPath = Path.Combine(Environment.CurrentDirectory, "presets");
         foreach (string file in Directory.GetFiles(configPath))
         {
             string fileName = Path.GetFileName(file);
@@ -949,7 +953,7 @@ public partial class MainWindow
         FlowDocument flowDocument = new FlowDocument();
         Paragraph paragraph = new Paragraph();
 
-        string pattern = @"\[(?<tag>[^\]]+):?(?<value>[^\]]*)\](?<content>.*?)\[/\k<tag>\]";
+        string pattern = @"\[(?<tag>[^\]]+):(?<value>[^\]]*)\](?<content>.*?)\[/\k<tag>\]";
         Regex regex = new Regex(pattern);
         int lastIndex = 0;
 
@@ -1618,5 +1622,74 @@ public partial class MainWindow
     private void ToggleWindowTopMost(object sender, RoutedPropertyChangedEventArgs<bool> e)
     {
         Topmost = e.NewValue;
+    }
+
+    private async void SavePreset(object sender, RoutedEventArgs e)
+    {
+        try 
+        {
+            LoggerService.LogInfo("开始保存预设流程");
+            
+            var inputDialog = new InputDialog
+            {
+                Title = "保存预设",
+                Message = "请输入预设名称:"
+            };
+
+            LoggerService.LogInfo("显示输入对话框");
+            if (inputDialog.ShowDialog() == true)
+            {
+                string presetName = inputDialog.InputText;
+                LoggerService.LogInfo($"用户输入的预设名称: {presetName}");
+                
+                if (string.IsNullOrWhiteSpace(presetName))
+                {
+                    LoggerService.LogInfo("预设名称为空，终止保存");
+                    Growl.Warning("预设名称不能为空");
+                    return;
+                }
+
+                LoggerService.LogInfo($"开始调用 PresetManager.SavePreset: {presetName}");
+                await _presetManager.SavePreset(presetName);
+                LoggerService.LogInfo("预设保存完成");
+            }
+            else
+            {
+                LoggerService.LogInfo("用户取消了保存预设操作");
+            }
+        }
+        catch (Exception ex)
+        {
+            LoggerService.LogError($"保存预设时发生异常: {ex}");
+            Growl.Error($"保存预设失败: {ex.Message}");
+        }
+    }
+
+    private async void LoadPreset(object sender, RoutedEventArgs e)
+    {
+        var presets = _presetManager.GetPresetNames();
+        if (!presets.Any())
+        {
+            Growl.Warning("没有可用的预设");
+            return;
+        }
+
+        var dialog = new PresetSelectDialog(presets);
+        if (dialog.ShowDialog() == true && dialog.SelectedPreset != null)
+        {
+            string selectedPreset = dialog.SelectedPreset;
+            var maaInterface = await _presetManager.LoadPreset(selectedPreset);
+            if (maaInterface != null)
+            {
+                MaaInterface.Instance = maaInterface;
+                
+                // 重新加载配置
+                DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
+
+                // 重新初始化界面
+                RestartMFA();
+ 
+            }
+        }
     }
 }

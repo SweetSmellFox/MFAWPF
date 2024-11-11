@@ -618,4 +618,19 @@
   <data name="EnableGPU" xml:space="preserve">
     <value>启用GPU加速</value>
   </data>
+  <data name="SavePreset" xml:space="preserve">
+    <value>保存预设</value>
+  </data>
+  <data name="LoadPreset" xml:space="preserve">
+    <value>加载预设</value>
+  </data>
+  <data name="NoTaskToSave" xml:space="preserve">
+    <value>没有可保存的任务</value>
+  </data>
+  <data name="PresetNameEmpty" xml:space="preserve">
+    <value>预设名称不能为空</value>
+  </data>
+  <data name="NoPresetAvailable" xml:space="preserve">
+    <value>没有可用的预设</value>
+  </data>
 </root>

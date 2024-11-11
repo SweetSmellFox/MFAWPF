@@ -17,6 +17,8 @@ public class TaskInterfaceItem
 
     [JsonProperty("pipeline_override")] public Dictionary<string, TaskModel>? PipelineOverride;
 
+    [JsonProperty("task")] public TaskModel? Task { get; set; }
+
     public override string ToString()
     {
         var settings = new JsonSerializerSettings
