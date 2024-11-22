@@ -29,5 +29,5 @@ public class AdbDeviceCoreConfig
     public string AdbSerial { get; set; } = "";
     public string Config { get; set; } = "{}";
     public AdbInputMethods Input { get; set; } = AdbInputMethods.Maatouch;
-    public AdbScreencapMethods ScreenCap { get; set; } = AdbScreencapMethods.RawWithGzip;
+    public AdbScreencapMethods ScreenCap { get; set; } = AdbScreencapMethods.Default;
 }

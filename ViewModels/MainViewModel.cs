@@ -6,6 +6,8 @@ using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools.Command;
 using MFAWPF.Utils;
+using System.Text.RegularExpressions;
+using System.Windows.Threading;
 
 
 namespace MFAWPF.ViewModels;
@@ -14,7 +16,9 @@ public class MainViewModel : ObservableObject
 {
     public ObservableCollection<LogItemViewModel> LogItemViewModels { get; } = new();
 
-    public void AddLog(string content, Brush? color = null, string weight = "Regular",
+    public void AddLog(string content,
+        Brush? color = null,
+        string weight = "Regular",
         bool showTime = true)
     {
         color ??= Brushes.Gray;
@@ -24,6 +28,7 @@ public class MainViewModel : ObservableObject
             {
                 LogItemViewModels.Add(new LogItemViewModel(content, color, weight, "HH':'mm':'ss",
                     showTime: showTime));
+                LoggerService.LogInfo(content);
             });
         });
     }
@@ -37,6 +42,27 @@ public class MainViewModel : ObservableObject
             {
                 LogItemViewModels.Add(new LogItemViewModel(key, color, "Regular", true, "HH':'mm':'ss",
                     true, formatArgsKeys));
+
+                string Content = string.Empty;
+                if (formatArgsKeys == null || formatArgsKeys.Length == 0)
+                    Content = key.GetLocalizationString();
+                else
+                {
+                    // 获取每个格式化参数的本地化字符串
+                    var formatArgs = formatArgsKeys.Select(key => key.GetLocalizedFormattedString()).ToArray();
+
+                    // 使用本地化字符串更新内容
+                    try
+                    {
+                        Content = Regex.Unescape(
+                            key.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray()));
+                    }
+                    catch
+                    {
+                        Content = key.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray());
+                    }
+                }
+                LoggerService.LogInfo(Content);
             });
         });
     }
