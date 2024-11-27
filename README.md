@@ -120,6 +120,7 @@
 - 目前一些地方并没有特别完善,欢迎各位大佬贡献代码
 - 注意，由于 `MaaFramework` 于 2.0 移除了Exec Agent，所以目前无法通过注册interface注册Custom Action和Custom Recognition
 - 在exe同级目录中放置 `logo.ico` 后可以替换窗口的图标
+- MFAWPF新增interface多语言支持,在interface.json同目录下新建zh-cn.json和en-us.json后，doc和任务的name和选项的name可以使用key来指代。MFAWPF会自动根据语言来读取文件的key对应的value。如果没有则默认为key
 
 **注：在MFA中，于Pipeline中任务新增了俩个属性字段，分别为 `focus_tip` 和 `focus_tip_color`。**
 

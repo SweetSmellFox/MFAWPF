@@ -71,8 +71,10 @@ public static class LanguageManager
         return _localizedStrings;
     }
     
-    public static string GetLocalizedString(string key)
+    public static string GetLocalizedString(string? key)
     {
+        if (key == null)
+            return string.Empty;
         return GetLocalizedStrings().GetValueOrDefault(key, key);
     }
 }

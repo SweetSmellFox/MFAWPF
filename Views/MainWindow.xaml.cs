@@ -1341,9 +1341,12 @@ public partial class MainWindow
         {
             if (MaaInterface.Instance.Option.TryGetValue(option.Name, out var interfaceOption))
             {
-                foreach (var VARIABLE in interfaceOption.Cases)
+                if (interfaceOption.Cases != null)
                 {
-                    VARIABLE.Name = LanguageManager.GetLocalizedString(VARIABLE.Name);
+                    foreach (var VARIABLE in interfaceOption.Cases)
+                    {
+                        VARIABLE.Name = LanguageManager.GetLocalizedString(VARIABLE.Name);
+                    }
                 }
 
                 ComboBox comboBox = new ComboBox
