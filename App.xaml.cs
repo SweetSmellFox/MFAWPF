@@ -17,7 +17,6 @@ public partial class App
     {
         Startup += App_Startup;
         Exit += App_Exit;
-      
     }
 
     void App_Startup(object sender, StartupEventArgs e)

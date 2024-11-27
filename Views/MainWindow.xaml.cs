@@ -47,6 +47,7 @@ public partial class MainWindow
 
     public MainWindow()
     {
+        LanguageManager.Initialize();
         InitializeComponent();
         Instance = this;
         version.Text = Version;
@@ -89,7 +90,11 @@ public partial class MainWindow
                 {
                     new()
                     {
-                        Name = "默认", Path = new List<string> { "{PROJECT_DIR}/resource/base" }
+                        Name = "默认",
+                        Path = new List<string>
+                        {
+                            "{PROJECT_DIR}/resource/base"
+                        }
                     }
                 },
                 Recognition = new Dictionary<string, MaaInterface.CustomExecutor>(),
@@ -103,11 +108,13 @@ public partial class MainWindow
                             {
                                 new()
                                 {
-                                    Name = "测试1", PipelineOverride = new Dictionary<string, TaskModel>()
+                                    Name = "测试1",
+                                    PipelineOverride = new Dictionary<string, TaskModel>()
                                 },
                                 new()
                                 {
-                                    Name = "测试2", PipelineOverride = new Dictionary<string, TaskModel>()
+                                    Name = "测试2",
+                                    PipelineOverride = new Dictionary<string, TaskModel>()
                                 }
                             }
                         }
@@ -147,12 +154,15 @@ public partial class MainWindow
 
             if (FirstTask)
             {
-                if (MaaInterface.Instance?.Resources != null &&
-                    MaaInterface.Instance.Resources.Count > DataSet.GetData("ResourceIndex", 0))
+                if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > DataSet.GetData("ResourceIndex", 0))
                     MaaProcessor.CurrentResources =
                         MaaInterface.Instance.Resources[
                             MaaInterface.Instance.Resources.Keys.ToList()[DataSet.GetData("ResourceIndex", 0)]];
-                else MaaProcessor.CurrentResources = new List<string> { MaaProcessor.ResourceBase };
+                else
+                    MaaProcessor.CurrentResources = new List<string>
+                    {
+                        MaaProcessor.ResourceBase
+                    };
                 FirstTask = false;
             }
 
@@ -162,7 +172,8 @@ public partial class MainWindow
         if (Data?.TaskItemViewModels.Count == 0)
         {
             var items = DataSet.GetData("TaskItems",
-                new List<TaskInterfaceItem>()) ?? new List<TaskInterfaceItem>();
+                    new List<TaskInterfaceItem>())
+                ?? new List<TaskInterfaceItem>();
             var dragItemViewModels = items.Select(interfaceItem => new DragItemViewModel(interfaceItem)).ToList();
             Data.TaskItemViewModels.AddRange(dragItemViewModels);
             if (Data.TaskItemViewModels.Count == 0 && Data.TasksSource.Count != 0)
@@ -323,7 +334,8 @@ public partial class MainWindow
         ValidateNextTasks(taskDictionary, task.Value.Interrupt, "interrupt");
     }
 
-    private void ValidateNextTasks(Dictionary<string, TaskModel> taskDictionary, object? nextTasks,
+    private void ValidateNextTasks(Dictionary<string, TaskModel> taskDictionary,
+        object? nextTasks,
         string name = "next")
     {
         if (nextTasks is List<string> tasks)
@@ -408,7 +420,10 @@ public partial class MainWindow
         AdbEditorDialog dialog = new AdbEditorDialog(deviceInfo);
         if (dialog.ShowDialog().IsTrue())
         {
-            deviceComboBox.ItemsSource = new List<AdbDeviceInfo> { dialog.Output };
+            deviceComboBox.ItemsSource = new List<AdbDeviceInfo>
+            {
+                dialog.Output
+            };
             deviceComboBox.SelectedIndex = 0;
             MaaProcessor.Config.IsConnected = true;
         }
@@ -421,9 +436,7 @@ public partial class MainWindow
         try
         {
             using JsonDocument doc = JsonDocument.Parse(config);
-            if (doc.RootElement.TryGetProperty("extras", out JsonElement extras) &&
-                extras.TryGetProperty("mumu", out JsonElement mumu) &&
-                mumu.TryGetProperty("index", out JsonElement indexElement))
+            if (doc.RootElement.TryGetProperty("extras", out JsonElement extras) && extras.TryGetProperty("mumu", out JsonElement mumu) && mumu.TryGetProperty("index", out JsonElement indexElement))
             {
                 index = indexElement.GetInt32();
                 return true;
@@ -519,9 +532,11 @@ public partial class MainWindow
 
         var tabControl = new TabControl
         {
-            TabStripPlacement = Dock.Bottom, Height = 400,
+            TabStripPlacement = Dock.Bottom,
+            Height = 400,
             Background = Brushes.Transparent,
-            BorderThickness = new Thickness(0), VerticalAlignment = VerticalAlignment.Stretch,
+            BorderThickness = new Thickness(0),
+            VerticalAlignment = VerticalAlignment.Stretch,
             Style = (Style)FindResource("TabControlCapsule")
         };
         Binding heightBinding = new Binding("ActualHeight")
@@ -532,7 +547,14 @@ public partial class MainWindow
         };
         tabControl.SetBinding(HeightProperty, heightBinding);
 
-        StackPanel s1 = new() { Margin = new Thickness(2) }, s2 = new() { Margin = new Thickness(2) };
+        StackPanel s1 = new()
+            {
+                Margin = new Thickness(2)
+            },
+            s2 = new()
+            {
+                Margin = new Thickness(2)
+            };
         AddResourcesOption(s1);
 
         AddAutoStartOption(s2);
@@ -575,13 +597,15 @@ public partial class MainWindow
         AddGpuOption(s2);
         ScrollViewer sv1 = new()
             {
-                Content = s1, VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Content = s1,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             },
             sv2 = new()
             {
-                Content = s2, VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Content = s2,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
@@ -682,24 +706,29 @@ public partial class MainWindow
         settingPanel.Children.Clear();
         StackPanel s1 = new()
             {
-                Orientation = Orientation.Horizontal, Margin = new Thickness(3),
+                Orientation = Orientation.Horizontal,
+                Margin = new Thickness(3),
                 HorizontalAlignment = HorizontalAlignment.Center
             },
             s2 = new()
             {
-                Orientation = Orientation.Horizontal, Margin = new Thickness(3),
+                Orientation = Orientation.Horizontal,
+                Margin = new Thickness(3),
                 HorizontalAlignment = HorizontalAlignment.Center
             };
         var t1 = new TextBlock
         {
-            VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2),
+            VerticalAlignment = VerticalAlignment.Center,
+            Margin = new Thickness(2),
             HorizontalAlignment = HorizontalAlignment.Center
         };
         t1.BindLocalization("ProjectLink", TextBlock.TextProperty);
         s1.Children.Add(t1);
         s1.Children.Add(new Shield
         {
-            Status = "MFAWPF", Subject = "Github", Margin = new Thickness(2),
+            Status = "MFAWPF",
+            Subject = "Github",
+            Margin = new Thickness(2),
             HorizontalAlignment = HorizontalAlignment.Center,
             Command = ControlCommands.OpenLink,
             CommandParameter = "https://github.com/SweetSmellFox/MFAWPF"
@@ -707,12 +736,17 @@ public partial class MainWindow
         var resourceLink = MaaInterface.Instance?.Url;
         if (!string.IsNullOrWhiteSpace(resourceLink))
         {
-            var t2 = new TextBlock { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(2) };
+            var t2 = new TextBlock
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(2)
+            };
             t2.BindLocalization("ResourceLink", TextBlock.TextProperty);
             s2.Children.Add(t2);
             s2.Children.Add(new Shield
             {
-                Status = MaaInterface.Instance?.Name ?? "Resource", Subject = "Github",
+                Status = MaaInterface.Instance?.Name ?? "Resource",
+                Subject = "Github",
                 Margin = new Thickness(2),
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Command = ControlCommands.OpenLink,
@@ -729,8 +763,9 @@ public partial class MainWindow
         panel ??= settingPanel;
         var comboBox = new ComboBox
         {
-            SelectedIndex = DataSet.GetData("ResourceIndex", defaultValue), DisplayMemberPath = "Name",
+            SelectedIndex = DataSet.GetData("ResourceIndex", defaultValue),
             Style = FindResource("ComboBoxExtend") as Style,
+            DisplayMemberPath = "Name",
             Margin = new Thickness(5)
         };
 
@@ -745,7 +780,21 @@ public partial class MainWindow
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
         if (MaaInterface.Instance?.Resource != null)
-            comboBox.ItemsSource = MaaInterface.Instance.Resource;
+        {
+            var a = new List<MaaInterface.MaaCustomResource>();
+            foreach (var VARIABLE in MaaInterface.Instance.Resource)
+            {
+                var o = new MaaInterface.MaaCustomResource
+                {
+                    Name = LanguageManager.GetLocalizedString(VARIABLE.Name),
+                    Path = VARIABLE.Path
+                };
+                a.Add(o);
+
+            }
+            comboBox.ItemsSource = a;
+        }
+
         comboBox.SelectionChanged += (sender, _) =>
         {
             var index = (sender as ComboBox)?.SelectedIndex ?? 0;
@@ -824,7 +873,11 @@ public partial class MainWindow
             Margin = new Thickness(5)
         };
 
-        comboBox.ItemsSource = new List<string> { "简体中文", "English" };
+        comboBox.ItemsSource = new List<string>
+        {
+            "简体中文",
+            "English"
+        };
         var binding = new Binding("Idle")
         {
             Source = Data,
@@ -846,7 +899,10 @@ public partial class MainWindow
         panel.Children.Add(comboBox);
     }
 
-    private void AddSettingOption(Panel? panel, string titleKey, IEnumerable<string> options, string datatype,
+    private void AddSettingOption(Panel? panel,
+        string titleKey,
+        IEnumerable<string> options,
+        string datatype,
         int defaultValue = 0)
     {
         var comboBox = new ComboBox
@@ -874,7 +930,10 @@ public partial class MainWindow
         panel?.Children.Add(comboBox);
     }
 
-    private void AddBindSettingOption(Panel? panel, string titleKey, IEnumerable<string> options, string datatype,
+    private void AddBindSettingOption(Panel? panel,
+        string titleKey,
+        IEnumerable<string> options,
+        string datatype,
         int defaultValue = 0)
 
     {
@@ -937,7 +996,7 @@ public partial class MainWindow
     private void AddIntroduction(Panel? panel = null, string input = "")
     {
         panel ??= settingPanel;
-
+        input = LanguageManager.GetLocalizedString(input);
         RichTextBox richTextBox = new RichTextBox
         {
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
@@ -1111,7 +1170,8 @@ public partial class MainWindow
         panel ??= settingPanel;
         var checkBox = new CheckBox
         {
-            IsChecked = DataSet.GetData("EnableGPU", true), Margin = new Thickness(5)
+            IsChecked = DataSet.GetData("EnableGPU", true),
+            Margin = new Thickness(5)
         };
         checkBox.BindLocalization("EnableGPU", ContentProperty);
         checkBox.Click += (_, _) => { DataSet.SetData("EnableGPU", checkBox.IsChecked); };
@@ -1123,7 +1183,8 @@ public partial class MainWindow
         panel ??= settingPanel;
         var checkBox = new CheckBox
         {
-            IsChecked = DataSet.GetData("RememberAdb", true), Margin = new Thickness(5)
+            IsChecked = DataSet.GetData("RememberAdb", true),
+            Margin = new Thickness(5)
         };
         checkBox.BindLocalization("RememberAdb", ContentProperty);
         checkBox.Click += (_, _) => { DataSet.SetData("RememberAdb", checkBox.IsChecked); };
@@ -1141,14 +1202,18 @@ public partial class MainWindow
 
         var checkBox = new CheckBox
         {
-            IsChecked = DataSet.GetData("StartEmulator", false), Margin = new Thickness(5)
+            IsChecked = DataSet.GetData("StartEmulator", false),
+            Margin = new Thickness(5)
         };
         checkBox.BindLocalization("StartEmulator", ContentProperty);
         checkBox.Click += (_, _) => { DataSet.SetData("StartEmulator", checkBox.IsChecked); };
         // checkBox.SetBinding(IsEnabledProperty, binding);
 
 
-        var grid = new Grid { Margin = new Thickness(5) };
+        var grid = new Grid
+        {
+            Margin = new Thickness(5)
+        };
 
         var col1 = new ColumnDefinition
         {
@@ -1164,7 +1229,8 @@ public partial class MainWindow
 
         var t1 = new TextBox
         {
-            Text = DataSet.GetData("EmulatorPath", string.Empty), HorizontalAlignment = HorizontalAlignment.Stretch
+            Text = DataSet.GetData("EmulatorPath", string.Empty),
+            HorizontalAlignment = HorizontalAlignment.Stretch
         };
         t1.TextChanged += (sender, _) =>
         {
@@ -1178,7 +1244,10 @@ public partial class MainWindow
 
         var path = new System.Windows.Shapes.Path
         {
-            Width = 15, MaxWidth = 15, Stretch = Stretch.Uniform, Data = FindResource("LoadGeometry") as Geometry,
+            Width = 15,
+            MaxWidth = 15,
+            Stretch = Stretch.Uniform,
+            Data = FindResource("LoadGeometry") as Geometry,
             Fill = FindResource("GrayColor4") as Brush
         };
 
@@ -1187,7 +1256,11 @@ public partial class MainWindow
         //     Source = this
         // };
         // button.SetBinding(System.Windows.Shapes.Path.FillProperty, b1);
-        var button = new Button { Content = path, VerticalAlignment = VerticalAlignment.Bottom };
+        var button = new Button
+        {
+            Content = path,
+            VerticalAlignment = VerticalAlignment.Bottom
+        };
         button.Click += (_, _) =>
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -1209,7 +1282,8 @@ public partial class MainWindow
 
         var numericUpDown = new NumericUpDown
         {
-            Margin = new Thickness(5), Value = DataSet.GetData("WaitEmulatorTime", 60.0),
+            Margin = new Thickness(5),
+            Value = DataSet.GetData("WaitEmulatorTime", 60.0),
             Style = FindResource("NumericUpDownExtend") as Style
         };
 
@@ -1247,7 +1321,8 @@ public partial class MainWindow
 
             var sc1 = new ScrollViewer
             {
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto, Content = s1
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Content = s1
             };
             Binding heightBinding = new Binding("ActualHeight")
             {
@@ -1266,10 +1341,17 @@ public partial class MainWindow
         {
             if (MaaInterface.Instance.Option.TryGetValue(option.Name, out var interfaceOption))
             {
+                foreach (var VARIABLE in interfaceOption.Cases)
+                {
+                    VARIABLE.Name = LanguageManager.GetLocalizedString(VARIABLE.Name);
+                }
+
                 ComboBox comboBox = new ComboBox
                 {
-                    SelectedIndex = option.Index ?? 0, Style = FindResource("ComboBoxExtend") as Style,
-                    DisplayMemberPath = "Name", Margin = new Thickness(5),
+                    SelectedIndex = option.Index ?? 0,
+                    Style = FindResource("ComboBoxExtend") as Style,
+                    DisplayMemberPath = "Name",
+                    Margin = new Thickness(5),
                 };
 
                 var multiBinding = new MultiBinding
@@ -1278,8 +1360,14 @@ public partial class MainWindow
                     Mode = BindingMode.OneWay
                 };
 
-                multiBinding.Bindings.Add(new Binding("IsCheckedWithNull") { Source = source });
-                multiBinding.Bindings.Add(new Binding("Idle") { Source = Data });
+                multiBinding.Bindings.Add(new Binding("IsCheckedWithNull")
+                {
+                    Source = source
+                });
+                multiBinding.Bindings.Add(new Binding("Idle")
+                {
+                    Source = Data
+                });
 
                 comboBox.SetBinding(IsEnabledProperty, multiBinding);
 
@@ -1310,8 +1398,12 @@ public partial class MainWindow
         {
             NumericUpDown numericUpDown = new NumericUpDown
             {
-                Value = source.InterfaceItem.RepeatCount ?? 1, Style = FindResource("NumericUpDownPlus") as Style,
-                Margin = new Thickness(5), Increment = 1, Minimum = -1, DecimalPlaces = 0
+                Value = source.InterfaceItem.RepeatCount ?? 1,
+                Style = FindResource("NumericUpDownPlus") as Style,
+                Margin = new Thickness(5),
+                Increment = 1,
+                Minimum = -1,
+                DecimalPlaces = 0
             };
 
             var multiBinding = new MultiBinding
@@ -1320,8 +1412,14 @@ public partial class MainWindow
                 Mode = BindingMode.OneWay
             };
 
-            multiBinding.Bindings.Add(new Binding("IsCheckedWithNull") { Source = source });
-            multiBinding.Bindings.Add(new Binding("Idle") { Source = Data });
+            multiBinding.Bindings.Add(new Binding("IsCheckedWithNull")
+            {
+                Source = source
+            });
+            multiBinding.Bindings.Add(new Binding("Idle")
+            {
+                Source = Data
+            });
 
             numericUpDown.SetBinding(ComboBox.IsEnabledProperty, multiBinding);
 
@@ -1566,9 +1664,7 @@ public partial class MainWindow
                     await MaaProcessor.Instance.StartEmulator();
                 }
 
-                if ((Data?.IsAdb).IsTrue() && DataSet.GetData("RememberAdb", true) &&
-                    "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) &&
-                    DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
+                if ((Data?.IsAdb).IsTrue() && DataSet.GetData("RememberAdb", true) && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) && DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
                 {
                     var settings = new JsonSerializerSettings();
                     settings.Converters.Add(new AdbInputMethodsConverter());
@@ -1579,7 +1675,10 @@ public partial class MainWindow
                     {
                         Growls.Process(() =>
                         {
-                            deviceComboBox.ItemsSource = new List<AdbDeviceInfo> { device };
+                            deviceComboBox.ItemsSource = new List<AdbDeviceInfo>
+                            {
+                                device
+                            };
                             deviceComboBox.SelectedIndex = 0;
                             MaaProcessor.Config.IsConnected = true;
                             if (DataSet.GetData("AutoStartIndex", 0) == 1)

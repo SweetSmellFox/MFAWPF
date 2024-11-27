@@ -469,8 +469,8 @@ public class MaaProcessor
         //string sign = HttpUtility.UrlEncode(Convert.ToBase64String(hmacCode));
         string sign = WebUtility.UrlEncode(base64Encoded).Replace("+", "%20").Replace("/", "%2F").Replace("=", "%3D");
         return sign;
-        Console.WriteLine(timestamp);
-        Console.WriteLine(sign);
+        // Console.WriteLine(timestamp);
+        // Console.WriteLine(sign);
     }
 
     static byte[] ComputeHmacSha256(byte[] key, byte[] data)

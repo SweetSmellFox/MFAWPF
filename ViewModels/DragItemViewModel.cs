@@ -13,6 +13,7 @@ public class DragItemViewModel : ObservableObject
     {
         InterfaceItem = interfaceItem;
         Name = interfaceItem?.Name ?? "未命名";
+        LanguageManager.LanguageChanged += OnLanguageChanged;
     }
 
 
@@ -41,16 +42,14 @@ public class DragItemViewModel : ObservableObject
         {
             if (!_isInitialized)
             {
-                // 这是初始化操作
-                _isInitialized = true; // 标记已初始化
-                SetProperty(ref _isCheckedWithNull, value); // 可以选择在初始化时不修改 value
+                _isInitialized = true;
+                SetProperty(ref _isCheckedWithNull, value);
                 if (InterfaceItem != null)
                     InterfaceItem.Check = IsChecked;
             }
             else
             {
-                // 这是后续的 set 操作
-                value ??= false; // 只有在后续 set 时才将 null 设置为 false
+                value ??= false;
                 SetProperty(ref _isCheckedWithNull, value);
                 if (InterfaceItem != null)
                     InterfaceItem.Check = IsChecked;
@@ -114,6 +113,19 @@ public class DragItemViewModel : ObservableObject
     {
         get => _visibility;
         set => SetProperty(ref _visibility, value);
+    }
+
+    private void UpdateContent()
+    {
+        if (!string.IsNullOrEmpty(InterfaceItem?.Name))
+        {
+            Name = LanguageManager.GetLocalizedString(Name);
+        }
+    }
+
+    private void OnLanguageChanged(object? sender, EventArgs e)
+    {
+        UpdateContent();
     }
 
     /// <summary>
