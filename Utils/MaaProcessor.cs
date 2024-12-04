@@ -315,10 +315,7 @@ public class MaaProcessor
                 foreach (var process in processes)
                 {
                     var commandLine = GetCommandLine(process);
-                    if (string.IsNullOrEmpty(emulatorConfig) ||
-                        MainWindow.ExtractNumberFromEmulatorConfig(emulatorConfig) == 0 &&
-                        commandLine.Split(" ").Length == 1 ||
-                        commandLine.ToLower().Contains(emulatorConfig.ToLower()))
+                    if (string.IsNullOrEmpty(emulatorConfig) || MainWindow.ExtractNumberFromEmulatorConfig(emulatorConfig) == 0 && commandLine.Split(" ").Length == 1 || commandLine.ToLower().Contains(emulatorConfig.ToLower()))
                     {
                         process.Kill();
                         break;
@@ -350,8 +347,7 @@ public class MaaProcessor
                     {
                         var commandLine = GetCommandLine(process);
 
-                        if (string.IsNullOrEmpty(emulatorConfig) ||
-                            commandLine.ToLower().Contains(emulatorConfig.ToLower()))
+                        if (string.IsNullOrEmpty(emulatorConfig) || commandLine.ToLower().Contains(emulatorConfig.ToLower()))
                         {
                             process.Kill();
                             break;
@@ -526,12 +522,12 @@ public class MaaProcessor
         foreach (var selectOption in options)
         {
             if (MaaInterface.Instance?.Option?.TryGetValue(selectOption.Name ?? string.Empty,
-                    out var interfaceOption) ==
-                true &&
-                MainWindow.Instance != null &&
-                selectOption.Index is int index &&
-                interfaceOption.Cases is { } cases &&
-                cases[index]?.PipelineOverride != null)
+                    out var interfaceOption)
+                == true
+                && MainWindow.Instance != null
+                && selectOption.Index is int index
+                && interfaceOption.Cases is { } cases
+                && cases[index]?.PipelineOverride != null)
             {
                 var param = interfaceOption.Cases[selectOption.Index.Value].PipelineOverride;
                 MainWindow.Instance.TaskDictionary = MainWindow.Instance.TaskDictionary.MergeTaskModels(param);
@@ -730,7 +726,7 @@ public class MaaProcessor
         MaaResource maaResource;
         try
         {
-            Console.WriteLine(string.Join(",", CurrentResources ?? Array.Empty<string>().ToList()));
+            LoggerService.LogInfo(string.Join(",", CurrentResources ?? Array.Empty<string>().ToList()));
             maaResource = new MaaResource(CurrentResources ?? Array.Empty<string>().ToList());
         }
         catch (Exception e)
@@ -782,6 +778,22 @@ public class MaaProcessor
 
     private MaaController InitializeController()
     {
+        if ((MainWindow.Data?.IsAdb).IsTrue())
+        {
+            LoggerService.LogInfo($"AdbPath: {Config.AdbDevice.AdbPath}");
+            LoggerService.LogInfo($"AdbSerial: {Config.AdbDevice.AdbSerial}");
+            LoggerService.LogInfo($"ScreenCap: {Config.AdbDevice.ScreenCap}");
+            LoggerService.LogInfo($"Input: {Config.AdbDevice.Input}");
+            LoggerService.LogInfo($"Config: {Config.AdbDevice.Config}");
+        }
+        else
+        {
+            LoggerService.LogInfo($"HWnd: {Config.DesktopWindow.HWnd}");
+            LoggerService.LogInfo($"ScreenCap: {Config.DesktopWindow.ScreenCap}");
+            LoggerService.LogInfo($"Input: {Config.DesktopWindow.Input}");
+            LoggerService.LogInfo($"Link: {Config.DesktopWindow.Link}");
+            LoggerService.LogInfo($"Check: {Config.DesktopWindow.Check}");
+        }
         return (MainWindow.Data?.IsAdb).IsTrue()
             ? new MaaAdbController(
                 Config.AdbDevice.AdbPath,
@@ -861,7 +873,9 @@ public class MaaProcessor
         }
     }
 
-    private void HandleInitializationError(Exception e, string message, bool hasWarning = false,
+    private void HandleInitializationError(Exception e,
+        string message,
+        bool hasWarning = false,
         string waringMessage = "")
     {
         Console.WriteLine(e);
