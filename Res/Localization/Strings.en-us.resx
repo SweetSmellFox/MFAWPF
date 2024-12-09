@@ -1,506 +1,515 @@
 <root>
-    <resheader name="resmimetype">
-        <value>text/microsoft-resx</value>
-    </resheader>
-    <resheader name="version">
-        <value>1.3</value>
-    </resheader>
-    <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-    </resheader>
-    <data name="AppTitle" xml:space="preserve">
-        <value>MFA Task Manager</value>
-    </data>
-    <data name="DeselectAll" xml:space="preserve">
-        <value>Deselect All</value>
-    </data>
-    <data name="TabWin32" xml:space="preserve">
-        <value>Win32</value>
-    </data>
-    <data name="TaskList" xml:space="preserve">
-        <value>Task List:</value>
-    </data>
-    <data name="TooltipSettings" xml:space="preserve">
-        <value>Settings</value>
-    </data>
-    <data name="TooltipRefresh" xml:space="preserve">
-        <value>Refresh</value>
-    </data>
-    <data name="TabADB" xml:space="preserve">
-        <value>ADB</value>
-    </data>
-    <data name="EditTask" xml:space="preserve">
-        <value>Edit Task</value>
-    </data>
-    <data name="TaskSettings" xml:space="preserve">
-        <value>Task Settings</value>
-    </data>
-    <data name="TooltipDragLabel" xml:space="preserve">
-        <value>Drag label to reorder</value>
-    </data>
-    <data name="StartTask" xml:space="preserve">
-        <value>Start Task</value>
-    </data>
-    <data name="SelectAll" xml:space="preserve">
-        <value>Select All</value>
-    </data>
-    <data name="StopTask" xml:space="preserve">
-        <value>Stop Task</value>
-    </data>
-    <data name="DuplicateTaskError" xml:space="preserve">
-    <value>Duplicate task name found in Pipeline file: "{0}"!</value>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppTitle" xml:space="preserve">
+    <value>MFA Task Manager</value>
   </data>
-    <data name="PipelineLoadError" xml:space="preserve">
-    <value>Error occurred while loading Pipeline file: {0}</value>
+  <data name="TabADB" xml:space="preserve">
+    <value>ADB</value>
   </data>
-    <data name="TaskNotFoundError" xml:space="preserve">
-    <value>The task "{1}" used in {0} does not exist in the Pipeline file!</value>
+  <data name="TabWin32" xml:space="preserve">
+    <value>Win32</value>
   </data>
-    <data name="TaskListHeader" xml:space="preserve">
+  <data name="TooltipRefresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="TooltipSettings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="TaskList" xml:space="preserve">
     <value>Task List:</value>
   </data>
-    <data name="EditTaskTooltip" xml:space="preserve">
+  <data name="SelectAll" xml:space="preserve">
+    <value>Select All</value>
+  </data>
+  <data name="DeselectAll" xml:space="preserve">
+    <value>Deselect All</value>
+  </data>
+  <data name="EditTask" xml:space="preserve">
     <value>Edit Task</value>
   </data>
-    <data name="ResourceOption" xml:space="preserve">
-    <value>Resources</value>
+  <data name="TaskSettings" xml:space="preserve">
+    <value>Task Settings</value>
   </data>
-    <data name="ThemeOption" xml:space="preserve">
-    <value>Color Theme</value>
+  <data name="StartTask" xml:space="preserve">
+    <value>Start Task</value>
   </data>
-    <data name="LanguageOption" xml:space="preserve">
-        <value>Language(语言)</value>
-    </data>
-    <data name="InputModeOption" xml:space="preserve">
-    <value>Input Mode</value>
+  <data name="StopTask" xml:space="preserve">
+    <value>Stop Task</value>
   </data>
-    <data name="CaptureModeOption" xml:space="preserve">
-    <value>Capture Mode</value>
+  <data name="TooltipDragLabel" xml:space="preserve">
+    <value>Drag label to reorder</value>
   </data>
-    <data name="RepeatOption" xml:space="preserve">
-    <value>Repeat Count</value>
+  <data name="DuplicateTaskError" xml:space="preserve">
+    <value>Duplicate task name found in Pipeline file: "{0}"!</value>
   </data>
-    <data name="WindowDetectionStarted" xml:space="preserve">
-    <value>Starting window search!</value>
+  <data name="PipelineLoadError" xml:space="preserve">
+    <value>Error occurred while loading Pipeline file: {0}</value>
   </data>
-    <data name="EmulatorDetectionStarted" xml:space="preserve">
-    <value>Starting emulator search!</value>
+  <data name="TaskNotFoundError" xml:space="preserve">
+    <value>The task "{1}" used in {0} does not exist in the Pipeline file!</value>
   </data>
-    <data name="NoEmulatorFound" xml:space="preserve">
-    <value>No emulator found!</value>
-  </data>
-    <data name="NoWindowFound" xml:space="preserve">
-    <value>No window found!</value>
-  </data>
-    <data name="WindowSelectionMessage" xml:space="preserve">
-    <value>Window selected: {0}</value>
-  </data>
-    <data name="EmulatorSelectionMessage" xml:space="preserve">
-    <value>Emulator selected: {0}</value>
-  </data>
-    <data name="AdbInputMode" xml:space="preserve">
-    <value>Input Mode:</value>
-  </data>
-    <data name="AdbCaptureMode" xml:space="preserve">
-    <value>Capture Mode:</value>
-  </data>
-    <data name="TaskStackError" xml:space="preserve">
-    <value>Error occurred while detecting {0}: {1}</value>
-  </data>
-    <data name="DarkColor" xml:space="preserve">
-        <value>Dark color</value>
-    </data>
-    <data name="LightColor" xml:space="preserve">
-        <value>Light Color</value>
-    </data>
-    <data name="EditTaskDialog_Title" xml:space="preserve">
-    <value>Task Editor</value>
-  </data>
-    <data name="Cut" xml:space="preserve">
-    <value>Cut</value>
-  </data>
-    <data name="Copy" xml:space="preserve">
-    <value>Copy</value>
-  </data>
-    <data name="PasteAbove" xml:space="preserve">
-    <value>Paste Above</value>
-  </data>
-    <data name="PasteBelow" xml:space="preserve">
-    <value>Paste Below</value>
-  </data>
-    <data name="Delete" xml:space="preserve">
-    <value>Delete</value>
-  </data>
-    <data name="Paste" xml:space="preserve">
-    <value>Paste</value>
-  </data>
-    <data name="EditTaskDialog_Header" xml:space="preserve">
-    <value>Task Editor</value>
-  </data>
-    <data name="EditTaskDialog_PipelineFileName_Placeholder" xml:space="preserve">
-    <value>Pipeline File Name</value>
-  </data>
-    <data name="EditTaskDialog_Load_Tooltip" xml:space="preserve">
-    <value>Load Pipeline File</value>
-  </data>
-    <data name="EditTaskDialog_SavePipeline_Tooltip" xml:space="preserve">
-    <value>Save Pipeline File</value>
-  </data>
-    <data name="EditTaskDialog_TaskList_Label" xml:space="preserve">
+  <data name="TaskListHeader" xml:space="preserve">
     <value>Task List:</value>
   </data>
-    <data name="EditTaskDialog_AddTask_Tooltip" xml:space="preserve">
+  <data name="EditTaskTooltip" xml:space="preserve">
+    <value>Edit Task</value>
+  </data>
+  <data name="ResourceOption" xml:space="preserve">
+    <value>Resources</value>
+  </data>
+  <data name="ThemeOption" xml:space="preserve">
+    <value>Color Theme</value>
+  </data>
+  <data name="LanguageOption" xml:space="preserve">
+    <value>Language(语言)</value>
+  </data>
+  <data name="InputModeOption" xml:space="preserve">
+    <value>Input Mode</value>
+  </data>
+  <data name="CaptureModeOption" xml:space="preserve">
+    <value>Capture Mode</value>
+  </data>
+  <data name="RepeatOption" xml:space="preserve">
+    <value>Repeat Count</value>
+  </data>
+  <data name="WindowDetectionStarted" xml:space="preserve">
+    <value>Starting window search!</value>
+  </data>
+  <data name="EmulatorDetectionStarted" xml:space="preserve">
+    <value>Starting emulator search!</value>
+  </data>
+  <data name="NoEmulatorFound" xml:space="preserve">
+    <value>No emulator found!</value>
+  </data>
+  <data name="NoWindowFound" xml:space="preserve">
+    <value>No window found!</value>
+  </data>
+  <data name="WindowSelectionMessage" xml:space="preserve">
+    <value>Window selected: {0}</value>
+  </data>
+  <data name="EmulatorSelectionMessage" xml:space="preserve">
+    <value>Emulator selected: {0}</value>
+  </data>
+  <data name="AdbInputMode" xml:space="preserve">
+    <value>Input Mode:</value>
+  </data>
+  <data name="AdbCaptureMode" xml:space="preserve">
+    <value>Capture Mode:</value>
+  </data>
+  <data name="TaskStackError" xml:space="preserve">
+    <value>Error occurred while detecting {0}: {1}</value>
+  </data>
+  <data name="LightColor" xml:space="preserve">
+    <value>Light Color</value>
+  </data>
+  <data name="DarkColor" xml:space="preserve">
+    <value>Dark color</value>
+  </data>
+  <data name="EditTaskDialog_Title" xml:space="preserve">
+    <value>Task Editor</value>
+  </data>
+  <data name="Cut" xml:space="preserve">
+    <value>Cut</value>
+  </data>
+  <data name="Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="PasteAbove" xml:space="preserve">
+    <value>Paste Above</value>
+  </data>
+  <data name="PasteBelow" xml:space="preserve">
+    <value>Paste Below</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Paste" xml:space="preserve">
+    <value>Paste</value>
+  </data>
+  <data name="EditTaskDialog_Header" xml:space="preserve">
+    <value>Task Editor</value>
+  </data>
+  <data name="EditTaskDialog_PipelineFileName_Placeholder" xml:space="preserve">
+    <value>Pipeline File Name</value>
+  </data>
+  <data name="EditTaskDialog_Load_Tooltip" xml:space="preserve">
+    <value>Load Pipeline File</value>
+  </data>
+  <data name="EditTaskDialog_SavePipeline_Tooltip" xml:space="preserve">
+    <value>Save Pipeline File</value>
+  </data>
+  <data name="EditTaskDialog_TaskList_Label" xml:space="preserve">
+    <value>Task List:</value>
+  </data>
+  <data name="EditTaskDialog_AddTask_Tooltip" xml:space="preserve">
     <value>Add Task</value>
   </data>
-    <data name="EditTaskDialog_ClearTask_Tooltip" xml:space="preserve">
+  <data name="EditTaskDialog_ClearTask_Tooltip" xml:space="preserve">
     <value>Clear Tasks</value>
   </data>
-    <data name="EditTaskDialog_TaskName_Title" xml:space="preserve">
+  <data name="EditTaskDialog_TaskName_Title" xml:space="preserve">
     <value>Task Name:</value>
   </data>
-    <data name="EditTaskDialog_RecognitionText_Tooltip" xml:space="preserve">
+  <data name="EditTaskDialog_RecognitionText_Tooltip" xml:space="preserve">
     <value>Text Recognition</value>
   </data>
-    <data name="EditTaskDialog_ColorExtraction_Tooltip" xml:space="preserve">
+  <data name="EditTaskDialog_ColorExtraction_Tooltip" xml:space="preserve">
     <value>Color Extraction</value>
   </data>
-    <data name="EditTaskDialog_Swipe_Tooltip" xml:space="preserve">
+  <data name="EditTaskDialog_Swipe_Tooltip" xml:space="preserve">
     <value>Swipe</value>
   </data>
-    <data name="EditTaskDialog_Screenshot_Tooltip" xml:space="preserve">
+  <data name="EditTaskDialog_Screenshot_Tooltip" xml:space="preserve">
     <value>Take Screenshot</value>
   </data>
-    <data name="EditTaskDialog_SelectionRegion_Tooltip" xml:space="preserve">
+  <data name="EditTaskDialog_SelectionRegion_Tooltip" xml:space="preserve">
     <value>Select Region</value>
   </data>
-    <data name="EditTaskDialog_AddAttribute_Tooltip" xml:space="preserve">
+  <data name="EditTaskDialog_AddAttribute_Tooltip" xml:space="preserve">
     <value>Add Attribute</value>
   </data>
-    <data name="EditTaskDialog_ClearAttribute_Tooltip" xml:space="preserve">
+  <data name="EditTaskDialog_ClearAttribute_Tooltip" xml:space="preserve">
     <value>Clear Attributes</value>
   </data>
-    <data name="EditTaskDialog_SaveTask_Button" xml:space="preserve">
-        <value>Save Task Name</value>
-    </data>
-    <data name="EditTaskDialog_ShowChart_Button" xml:space="preserve">
+  <data name="EditTaskDialog_SaveTask_Button" xml:space="preserve">
+    <value>Save Task Name</value>
+  </data>
+  <data name="EditTaskDialog_ShowChart_Button" xml:space="preserve">
     <value>Flowchart</value>
   </data>
-    <data name="Quit" xml:space="preserve">
+  <data name="Quit" xml:space="preserve">
     <value>Quit</value>
   </data>
-    <data name="SaveSuccessMessage" xml:space="preserve">
+  <data name="SaveSuccessMessage" xml:space="preserve">
     <value>Task saved successfully!</value>
   </data>
-    <data name="SaveFailureMessage" xml:space="preserve">
+  <data name="SaveFailureMessage" xml:space="preserve">
     <value>Failed to save task!</value>
   </data>
-    <data name="DuplicateTaskNameError" xml:space="preserve">
+  <data name="DuplicateTaskNameError" xml:space="preserve">
     <value>A task with the name "{0}" already exists in the task list.</value>
   </data>
-    <data name="LoadPipelineTitle" xml:space="preserve">
+  <data name="LoadPipelineTitle" xml:space="preserve">
     <value>Select Pipeline File</value>
   </data>
-    <data name="LoadPipelineErrorMessage" xml:space="preserve">
+  <data name="LoadPipelineErrorMessage" xml:space="preserve">
     <value>Failed to load or parse the pipeline file: {0}</value>
   </data>
-    <data name="SavePipelineSuccess" xml:space="preserve">
+  <data name="SavePipelineSuccess" xml:space="preserve">
     <value>Saved successfully!</value>
   </data>
-    <data name="SavePipelineWarning" xml:space="preserve">
+  <data name="SavePipelineWarning" xml:space="preserve">
     <value>There are tasks with duplicate names in the task list!</value>
   </data>
-    <data name="ClipboardDataError" xml:space="preserve">
+  <data name="ClipboardDataError" xml:space="preserve">
     <value>The data currently in the clipboard cannot be converted to text.</value>
   </data>
-    <data name="ConnectingTo" xml:space="preserve">
+  <data name="Warning_CannotConnect" xml:space="preserve">
+    <value>Unable to connect to {0}</value>
+  </data>
+  <data name="Emulator" xml:space="preserve">
+    <value>Emulator</value>
+  </data>
+  <data name="Window" xml:space="preserve">
+    <value>Window</value>
+  </data>
+  <data name="ConnectingTo" xml:space="preserve">
     <value>Connecting to {0}......</value>
-</data>
-    <data name="InitInstanceFailed" xml:space="preserve">
+  </data>
+  <data name="InitInstanceFailed" xml:space="preserve">
     <value>Failed to initialize MAA instance, a connection error or resource file corruption occurred, please refer to the logs.</value>
-</data>
-    <data name="InstanceInitFailedLog" xml:space="preserve">
+  </data>
+  <data name="InstanceInitFailedLog" xml:space="preserve">
     <value>Connection failure</value>
-</data>
-    <data name="TaskStart" xml:space="preserve">
+  </data>
+  <data name="TaskStart" xml:space="preserve">
     <value>Starting task: {0}</value>
-</data>
-    <data name="Stopping" xml:space="preserve">
+  </data>
+  <data name="Stopping" xml:space="preserve">
     <value>Stopping......</value>
-</data>
-    <data name="TaskStopped" xml:space="preserve">
+  </data>
+  <data name="TaskStopped" xml:space="preserve">
     <value>Task has been stopped</value>
-</data>
-    <data name="TaskAbandoned" xml:space="preserve">
+  </data>
+  <data name="TaskAbandoned" xml:space="preserve">
     <value>Task has been abandoned</value>
-</data>
-    <data name="TaskCompleted" xml:space="preserve">
+  </data>
+  <data name="TaskCompleted" xml:space="preserve">
     <value>Task has been completed</value>
-</data>
-    <data name="TaskAllCompleted" xml:space="preserve">
+  </data>
+  <data name="TaskAllCompleted" xml:space="preserve">
     <value>All tasks have been completed!</value>
-</data>
-    <data name="TaskAllCompletedWithTime" xml:space="preserve">
+  </data>
+  <data name="TaskAllCompletedWithTime" xml:space="preserve">
     <value>All tasks have been completed!\n(Elapsed time {0}h {1}m {2}s)</value>
-</data>
-    <data name="StoppingFailed" xml:space="preserve">
+  </data>
+  <data name="StoppingFailed" xml:space="preserve">
     <value>Failed to stop the task</value>
-</data>
-    <data name="NoTaskToStop" xml:space="preserve">
+  </data>
+  <data name="NoTaskToStop" xml:space="preserve">
     <value>There is no task to stop!</value>
-</data>
-    <data name="LoadingResources" xml:space="preserve">
+  </data>
+  <data name="LoadingResources" xml:space="preserve">
     <value>Loading resources</value>
-</data>
-    <data name="LoadResourcesFailed" xml:space="preserve">
+  </data>
+  <data name="LoadResourcesFailed" xml:space="preserve">
     <value>Failed to load resources!</value>
-</data>
-    <data name="InitResourcesSuccess" xml:space="preserve">
+  </data>
+  <data name="InitResourcesSuccess" xml:space="preserve">
     <value>Resources initialized successfully</value>
-</data>
-    <data name="LoadingController" xml:space="preserve">
+  </data>
+  <data name="LoadingController" xml:space="preserve">
     <value>Initializing the controller</value>
-</data>
-    <data name="ConnectingEmulatorOrWindow" xml:space="preserve">
+  </data>
+  <data name="ConnectingEmulatorOrWindow" xml:space="preserve">
     <value>Error connecting to {0}!</value>
-</data>
-    <data name="InitControllerFailed" xml:space="preserve">
+  </data>
+  <data name="InitControllerFailed" xml:space="preserve">
     <value>Error initializing controller!</value>
-</data>
-    <data name="InitControllerSuccess" xml:space="preserve">
+  </data>
+  <data name="InitControllerSuccess" xml:space="preserve">
     <value>Controller initialized successfully</value>
-</data>
-    <data name="RegisteringCustomRecognizer" xml:space="preserve">
+  </data>
+  <data name="RegisteringCustomRecognizer" xml:space="preserve">
     <value>Registering custom recognizer</value>
-</data>
-    <data name="RegisteringCustomAction" xml:space="preserve">
+  </data>
+  <data name="RegisteringCustomAction" xml:space="preserve">
     <value>Registering custom action</value>
-</data>
-    <data name="RegisterCustomRecognizer" xml:space="preserve">
+  </data>
+  <data name="RegisterCustomRecognizer" xml:space="preserve">
     <value>Register custom recognizer: {0}</value>
-</data>
-    <data name="RegisterCustomAction" xml:space="preserve">
+  </data>
+  <data name="RegisterCustomAction" xml:space="preserve">
     <value>Register custom action: {0}</value>
-</data>
-    <data name="Emulator" xml:space="preserve">
-        <value>Emulator</value>
-    </data>
-    <data name="Window" xml:space="preserve">
-        <value>Window</value>
-    </data>
-    <data name="Warning_CannotConnect" xml:space="preserve">
-        <value>Unable to connect to {0}</value>
-    </data>
-    <data name="EditAttributeDialogTitle" xml:space="preserve">
+  </data>
+  <data name="EditAttributeDialogTitle" xml:space="preserve">
     <value>Attribute Editor</value>
-</data>
-    <data name="LabelPropertyType" xml:space="preserve">
+  </data>
+  <data name="LabelPropertyType" xml:space="preserve">
     <value>Property Type:</value>
-</data>
-    <data name="ButtonSave" xml:space="preserve">
+  </data>
+  <data name="ButtonSave" xml:space="preserve">
     <value>Save</value>
-</data>
-    <data name="ButtonCancel" xml:space="preserve">
+  </data>
+  <data name="ButtonCancel" xml:space="preserve">
     <value>Cancel</value>
-</data>
-    <data name="ButtonAdd" xml:space="preserve">
-        <value>Add</value>
-    </data>
-    <data name="ButtonClose" xml:space="preserve">
+  </data>
+  <data name="ButtonClose" xml:space="preserve">
     <value>Close</value>
-</data>
-    <data name="ColorPickerTitle" xml:space="preserve">
+  </data>
+  <data name="ButtonAdd" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ColorPickerTitle" xml:space="preserve">
     <value>Color Picker</value>
-</data>
-    <data name="ImageBrowserTitle" xml:space="preserve">
+  </data>
+  <data name="ImageBrowserTitle" xml:space="preserve">
     <value>Image Browser</value>
-</data>
-    <data name="TextRecognizerTitle" xml:space="preserve">
+  </data>
+  <data name="TextRecognizerTitle" xml:space="preserve">
     <value>Text Recognizer</value>
-</data>
-    <data name="RegionSelectorTitle" xml:space="preserve">
+  </data>
+  <data name="RegionSelectorTitle" xml:space="preserve">
     <value>Region Selector</value>
-</data>
-    <data name="SliderControlTitle" xml:space="preserve">
+  </data>
+  <data name="SliderControlTitle" xml:space="preserve">
     <value>Slider Control</value>
-</data>
-    <data name="WorkflowDiagramTitle" xml:space="preserve">
+  </data>
+  <data name="WorkflowDiagramTitle" xml:space="preserve">
     <value>Workflow Diagram</value>
-</data>
-    <data name="AddAbove" xml:space="preserve">
-        <value>Add Above</value>
-    </data>
-    <data name="AddBelow" xml:space="preserve">
-        <value>Add below</value>
-    </data>
-    <data name="Task" xml:space="preserve">
-        <value>Tasks</value>
-    </data>
-    <data name="EnterTaskName" xml:space="preserve">
-        <value>Please enter a task name</value>
-    </data>
-    <data name="ResourceVersion" xml:space="preserve">
-        <value>Resource Version</value>
-    </data>
-    <data name="ResourceName" xml:space="preserve">
-        <value>Resource Name</value>
-    </data>
-    <data name="About" xml:space="preserve">
-        <value>About</value>
-    </data>
-    <data name="ScreenshotTime" xml:space="preserve">
-        <value>Screenshot time: {0}ms({1})</value>
-    </data>
-    <data name="Error" xml:space="preserve">
-        <value>Error</value>
-    </data>
-    <data name="ErrorProlog" xml:space="preserve">
-        <value>MFA has encountered an error</value>
-    </data>
-    <data name="ErrorDetails" xml:space="preserve">
-        <value>Details</value>
-    </data>
-    <data name="CopyErrorMessage" xml:space="preserve">
-        <value>Copy error message</value>
-    </data>
-    <data name="CopiedToClipboard" xml:space="preserve">
-        <value>Copied to Clipboard</value>
-    </data>
-    <data name="MiniTouch" xml:space="preserve">
-        <value>MiniTouch (Default)</value>
-    </data>
-    <data name="MaaTouch" xml:space="preserve">
-        <value>MaaTouch (Experimental)</value>
-    </data>
-    <data name="AdbInput" xml:space="preserve">
-        <value>AdbInput (Not Recommended)</value>
-    </data>
-    <data name="AutoDetect" xml:space="preserve">
-        <value>AutoDetect (Automatic Detection)</value>
-    </data>
-    <data name="CopyKey" xml:space="preserve">
-        <value>Copy Key</value>
-    </data>
-    <data name="CopyValue" xml:space="preserve">
-        <value>Copy Value</value>
-    </data>
-    <data name="Edit" xml:space="preserve">
-        <value>Edit</value>
-    </data>
-    <data name="Load" xml:space="preserve">
-        <value>Load</value>
-    </data>
-    <data name="LoadImageTitle" xml:space="preserve">
-        <value>Select Image File</value>
-    </data>
-    <data name="ImageFilter" xml:space="preserve">
-        <value>Image Files (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp</value>
-    </data>
-    <data name="JSONFilter" xml:space="preserve">
-        <value>JSON Files (*.json)|*.json|All files (*.*)|*.*"</value>
-    </data>
-    <data name="ButtonClear" xml:space="preserve">
-        <value>Clear</value>
-    </data>
-    <data name="CommonSetting" xml:space="preserve">
-        <value>Common</value>
-    </data>
-    <data name="AdvancedSetting" xml:space="preserve">
-        <value>Advanced</value>
-    </data>
-    <data name="AutoStartOption" xml:space="preserve">
-        <value>Post-start operation</value>
-    </data>
-    <data name="None" xml:space="preserve">
-        <value>None</value>
-    </data>
-    <data name="StartupScript" xml:space="preserve">
-        <value>Startup Script</value>
-    </data>
-    <data name="Custom" xml:space="preserve">
-        <value>Custom</value>
-    </data>
-    <data name="AdbEditor" xml:space="preserve">
-        <value>Adb Editor</value>
-    </data>
-    <data name="AllFilter" xml:space="preserve">
-        <value>All Files (*.*)|*.*</value>
-    </data>
-    <data name="LoadFileTitle" xml:space="preserve">
-        <value>Select Any File</value>
-    </data>
-    <data name="AdbName" xml:space="preserve">
-        <value>Adb Name</value>
-    </data>
-    <data name="AdbSerial" xml:space="preserve">
-        <value>Adb Address</value>
-    </data>
-    <data name="AdbPath" xml:space="preserve">
-        <value>Adb Path</value>
-    </data>
-    <data name="FollowingSystem" xml:space="preserve">
-        <value>Following System</value>
-    </data>
-    <data name="EmulatorPath" xml:space="preserve">
-        <value>Emulator Path</value>
-    </data>
-    <data name="WaitEmulator" xml:space="preserve">
-        <value>Wait time for Emulator to start (seconds)</value>
-    </data>
-    <data name="StartEmulator" xml:space="preserve">
-        <value>Start the emulator after starting the MFA</value>
-    </data>
-    <data name="Select" xml:space="preserve">
-        <value>Select</value>
-    </data>
-    <data name="ExeFilter" xml:space="preserve">
-        <value>Executable files (*.exe*)|*.exe*</value>
-    </data>
-    <data name="SelectExecutableFile" xml:space="preserve">
-        <value>Select Executable File</value>
-    </data>
-    <data name="WaitEmulatorTime" xml:space="preserve">
-        <value>Wait time for Emulator to start (seconds): {0}(s)</value>
-    </data>
-    <data name="ProjectLink" xml:space="preserve">
-        <value>Project Link: </value>
-    </data>
-    <data name="ResourceLink" xml:space="preserve">
-        <value>Resource Link: </value>
-    </data>
-    <data name="StartupParameter" xml:space="preserve">
-        <value>Startup Parameter</value>
-    </data>
-    <data name="AfterTaskOption" xml:space="preserve">
-        <value>Post-task Actions</value>
-    </data>
-    <data name="CloseMFA" xml:space="preserve">
-        <value>Disable MFA</value>
-    </data>
-    <data name="CloseEmulator" xml:space="preserve">
-        <value>Disable Emulator</value>
-    </data>
-    <data name="CloseEmulatorAndMFA" xml:space="preserve">
-        <value>Disable MFA and Emulator</value>
-    </data>
-    <data name="ShutDown" xml:space="preserve">
-        <value>Shut Down</value>
-    </data>
-    <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
-        <value>Disable MFA and Restart Emulator</value>
-    </data>
-    <data name="Restart" xml:space="preserve">
-        <value>RestartDevice</value>
-    </data>
-    <data name="AdbConfig" xml:space="preserve">
-        <value>Extras</value>
-    </data>
-    <data name="RememberAdb" xml:space="preserve">
-        <value>Remember Connection</value>
-    </data>
-    <data name="EnableGPU" xml:space="preserve">
-        <value>Enable GPU acceleration</value>
-    </data>
+  </data>
+  <data name="AddAbove" xml:space="preserve">
+    <value>Add Above</value>
+  </data>
+  <data name="AddBelow" xml:space="preserve">
+    <value>Add below</value>
+  </data>
+  <data name="Task" xml:space="preserve">
+    <value>Tasks</value>
+  </data>
+  <data name="EnterTaskName" xml:space="preserve">
+    <value>Please enter a task name</value>
+  </data>
+  <data name="ResourceName" xml:space="preserve">
+    <value>Resource Name</value>
+  </data>
+  <data name="ResourceVersion" xml:space="preserve">
+    <value>Resource Version</value>
+  </data>
+  <data name="About" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="ScreenshotTime" xml:space="preserve">
+    <value>Screenshot time: {0}ms({1})</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ErrorProlog" xml:space="preserve">
+    <value>MFA has encountered an error</value>
+  </data>
+  <data name="ErrorDetails" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="CopyErrorMessage" xml:space="preserve">
+    <value>Copy error message</value>
+  </data>
+  <data name="CopiedToClipboard" xml:space="preserve">
+    <value>Copied to Clipboard</value>
+  </data>
+  <data name="MiniTouch" xml:space="preserve">
+    <value>MiniTouch (Default)</value>
+  </data>
+  <data name="MaaTouch" xml:space="preserve">
+    <value>MaaTouch (Experimental)</value>
+  </data>
+  <data name="AdbInput" xml:space="preserve">
+    <value>AdbInput (Not Recommended)</value>
+  </data>
+  <data name="AutoDetect" xml:space="preserve">
+    <value>AutoDetect (Automatic Detection)</value>
+  </data>
+  <data name="CopyKey" xml:space="preserve">
+    <value>Copy Key</value>
+  </data>
+  <data name="CopyValue" xml:space="preserve">
+    <value>Copy Value</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Load" xml:space="preserve">
+    <value>Load</value>
+  </data>
+  <data name="LoadImageTitle" xml:space="preserve">
+    <value>Select Image File</value>
+  </data>
+  <data name="ImageFilter" xml:space="preserve">
+    <value>Image Files (*.png;*.jpg;*.jpeg;*.bmp)|*.png;*.jpg;*.jpeg;*.bmp</value>
+  </data>
+  <data name="JSONFilter" xml:space="preserve">
+    <value>JSON Files (*.json)|*.json|All files (*.*)|*.*"</value>
+  </data>
+  <data name="ButtonClear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="CommonSetting" xml:space="preserve">
+    <value>Common</value>
+  </data>
+  <data name="AdvancedSetting" xml:space="preserve">
+    <value>Advanced</value>
+  </data>
+  <data name="AutoStartOption" xml:space="preserve">
+    <value>Post-start operation</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="StartupScript" xml:space="preserve">
+    <value>Startup Script</value>
+  </data>
+  <data name="Custom" xml:space="preserve">
+    <value>Custom</value>
+  </data>
+  <data name="AdbEditor" xml:space="preserve">
+    <value>Adb Editor</value>
+  </data>
+  <data name="AllFilter" xml:space="preserve">
+    <value>All Files (*.*)|*.*</value>
+  </data>
+  <data name="LoadFileTitle" xml:space="preserve">
+    <value>Select Any File</value>
+  </data>
+  <data name="AdbName" xml:space="preserve">
+    <value>Adb Name</value>
+  </data>
+  <data name="AdbPath" xml:space="preserve">
+    <value>Adb Path</value>
+  </data>
+  <data name="AdbSerial" xml:space="preserve">
+    <value>Adb Address</value>
+  </data>
+  <data name="FollowingSystem" xml:space="preserve">
+    <value>Following System</value>
+  </data>
+  <data name="EmulatorPath" xml:space="preserve">
+    <value>Emulator Path</value>
+  </data>
+  <data name="WaitEmulator" xml:space="preserve">
+    <value>Wait time for Emulator to start (seconds)</value>
+  </data>
+  <data name="StartEmulator" xml:space="preserve">
+    <value>Start the emulator after starting the MFA</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="ExeFilter" xml:space="preserve">
+    <value>Executable files (*.exe*)|*.exe*</value>
+  </data>
+  <data name="SelectExecutableFile" xml:space="preserve">
+    <value>Select Executable File</value>
+  </data>
+  <data name="WaitEmulatorTime" xml:space="preserve">
+    <value>Wait time for Emulator to start (seconds): {0}(s)</value>
+  </data>
+  <data name="ProjectLink" xml:space="preserve">
+    <value>Project Link: </value>
+  </data>
+  <data name="ResourceLink" xml:space="preserve">
+    <value>Resource Link: </value>
+  </data>
+  <data name="StartupParameter" xml:space="preserve">
+    <value>Startup Parameter</value>
+  </data>
+  <data name="AfterTaskOption" xml:space="preserve">
+    <value>Post-task Actions</value>
+  </data>
+  <data name="CloseMFA" xml:space="preserve">
+    <value>Disable MFA</value>
+  </data>
+  <data name="CloseEmulator" xml:space="preserve">
+    <value>Disable Emulator</value>
+  </data>
+  <data name="CloseEmulatorAndMFA" xml:space="preserve">
+    <value>Disable MFA and Emulator</value>
+  </data>
+  <data name="ShutDown" xml:space="preserve">
+    <value>Shut Down</value>
+  </data>
+  <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
+    <value>Disable MFA and Restart Emulator</value>
+  </data>
+  <data name="Restart" xml:space="preserve">
+    <value>RestartDevice</value>
+  </data>
+  <data name="AdbConfig" xml:space="preserve">
+    <value>Extras</value>
+  </data>
+  <data name="RememberAdb" xml:space="preserve">
+    <value>Remember Connection</value>
+  </data>
+  <data name="SwitchConfiguration" xml:space="preserve">
+    <value>Switch Configuration</value>
+  </data>
+  <data name="RestartMFA" xml:space="preserve">
+    <value>Restart MFA</value>
+  </data>
+  <data name="DingTalkMessageAsync" xml:space="preserve">
+    <value>DingTalk group message notification</value>
+  </data>
+  <data name="EnableGPU" xml:space="preserve">
+    <value>Enable GPU acceleration</value>
+  </data>
 </root>
