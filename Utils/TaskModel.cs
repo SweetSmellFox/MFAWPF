@@ -44,6 +44,7 @@ public class TaskModel : ObservableObject
     private List<int>? _begin_offset;
     private object? _end;
     private List<int>? _end_offset;
+    private uint? _starting;
     private uint? _duration;
     private List<int>? _key;
     private string? _input_text;
@@ -645,6 +646,18 @@ public class TaskModel : ObservableObject
         set => SetNewProperty(ref _duration, value);
     }
 
+    [JsonProperty("starting")]
+    [Category("动作")]
+    [Description(
+        "滑动起始时间，单位毫秒。可选，默认 0 。\nMultiSwipe 额外字段，该滑动会在本 action 中第 starting 毫秒才开始。"
+    )]
+    [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
+    public uint? Starting
+    {
+        get => _starting;
+        set => SetNewProperty(ref _starting, value);
+    }
+
     [JsonProperty("key")]
     [Category("动作")]
     [Description(
@@ -682,7 +695,9 @@ public class TaskModel : ObservableObject
         set => SetNewProperty(ref _package, value);
     }
 
-    [Browsable(false)] [JsonExtensionData] public Dictionary<string, object> AdditionalData { get; set; } = new();
+    [Browsable(false)]
+    [JsonExtensionData]
+    public Dictionary<string, object> AdditionalData { get; set; } = new();
 
     public override string ToString()
     {
@@ -791,7 +806,8 @@ public class TaskModel : ObservableObject
         return this;
     }
 
-    protected bool SetNewProperty<T>([NotNullIfNotNull(nameof(newValue))] ref T field, T newValue,
+    protected bool SetNewProperty<T>([NotNullIfNotNull(nameof(newValue))] ref T field,
+        T newValue,
         [CallerMemberName] string? propertyName = null)
     {
         OnPropertyChanging(propertyName);

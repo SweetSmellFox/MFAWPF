@@ -58,6 +58,7 @@ public class StringComboBoxEditor : PropertyEditorBase
                 "DoNothing",
                 "Click",
                 "Swipe",
+                "MultiSwipe",
                 "Key",
                 "Text",
                 "StartApp",

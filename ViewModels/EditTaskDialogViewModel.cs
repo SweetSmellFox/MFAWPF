@@ -145,7 +145,7 @@ public class EditTaskDialogViewModel : ObservableObject
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine(exception);
+                    LoggerService.LogError(exception);
                     throw;
                 }
             }
