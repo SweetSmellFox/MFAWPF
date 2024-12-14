@@ -73,8 +73,7 @@ public partial class CropImageDialog
         var canvasPosition = e.GetPosition(SelectionCanvas);
 
         // 判断点击是否在Image边缘5个像素内
-        if (canvasPosition.X < image.ActualWidth + 5 && canvasPosition.Y < image.ActualHeight + 5 &&
-            canvasPosition is { X: > -5, Y: > -5 })
+        if (canvasPosition.X < image.ActualWidth + 5 && canvasPosition.Y < image.ActualHeight + 5 && canvasPosition is { X: > -5, Y: > -5 })
         {
             if (_selectionRectangle != null)
             {
@@ -93,7 +92,10 @@ public partial class CropImageDialog
             {
                 Stroke = Brushes.Red,
                 StrokeThickness = 2.5,
-                StrokeDashArray = { 2 }
+                StrokeDashArray =
+                {
+                    2
+                }
             };
 
             Canvas.SetLeft(_selectionRectangle, _startPoint.X);
@@ -192,7 +194,13 @@ public partial class CropImageDialog
             var roiY = Math.Max(y - 5, 0);
             var roiW = Math.Min(width + 10, bitmapImage.PixelWidth - roiX);
             var roiH = Math.Min(height + 10, bitmapImage.PixelHeight - roiY);
-            OutputRoi = new List<int> { (int)roiX, (int)roiY, (int)roiW, (int)roiH };
+            OutputRoi = new List<int>
+            {
+                (int)roiX,
+                (int)roiY,
+                (int)roiW,
+                (int)roiH
+            };
             // 创建WriteableBitmap对象并加载BitmapImage
             var writeableBitmap = new WriteableBitmap(bitmapImage);
 
@@ -252,7 +260,8 @@ public partial class CropImageDialog
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadImageTitle".GetLocalizationString(),Filter = "ImageFilter".GetLocalizationString()
+            Title = "LoadImageTitle".GetLocalizationString(),
+            Filter = "ImageFilter".GetLocalizationString()
         };
         if (openFileDialog.ShowDialog().IsTrue())
         {
@@ -260,6 +269,27 @@ public partial class CropImageDialog
             {
                 BitmapImage bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
                 UpdateImage(bitmapImage);
+            }
+            catch (Exception ex)
+            {
+                ErrorView.ShowException(ex);
+            }
+        }
+    }
+    private void Select(object sender, RoutedEventArgs e)
+    {
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Title = "LoadImageTitle".GetLocalizationString(),
+            Filter = "ImageFilter".GetLocalizationString()
+        };
+        if (openFileDialog.ShowDialog().IsTrue())
+        {
+            try
+            {
+                Output = System.IO.Path.GetFileName(openFileDialog.FileName);
+                DialogResult = true;
+                Close();
             }
             catch (Exception ex)
             {
