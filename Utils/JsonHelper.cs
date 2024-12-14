@@ -36,7 +36,6 @@ public static class JsonHelper
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
             if (show)
                 LoggerService.LogError(e);
             return defaultS;

@@ -55,7 +55,6 @@ public partial class App
         try
         {
             e.Handled = true; //把 Handled 属性设为true，表示此异常已处理，程序可以继续运行，不会强制退出      
-            Console.WriteLine(e.Exception);
             LoggerService.LogError(e.Exception);
             ErrorView.ShowException(e.Exception);
         }
@@ -99,9 +98,6 @@ public partial class App
         ErrorView.ShowException(e.Exception);
         foreach (var item in e.Exception.InnerExceptions)
         {
-            Console.WriteLine("异常类型：{0}{1}来自：{2}{3}异常内容：{4}",
-                item.GetType(), Environment.NewLine, item.Source,
-                Environment.NewLine, item.Message);
             LoggerService.LogError(string.Format("异常类型：{0}{1}来自：{2}{3}异常内容：{4}",
                 item.GetType(), Environment.NewLine, item.Source,
                 Environment.NewLine, item.Message));

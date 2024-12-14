@@ -17,6 +17,25 @@ public class MainViewModel : ObservableObject
     public ObservableCollection<LogItemViewModel> LogItemViewModels { get; } = new();
 
     public void AddLog(string content,
+        string? color = "",
+        string weight = "Regular",
+        bool showTime = true)
+    {
+
+        SolidColorBrush brush = new BrushConverter().ConvertFromString(color) as SolidColorBrush;
+        brush ??= Brushes.Gray;
+        Task.Run(() =>
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                LogItemViewModels.Add(new LogItemViewModel(content, brush, weight, "HH':'mm':'ss",
+                    showTime: showTime));
+                LoggerService.LogInfo(content);
+            });
+        });
+    }
+    
+    public void AddLog(string content,
         Brush? color = null,
         string weight = "Regular",
         bool showTime = true)

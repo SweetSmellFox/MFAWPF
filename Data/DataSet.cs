@@ -47,7 +47,6 @@ public class DataSet
             }
             catch (Exception e)
             {
-                Console.WriteLine("在进行类型转换时发生错误！");
                 LoggerService.LogError("在进行类型转换时发生错误!");
                 LoggerService.LogError(e);
             }
@@ -81,7 +80,6 @@ public class DataSet
             }
             catch (Exception e)
             {
-                Console.WriteLine("在进行类型转换时发生错误！");
                 LoggerService.LogError("在进行类型转换时发生错误!");
                 LoggerService.LogError(e);
             }
