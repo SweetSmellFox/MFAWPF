@@ -1800,7 +1800,7 @@ public partial class MainWindow
         string timeStamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         string formattedLogMessage =
             $"[{timeStamp}][INF][Px14600][Tx16498][Parser.cpp][L56][MaaNS::ProjectInterfaceNS::Parser::parse_interface] ";
-        var logMessage = $"MFAWPF Version: [data.version={Version}] "
+        var logMessage = $"MFAWPF Version: [mfa.version={Version}] "
             + (resourceVersion is null
                 ? ""
                 : $"Interface Version: [data.version=v{resourceVersion}] ");
