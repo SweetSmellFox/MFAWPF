@@ -995,6 +995,7 @@ public partial class MainWindow
         comboBox.ItemsSource = new List<string>
         {
             "简体中文",
+            "繁體中文",
             "English"
         };
         var binding = new Binding("Idle")
@@ -1009,8 +1010,25 @@ public partial class MainWindow
         comboBox.SelectionChanged += (sender, _) =>
         {
             var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+
+            string cultureCode; switch (index)
+            {
+                case 0:
+                    cultureCode = "zh-cn";
+                    break;
+                case 1:
+                    cultureCode = "zh-tw";
+                    break;
+                case 2:
+                    cultureCode = "en-us";
+                    break;
+                default:
+                    cultureCode = "zh-cn";
+                    break;
+            }
+
             LanguageManager.ChangeLanguage(
-                CultureInfo.CreateSpecificCulture(index == 0 ? "zh-cn" : "en-us"));
+                CultureInfo.CreateSpecificCulture(cultureCode));
             DataSet.SetData("LangIndex", index);
         };
 
