@@ -52,13 +52,12 @@ public partial class MainWindow
         InitializeComponent();
         Instance = this;
         version.Text = Version;
-        _maaToolkit = new MaaToolkit(init: true);
         Data = DataContext as MainViewModel;
         Loaded += (_, _) => { LoadUI(); };
         InitializeData();
         OCRHelper.Initialize();
         VersionChecker.CheckVersion();
-
+        _maaToolkit = new MaaToolkit(init: true);
         MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
 
         SetIconFromExeDirectory();
@@ -137,6 +136,7 @@ public partial class MainWindow
 
         if (MaaInterface.Instance != null)
         {
+            AppendVersionLog(MaaInterface.Instance.Version);
             Data?.TasksSource.Clear();
             LoadTasks(MaaInterface.Instance.Task ?? new List<TaskInterfaceItem>());
         }
@@ -1781,8 +1781,6 @@ public partial class MainWindow
                 EditButton.Visibility = Visibility.Collapsed;
             DataSet.SetData("EnableEdit", value);
 
-            AppendVersionLog(MaaInterface.Instance.Version);
-
             if (!string.IsNullOrWhiteSpace(MaaInterface.Instance.Message))
             {
                 Growl.Info(MaaInterface.Instance.Message);
@@ -1801,12 +1799,15 @@ public partial class MainWindow
         string logFilePath = Path.Combine(debugFolderPath, "maa.log");
         string timeStamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         string formattedLogMessage =
-            $"[{timeStamp}][INF][Px14600][Tx16498][Parser.cpp][L56][MaaNS::ProjectInterfaceNS::Parser::parse_interface] MFAWPF Version: [data.version=v{Version}] " + resourceVersion is null
+            $"[{timeStamp}][INF][Px14600][Tx16498][Parser.cpp][L56][MaaNS::ProjectInterfaceNS::Parser::parse_interface] ";
+        var logMessage = $"MFAWPF Version: [data.version={Version}] "
+            + (resourceVersion is null
                 ? ""
-                : $"Interface Version: [data.version=v{resourceVersion}] ";
+                : $"Interface Version: [data.version=v{resourceVersion}] ");
+        LoggerService.LogInfo(logMessage);
         using (StreamWriter writer = new StreamWriter(logFilePath, true, Encoding.UTF8))
         {
-            writer.WriteLine(formattedLogMessage);
+            writer.WriteLine(formattedLogMessage + logMessage);
         }
     }
     public void WaitEmulator()
