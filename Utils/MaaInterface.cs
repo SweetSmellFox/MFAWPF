@@ -8,8 +8,10 @@ public class MaaInterface
 {
     public class MaaInterfaceOptionCase
     {
-        [JsonProperty("name")] public string? Name { get; set; }
-        [JsonProperty("pipeline_override")] public Dictionary<string, TaskModel>? PipelineOverride { get; set; }
+        [JsonProperty("name")]
+        public string? Name { get; set; }
+        [JsonProperty("pipeline_override")]
+        public Dictionary<string, TaskModel>? PipelineOverride { get; set; }
 
         public override string ToString()
         {
@@ -25,14 +27,20 @@ public class MaaInterface
 
     public class MaaInterfaceOption
     {
-        [JsonIgnore] public string Name { get; set; } = string.Empty;
-        [JsonProperty("cases")] public List<MaaInterfaceOptionCase>? Cases { get; set; }
+        [JsonIgnore]
+        public string Name { get; set; } = string.Empty;
+        [JsonProperty("cases")]
+        public List<MaaInterfaceOptionCase>? Cases { get; set; }
+        [JsonProperty("default_case")]
+        public string? DefaultCase { get; set; }
     }
 
     public class MaaInterfaceSelectOption
     {
-        [JsonProperty("name")] public string? Name { get; set; }
-        [JsonProperty("index")] public int? Index { get; set; }
+        [JsonProperty("name")]
+        public string? Name { get; set; }
+        [JsonProperty("index")]
+        public int? Index { get; set; }
 
         public override string ToString()
         {
@@ -42,8 +50,10 @@ public class MaaInterface
 
     public class CustomExecutor
     {
-        [JsonIgnore] public string? Name { get; set; }
-        [JsonProperty("exec_path")] public string? ExecPath { get; set; }
+        [JsonIgnore]
+        public string? Name { get; set; }
+        [JsonProperty("exec_path")]
+        public string? ExecPath { get; set; }
 
         [JsonConverter(typeof(SingleOrListConverter))]
         [JsonProperty("exec_param")]
@@ -52,7 +62,8 @@ public class MaaInterface
 
     public class MaaCustomResource
     {
-        [JsonProperty("name")] public string? Name { get; set; }
+        [JsonProperty("name")]
+        public string? Name { get; set; }
 
         [JsonConverter(typeof(SingleOrListConverter))]
         [JsonProperty("path")]
@@ -61,9 +72,12 @@ public class MaaInterface
 
     public class MaaResourceVersion
     {
-        [JsonProperty("name")] public string? Name { get; set; }
-        [JsonProperty("version")] public string? Version { get; set; }
-        [JsonProperty("url")] public string? Url { get; set; }
+        [JsonProperty("name")]
+        public string? Name { get; set; }
+        [JsonProperty("version")]
+        public string? Version { get; set; }
+        [JsonProperty("url")]
+        public string? Url { get; set; }
 
 
         public override string ToString()
@@ -72,34 +86,84 @@ public class MaaInterface
         }
     }
 
-    [JsonProperty("name")] public string? Name { get; set; }
+    public class MaaResourceControllerAdb
+    {
+        [JsonProperty("input")]
+        public long? Input { get; set; }
+        [JsonProperty("screencap")]
+        public long? ScreenCap { get; set; }
+        [JsonProperty("config")]
+        public object? Adb { get; set; }
+    }
+
+    public class MaaResourceControllerWin32
+    {
+        [JsonProperty("class_regex")]
+        public string? ClassRegex { get; set; }
+        [JsonProperty("window_regex")]
+        public string? WindowRegex { get; set; }
+        [JsonProperty("input")]
+        public long? Input { get; set; }
+        [JsonProperty("screencap")]
+        public long? ScreenCap { get; set; }
+    }
+
+    public class MaaResourceController
+    {
+        [JsonProperty("name")]
+        public string? Name { get; set; }
+        [JsonProperty("type")]
+        public string? Type { get; set; }
+        [JsonProperty("adb")]
+        public MaaResourceControllerAdb? Adb { get; set; }
+        [JsonProperty("win32")]
+        public MaaResourceControllerWin32? Win32 { get; set; }
+    }
+
+    [JsonProperty("name")]
+    public string? Name { get; set; }
 
     [JsonProperty("version")]
     [JsonConverter(typeof(MaaResourceVersionConverter))]
     public string? Version { get; set; }
+    
+    [JsonProperty("message")]
+    public string? Message { get; set; }
 
-    [JsonProperty("url")] public string? Url { get; set; }
+    [JsonProperty("url")]
+    public string? Url { get; set; }
 
-    [JsonProperty("custom_title")] public string? CustomTitle { get; set; }
+    [JsonProperty("custom_title")]
+    public string? CustomTitle { get; set; }
 
-    [JsonProperty("default_controller")] public string? DefaultController { get; set; }
+    [JsonProperty("default_controller")]
+    public string? DefaultController { get; set; }
 
-    [JsonProperty("lock_controller")] public bool? LockController { get; set; }
+    [JsonProperty("lock_controller")]
+    public bool? LockController { get; set; }
+    [JsonProperty("controller")]
+    public List<MaaResourceController>? Controller { get; set; }
+    [JsonProperty("resource")]
+    public List<MaaCustomResource>? Resource { get; set; }
+    [JsonProperty("task")]
+    public List<TaskInterfaceItem>? Task { get; set; }
+    [JsonProperty("recognition")]
+    public Dictionary<string, CustomExecutor>? Recognition { get; set; }
+    [JsonProperty("action")]
+    public Dictionary<string, CustomExecutor>? Action { get; set; }
+    [JsonProperty("option")]
+    public Dictionary<string, MaaInterfaceOption>? Option { get; set; }
 
-    [JsonProperty("resource")] public List<MaaCustomResource>? Resource { get; set; }
-    [JsonProperty("task")] public List<TaskInterfaceItem>? Task { get; set; }
-    [JsonProperty("recognition")] public Dictionary<string, CustomExecutor>? Recognition { get; set; }
-    [JsonProperty("action")] public Dictionary<string, CustomExecutor>? Action { get; set; }
-    [JsonProperty("option")] public Dictionary<string, MaaInterfaceOption>? Option { get; set; }
-
-    [JsonExtensionData] public Dictionary<string, object> AdditionalData { get; set; } = new();
+    [JsonExtensionData]
+    public Dictionary<string, object> AdditionalData { get; set; } = new();
     private static MaaInterface? _instance;
 
     // [JsonIgnore] public List<MaaCustomRecognizerExecutor> CustomRecognizerExecutors { get; } = new();
     //
     // [JsonIgnore] public List<MaaCustomActionExecutor> CustomActionExecutors { get; } = new();
 
-    [JsonIgnore] public Dictionary<string, List<string>> Resources { get; } = new();
+    [JsonIgnore]
+    public Dictionary<string, List<string>> Resources { get; } = new();
 
     // 替换单个字符串中的 "{PROJECT_DIR}" 为指定的替换值
     public static string ReplacePlaceholder(string? input, string replacement)

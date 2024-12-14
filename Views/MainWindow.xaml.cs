@@ -79,48 +79,50 @@ public partial class MainWindow
         DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
         if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json"))
         {
-            Console.WriteLine("未找到interface文件，生成interface.json...");
             LoggerService.LogInfo("未找到interface文件，生成interface.json...");
             MaaInterface.Instance = new MaaInterface
-            {
-                Version = "1.0",
-                Name = "Debug",
-                Task = new List<TaskInterfaceItem>(),
-                Resource = new List<MaaInterface.MaaCustomResource>
                 {
-                    new()
+                    Version = "1.0",
+                    Name = "Debug",
+                    Task = new List<TaskInterfaceItem>(),
+                    Resource = new List<MaaInterface.MaaCustomResource>
                     {
-                        Name = "默认",
-                        Path = new List<string>
+                        new()
                         {
-                            "{PROJECT_DIR}/resource/base"
+                            Name = "默认",
+                            Path =
+                            [
+                                "{PROJECT_DIR}/resource/base"
+                            ]
+
                         }
-                    }
-                },
-                Recognition = new Dictionary<string, MaaInterface.CustomExecutor>(),
-                Action = new Dictionary<string, MaaInterface.CustomExecutor>(),
-                Option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
-                {
+                    },
+                    Recognition = new Dictionary<string, MaaInterface.CustomExecutor>(),
+                    Action = new Dictionary<string, MaaInterface.CustomExecutor>(),
+                    Option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
                     {
-                        "测试", new MaaInterface.MaaInterfaceOption()
                         {
-                            Cases = new List<MaaInterface.MaaInterfaceOptionCase>
+                            "测试", new MaaInterface.MaaInterfaceOption()
                             {
-                                new()
-                                {
-                                    Name = "测试1",
-                                    PipelineOverride = new Dictionary<string, TaskModel>()
-                                },
-                                new()
-                                {
-                                    Name = "测试2",
-                                    PipelineOverride = new Dictionary<string, TaskModel>()
-                                }
+                                Cases =
+                                [
+
+                                    new MaaInterface.MaaInterfaceOptionCase
+                                    {
+                                        Name = "测试1",
+                                        PipelineOverride = new Dictionary<string, TaskModel>()
+                                    },
+                                    new MaaInterface.MaaInterfaceOptionCase
+                                    {
+                                        Name = "测试2",
+                                        PipelineOverride = new Dictionary<string, TaskModel>()
+                                    }
+                                ]
                             }
                         }
                     }
                 }
-            };
+                ;
             JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
                 MaaInterface.Instance, new MaaInterfaceSelectOptionConverter(true));
         }
@@ -132,7 +134,6 @@ public partial class MainWindow
                     () => { }, new MaaInterfaceSelectOptionConverter(false));
         }
 
-
         if (MaaInterface.Instance != null)
         {
             Data?.TasksSource.Clear();
@@ -141,6 +142,7 @@ public partial class MainWindow
 
         ConnectToMAA();
         return LoadTask();
+
     }
 
 
@@ -496,15 +498,131 @@ public partial class MainWindow
                 }
                 else
                     deviceComboBox.SelectedIndex = 0;
+                if (MaaInterface.Instance.Controller != null)
+                {
+                    if (MaaInterface.Instance.Controller.Any(controller => controller.Type.ToLower().Equals("adb")))
+                    {
+                        var adbController = MaaInterface.Instance.Controller.FirstOrDefault(controller => controller.Type.ToLower().Equals("adb"));
+                        if (adbController.Adb != null)
+                        {
+                            if (adbController.Adb.Input != null)
+                            {
+                                int result = 3;
+                                switch (adbController.Adb.Input)
+                                {
+                                    case 1:
+                                        result = 2;
+                                        break;
+                                    case 2:
+                                        result = 0;
+                                        break;
+                                    case 4:
+                                        result = 1;
+                                        break;
+                                }
+                                DataSet.SetData("AdbControlInputType", result);
+                            }
+                            if (adbController.Adb.ScreenCap != null)
+                            {
+                                int result = 0;
+                                switch (adbController.Adb.ScreenCap)
+                                {
+                                    case 1:
+                                        result = 4;
+                                        break;
+                                    case 2:
+                                        result = 3;
+                                        break;
+                                    case 4:
+                                        result = 1;
+                                        break;
+                                    case 8:
+                                        result = 2;
+                                        break;
+                                    case 16:
+                                        result = 5;
+                                        break;
+                                    case 32:
+                                        result = 6;
+                                        break;
+                                    case 64:
+                                        result = 7;
+                                        break;
+                                }
+                                DataSet.SetData("AdbControlScreenCapType", result);
+                            }
+                        }
+                    }
+                }
             }
             else
             {
-                var windows = _maaToolkit.Desktop.Window.Find();
+                var windows = _maaToolkit.Desktop.Window.Find().ToList();
                 deviceComboBox.ItemsSource = windows;
                 MaaProcessor.Config.IsConnected = windows.Count > 0;
                 deviceComboBox.SelectedIndex = windows.Count > 0
                     ? windows.ToList().FindIndex(win => !string.IsNullOrWhiteSpace(win.Name))
                     : 0;
+                if (MaaInterface.Instance.Controller != null)
+                {
+                    if (MaaInterface.Instance.Controller.Any(controller => controller.Type.ToLower().Equals("win32")))
+                    {
+                        var win32Controller = MaaInterface.Instance.Controller.FirstOrDefault(controller => controller.Type.ToLower().Equals("win32"));
+                        if (win32Controller.Win32 != null)
+                        {
+                            var filteredWindows = windows.Where(win => !string.IsNullOrWhiteSpace(win.Name) || !string.IsNullOrWhiteSpace(win.ClassName)).ToList();
+                            if (!string.IsNullOrWhiteSpace(win32Controller.Win32.WindowRegex))
+                            {
+                                var windowRegex = new Regex(win32Controller.Win32.WindowRegex);
+                                filteredWindows = filteredWindows.Where(win => windowRegex.IsMatch(win.Name)).ToList();
+                                deviceComboBox.SelectedIndex = filteredWindows.Count > 0
+                                    ? windows.FindIndex(win => win.Name.Equals(filteredWindows.First().Name))
+                                    : 0;
+                            }
+
+                            if (!string.IsNullOrWhiteSpace(win32Controller.Win32.ClassRegex))
+                            {
+                                var classRegex = new Regex(win32Controller.Win32.ClassRegex);
+                                var filteredWindowsByClass = filteredWindows.Where(win => classRegex.IsMatch(win.ClassName)).ToList();
+                                deviceComboBox.SelectedIndex = filteredWindowsByClass.Count > 0
+                                    ? windows.FindIndex(win => win.ClassName.Equals(filteredWindowsByClass.First().ClassName))
+                                    : 0;
+                            }
+
+                            if (win32Controller.Win32.Input != null)
+                            {
+                                int result = 0;
+                                switch (win32Controller.Win32.Input)
+                                {
+                                    case 1:
+                                        result = 0;
+                                        break;
+                                    case 2:
+                                        result = 1;
+                                        break;
+                                }
+                                DataSet.SetData("Win32ControlInputType", result);
+                            }
+                            if (win32Controller.Win32.ScreenCap != null)
+                            {
+                                int result = 0;
+                                switch (win32Controller.Win32.ScreenCap)
+                                {
+                                    case 1:
+                                        result = 2;
+                                        break;
+                                    case 2:
+                                        result = 0;
+                                        break;
+                                    case 4:
+                                        result = 1;
+                                        break;
+                                }
+                                DataSet.SetData("Win32ControlScreenCapType", result);
+                            }
+                        }
+                    }
+                }
             }
 
             if (!MaaProcessor.Config.IsConnected)
@@ -1375,7 +1493,14 @@ public partial class MainWindow
                 comboBox.SetBinding(IsEnabledProperty, multiBinding);
 
                 comboBox.ItemsSource = interfaceOption.Cases;
-
+                if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase))
+                {
+                    int index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
+                    if (index != -1)
+                    {
+                        comboBox.SelectedIndex = index;
+                    }
+                }
                 comboBox.Tag = option.Name;
 
                 comboBox.SelectionChanged += (_, _) =>
@@ -1654,6 +1779,10 @@ public partial class MainWindow
             if (!value)
                 EditButton.Visibility = Visibility.Collapsed;
             DataSet.SetData("EnableEdit", value);
+            if (!string.IsNullOrWhiteSpace(MaaInterface.Instance.Message))
+            {
+                Growl.Info(MaaInterface.Instance.Message);
+            }
         });
     }
 

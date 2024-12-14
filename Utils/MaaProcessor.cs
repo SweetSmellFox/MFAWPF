@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 using HandyControl.Controls;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
+using MaaFramework.Binding.Custom;
 using MaaFramework.Binding.Messages;
 using MFAWPF.Custom;
 using MFAWPF.Data;
@@ -24,6 +25,7 @@ using System;
 using System.Runtime.Intrinsics.Arm;
 using System.Collections;
 using System.Net;
+using System.Reflection;
 using System.Web;
 
 namespace MFAWPF.Utils;
@@ -811,28 +813,89 @@ public class MaaProcessor
                 Config.DesktopWindow.Link,
                 Config.DesktopWindow.Check);
     }
-
+    // public static IEnumerable<object> LoadAndInstantiateCustomClasses(string directory, string[] interfacesToImplement)
+    // {
+    //     var customClasses = new List<object>();
+    //     var csFiles = Directory.GetFiles(directory, "*.cs");
+    //
+    //     foreach (var filePath in csFiles)
+    //     {
+    //         // 读取.cs文件内容
+    //         string code = File.ReadAllText(filePath);
+    //
+    //         // 使用Roslyn编译代码
+    //         var syntaxTree = CSharpSyntaxTree.ParseText(code);
+    //         var compilation = CSharpCompilation.Create("DynamicAssembly")
+    //             .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+    //             .AddSyntaxTrees(syntaxTree)
+    //             .AddReferences(
+    //                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location));
+    //         foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+    //         {
+    //             if (!string.IsNullOrEmpty(assembly.Location))
+    //             {
+    //                 compilation.AddReferences(MetadataReference.CreateFromFile(assembly.Location));
+    //                 Console.WriteLine(assembly.FullName + ":"+ assembly.Location);
+    //             }
+    //         }
+    //         using (var ms = new MemoryStream())
+    //         {
+    //             EmitResult result = compilation.Emit(ms);
+    //             if (!result.Success)
+    //             {
+    //                 var failures = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
+    //                 foreach (var diagnostic in failures)
+    //                 {
+    //                     Console.WriteLine($"{diagnostic.Id}: {diagnostic.GetMessage()}");
+    //                 }
+    //                 continue;
+    //             }
+    //
+    //             ms.Seek(0, SeekOrigin.Begin);
+    //             var assembly = Assembly.Load(ms.ToArray());
+    //
+    //             // 查找实现了指定接口的类
+    //             foreach (var type in assembly.GetTypes())
+    //             {
+    //                 foreach (var iface in interfacesToImplement)
+    //                 {
+    //                     if (type.GetInterfaces().Any(i => i.Name == iface))
+    //                     {
+    //                         customClasses.Add(Activator.CreateInstance(type));
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    //
+    //     return customClasses;
+    // }
     private void RegisterCustomRecognitionsAndActions(MaaTasker instance)
     {
         if (MaaInterface.Instance == null) return;
         LoggerService.LogInfo("RegisteringCustomRecognizer".GetLocalizationString());
-
-        // foreach (var recognizer in MaaInterface.Instance.CustomRecognizerExecutors)
-        // {
-        //     LoggerService.LogInfo($"RegisterCustomRecognizer".GetLocalizationString().FormatWith(recognizer.Name));
-        //     instance.Toolkit.ExecAgent.Register(instance, recognizer);
-        // }
-        //
-        // LoggerService.LogInfo("RegisteringCustomAction".GetLocalizationString());
-        // foreach (var action in MaaInterface.Instance.CustomActionExecutors)
-        // {
-        //     LoggerService.LogInfo("RegisterCustomAction".GetLocalizationString().FormatWith(action.Name));
-        //     instance.Toolkit.ExecAgent.Register(instance, action);
-        // }
-
-        instance.Resource.Register(new MoneyRecognition());
+        
         instance.Resource.Register(new MoneyDetectRecognition());
-
+        instance.Resource.Register(new MoneyRecognition());
+        // var customClasses = LoadAndInstantiateCustomClasses($"{Resource}/custom", new[]
+        // {
+        //     "IMaaCustomRecognition",
+        //     "IMaaCustomAction"
+        // });
+        // foreach (var customClass in customClasses)
+        // {
+        //     if (customClass is IMaaCustomRecognition recognition)
+        //     {
+        //         instance.Resource.Register(recognition);
+        //
+        //     }
+        //     else if (customClass is IMaaCustomAction action)
+        //     {
+        //         instance.Resource.Register(action);
+        //     }
+        //     LoggerService.LogInfo("Registering " + nameof(customClass));
+        //
+        // }
         instance.Callback += (_, args) =>
         {
             var jObject = JObject.Parse(args.Details);
