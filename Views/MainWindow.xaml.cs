@@ -23,6 +23,7 @@ using MFAWPF.ViewModels;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text;
 using WPFLocalizeExtension.Extensions;
 using ComboBox = HandyControl.Controls.ComboBox;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
@@ -1779,13 +1780,35 @@ public partial class MainWindow
             if (!value)
                 EditButton.Visibility = Visibility.Collapsed;
             DataSet.SetData("EnableEdit", value);
+
+            AppendVersionLog(MaaInterface.Instance.Version);
+
             if (!string.IsNullOrWhiteSpace(MaaInterface.Instance.Message))
             {
                 Growl.Info(MaaInterface.Instance.Message);
             }
+
         });
     }
+    public static void AppendVersionLog(string? resourceVersion)
+    {
+        string debugFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug");
+        if (!Directory.Exists(debugFolderPath))
+        {
+            Directory.CreateDirectory(debugFolderPath);
+        }
 
+        string logFilePath = Path.Combine(debugFolderPath, "maa.log");
+        string timeStamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        string formattedLogMessage =
+            $"[{timeStamp}][INF][Px14600][Tx16498][Parser.cpp][L56][MaaNS::ProjectInterfaceNS::Parser::parse_interface] MFAWPF Version: [data.version=v{Version}] " + resourceVersion is null
+                ? ""
+                : $"Interface Version: [data.version=v{resourceVersion}] ";
+        using (StreamWriter writer = new StreamWriter(logFilePath, true, Encoding.UTF8))
+        {
+            writer.WriteLine(formattedLogMessage);
+        }
+    }
     public void WaitEmulator()
     {
         Task.Run(
