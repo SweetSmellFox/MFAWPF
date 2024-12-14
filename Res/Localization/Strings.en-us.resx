@@ -512,4 +512,7 @@
   <data name="EnableGPU" xml:space="preserve">
     <value>Enable GPU acceleration</value>
   </data>
+  <data name="SelectExistingImage" xml:space="preserve">
+    <value>Select an existing image</value>
+  </data>
 </root>

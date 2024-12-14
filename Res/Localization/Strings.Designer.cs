@@ -1239,6 +1239,15 @@ namespace MFAWPF.Res.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 选择一张已有图片.
+        /// </summary>
+        internal static string SelectExistingImage {
+            get {
+                return ResourceManager.GetString("SelectExistingImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 关机.
         /// </summary>
         internal static string ShutDown {
@@ -1329,7 +1338,7 @@ namespace MFAWPF.Res.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ADB.
+        ///   Looks up a localized string similar to 模拟器.
         /// </summary>
         internal static string TabADB {
             get {
@@ -1338,7 +1347,7 @@ namespace MFAWPF.Res.Localization {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Win32.
+        ///   Looks up a localized string similar to 桌面应用.
         /// </summary>
         internal static string TabWin32 {
             get {

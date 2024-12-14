@@ -121,10 +121,10 @@
     <value>MFA 任务管理器</value>
   </data>
   <data name="TabADB" xml:space="preserve">
-    <value>ADB</value>
+    <value>模拟器</value>
   </data>
   <data name="TabWin32" xml:space="preserve">
-    <value>Win32</value>
+    <value>桌面应用</value>
   </data>
   <data name="TooltipRefresh" xml:space="preserve">
     <value>刷新</value>
@@ -617,5 +617,8 @@
   </data>
   <data name="EnableGPU" xml:space="preserve">
     <value>启用GPU加速</value>
+  </data>
+  <data name="SelectExistingImage" xml:space="preserve">
+    <value>选择一张已有图片</value>
   </data>
 </root>
