@@ -515,4 +515,7 @@
   <data name="SelectExistingImage" xml:space="preserve">
     <value>Select an existing image</value>
   </data>
+  <data name="EnableSaveDraw" xml:space="preserve">
+    <value>Enable Save Draw(for debugging)</value>
+  </data>
 </root>

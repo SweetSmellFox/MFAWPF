@@ -708,6 +708,15 @@ namespace MFAWPF.Res.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 启用保存截图(用于调试).
+        /// </summary>
+        internal static string EnableSaveDraw {
+            get {
+                return ResourceManager.GetString("EnableSaveDraw", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 请输入任务名称.
         /// </summary>
         internal static string EnterTaskName {

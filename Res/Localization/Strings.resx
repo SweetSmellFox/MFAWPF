@@ -621,4 +621,7 @@
   <data name="SelectExistingImage" xml:space="preserve">
     <value>选择一张已有图片</value>
   </data>
+  <data name="EnableSaveDraw" xml:space="preserve">
+    <value>启用保存截图(用于调试)</value>
+  </data>
 </root>

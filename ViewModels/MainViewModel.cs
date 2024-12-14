@@ -22,7 +22,7 @@ public class MainViewModel : ObservableObject
         bool showTime = true)
     {
 
-        SolidColorBrush brush = new BrushConverter().ConvertFromString(color) as SolidColorBrush;
+        var brush = new BrushConverter().ConvertFromString(color ?? "Gray") as SolidColorBrush;
         brush ??= Brushes.Gray;
         Task.Run(() =>
         {

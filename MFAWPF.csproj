@@ -19,9 +19,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Lierda.WPFHelper" Version="1.0.3" />
-    <PackageReference Include="Maa.Framework.Native" Version="2.1.2" />
+    <PackageReference Include="Maa.Framework.Native" Version="2.3.1" />
     <PackageReference Include="Maa.Framework.Runtime.win-arm64" Version="2.3.1" />
-    <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="2.3.1" />
   </ItemGroup>
     <!-- Info -->
     <PropertyGroup>
@@ -68,10 +67,11 @@
 
   
     <ItemGroup>
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0-preview3" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
         <PackageReference Include="GraphSharp" Version="1.1.0" />
         <PackageReference Include="HandyControls" Version="3.5.3" />
+        <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="2.3.1" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="NLog" Version="5.3.4" />
         <PackageReference Include="NLog.Config" Version="4.7.15" />

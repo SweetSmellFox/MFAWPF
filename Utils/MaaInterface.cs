@@ -141,6 +141,7 @@ public class MaaInterface
 
     [JsonProperty("lock_controller")]
     public bool? LockController { get; set; }
+    
     [JsonProperty("controller")]
     public List<MaaResourceController>? Controller { get; set; }
     [JsonProperty("resource")]

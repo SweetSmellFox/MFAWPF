@@ -12,7 +12,7 @@ using HandyControl.Controls;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Custom;
-using MaaFramework.Binding.Messages;
+using MaaFramework.Binding.Notification;
 using MFAWPF.Custom;
 using MFAWPF.Data;
 using MFAWPF.ViewModels;
@@ -146,7 +146,7 @@ public class MaaProcessor
             {
                 if (IsStopped)
                     MainWindow.Data?.AddLogByKey("Stopping");
-                if (_currentTasker == null || (_currentTasker?.Abort()).IsTrue())
+                if (_currentTasker == null || _currentTasker?.Abort().Wait() == MaaJobStatus.Succeeded)
                 {
                     DisplayTaskCompletionMessage();
                     MainWindow.Data?.SetIdle(true);
@@ -769,6 +769,7 @@ public class MaaProcessor
             RegisterCustomRecognitionsAndActions(tasker);
             if (!DataSet.GetData("EnableGPU", true))
                 tasker.Resource.SetOptionInferenceDevice(InferenceDevice.CPU);
+            tasker.Utility.SetOptionSaveDraw(DataSet.GetData("EnableSaveDraw", false));
             return tasker;
         }
         catch (Exception e)
@@ -874,7 +875,7 @@ public class MaaProcessor
     {
         if (MaaInterface.Instance == null) return;
         LoggerService.LogInfo("RegisteringCustomRecognizer".GetLocalizationString());
-        
+
         instance.Resource.Register(new MoneyDetectRecognition());
         instance.Resource.Register(new MoneyRecognition());
         // var customClasses = LoadAndInstantiateCustomClasses($"{Resource}/custom", new[]

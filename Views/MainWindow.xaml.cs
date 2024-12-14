@@ -59,7 +59,6 @@ public partial class MainWindow
         VersionChecker.CheckVersion();
         _maaToolkit = new MaaToolkit(init: true);
         MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
-
         SetIconFromExeDirectory();
     }
 
@@ -499,12 +498,12 @@ public partial class MainWindow
                 }
                 else
                     deviceComboBox.SelectedIndex = 0;
-                if (MaaInterface.Instance.Controller != null)
+                if (MaaInterface.Instance?.Controller != null)
                 {
-                    if (MaaInterface.Instance.Controller.Any(controller => controller.Type.ToLower().Equals("adb")))
+                    if (MaaInterface.Instance.Controller.Any(controller => controller.Type != null && controller.Type.ToLower().Equals("adb")))
                     {
-                        var adbController = MaaInterface.Instance.Controller.FirstOrDefault(controller => controller.Type.ToLower().Equals("adb"));
-                        if (adbController.Adb != null)
+                        var adbController = MaaInterface.Instance.Controller.FirstOrDefault(controller => controller.Type != null && controller.Type.ToLower().Equals("adb"));
+                        if (adbController?.Adb != null)
                         {
                             if (adbController.Adb.Input != null)
                             {
@@ -564,12 +563,12 @@ public partial class MainWindow
                 deviceComboBox.SelectedIndex = windows.Count > 0
                     ? windows.ToList().FindIndex(win => !string.IsNullOrWhiteSpace(win.Name))
                     : 0;
-                if (MaaInterface.Instance.Controller != null)
+                if (MaaInterface.Instance?.Controller != null)
                 {
-                    if (MaaInterface.Instance.Controller.Any(controller => controller.Type.ToLower().Equals("win32")))
+                    if (MaaInterface.Instance.Controller.Any(controller => controller.Type != null && controller.Type.ToLower().Equals("win32")))
                     {
-                        var win32Controller = MaaInterface.Instance.Controller.FirstOrDefault(controller => controller.Type.ToLower().Equals("win32"));
-                        if (win32Controller.Win32 != null)
+                        var win32Controller = MaaInterface.Instance.Controller.FirstOrDefault(controller => controller.Type != null && controller.Type.ToLower().Equals("win32"));
+                        if (win32Controller?.Win32 != null)
                         {
                             var filteredWindows = windows.Where(win => !string.IsNullOrWhiteSpace(win.Name) || !string.IsNullOrWhiteSpace(win.ClassName)).ToList();
                             if (!string.IsNullOrWhiteSpace(win32Controller.Win32.WindowRegex))
@@ -714,6 +713,7 @@ public partial class MainWindow
         AddThemeOption(s1);
         AddLanguageOption(s1);
         AddGpuOption(s2);
+        AddSaveDrawOption(s2);
         ScrollViewer sv1 = new()
             {
                 Content = s1,
@@ -1297,6 +1297,19 @@ public partial class MainWindow
         panel.Children.Add(checkBox);
     }
 
+    private void AddSaveDrawOption(Panel? panel = null)
+    {
+        panel ??= settingPanel;
+        var checkBox = new CheckBox
+        {
+            IsChecked = DataSet.GetData("EnableSaveDraw", false),
+            Margin = new Thickness(5)
+        };
+        checkBox.BindLocalization("EnableSaveDraw", ContentProperty);
+        checkBox.Click += (_, _) => { DataSet.SetData("EnableSaveDraw", checkBox.IsChecked); };
+        panel.Children.Add(checkBox);
+    }
+
     private void AddRememberAdbOption(Panel? panel = null)
     {
         panel ??= settingPanel;
@@ -1494,7 +1507,7 @@ public partial class MainWindow
                 comboBox.SetBinding(IsEnabledProperty, multiBinding);
 
                 comboBox.ItemsSource = interfaceOption.Cases;
-                if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase))
+                if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase) && interfaceOption.Cases != null)
                 {
                     int index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
                     if (index != -1)
@@ -1781,13 +1794,14 @@ public partial class MainWindow
                 EditButton.Visibility = Visibility.Collapsed;
             DataSet.SetData("EnableEdit", value);
 
-            if (!string.IsNullOrWhiteSpace(MaaInterface.Instance.Message))
+            if (!string.IsNullOrWhiteSpace(MaaInterface.Instance?.Message))
             {
                 Growl.Info(MaaInterface.Instance.Message);
             }
 
         });
     }
+    
     public static void AppendVersionLog(string? resourceVersion)
     {
         string debugFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug");
@@ -1805,11 +1819,17 @@ public partial class MainWindow
                 ? ""
                 : $"Interface Version: [data.version=v{resourceVersion}] ");
         LoggerService.LogInfo(logMessage);
-        using (StreamWriter writer = new StreamWriter(logFilePath, true, Encoding.UTF8))
+
+        try
         {
-            writer.WriteLine(formattedLogMessage + logMessage);
+            File.AppendAllText(logFilePath, formattedLogMessage + logMessage);
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("尝试写入失败！");
         }
     }
+    
     public void WaitEmulator()
     {
         Task.Run(
