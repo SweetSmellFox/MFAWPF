@@ -8,73 +8,135 @@ using WPFLocalizeExtension.Engine;
 
 namespace MFAWPF.Utils;
 
-public static class LanguageManager
+public class LanguageManager
 {
     public static event EventHandler? LanguageChanged;
 
-    public static void ChangeLanguage(CultureInfo newCulture)
+    public class SupportedLanguage
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Key { get; set; } = string.Empty;
+        public SupportedLanguage(string key, string name)
+        {
+            Name = name;
+            Key = key;
+        }
+    }
+
+    public static readonly List<SupportedLanguage> SupportedLanguages =
+    [
+        new("zh-hans", "简体中文"),
+        new("zh-hant", "繁體中文"),
+        new("en-us", "English")
+    ];
+
+    public static SupportedLanguage GetLanguage(string key)
+    {
+        foreach (SupportedLanguage lang in SupportedLanguages)
+        {
+            if (lang.Key == key)
+            {
+                return lang;
+            }
+        }
+        throw new ArgumentException($"不支持的语言代码: {key}");
+    }
+
+    public static void ChangeLanguage(SupportedLanguage language)
     {
         // 设置应用程序的文化
-        LocalizeDictionary.Instance.Culture = newCulture;
+        LocalizeDictionary.Instance.Culture = CultureInfo.CreateSpecificCulture(language.Key);
 
-        _localizedStrings = newCulture.Name.ToLower() == "zh-cn" ? _cn : _en;
+        _currentLanguage = language.Key;
 
         // 触发语言变化事件
         LanguageChanged?.Invoke(null, EventArgs.Empty);
     }
 
     // 存储语言的字典
-    private static Dictionary<string, string> _cn = new();
-    private static Dictionary<string, string> _en = new();
-    private static Dictionary<string, string> _localizedStrings = new();
+    private static readonly Dictionary<string, Dictionary<string, string>> _langs = new();
+    private static string _currentLanguage = SupportedLanguages[0].Key;
     public static void Initialize()
     {
         Console.WriteLine("Initializing LanguageManager...");
-        LoadLanguage("zh-cn", ref _cn);
-        LoadLanguage("en-us", ref _en);
+        LoadLanguages();
     }
 
-    // 初始化时加载语言文件
-    public static void LoadLanguage(string languageName, ref Dictionary<string, string> localizedStrings)
+    private static void LoadLanguages()
     {
-        string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lang", $"{languageName}.json");
-
-        if (File.Exists(filePath))
+        string langPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lang");
+        if (Directory.Exists(langPath))
         {
-            try
+            string[] langFiles = Directory.GetFiles(langPath, "*.json");
+            foreach (string langFile in langFiles)
             {
-                string jsonContent = File.ReadAllText(filePath);
-                var parsedData = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonContent);
-
-                if (parsedData != null)
+                string langCode = Path.GetFileNameWithoutExtension(langFile).ToLower();
+                if (IsSimplifiedChinese(langCode))
                 {
-                    localizedStrings = parsedData;
+                    langCode = "zh-hans";
                 }
-
+                else if (IsTraditionalChinese(langCode))
+                {
+                    langCode = "zh-hant";
+                }
+                string jsonContent = File.ReadAllText(langFile);
+                var langResources = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonContent);
+                if (langResources is not null)
+                    _langs[langCode] = langResources;
             }
-            catch (Exception ex)
-            {
-                // 处理读取文件时的错误
-                Console.WriteLine($"Error loading localization file: {ex.Message}");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"Localization file for language '{languageName}' not found.");
         }
     }
-    
+
     private static Dictionary<string, string> GetLocalizedStrings()
     {
-        if (_localizedStrings.Count == 0)
-            return _cn;
-        return _localizedStrings;
+        return _langs.TryGetValue(_currentLanguage,
+            out var dict) 
+            ? dict 
+            : new Dictionary<string, string>();
     }
-    
+
     public static string GetLocalizedString(string? key)
     {
         if (key == null)
             return string.Empty;
         return GetLocalizedStrings().GetValueOrDefault(key, key);
+    }
+
+
+    private static bool IsSimplifiedChinese(string langCode)
+    {
+        string[] simplifiedPrefixes =
+        {
+            "zh-hans",
+            "zh-cn",
+            "zh-sg"
+        };
+        foreach (string prefix in simplifiedPrefixes)
+        {
+            if (langCode.StartsWith(prefix))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static bool IsTraditionalChinese(string langCode)
+    {
+        string[] traditionalPrefixes =
+        {
+            "zh-hant",
+            "zh-tw",
+            "zh-hk",
+            "zh-mo"
+        };
+        foreach (string prefix in traditionalPrefixes)
+        {
+            if (langCode.StartsWith(prefix))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

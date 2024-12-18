@@ -58,9 +58,9 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style TargetType="{x:Type controls:PinButton}" BasedOn="{StaticResource ButtonDefault}">
-        <Setter Property="Foreground" Value="{DynamicResource ActionIconColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource ActionIconColor}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="BorderThickness" Value="0" />
@@ -69,119 +69,12 @@
                 <Setter Property="Background" Value="{DynamicResource GrayColor11}" />
             </Trigger>
             <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryBrush}" />
             </Trigger>
         </Style.Triggers>
     </Style>
     <!-- End: Button | Minimize | Maximize | Close -->
-
-    <!-- Start: Menu Icon -->
-    <Style x:Key="MenuIconStyle" TargetType="{x:Type ToggleButton}">
-        <Setter Property="Width" Value="30" />
-        <Setter Property="Height" Value="30" />
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type ToggleButton}">
-                    <Border x:Name="border" BorderThickness="{TemplateBinding BorderThickness}"
-                            Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                        <Viewbox Height="20" Width="20" Margin="0 6 0 0" Stretch="UniformToFill">
-                            <Canvas Height="512" Width="512">
-                                <Path x:Name="ico"
-                                      Data="m32 0h448c17.671875 0 32 14.328125 32 32s-14.328125 32-32 32h-448c-17.671875 0-32-14.328125-32-32s14.328125-32 32-32zm0 0"
-                                      Fill="{DynamicResource PrimaryGrayColor}" Margin="0 0 0 0" />
-                                <Path x:Name="ico1"
-                                      Data="m32 128h448c17.671875 0 32 14.328125 32 32s-14.328125 32-32 32h-448c-17.671875 0-32-14.328125-32-32s14.328125-32 32-32zm0 0"
-                                      Fill="{DynamicResource PrimaryGrayColor}" Margin="0 20 0 0" />
-                                <Path x:Name="ico2"
-                                      Data="m32 256h448c17.671875 0 32 14.328125 32 32s-14.328125 32-32 32h-448c-17.671875 0-32-14.328125-32-32s14.328125-32 32-32zm0 0"
-                                      Fill="{DynamicResource PrimaryGrayColor}" Margin="0 40 0 0" />
-                            </Canvas>
-                        </Viewbox>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" TargetName="border" Value="Transparent" />
-                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource WhiteColor}" />
-                            <Setter Property="Fill" TargetName="ico" Value="{DynamicResource PrimaryBlueColor}" />
-                            <Setter Property="Fill" TargetName="ico1" Value="{DynamicResource PrimaryBlueColor}" />
-                            <Setter Property="Fill" TargetName="ico2" Value="{DynamicResource PrimaryBlueColor}" />
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background" TargetName="border" Value="Transparent" />
-                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource WhiteColor}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <!-- Start: VerticalMenuStyle -->
-    <Style x:Key="MenuRadioButtonStyle" TargetType="{x:Type RadioButton}">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryGrayColor}" />
-        <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="FontWeight" Value="Normal" />
-        <Setter Property="FontSize" Value="15" />
-        <Setter Property="Height" Value="40" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type RadioButton}">
-                    <Border x:Name="menuButton" Background="{TemplateBinding Background}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="45" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Selected  -->
-                            <Border x:Name="btnSelected" Grid.ColumnSpan="2" CornerRadius="4" Width="210"
-                                    HorizontalAlignment="Right" />
-
-                            <!-- Indicator -->
-                            <Rectangle Name="Indicator" HorizontalAlignment="Left" Width="4" Height="40"
-                                       VerticalAlignment="Center" RadiusX="2" RadiusY="2" />
-
-                            <!-- Icon -->
-                            <Path x:Name="Icon"
-                                  Data="{Binding Tag, RelativeSource={RelativeSource AncestorType={x:Type RadioButton}}}"
-                                  Height="24" Width="24" Stretch="Uniform" Fill="{DynamicResource PrimaryGrayColor}"
-                                  VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 5 0" />
-
-                            <!-- Text -->
-                            <TextBlock x:Name="txtName" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                       Margin="13 0 0 0"
-                                       Grid.Column="1" Text="{TemplateBinding Content}"
-                                       Foreground="{TemplateBinding Foreground}"
-                                       FontWeight="{TemplateBinding FontWeight}"
-                                       FontSize="{TemplateBinding FontSize}" />
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="txtName" Property="Foreground"
-                                    Value="{DynamicResource PrimaryBlueColor}" />
-                            <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource PrimaryBlueColor}" />
-                            <!-- Optional 
-                            <Setter TargetName="Indicator" Property="Fill" Value="red"/>
-                            <Setter TargetName="Indicator" Property="Height" Value="20"/>-->
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Icon" Property="Fill" Value="{DynamicResource PrimaryBlueColor}" />
-                            <Setter TargetName="Indicator" Property="Fill" Value="{DynamicResource PrimaryBlueColor}" />
-                            <Setter TargetName="Indicator" Property="Height" Value="20" />
-                            <Setter TargetName="btnSelected" Property="Background"
-                                    Value="{DynamicResource SecundaryGrayColor}" />
-                            <Setter TargetName="txtName" Property="Foreground"
-                                    Value="{DynamicResource PrimaryBlueColor}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+    
 
     <Style
         x:Key="CustomListBoxItemStyle"
@@ -214,36 +107,13 @@
     </Style>
 
 
-    <Style x:Key="messageTextbox" TargetType="TextBox">
-        <Setter Property="Background" Value="{DynamicResource DefaultBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DarkDefaultBrush}" />
-        <Setter Property="FontSize" Value="12" />
-        <Setter Property="Padding" Value="10 15 120 15" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Margin" Value="0 10" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type TextBoxBase}">
-                    <Border x:Name="border" CornerRadius="3" Background="{TemplateBinding Background}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            BorderBrush="{TemplateBinding BorderBrush}" SnapsToDevicePixels="True">
-                        <ScrollViewer x:Name="PART_ContentHost" Focusable="false"
-                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
-                    </Border>
-
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="true">
-                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource GrayColor5}" />
-                        </Trigger>
-                        <Trigger Property="IsKeyboardFocused" Value="true">
-                            <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource GrayColor5}" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+    <Style x:Key="CustomTabItemStyle" TargetType="{x:Type TabItem}" BasedOn="{StaticResource TabItemInLine}">
+        <Setter Property="Background" Value="{StaticResource MainContentBackgroundBrush}" />
+        <!-- <Style.Triggers> -->
+        <!--     <MultiTrigger Property="IsMouseOver" Value="True"> -->
+        <!--         <Setter Property="Background" Value="{StaticResource MainContentForegroundBrush}" /> -->
+        <!--     </MultiTrigger> -->
+        <!-- </Style.Triggers> -->
     </Style>
 
     <Style TargetType="controls:AttributeButton" x:Key="AttributeButtonStyle" BasedOn="{StaticResource ButtonDefault}">
@@ -253,6 +123,11 @@
                 <Setter Property="BorderBrush" Value="Blue" />
             </Trigger>
         </Style.Triggers>
+    </Style>
+    
+    <Style TargetType="hc:Divider" BasedOn="{StaticResource DividerBaseStyle}">
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryBorderBrush}" />
+        <Setter Property="LineStroke" Value="{DynamicResource GrayColor5}" />
     </Style>
     <!-- End: VerticalMenuStyle -->
 </ResourceDictionary>

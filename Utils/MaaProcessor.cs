@@ -88,7 +88,7 @@ public class MaaProcessor
                     : "Window".GetLocalizationString()));
             return;
         }
-
+        MainWindow.Instance?.RunScript();
         _startTime = DateTime.Now;
         IsStopped = false;
         tasks ??= new List<DragItemViewModel>();
@@ -106,7 +106,7 @@ public class MaaProcessor
 
         TaskManager.RunTaskAsync(async () =>
         {
-            MainWindow.Data?.AddLogByKey("ConnectingTo", null, (MainWindow.Data?.IsAdb).IsTrue()
+            MainWindow.AddLogByKey("ConnectingTo", null, (MainWindow.Data?.IsAdb).IsTrue()
                 ? "Emulator"
                 : "Window");
             var instance = await Task.Run(GetCurrentTasker, token);
@@ -115,14 +115,17 @@ public class MaaProcessor
             {
                 Growls.ErrorGlobal("InitInstanceFailed".GetLocalizationString());
                 LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
-                MainWindow.Data?.AddLogByKey("InstanceInitFailedLog");
+                MainWindow.AddLogByKey("InstanceInitFailedLog");
                 Stop();
                 return;
             }
 
-            bool run = await ExecuteTasks(token);
+            var run = await ExecuteTasks(token);
             if (run)
+            {
+                MainWindow.Instance?.RunScript("Post-script");
                 Stop(IsStopped);
+            }
         }, null, "启动任务");
     }
 
@@ -131,7 +134,7 @@ public class MaaProcessor
         if (_emulatorCancellationTokenSource != null)
         {
             _emulatorCancellationTokenSource?.Cancel();
-            MainWindow.Data?.AddLogByKey("Stopping");
+            MainWindow.AddLogByKey("Stopping");
 
             if (DataSet.GetData("AutoStartIndex", 0) != 1)
             {
@@ -145,7 +148,7 @@ public class MaaProcessor
             TaskManager.RunTaskAsync(() =>
             {
                 if (IsStopped)
-                    MainWindow.Data?.AddLogByKey("Stopping");
+                    MainWindow.AddLogByKey("Stopping");
                 if (_currentTasker == null || _currentTasker?.Abort().Wait() == MaaJobStatus.Succeeded)
                 {
                     DisplayTaskCompletionMessage();
@@ -211,7 +214,7 @@ public class MaaProcessor
         TaskQueue.Clear();
         OnTaskQueueChanged();
         if (showTip)
-            MainWindow.Data?.AddLogByKey("TaskAbandoned");
+            MainWindow.AddLogByKey("TaskAbandoned");
         MainWindow.Data?.SetIdle(true);
     }
 
@@ -256,7 +259,7 @@ public class MaaProcessor
 
             if (remainingTime % 10 == 0)
             {
-                MainWindow.Data?.AddLogByKey("WaitEmulatorTime", null, remainingTime.ToString());
+                MainWindow.AddLogByKey("WaitEmulatorTime", null, remainingTime.ToString());
             }
 
             try
@@ -567,7 +570,7 @@ public class MaaProcessor
         stopwatch.Stop();
         long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-        MainWindow.Data?.AddLogByKey("ScreenshotTime", null, elapsedMilliseconds.ToString(),
+        MainWindow.AddLogByKey("ScreenshotTime", null, elapsedMilliseconds.ToString(),
             MainWindow.Instance?.ScreenshotType() ?? string.Empty);
     }
 
@@ -580,7 +583,7 @@ public class MaaProcessor
         stopwatch.Stop();
         long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-        MainWindow.Data?.AddLogByKey("ScreenshotTime", null, elapsedMilliseconds.ToString(),
+        MainWindow.AddLogByKey("ScreenshotTime", null, elapsedMilliseconds.ToString(),
             MainWindow.Instance?.ScreenshotType() ?? string.Empty);
     }
 
@@ -597,7 +600,7 @@ public class MaaProcessor
                 if (TaskQueue.Count > 0)
                 {
                     var taskA = TaskQueue.Peek();
-                    MainWindow.Data?.AddLogByKey("TaskStart", null, taskA.Name ?? string.Empty);
+                    MainWindow.AddLogByKey("TaskStart", null, taskA.Name ?? string.Empty);
                     if (!TryRunTasks(_currentTasker, taskA.Entry, taskA.Param))
                     {
                         if (IsStopped) return false;
@@ -619,7 +622,7 @@ public class MaaProcessor
         if (IsStopped)
         {
             Growl.Info("TaskStopped".GetLocalizationString());
-            MainWindow.Data?.AddLogByKey("TaskAbandoned");
+            MainWindow.AddLogByKey("TaskAbandoned");
             IsStopped = false;
         }
         else
@@ -628,12 +631,12 @@ public class MaaProcessor
             if (_startTime != null)
             {
                 TimeSpan elapsedTime = DateTime.Now - (DateTime)_startTime;
-                MainWindow.Data?.AddLogByKey("TaskAllCompletedWithTime", null, ((int)elapsedTime.TotalHours).ToString(),
+                MainWindow.AddLogByKey("TaskAllCompletedWithTime", null, ((int)elapsedTime.TotalHours).ToString(),
                     ((int)elapsedTime.TotalMinutes % 60).ToString(), ((int)elapsedTime.TotalSeconds % 60).ToString());
             }
             else
             {
-                MainWindow.Data?.AddLogByKey("TaskAllCompleted");
+                MainWindow.AddLogByKey("TaskAllCompleted");
             }
 
             HandleAfterTaskOperation();
@@ -932,7 +935,7 @@ public class MaaProcessor
                     LoggerService.LogError(e);
                 }
 
-                MainWindow.Data?.AddLog(HandleStringsWithVariables(tip), brush);
+                MainWindow.AddLog(HandleStringsWithVariables(tip), brush);
             }
         }
     }

@@ -12,6 +12,8 @@
            xmlns:lex="http://wpflocalizeextension.codeplex.com"
            xmlns:engine="https://github.com/XAMLMarkupExtensions/WPFLocalizationExtension"
            xmlns:utils="clr-namespace:MFAWPF.Utils"
+           xmlns:views="clr-namespace:MFAWPF.Views"
+           xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
            engine:ResxLocalizationProvider.DefaultAssembly="MFAWPF"
            engine:ResxLocalizationProvider.DefaultDictionary="Strings"
            mc:Ignorable="d" x:Name="home" ResizeMode="CanResize"
@@ -74,7 +76,6 @@
     </hc:Window.NonClientAreaContent>
     <hc:Window.Resources>
         <converters:SubtractConverter x:Key="SubtractConverter" />
-        <converters:MultiBoolAndOrConverter x:Key="MultiBoolAndOrConverter" />
         <converters:CustomIsEnabledConverter x:Key="CustomIsEnabledConverter" />
         <DataTemplate x:Key="DeviceInfoTemplate">
             <TextBlock>
@@ -99,110 +100,21 @@
             <MenuItem Header="{lex:Loc Delete}" Click="Delete" />
         </ContextMenu>
     </hc:Window.Resources>
-
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0">
-            <hc:SideMenu BorderThickness="1" Width="120" Margin="0" HorizontalAlignment="Center"
-                         HorizontalContentAlignment="Center" Background="{DynamicResource MainContentBackgroundBrush}"
-                         BorderBrush="Transparent" SideBrush="{DynamicResource PrimaryBrush}">
-                <hc:SideMenu.Resources>
-
-                </hc:SideMenu.Resources>
-                <hc:Interaction.Triggers>
-                    <hc:EventTrigger EventName="SelectionChanged">
-                        <hc:EventToCommand Command="{Binding SwitchItemCmd}" PassEventArgsToCommand="True" />
-                    </hc:EventTrigger>
-                </hc:Interaction.Triggers>
-                <hc:SideMenuItem Header="主页" Height="50" Background="Transparent" IsSelected="True">
-                    <hc:SideMenuItem.Icon>
-
-                        <Path Data="{StaticResource HomeGeometry}"
-                              Fill="{DynamicResource GrayColor4}"
-                              MaxWidth="20" Stretch="Uniform" />
-                    </hc:SideMenuItem.Icon>
-                </hc:SideMenuItem>
-                <hc:SideMenuItem Header="设置" Background="Transparent">
-                    <hc:SideMenuItem.Icon>
-                        <Path Data="{StaticResource SettingsRegular}"
-                              Fill="{DynamicResource GrayColor4}"
-                              MaxWidth="20" Stretch="Uniform" />
-
-                    </hc:SideMenuItem.Icon>
-                </hc:SideMenuItem>
-            </hc:SideMenu>
-        </Grid>
-        <Border Grid.Row="1" Grid.Column="1" Margin="2 2 2 2" Background="{DynamicResource SecundaryBackgroundColor}"
-                CornerRadius="5">
-            <!-- BorderBrush="#ededed" BorderThickness="1" -->
-            <Grid Margin="5 0 5 5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="45" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <hc:SimpleStackPanel Orientation="Horizontal" Margin="15,6,10,0" Height="30">
-                    <TabControl TabStripPlacement="Top" Background="Transparent"
-                                BorderThickness="0" x:Name="TabControl" 
-                                Style="{StaticResource TabControlCapsuleSolid}">
-                        <TabControl.IsEnabled>
-                            <MultiBinding Converter="{StaticResource MultiBoolAndOrConverter}" ConverterParameter="And">
-                                <Binding Path="Idle" />
-                                <Binding Path="NotLock" />
-                            </MultiBinding>
-                        </TabControl.IsEnabled>
-                        <TabItem Header="{lex:Loc TabADB}" x:Name="adbTab"></TabItem>
-                        <TabItem Header="{lex:Loc TabWin32}" x:Name="win32Tab"></TabItem>
-                    </TabControl>
-                    <ComboBox Width="250" x:Name="deviceComboBox" Margin="4 0 0 0"
-                              IsEnabled="{Binding Idle}"
-                              ItemTemplateSelector="{StaticResource DeviceWindowTemplateSelector}"
-                              SelectionChanged="DeviceComboBox_OnSelectionChanged" />
-                    <Button ToolTip="{lex:Loc TooltipRefresh}" Width="20" Height="20" Margin="6 0 2 0"
-                            Style="{StaticResource textBoxButton}"
-                            Foreground="{DynamicResource GrayColor4}"
-                            Click="Refresh" IsEnabled="{Binding Idle}"
-                            Padding="0" hc:IconElement.Width="14"
-                            hc:IconElement.Geometry="{StaticResource clear}" />
-                    <Button ToolTip="{lex:Loc Custom}" x:Name="btnCustom" Width="20" Height="20" Margin="2 0 2 0"
-                            Style="{StaticResource textBoxButton}"
-                            Foreground="{DynamicResource GrayColor4}"
-                            Click="CustomAdb" IsEnabled="{Binding Idle}"
-                            Padding="0" hc:IconElement.Width="14"
-                            hc:IconElement.Geometry="{StaticResource CustomGeometry}" />
-                    <RadioButton x:Name="ConnectSettingButton" ToolTip="{lex:Loc TooltipSettings}"
-                                 Margin="0"
-                                 Padding="5,0,5,0"
-                                 hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
-                                 hc:VisualElement.HighlightBackground="Transparent"
-                                 hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
-                                 Foreground="{DynamicResource GrayColor4}"
-                                 Background="Transparent"
-                                 BorderThickness="0"
-                                 GroupName="TaskSettings" Checked="ConfigureSettingsPanel"
-                                 Style="{DynamicResource RadioGroupItemSingle}" />
-                    <RadioButton ToolTip="{lex:Loc About}"
-                                 Margin="0"
-                                 Padding="5,0,5,0"
-                                 hc:IconElement.Geometry="{StaticResource AboutGeometry}"
-                                 hc:VisualElement.HighlightBackground="Transparent"
-                                 hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
-                                 Foreground="{DynamicResource GrayColor4}"
-                                 Background="Transparent"
-                                 BorderThickness="0"
-                                 GroupName="TaskSettings" Checked="About"
-                                 Style="{DynamicResource RadioGroupItemSingle}" />
-                </hc:SimpleStackPanel>
-                <Grid Grid.Row="1" ClipToBounds="False" Margin="15 0 0 0">
+    <DockPanel>
+        <views:NotifyIcon x:Name="NotifyIcon" Visibility="Hidden" />
+        <TabControl
+            BorderThickness="0,1,0,0"
+            Style="{StaticResource TabControlInLine}">
+            <TabItem Header="{lex:Loc Home}" Style="{StaticResource CustomTabItemStyle}" IsSelected="True">
+                <Grid Background="{DynamicResource SecundaryBackgroundColor}" Margin="0 0 0 0" Grid.Row="1"
+                      ClipToBounds="False">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="7*" MaxWidth="330" />
                         <ColumnDefinition Width="6*" MaxWidth="300" />
                         <ColumnDefinition Width="8*" />
                     </Grid.ColumnDefinitions>
 
-                    <Grid Grid.Column="0">
+                    <Grid Grid.Column="0" Margin="20 0 0 5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30" />
                             <RowDefinition />
@@ -216,41 +128,59 @@
                                        HorizontalAlignment="Left">
                             </TextBlock>
 
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="2 2 0 0"
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center"
+                                        Margin="2 2 0 0"
                                         HorizontalAlignment="Right">
-                                <Button ToolTip="{lex:Loc SelectAll}" Width="15" Height="15" Margin="7 0 0 0"
+                                <Button ToolTip="{lex:Loc SelectAll}" Width="15" Height="15"
+                                        Margin="7 0 0 0"
                                         Style="{StaticResource textBoxButton}"
                                         Foreground="{DynamicResource GrayColor4}"
                                         Click="SelectAll" IsEnabled="{Binding Idle}"
                                         Padding="0"
                                         hc:IconElement.Geometry="{StaticResource SelectAllGeometry}" />
-                                <Button ToolTip="{lex:Loc DeselectAll}" Width="15" Height="15" Margin="7 0 0 0"
+                                <Button ToolTip="{lex:Loc DeselectAll}" Width="15" Height="15"
+                                        Margin="7 0 0 0"
                                         Style="{StaticResource textBoxButton}"
                                         Foreground="{DynamicResource GrayColor4}"
                                         Click="SelectNone" IsEnabled="{Binding Idle}"
                                         Padding="0"
                                         hc:IconElement.Geometry="{StaticResource SelectNoneGeometry}" />
-                                <Button ToolTip="{lex:Loc EditTask}" Width="15" Height="15" Margin="7 0 0 0"
+                                <Button ToolTip="{lex:Loc EditTask}" Width="15" Height="15"
+                                        Margin="7 0 0 0"
                                         x:Name="EditButton"
                                         Style="{StaticResource textBoxButton}"
                                         Foreground="{DynamicResource GrayColor4}"
                                         Click="Edit" IsEnabled="{Binding Idle}"
                                         Padding="0"
                                         hc:IconElement.Geometry="{StaticResource EditGeometry}" />
-                                <Button ToolTip="{lex:Loc EditTaskDialog_AddTask_Tooltip}" Width="15" Height="15"
+                                <Button ToolTip="{lex:Loc EditTaskDialog_AddTask_Tooltip}" Width="15"
+                                        Height="15"
                                         Margin="7 0 0 0"
                                         Style="{StaticResource textBoxButton}"
                                         Foreground="{DynamicResource GrayColor4}"
                                         Click="Add" IsEnabled="{Binding Idle}"
                                         Padding="0"
                                         hc:IconElement.Geometry="{StaticResource AddRegularGeometry}" />
-                                <Button ToolTip="{lex:Loc TaskSettings}" Width="15" Height="15" Margin="7 0 0 0"
+                                <Button ToolTip="{lex:Loc TaskSettings}" Width="15" Height="15"
+                                        Margin="7 0 0 0"
                                         Visibility="Collapsed"
                                         Style="{StaticResource textBoxButton}"
                                         Foreground="{DynamicResource GrayColor4}"
                                         Click="Edit" IsEnabled="{Binding Idle}"
                                         Padding="0"
                                         hc:IconElement.Geometry="{StaticResource SettingsRegular}" />
+                                <RadioButton x:Name="ConnectSettingButton" ToolTip="{lex:Loc TooltipSettings}"
+                                             Margin="0"
+                                             Padding="7,0,5,0"
+                                             hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
+                                             hc:IconElement.Width="15" hc:IconElement.Height="15"
+                                             hc:VisualElement.HighlightBackground="Transparent"
+                                             hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
+                                             Foreground="{DynamicResource GrayColor4}"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             GroupName="TaskSettings" Checked="ConfigureSettingsPanel"
+                                             Style="{DynamicResource RadioGroupItemSingle}" />
 
                             </StackPanel>
                         </Grid>
@@ -331,6 +261,7 @@
                                 Content="{lex:Loc StartTask}" x:Name="startButton"
                                 Foreground="{DynamicResource BlackColor}"
                                 FontSize="11"
+                                Visibility="{c:Binding '!IsRunning'}"
                                 VerticalContentAlignment="Center" Click="Start"
                                 Width="90" Height="30"
                                 Margin="20,12,20,8">
@@ -338,7 +269,8 @@
                             <Button
                                 Content="{lex:Loc StopTask}" x:Name="stopButton"
                                 Foreground="{DynamicResource BlackColor}"
-                                FontSize="11" Visibility="Collapsed"
+                                FontSize="11"
+                                Visibility="{c:Binding 'IsRunning'}"
                                 VerticalContentAlignment="Center" Click="Stop"
                                 Width="90" Height="30"
                                 Margin="20,12,20,8">
@@ -347,7 +279,8 @@
 
                     </Grid>
 
-                    <hc:SimpleStackPanel Margin="10" Grid.Column="1" Orientation="Vertical" x:Name="settingPanel">
+                    <hc:SimpleStackPanel Margin="10" Grid.Column="1" Orientation="Vertical"
+                                         x:Name="settingPanel">
                         <hc:SimpleStackPanel.RenderTransform>
                             <TranslateTransform Y="-5" />
 
@@ -401,17 +334,79 @@
                         </ItemsControl>
                     </hc:ScrollViewer>
                 </Grid>
+            </TabItem>
+            <TabItem Style="{StaticResource CustomTabItemStyle}" Header="{lex:Loc Connection}">
 
 
-            </Grid>
-        </Border>
+                <Grid Background="{DynamicResource SecundaryBackgroundColor}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="45" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
 
-        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Hidden" HorizontalAlignment="Right"
-                      VerticalAlignment="Top"
-                      Margin="0,20,0, 0">
-            <StackPanel hc:Growl.GrowlParent="True" VerticalAlignment="Top" Margin="0,0,10,10" x:Name="stackPanel"
-                        Background="Transparent" />
-        </ScrollViewer>
-    </Grid>
+                    <Grid Grid.Row="0" Margin="15,6,10,0" Height="30">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" MinWidth="150" />
+                            <ColumnDefinition Width="*" MinWidth="250" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TabControl Grid.Column="0" TabStripPlacement="Top" Background="Transparent"
+                                    BorderThickness="0" x:Name="ConnectionTabControl"
+                                    IsEnabled="{c:Binding 'NotLock and Idle'}"
+                                    Style="{StaticResource TabControlCapsuleSolid}">
+                            <TabItem Header="{lex:Loc TabADB}" x:Name="adbTab"></TabItem>
+                            <TabItem Header="{lex:Loc TabWin32}" x:Name="win32Tab"></TabItem>
+                        </TabControl>
+                        <ComboBox Grid.Column="1" x:Name="deviceComboBox" Margin="4 0 0 0"
+                                  IsEnabled="{Binding Idle}"
+                                  ItemTemplateSelector="{StaticResource DeviceWindowTemplateSelector}"
+                                  SelectionChanged="DeviceComboBox_OnSelectionChanged" />
+                        <WrapPanel Grid.Column="2">
+                            <Button ToolTip="{lex:Loc TooltipRefresh}" Width="20" Height="20" Margin="6 0 2 0"
+                                    Style="{StaticResource textBoxButton}"
+                                    Foreground="{DynamicResource GrayColor4}"
+                                    Click="Refresh" IsEnabled="{Binding Idle}"
+                                    Padding="0" hc:IconElement.Width="14"
+                                    hc:IconElement.Geometry="{StaticResource clear}" />
+                            <Button ToolTip="{lex:Loc Custom}" x:Name="btnCustom" Width="20" Height="20"
+                                    Margin="2 0 2 0"
+                                    Style="{StaticResource textBoxButton}"
+                                    Foreground="{DynamicResource GrayColor4}"
+                                    Click="CustomAdb" IsEnabled="{Binding Idle}"
+                                    Padding="0" hc:IconElement.Width="14"
+                                    hc:IconElement.Geometry="{StaticResource CustomGeometry}" />
 
+                            <RadioButton ToolTip="{lex:Loc About}"
+                                         Margin="0"
+                                         Padding="5,0,5,0"
+                                         hc:IconElement.Geometry="{StaticResource AboutGeometry}"
+                                         hc:VisualElement.HighlightBackground="Transparent"
+                                         hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
+                                         Foreground="{DynamicResource GrayColor4}"
+                                         Background="Transparent"
+                                         BorderThickness="0"
+                                         GroupName="TaskSettings" Checked="About"
+                                         Style="{DynamicResource RadioGroupItemSingle}" />
+                        </WrapPanel>
+                    </Grid>
+                    <hc:SimpleStackPanel Grid.Row="1" Margin="10" Grid.Column="1" Orientation="Vertical"
+                                         x:Name="connectionSettingPanel">
+
+                    </hc:SimpleStackPanel>
+                </Grid>
+
+            </TabItem>
+            <TabItem Style="{StaticResource CustomTabItemStyle}" Header="{lex:Loc Settings}">
+                <Border Background="{DynamicResource SecundaryBackgroundColor}">
+                    <views:SettingsView x:Name="settingsView"></views:SettingsView>
+                </Border>
+
+            </TabItem>
+        </TabControl>
+
+    </DockPanel>
+
+    <hc:Interaction.Behaviors>
+        <hc:TaskbarRebuildBehavior Element="{Binding ElementName=NotifyIcon}" />
+    </hc:Interaction.Behaviors>
 </hc:Window>

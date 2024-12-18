@@ -20,9 +20,9 @@ public class MoneyDetectRecognition : IMaaCustomRecognition
             int getMoney = currentMoney - MaaProcessor.AllMoney;
             MaaProcessor.Money += getMoney;
             MaaProcessor.AllMoney = currentMoney;
-            MainWindow.Data?.AddLog(
-                    $"已投资 {MaaProcessor.Money}(+{getMoney}),存款: {MaaProcessor.AllMoney}",
-                    "LightSeaGreen");
+            MainWindow.AddLog(
+                $"已投资 {MaaProcessor.Money}(+{getMoney}),存款: {MaaProcessor.AllMoney}",
+                "LightSeaGreen");
             if (MaaProcessor.AllMoney == 999)
                 return false;
         }

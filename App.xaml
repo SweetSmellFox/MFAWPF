@@ -9,8 +9,8 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/HandyControl;component/themes/theme.xaml"/>
-                <ResourceDictionary Source="/MFAWPF;component/Res/Theme.xaml" />
-                <ResourceDictionary Source="/MFAWPF;component/Res/Style.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MFAWPF;component/Res/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MFAWPF;component/Res/Style.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

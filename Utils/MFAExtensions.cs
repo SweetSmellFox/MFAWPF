@@ -49,7 +49,7 @@ public static class MFAExtensions
     {
         if (string.IsNullOrWhiteSpace(key))
             return string.Empty;
-        return LocalizeDictionary.Instance.GetLocalizedObject(key, null, null) as string ?? string.Empty;
+        return LocalizeDictionary.Instance.GetLocalizedObject(key, null, null) as string ?? key;
     }
 
     public static string GetLocalizedFormattedString(this string? key, params object[] args)
@@ -125,11 +125,28 @@ public static class MFAExtensions
     {
         return maaContext.Tasker.Controller.PressKey(key);
     }
-
+    public static MaaJob Screencap(this IMaaContext maaContext)
+    {
+        return maaContext.Tasker.Controller.Screencap();
+    }
+    public static bool GetCachedImage(this IMaaContext maaContext, IMaaImageBuffer imageBuffer)
+    {
+        return maaContext.Tasker.Controller.GetCachedImage(imageBuffer);
+    }
+    public static RecognitionDetail? RunRecognition(this IMaaContext maaContext, TaskModel taskModel, IMaaImageBuffer imageBuffer)
+    {
+        return maaContext.RunRecognition(new TaskItemViewModel
+        {
+            Task = taskModel,
+            Name = taskModel.Name
+        }, imageBuffer);
+    }
+    
     public static RecognitionDetail? RunRecognition(this IMaaContext maaContext, TaskItemViewModel taskModel, IMaaImageBuffer imageBuffer)
     {
         return maaContext.RunRecognition(taskModel.Name, taskModel.ToString(), imageBuffer);
     }
+
     public static string GetText(this IMaaContext maaContext, int x, int y, int w, int h, IMaaImageBuffer imageBuffer)
     {
         return OCRHelper.ReadTextFromMAAContext(maaContext, imageBuffer, x, y, w, h);

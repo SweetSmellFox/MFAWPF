@@ -6,8 +6,10 @@ using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools.Command;
 using MFAWPF.Utils;
+using System.Data;
 using System.Text.RegularExpressions;
 using System.Windows.Threading;
+using DataSet = MFAWPF.Data.DataSet;
 
 
 namespace MFAWPF.ViewModels;
@@ -34,7 +36,7 @@ public class MainViewModel : ObservableObject
             });
         });
     }
-    
+
     public void AddLog(string content,
         Brush? color = null,
         string weight = "Regular",
@@ -111,6 +113,14 @@ public class MainViewModel : ObservableObject
         set => SetProperty(ref _notLock, value);
     }
 
+    private bool _isRunning = false;
+
+    public bool IsRunning
+    {
+        get => _isRunning;
+        set => SetProperty(ref _isRunning, value);
+    }
+
     public void SetIdle(bool value)
     {
         Idle = value;
@@ -127,6 +137,25 @@ public class MainViewModel : ObservableObject
         set => SetProperty(ref _isAdb, value);
     }
 
+    private bool _isVisible = true;
+
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set
+        {
+            if (value)
+            {
+                Application.Current.MainWindow.Show();
+            }
+            else
+            {
+                Application.Current.MainWindow.Hide();
+            }
+            SetProperty(ref _isVisible, value);
+        }
+    }
+
     public RelayCommand<FunctionEventArgs<object>> SwitchItemCmd => new Lazy<RelayCommand<FunctionEventArgs<object>>>(
         () =>
             new RelayCommand<FunctionEventArgs<object>>(SwitchItem)).Value;
@@ -134,5 +163,169 @@ public class MainViewModel : ObservableObject
     private void SwitchItem(FunctionEventArgs<object> info)
     {
         Growl.Info((info.Info as SideMenuItem)?.Header.ToString(), "InfoMessage");
+    }
+
+    private enum NotifyType
+    {
+        None,
+        SelectedIndex,
+        ScrollOffset,
+    }
+
+    private NotifyType _notifySource = NotifyType.None;
+
+    private System.Timers.Timer _resetNotifyTimer;
+
+    private void ResetNotifySource()
+    {
+        if (_resetNotifyTimer != null)
+        {
+            _resetNotifyTimer.Stop();
+            _resetNotifyTimer.Close();
+        }
+
+        _resetNotifyTimer = new(20);
+        _resetNotifyTimer.Elapsed += (_, _) =>
+        {
+            _notifySource = NotifyType.None;
+        };
+        _resetNotifyTimer.AutoReset = false;
+        _resetNotifyTimer.Enabled = true;
+        _resetNotifyTimer.Start();
+    }
+
+    /// <summary>
+    /// Gets or sets the height of scroll viewport.
+    /// </summary>
+    public double ScrollViewportHeight { get; set; }
+
+    /// <summary>
+    /// Gets or sets the extent height of scroll.
+    /// </summary>
+    public double ScrollExtentHeight { get; set; }
+
+    public List<double> DividerVerticalOffsetList { get; set; } = new();
+
+    private int _selectedIndex;
+
+    /// <summary>
+    /// Gets or sets the index selected.
+    /// </summary>
+    public int SelectedIndex
+    {
+        get => _selectedIndex;
+        set
+        {
+            switch (_notifySource)
+            {
+                case NotifyType.None:
+                    _notifySource = NotifyType.SelectedIndex;
+                    SetProperty(ref _selectedIndex, value);
+
+                    if (DividerVerticalOffsetList?.Count > 0 && value < DividerVerticalOffsetList.Count)
+                    {
+                        ScrollOffset = DividerVerticalOffsetList[value];
+                    }
+
+                    ResetNotifySource();
+                    break;
+
+                case NotifyType.ScrollOffset:
+                    SetProperty(ref _selectedIndex, value);
+                    break;
+
+                case NotifyType.SelectedIndex:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
+
+    private double _scrollOffset;
+
+    /// <summary>
+    /// Gets or sets the scroll offset.
+    /// </summary>
+    public double ScrollOffset
+    {
+        get => _scrollOffset;
+        set
+        {
+            switch (_notifySource)
+            {
+                case NotifyType.None:
+                    _notifySource = NotifyType.ScrollOffset;
+                    SetProperty(ref _scrollOffset, value);
+
+                    // 设置 ListBox SelectedIndex 为当前 ScrollOffset 索引
+                    if (DividerVerticalOffsetList?.Count > 0)
+                    {
+                        // 滚动条滚动到底部，返回最后一个 Divider 索引
+                        if (value + ScrollViewportHeight >= ScrollExtentHeight)
+                        {
+                            SelectedIndex = DividerVerticalOffsetList.Count - 1;
+                            ResetNotifySource();
+                            break;
+                        }
+
+                        // 根据出当前 ScrollOffset 选出最后一个在可视范围的 Divider 索引
+                        var dividerSelect = DividerVerticalOffsetList.Select((n, i) => (
+                            dividerAppeared: value >= n,
+                            index: i));
+
+                        var index = dividerSelect.LastOrDefault(n => n.dividerAppeared).index;
+                        SelectedIndex = index;
+                    }
+
+                    ResetNotifySource();
+                    break;
+
+                case NotifyType.SelectedIndex:
+                    SetProperty(ref _scrollOffset, value);
+                    break;
+
+                case NotifyType.ScrollOffset:
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
+
+    private List<SettingViewModel> _listTitle =
+    [
+        new("SwitchConfiguration"),
+        new("LanguageSettings"),
+        new("ThemeSettings"),
+        new("PerformanceSettings"),
+        new("RunningSettings"),
+    ];
+
+    /// <summary>
+    /// Gets or sets the list title.
+    /// </summary>
+    public List<SettingViewModel> ListTitle
+    {
+        get => _listTitle;
+        set => SetProperty(ref _listTitle, value);
+    }
+
+    private int _languageIndex = 0;
+
+    public int LanguageIndex
+    {
+        set
+        {
+            SetProperty(ref _languageIndex, value);
+        }
+        get
+        {
+            if (_languageIndex != DataSet.GetData("LangIndex", 0))
+                _languageIndex = DataSet.GetData("LangIndex", 0);
+            return _languageIndex;
+        }
     }
 }

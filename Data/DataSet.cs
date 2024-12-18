@@ -1,5 +1,6 @@
 ﻿using MFAWPF.Utils;
 using MFAWPF.Utils.Converters;
+using MFAWPF.Views;
 using Newtonsoft.Json.Linq;
 
 namespace MFAWPF.Data
@@ -14,7 +15,8 @@ public class DataSet
     {
         if (Data == null || value == null) return;
         Data[key] = value; // 如果 key 不存在，将自动添加条目；如果存在，将更新值
-
+        if (key == "LangIndex" && MainWindow.Data is not null)
+            MainWindow.Data.LanguageIndex = Convert.ToInt32(value);
         JsonHelper.WriteToConfigJsonFile("config", Data, new MaaInterfaceSelectOptionConverter(false));
     }
 

@@ -1,4 +1,5 @@
-
+using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using HandyControl.Controls;
@@ -72,7 +73,7 @@ namespace MFAWPF.Styles.Properties
 
         private static void BindVerticalOffset(ScrollViewer scrollViewer)
         {
-            if (scrollViewer.GetValue(_verticalOffsetBindingProperty) != null)
+            if (scrollViewer.GetValue(_verticalOffsetBindingProperty)!= null)
             {
                 return;
             }
@@ -148,7 +149,7 @@ namespace MFAWPF.Styles.Properties
 
         private static void BindViewportHeight(ScrollViewer scrollViewer)
         {
-            if (scrollViewer.GetValue(_viewportHeightBindingProperty) != null)
+            if (scrollViewer.GetValue(_viewportHeightBindingProperty)!= null)
             {
                 return;
             }
@@ -207,7 +208,7 @@ namespace MFAWPF.Styles.Properties
         {
             if (!(depObj is ScrollViewer))
             {
-                return;
+            return;
             }
 
             depObj.SetValue(ExtentHeightProperty, value);
@@ -225,7 +226,7 @@ namespace MFAWPF.Styles.Properties
 
         private static void BindExtentHeight(ScrollViewer scrollViewer)
         {
-            if (scrollViewer.GetValue(_extentHeightBindingProperty) != null)
+            if (scrollViewer.GetValue(_extentHeightBindingProperty)!= null)
             {
                 return;
             }
@@ -298,32 +299,39 @@ namespace MFAWPF.Styles.Properties
 
         private static void BindDividerVerticalOffsetList(ScrollViewer scrollViewer)
         {
-            if (scrollViewer.GetValue(_dividerVerticalOffsetListBindingProperty) != null)
+            if (scrollViewer.GetValue(_dividerVerticalOffsetListBindingProperty)!= null)
             {
                 return;
             }
 
             scrollViewer.SetValue(_dividerVerticalOffsetListBindingProperty, true);
 
-            // 当滚动条载入时，遍历 StackPanel 中的所有 Divider 子元素对应位置
+            // 改进点：添加更多的验证和异常处理，确保可视化元素状态正确
             scrollViewer.Loaded += (s, se) =>
             {
-                if (!scrollViewer.HasContent || !(scrollViewer.Content is StackPanel stackPanel))
+                if (scrollViewer.Content is StackPanel stackPanel)
                 {
-                    return;
-                }
-
-                var point = new Point(10, scrollViewer.VerticalOffset);
-
-                var dividerOffsetList = stackPanel.Children.OfType<Divider>()
-                    .Select(child => child.TransformToVisual(scrollViewer)
-                        .Transform(point))
-                    .Select(targetPosition => targetPosition.Y)
-                    .ToList();
-
-                if (dividerOffsetList.Count > 0)
-                {
-                    SetDividerVerticalOffsetList(scrollViewer, dividerOffsetList);
+                    try
+                    {
+                        var dividerOffsetList = new List<double>();
+                        foreach (Divider divider in stackPanel.Children.OfType<Divider>())
+                        {
+                            var transform = divider.TransformToAncestor(scrollViewer);
+                            if (transform!= null)
+                            {
+                                var position = transform.Transform(new Point(0, 0));
+                                dividerOffsetList.Add(position.Y);
+                            }
+                        }
+                        if (dividerOffsetList.Count > 0)
+                        {
+                            SetDividerVerticalOffsetList(scrollViewer, dividerOffsetList);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // 这里可以添加日志记录或者其他合适的错误处理逻辑，比如显示提示信息等
+                    }
                 }
             };
         }

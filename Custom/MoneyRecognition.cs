@@ -23,59 +23,50 @@ public class MoneyRecognition : IMaaCustomRecognition
 
         while (true)
         {
-            context.Tasker.Controller.Click(980, 495);
-            context.Tasker.Controller.Screencap().Wait();
-            context.Tasker.Controller.GetCachedImage(imageBuffer);
-            TaskItemViewModel t1 = new()
+            context.Click(980, 495);
+            context.Screencap().Wait();
+            context.GetCachedImage(imageBuffer);
+            TaskModel t1 = new()
                 {
-                    Task = new TaskModel
-                    {
-                        Recognition = "TemplateMatch",
-                        Roi = new List<int>
-                        {
-                            454,
-                            191,
-                            355,
-                            279
-                        },
-                        Template = ["Roguelike@StageTraderInvestSystemError.png"],
-                        Threshold = 0.9
-                    },
                     Name = DiffEntry,
+                    Recognition = "TemplateMatch",
+                    Roi = new List<int>
+                    {
+                        454,
+                        191,
+                        355,
+                        279
+                    },
+                    Template = ["Roguelike@StageTraderInvestSystemError.png"],
+                    Threshold = 0.9
                 },
                 t2 = new()
                 {
-                    Task = new TaskModel
-                    {
-                        Recognition = "TemplateMatch",
-                        Roi = new List<int>
-                        {
-                            787,
-                            457,
-                            413,
-                            80
-                        },
-                        Template = ["notEnoughMoney.png"],
-                        Threshold = 0.9
-                    },
                     Name = DiffEntry,
+                    Recognition = "TemplateMatch",
+                    Roi = new List<int>
+                    {
+                        787,
+                        457,
+                        413,
+                        80
+                    },
+                    Template = ["notEnoughMoney.png"],
+                    Threshold = 0.9
                 },
                 t3 = new()
                 {
-                    Task = new TaskModel
-                    {
-                        Recognition = "TemplateMatch",
-                        Roi = new List<int>
-                        {
-                            728,
-                            49,
-                            551,
-                            475
-                        },
-                        Template = ["fullOfMoney.png"],
-                        Threshold = 0.9
-                    },
                     Name = DiffEntry,
+                    Recognition = "TemplateMatch",
+                    Roi = new List<int>
+                    {
+                        728,
+                        49,
+                        551,
+                        475
+                    },
+                    Template = ["fullOfMoney.png"],
+                    Threshold = 0.9
                 };
             var rd1 = context.RunRecognition(t1, imageBuffer);
             if (rd1.IsHit())
@@ -89,7 +80,6 @@ public class MoneyRecognition : IMaaCustomRecognition
             {
                 break;
             }
-
             context.Click(980, 495);
 
             var rd3 = context.RunRecognition(t3, imageBuffer);
@@ -97,7 +87,6 @@ public class MoneyRecognition : IMaaCustomRecognition
             {
                 break;
             }
-
             context.Click(980, 495);
         }
 

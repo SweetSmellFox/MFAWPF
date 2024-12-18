@@ -18,7 +18,7 @@
                     ClipToBounds="False">
                 <Grid Height="34">
                     <TextBlock Text="{lex:Loc ImageBrowserTitle}" VerticalAlignment="Center" x:Name="TitleText"
-                               Foreground="{StaticResource BlackColor}" IsHitTestVisible="False"
+                               Foreground="{DynamicResource BlackColor}" IsHitTestVisible="False"
                                FontWeight="Bold" FontSize="17" HorizontalAlignment="Center"
                                Margin="0 0 0 0" />
                     <Button Width="22" Height="22" Click="Close" Style="{StaticResource ButtonIcon}"
@@ -91,7 +91,7 @@
                         Foreground="{DynamicResource GrayColor4}" VerticalContentAlignment="Center"
                         hc:IconElement.Width="15"
                         hc:IconElement.Height="15" Click="Load"
-                        hc:IconElement.Geometry="{StaticResource LoadGeometry}" />
+                        hc:IconElement.Geometry="{DynamicResource LoadGeometry}" />
                 <Button x:Name="SaveButton"
                         BorderThickness="0"
                         Content="{lex:Loc ButtonSave}" Click="SaveButton_Click"

@@ -1,0 +1,77 @@
+<UserControl x:Class="MFAWPF.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:properties="clr-namespace:MFAWPF.Styles.Properties"
+             xmlns:lex="http://wpflocalizeextension.codeplex.com"
+             xmlns:hc="https://handyorg.github.io/handycontrol"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="800">
+    <Grid Margin="20 5 20 20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="175" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <ListBox
+            x:Name="MasterListBox"
+            Grid.Column="0"
+            Margin="10"
+            IsSynchronizedWithCurrentItem="true"
+            ItemsSource="{Binding ListTitle}"
+            DisplayMemberPath="Name"
+            SelectedIndex="{Binding SelectedIndex}" />
+
+        <hc:ScrollViewer
+            Grid.Column="1"
+            Margin="20,5 20,10"
+            HorizontalAlignment="Stretch"
+            properties:ScrollViewerBinding.DividerVerticalOffsetList="{Binding DividerVerticalOffsetList}"
+            properties:ScrollViewerBinding.ExtentHeight="{Binding ScrollExtentHeight}"
+            properties:ScrollViewerBinding.VerticalOffset="{Binding ScrollOffset}"
+            properties:ScrollViewerBinding.ViewportHeight="{Binding ScrollViewportHeight}"
+            IsInertiaEnabled="True"
+            PanningMode="Both">
+            <StackPanel>
+                <hc:Divider Content="{Binding ListTitle[0].Name}" />
+                <hc:ComboBox Margin="30 10 30 10" x:Name="swtichConfigs"
+                             hc:TitleElement.HorizontalAlignment="Right"
+                             Width="160" HorizontalAlignment="Center">
+                </hc:ComboBox>
+                <hc:Divider Content="{Binding ListTitle[1].Name}" />
+                <hc:ComboBox Margin="30 10 30 10" x:Name="languageSettings" hc:TitleElement.TitleWidth="110"
+                             hc:TitleElement.HorizontalAlignment="Right"
+                             Width="360" HorizontalAlignment="Center">
+                </hc:ComboBox>
+                <hc:Divider Content="{Binding ListTitle[2].Name}" />
+                <hc:ComboBox Margin="30 10 30 10" x:Name="themeSettings" hc:TitleElement.TitleWidth="110"
+                             hc:TitleElement.HorizontalAlignment="Right" Width="360"
+                             HorizontalAlignment="Center">
+                </hc:ComboBox>
+                <hc:Divider Content="{Binding ListTitle[3].Name}" />
+                <CheckBox Margin="30 10 30 10" x:Name="performanceSettings" Content="{lex:Loc EnableGPU}"
+                          HorizontalAlignment="Center">
+                </CheckBox>
+                <hc:Divider Content="{Binding ListTitle[4].Name}" />
+                <hc:TextBox Margin="30 10 30 10" x:Name="beforeTaskSettings" hc:TitleElement.TitleWidth="110"
+                            hc:TitleElement.HorizontalAlignment="Right"
+                            hc:InfoElement.Placeholder="Example: &quot;C:\1.cmd&quot; -minimized" AllowDrop="True"
+                            Drop="StartsWithScript_Drop"
+                            PreviewDragOver="TextBox_PreviewDragOver"
+                            Width="360">
+                </hc:TextBox>
+                <hc:TextBox Margin="30 10 30 10" x:Name="afterTaskSettings" hc:TitleElement.TitleWidth="110"
+                            hc:TitleElement.HorizontalAlignment="Right"
+                            hc:InfoElement.Placeholder="Example: &quot;C:\1.cmd&quot; -noWindow"
+                            AllowDrop="True"
+                            Drop="EndsWithScript_Drop"
+                            PreviewDragOver="TextBox_PreviewDragOver"
+                            Width="360">
+                </hc:TextBox>
+                <CheckBox Margin="30 10 30 10" x:Name="enableSaveDrawSettings" Content="{lex:Loc EnableSaveDraw}"
+                          HorizontalAlignment="Center">
+                </CheckBox>
+            </StackPanel>
+        </hc:ScrollViewer>
+    </Grid>
+</UserControl>
