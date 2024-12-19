@@ -64,6 +64,7 @@ public class StringComboBoxEditor : PropertyEditorBase
                 "StartApp",
                 "StopApp",
                 "StopTask",
+                "Command",
                 "Custom"
             };
         }

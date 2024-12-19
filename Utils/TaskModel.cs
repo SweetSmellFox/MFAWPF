@@ -67,7 +67,9 @@ public class TaskModel : ObservableObject
     private object? _lower;
     private object? _upper;
     private bool? _connected;
-
+    private string? _exec;
+    private List<string>? _args;
+    private bool? _detach;
     [Browsable(false)]
     [JsonIgnore]
     [JsonProperty("name")]
@@ -682,7 +684,7 @@ public class TaskModel : ObservableObject
         get => _input_text;
         set => SetNewProperty(ref _input_text, value);
     }
-
+    
     [JsonProperty("package")]
     [Category("动作")]
     [Description(
@@ -694,7 +696,44 @@ public class TaskModel : ObservableObject
         get => _package;
         set => SetNewProperty(ref _package, value);
     }
+    
+    [JsonProperty("exec")]
+    [Category("动作")]
+    [Description(
+        "执行的程序路径。必选。"
+    )]
+    [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
+    public string? Exec
+    {
+        get => _exec;
+        set => SetNewProperty(ref _exec, value);
+    }
 
+    [JsonProperty("args")]
+    [Category("动作")]
+    [Description(
+        "执行的参数。可选。\n支持部分运行期参数替换：\n\n{ENTRY}: 任务入口名。\n{NODE}: 当前任务名。\n{IMAGE}: 截图保存到文件的路径。该文件在进程退出前删除，若要持久保存请自行复制。\n{BOX}: 识别命中的目标，格式为 [x, y, w, h]。\n{RESOURCE_DIR}: 最后一次加载的资源文件夹路径。\n{LIBRARY_DIR}: MaaFW 库所在的文件夹路径。"
+    )]
+    [JsonConverter(typeof(SingleOrListConverter))]
+    [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
+    public List<string>? Args
+    {
+        get => _args;
+        set => SetNewProperty(ref _args, value);
+    }
+    
+    [JsonProperty("detach")]
+    [Category("动作")]
+    [Description(
+        "分离子进程，即不等待子进程执行完成，直接继续之后后面的任务。可选，默认 false。"
+    )]
+    [Editor(typeof(SwitchPropertyEditor), typeof(SwitchPropertyEditor))]
+    public bool? Detach
+    {
+        get => _detach;
+        set => SetNewProperty(ref _detach, value);
+    }
+    
     [Browsable(false)]
     [JsonExtensionData]
     public Dictionary<string, object> AdditionalData { get; set; } = new();
