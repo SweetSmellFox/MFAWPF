@@ -413,8 +413,8 @@
     <data name="None" xml:space="preserve">
     <value>None</value>
   </data>
-    <data name="StartupScript" xml:space="preserve">
-    <value>Startup Script</value>
+  <data name="StartupScript" xml:space="preserve">
+    <value>Startup script</value>
   </data>
     <data name="Custom" xml:space="preserve">
     <value>Custom</value>
@@ -440,14 +440,14 @@
     <data name="FollowingSystem" xml:space="preserve">
     <value>Following System</value>
   </data>
-    <data name="EmulatorPath" xml:space="preserve">
-    <value>Emulator Path</value>
+  <data name="SoftwarePath" xml:space="preserve">
+    <value>Software Path</value>
   </data>
-    <data name="WaitEmulator" xml:space="preserve">
-    <value>Wait time for Emulator to start (seconds)</value>
+  <data name="WaitSoftware" xml:space="preserve">
+    <value>Wait time for Software to start (seconds)</value>
   </data>
-    <data name="StartEmulator" xml:space="preserve">
-    <value>Start the emulator after starting the MFA</value>
+  <data name="StartEmulator" xml:space="preserve">
+    <value>Start the software after starting the MFA</value>
   </data>
     <data name="Select" xml:space="preserve">
     <value>Select</value>
@@ -458,8 +458,8 @@
     <data name="SelectExecutableFile" xml:space="preserve">
     <value>Select Executable File</value>
   </data>
-    <data name="WaitEmulatorTime" xml:space="preserve">
-    <value>Wait time for Emulator to start (seconds): {0}(s)</value>
+  <data name="WaitSoftwareTime" xml:space="preserve">
+    <value>Wait time for Software to start (seconds): {0}(s)</value>
   </data>
     <data name="ProjectLink" xml:space="preserve">
     <value>Project Link: </value>
@@ -476,17 +476,17 @@
     <data name="CloseMFA" xml:space="preserve">
     <value>Disable MFA</value>
   </data>
-    <data name="CloseEmulator" xml:space="preserve">
-    <value>Disable Emulator</value>
+  <data name="CloseEmulator" xml:space="preserve">
+    <value>Disable Software</value>
   </data>
-    <data name="CloseEmulatorAndMFA" xml:space="preserve">
-    <value>Disable MFA and Emulator</value>
+  <data name="CloseEmulatorAndMFA" xml:space="preserve">
+    <value>Disable MFA and Software</value>
   </data>
     <data name="ShutDown" xml:space="preserve">
     <value>Shut Down</value>
   </data>
-    <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
-    <value>Disable MFA and Restart Emulator</value>
+  <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
+    <value>Disable MFA and Restart Software</value>
   </data>
     <data name="Restart" xml:space="preserve">
     <value>RestartDevice</value>
@@ -553,5 +553,11 @@
   </data>
   <data name="Post-script" xml:space="preserve">
     <value>Post-script</value>
+  </data>
+  <data name="StartupSoftwareAndScript" xml:space="preserve">
+    <value>Startup software and script</value>
+  </data>
+  <data name="ConnectionSettings" xml:space="preserve">
+    <value>Connection Settings</value>
   </data>
 </root>

@@ -6,6 +6,7 @@
              xmlns:properties="clr-namespace:MFAWPF.Styles.Properties"
              xmlns:lex="http://wpflocalizeextension.codeplex.com"
              xmlns:hc="https://handyorg.github.io/handycontrol"
+             xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="800">
     <Grid Margin="20 5 20 20">
@@ -35,32 +36,52 @@
             <StackPanel>
                 <hc:Divider Content="{Binding ListTitle[0].Name}" />
                 <hc:ComboBox Margin="30 10 30 10" x:Name="swtichConfigs"
-                             hc:TitleElement.HorizontalAlignment="Right"
+                             hc:TitleElement.HorizontalAlignment="Right" IsEnabled="{calcBinding:Binding 'Idle'}"
                              Width="160" HorizontalAlignment="Center">
                 </hc:ComboBox>
                 <hc:Divider Content="{Binding ListTitle[1].Name}" />
                 <hc:ComboBox Margin="30 10 30 10" x:Name="languageSettings" hc:TitleElement.TitleWidth="110"
-                             hc:TitleElement.HorizontalAlignment="Right"
+                             hc:TitleElement.HorizontalAlignment="Right" IsEnabled="{calcBinding:Binding 'Idle'}"
                              Width="360" HorizontalAlignment="Center">
                 </hc:ComboBox>
                 <hc:Divider Content="{Binding ListTitle[2].Name}" />
                 <hc:ComboBox Margin="30 10 30 10" x:Name="themeSettings" hc:TitleElement.TitleWidth="110"
-                             hc:TitleElement.HorizontalAlignment="Right" Width="360"
+                             hc:TitleElement.HorizontalAlignment="Right" Width="360" IsEnabled="{calcBinding:Binding 'Idle'}"
                              HorizontalAlignment="Center">
                 </hc:ComboBox>
                 <hc:Divider Content="{Binding ListTitle[3].Name}" />
-                <CheckBox Margin="30 10 30 10" x:Name="performanceSettings" Content="{lex:Loc EnableGPU}"
+                <hc:ComboBox Margin="30 10 30 10" x:Name="adbCaptureComboBox" hc:TitleElement.TitleWidth="110"
+                             hc:TitleElement.HorizontalAlignment="Right" Width="360" Visibility="{calcBinding:Binding IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                             HorizontalAlignment="Center">
+                </hc:ComboBox>
+                <hc:ComboBox Margin="30 10 30 10" x:Name="adbInputComboBox" hc:TitleElement.TitleWidth="110"
+                             hc:TitleElement.HorizontalAlignment="Right" Width="360" Visibility="{calcBinding:Binding IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                             HorizontalAlignment="Center">
+                </hc:ComboBox>
+                <CheckBox Margin="30 10 30 10" x:Name="rememberAdbButton" Visibility="{calcBinding:Binding IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
                           HorizontalAlignment="Center">
                 </CheckBox>
+                <hc:ComboBox Margin="30 10 30 10" x:Name="win32CaptureComboBox" hc:TitleElement.TitleWidth="110"
+                             hc:TitleElement.HorizontalAlignment="Right" Width="360" Visibility="{calcBinding:Binding !IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                             HorizontalAlignment="Center">
+                </hc:ComboBox>
+                <hc:ComboBox Margin="30 10 30 10" x:Name="win32InputComboBox" hc:TitleElement.TitleWidth="110"
+                             hc:TitleElement.HorizontalAlignment="Right" Width="360" Visibility="{calcBinding:Binding !IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                             HorizontalAlignment="Center">
+                </hc:ComboBox>
                 <hc:Divider Content="{Binding ListTitle[4].Name}" />
-                <hc:TextBox Margin="30 10 30 10" x:Name="beforeTaskSettings" hc:TitleElement.TitleWidth="110"
+                <CheckBox Margin="30 10 30 10" x:Name="performanceSettings" Content="{lex:Loc EnableGPU}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                          HorizontalAlignment="Center">
+                </CheckBox>
+                <hc:Divider Content="{Binding ListTitle[5].Name}" />
+                <hc:TextBox Margin="30 10 30 10" x:Name="beforeTaskSettings" hc:TitleElement.TitleWidth="110" IsEnabled="{calcBinding:Binding 'Idle'}"
                             hc:TitleElement.HorizontalAlignment="Right"
                             hc:InfoElement.Placeholder="Example: &quot;C:\1.cmd&quot; -minimized" AllowDrop="True"
                             Drop="StartsWithScript_Drop"
                             PreviewDragOver="TextBox_PreviewDragOver"
                             Width="360">
                 </hc:TextBox>
-                <hc:TextBox Margin="30 10 30 10" x:Name="afterTaskSettings" hc:TitleElement.TitleWidth="110"
+                <hc:TextBox Margin="30 10 30 10" x:Name="afterTaskSettings" hc:TitleElement.TitleWidth="110" IsEnabled="{calcBinding:Binding 'Idle'}"
                             hc:TitleElement.HorizontalAlignment="Right"
                             hc:InfoElement.Placeholder="Example: &quot;C:\1.cmd&quot; -noWindow"
                             AllowDrop="True"
@@ -68,7 +89,7 @@
                             PreviewDragOver="TextBox_PreviewDragOver"
                             Width="360">
                 </hc:TextBox>
-                <CheckBox Margin="30 10 30 10" x:Name="enableSaveDrawSettings" Content="{lex:Loc EnableSaveDraw}"
+                <CheckBox Margin="30 10 30 10" x:Name="enableSaveDrawSettings" Content="{lex:Loc EnableSaveDraw}" IsEnabled="{calcBinding:Binding 'Idle'}"
                           HorizontalAlignment="Center">
                 </CheckBox>
             </StackPanel>

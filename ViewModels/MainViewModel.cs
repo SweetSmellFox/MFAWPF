@@ -300,6 +300,7 @@ public class MainViewModel : ObservableObject
         new("SwitchConfiguration"),
         new("LanguageSettings"),
         new("ThemeSettings"),
+        new("ConnectionSettings"),
         new("PerformanceSettings"),
         new("RunningSettings"),
     ];
@@ -327,5 +328,62 @@ public class MainViewModel : ObservableObject
                 _languageIndex = DataSet.GetData("LangIndex", 0);
             return _languageIndex;
         }
+    }
+
+    private string _beforeTask = "None".GetLocalizationString();
+
+    public string BeforeTask
+    {
+        get
+        {
+            if (_beforeTask != BeforeTaskList[DataSet.GetData("AutoStartIndex", 0)].Name)
+                _beforeTask = BeforeTaskList[DataSet.GetData("AutoStartIndex", 0)].Name;
+            return _beforeTask;
+        }
+        set => SetProperty(ref _beforeTask, value);
+    }
+
+    private string _afterTask = "None".GetLocalizationString();
+
+    public string AfterTask
+    {
+        get
+        {
+            if (_afterTask != AfterTaskList[DataSet.GetData("AfterTaskIndex", 0)].Name)
+                _afterTask = AfterTaskList[DataSet.GetData("AfterTaskIndex", 0)].Name;
+            return _afterTask;
+        }
+        set => SetProperty(ref _afterTask, value);
+    }
+
+    private List<SettingViewModel> _beforeTaskList =
+    [
+        new("None"),
+        new("StartupSoftwareAndScript"),
+    ];
+
+
+    public List<SettingViewModel> BeforeTaskList
+    {
+        get => _beforeTaskList;
+        set => SetProperty(ref _beforeTaskList, value);
+    }
+
+    private List<SettingViewModel> _afterTaskList =
+    [
+        new("None"),
+        new("CloseMFA"),
+        new("CloseEmulator"),
+        new("CloseEmulatorAndMFA"),
+        new("ShutDown"),
+        new("CloseEmulatorAndRestartMFA"),
+        new("Restart"),
+        new("DingTalkMessageAsync"),
+    ];
+
+    public List<SettingViewModel> AfterTaskList
+    {
+        get => _afterTaskList;
+        set => SetProperty(ref _listTitle, value);
     }
 }

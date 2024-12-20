@@ -36,7 +36,7 @@ namespace MFAWPF.Views;
 
 public partial class MainWindow
 {
-    public static MainWindow? Instance { get; private set; }
+    public static MainWindow Instance { get; private set; }
     private readonly MaaToolkit _maaToolkit;
 
     public static MainViewModel? Data { get; private set; }
@@ -48,6 +48,7 @@ public partial class MainWindow
 
     public MainWindow()
     {
+        DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
         LanguageManager.Initialize();
         InitializeComponent();
         Instance = this;
@@ -75,7 +76,6 @@ public partial class MainWindow
 
     private bool InitializeData()
     {
-        DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
         if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json"))
         {
             LoggerService.LogInfo("未找到interface文件，生成interface.json...");
@@ -382,6 +382,7 @@ public partial class MainWindow
 
     public void Start(object? sender, RoutedEventArgs? e)
     {
+        Console.WriteLine("正在启动！");
         if (Data?.Idle == false)
         {
             Growls.Warning("CannotStart".GetLocalizationString());
@@ -678,25 +679,24 @@ public partial class MainWindow
     private void ConfigureSettingsPanel(object? sender = null, RoutedEventArgs? e = null)
     {
         settingPanel.Children.Clear();
-        connectionSettingPanel.Children.Clear();
 
 
-        var tabControl = new TabControl
-        {
-            TabStripPlacement = Dock.Bottom,
-            Height = 400,
-            Background = Brushes.Transparent,
-            BorderThickness = new Thickness(0),
-            VerticalAlignment = VerticalAlignment.Stretch,
-            Style = (Style)FindResource("TabControlCapsule")
-        };
-        Binding heightBinding = new Binding("ActualHeight")
-        {
-            Source = settingPanel,
-            Converter = new SubtractConverter(),
-            ConverterParameter = "20"
-        };
-        tabControl.SetBinding(HeightProperty, heightBinding);
+        // var tabControl = new TabControl
+        // {
+        //     TabStripPlacement = Dock.Bottom,
+        //     Height = 400,
+        //     Background = Brushes.Transparent,
+        //     BorderThickness = new Thickness(0),
+        //     VerticalAlignment = VerticalAlignment.Stretch,
+        //     Style = (Style)FindResource("TabControlCapsule")
+        // };
+        // Binding heightBinding = new Binding("ActualHeight")
+        // {
+        //     Source = settingPanel,
+        //     Converter = new SubtractConverter(),
+        //     ConverterParameter = "20"
+        // };
+        // tabControl.SetBinding(HeightProperty, heightBinding);
 
         StackPanel s1 = new()
             {
@@ -707,41 +707,6 @@ public partial class MainWindow
                 Margin = new Thickness(2)
             };
         AddResourcesOption(s1);
-
-        AddAutoStartOption(s2);
-        if ((Data?.IsAdb).IsTrue())
-        {
-            AddSettingOption(connectionSettingPanel, "CaptureModeOption",
-                [
-                    "Default", "RawWithGzip", "RawByNetcat",
-                    "Encode", "EncodeToFileAndPull", "MinicapDirect", "MinicapStream",
-                    "EmulatorExtras"
-                ],
-                "AdbControlScreenCapType");
-            AddBindSettingOption(connectionSettingPanel, "InputModeOption",
-                ["MiniTouch", "MaaTouch", "AdbInput", "AutoDetect"],
-                "AdbControlInputType");
-            AddAfterTaskOption(s2);
-
-            AddStartSettingOption(s2);
-            // AddSwitchConfiguration(s2);
-            //AddStartExtrasOption(s2);
-            AddStartEmulatorOption(s2);
-            AddRememberAdbOption(connectionSettingPanel);
-
-            // AddIntroduction(s2,
-            //     "[size:24][b][color:blue]这是一个蓝色的大标题[/color][/b][/size]\n[color:green][i]这是绿色的斜体文本。[/i][/color]\n[u]这是带有下划线的文本。[/u]\n[s]这是带有删除线的文本。[/s]\n[b][color:red]这是红色的粗体文本。[/color][/b]\n[size:18]这是一个较小的字号文本，字号为18。[/size]\n");
-        }
-        else
-        {
-            AddSettingOption(connectionSettingPanel, "CaptureModeOption",
-                ["FramePool", "DXGIDesktopDup", "GDI"],
-                "Win32ControlScreenCapType");
-
-            AddSettingOption(connectionSettingPanel, "InputModeOption",
-                ["Seize", "SendMessage"],
-                "Win32ControlInputType");
-        }
 
         ScrollViewer sv1 = new()
             {
@@ -757,22 +722,22 @@ public partial class MainWindow
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
-        var commonSettingTabItem = new TabItem
-        {
-            Content = sv1
-        };
-        commonSettingTabItem.BindLocalization("CommonSetting", HeaderedContentControl.HeaderProperty);
-        var advancedSettingTabItem = new TabItem
-        {
-            Content = sv2
-        };
-        advancedSettingTabItem.BindLocalization("AdvancedSetting", HeaderedContentControl.HeaderProperty);
+        // var commonSettingTabItem = new TabItem
+        // {
+        //     Content = sv1
+        // };
+        // commonSettingTabItem.BindLocalization("CommonSetting", HeaderedContentControl.HeaderProperty);
+        // var advancedSettingTabItem = new TabItem
+        // {
+        //     Content = sv2
+        // };
+        // advancedSettingTabItem.BindLocalization("AdvancedSetting", HeaderedContentControl.HeaderProperty);
 
+        //
+        // tabControl.Items.Add(commonSettingTabItem);
+        // tabControl.Items.Add(advancedSettingTabItem);
 
-        tabControl.Items.Add(commonSettingTabItem);
-        tabControl.Items.Add(advancedSettingTabItem);
-
-        settingPanel.Children.Add(tabControl);
+        settingPanel.Children.Add(sv1);
     }
 
     private void AddSwitchConfiguration(Panel? panel = null, int defaultValue = 0)
@@ -849,128 +814,6 @@ public partial class MainWindow
         Growls.Process(Application.Current.Shutdown);
     }
 
-    private void InitializationSettings()
-    {
-        //语言设置
-
-        settingsView.languageSettings.ItemsSource = LanguageManager.SupportedLanguages;
-        settingsView.languageSettings.DisplayMemberPath = "Name";
-        settingsView.languageSettings.BindLocalization("LanguageOption");
-        settingsView.languageSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
-
-        settingsView.languageSettings.SelectionChanged += (sender, _) =>
-        {
-            if ((sender as ComboBox)?.SelectedItem is LanguageManager.SupportedLanguage language)
-                LanguageManager.ChangeLanguage(language);
-            DataSet.SetData("LangIndex", (sender as ComboBox)?.SelectedIndex ?? 0);
-        };
-        var binding2 = new Binding("LanguageIndex")
-        {
-            Source = Data,
-            Mode = BindingMode.OneWay
-        };
-        settingsView.languageSettings.SetBinding(ComboBox.SelectedIndexProperty, binding2);
-
-        //主题设置
-        var light = new ComboBoxItem();
-        light.BindLocalization("LightColor", ContentProperty);
-        var dark = new ComboBoxItem();
-        dark.BindLocalization("DarkColor", ContentProperty);
-        var followSystem = new ComboBoxItem();
-        followSystem.BindLocalization("FollowingSystem", ContentProperty);
-        settingsView.themeSettings.Items.Add(light);
-        settingsView.themeSettings.Items.Add(dark);
-        settingsView.themeSettings.Items.Add(followSystem);
-        var binding3 = new Binding("Idle")
-        {
-            Source = Data,
-            Mode = BindingMode.OneWay
-        };
-        settingsView.themeSettings.SetBinding(IsEnabledProperty, binding3);
-        settingsView.themeSettings.BindLocalization("ThemeOption");
-        settingsView.themeSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
-
-        settingsView.themeSettings.SelectionChanged += (sender, _) =>
-        {
-            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-
-            switch (index)
-            {
-                case 0:
-                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
-                    break;
-                case 1:
-                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
-                    break;
-                default:
-                    FollowSystemTheme();
-                    break;
-            }
-
-            ThemeManager.Current.ApplicationTheme = index == 0 ? ApplicationTheme.Light : ApplicationTheme.Dark;
-            DataSet.SetData("ThemeIndex", index);
-        };
-        settingsView.themeSettings.SelectedIndex = DataSet.GetData("ThemeIndex", 0);
-
-        //性能设置
-        settingsView.performanceSettings.IsChecked = DataSet.GetData("EnableGPU", true);
-        settingsView.performanceSettings.Click += (_, _) => { DataSet.SetData("EnableGPU", settingsView.performanceSettings.IsChecked); };
-
-        //运行设置
-        settingsView.enableSaveDrawSettings.IsChecked = DataSet.GetData("EnableSaveDraw", false);
-        settingsView.enableSaveDrawSettings.Click += (_, _) => { DataSet.SetData("EnableSaveDraw", settingsView.enableSaveDrawSettings.IsChecked); };
-
-        settingsView.beforeTaskSettings.Text = DataSet.GetData("Prescript", string.Empty);
-        settingsView.beforeTaskSettings.BindLocalization("Prescript");
-        settingsView.beforeTaskSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
-        settingsView.beforeTaskSettings.TextChanged += (_, _) => { DataSet.SetData("Prescript", settingsView.beforeTaskSettings.Text); };
-
-        settingsView.afterTaskSettings.Text = DataSet.GetData("Post-script", string.Empty);
-        settingsView.afterTaskSettings.BindLocalization("Post-script");
-        settingsView.afterTaskSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
-        settingsView.afterTaskSettings.TextChanged += (_, _) => { DataSet.SetData("Post-script", settingsView.afterTaskSettings.Text); };
-        //切换配置
-        string configPath = Path.Combine(Environment.CurrentDirectory, "config");
-        foreach (string file in Directory.GetFiles(configPath))
-        {
-            string fileName = Path.GetFileName(file);
-            if (fileName.EndsWith(".json") && fileName != "maa_option.json")
-            {
-                settingsView.swtichConfigs.Items.Add(fileName);
-            }
-        }
-
-
-        settingsView.swtichConfigs.SelectionChanged += (sender, _) =>
-        {
-            string selectedItem = (string)settingsView.swtichConfigs.SelectedItem;
-            if (selectedItem == "config.json")
-            {
-                //
-            }
-            // else if (selectedItem == "maa_option.json")
-            // {
-            //     // 什么都不做，等待后续添加逻辑
-            // }
-            else if (selectedItem == "config.json.bak")
-            {
-                string _currentFile = Path.Combine(configPath, "config.json");
-                string _selectedItem = Path.Combine(configPath, "config.json.bak");
-                string _bakContent = File.ReadAllText(_selectedItem);
-                File.WriteAllText(_currentFile, _bakContent);
-                RestartMFA();
-            }
-            else
-            {
-                // 恢复成绝对路径
-                string _currentFile = Path.Combine(configPath, "config.json");
-                string _selectedItem = Path.Combine(configPath, selectedItem);
-                SwapFiles(_currentFile, _selectedItem);
-                RestartMFA();
-            }
-        };
-
-    }
 
     private void About(object? sender = null, RoutedEventArgs? e = null)
     {
@@ -1167,56 +1010,33 @@ public partial class MainWindow
         panel.Children.Add(comboBox);
     }
 
-    private void AddSettingOption(Panel? panel,
+    private void SetSettingOption(ComboBox? comboBox,
         string titleKey,
         IEnumerable<string> options,
         string datatype,
         int defaultValue = 0)
     {
-        var comboBox = new ComboBox
-        {
-            ItemsSource = options,
-            SelectedIndex = DataSet.GetData(datatype, defaultValue),
-            Style = FindResource("ComboBoxExtend") as Style,
-            Margin = new Thickness(5)
-        };
-        var binding = new Binding("Idle")
-        {
-            Source = Data,
-            Mode = BindingMode.OneWay
-        };
-        comboBox.SetBinding(IsEnabledProperty, binding);
+        comboBox.SelectedIndex = DataSet.GetData(datatype, defaultValue);
+        comboBox.ItemsSource = options;
         comboBox.BindLocalization(titleKey);
-        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
         comboBox.SelectionChanged += (sender, _) =>
         {
             var index = (sender as ComboBox)?.SelectedIndex ?? 0;
             DataSet.SetData(datatype, index);
             MaaProcessor.Instance.SetCurrentTasker();
         };
-
-        panel?.Children.Add(comboBox);
     }
 
-    private void AddBindSettingOption(Panel? panel,
+    private void SetBindSettingOption(ComboBox? comboBox,
         string titleKey,
         IEnumerable<string> options,
         string datatype,
         int defaultValue = 0)
 
     {
-        var comboBox = new ComboBox
-        {
-            SelectedIndex = DataSet.GetData(datatype, defaultValue),
-            Style = FindResource("ComboBoxExtend") as Style,
-            Margin = new Thickness(5)
-        };
-        var binding = new Binding("Idle")
-        {
-            Source = Data,
-            Mode = BindingMode.OneWay
-        };
-        comboBox.SetBinding(IsEnabledProperty, binding);
+        comboBox.SelectedIndex = DataSet.GetData(datatype, defaultValue);
+
         foreach (var s in options)
         {
             var comboBoxItem = new ComboBoxItem();
@@ -1225,15 +1045,13 @@ public partial class MainWindow
         }
 
         comboBox.BindLocalization(titleKey);
-        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
         comboBox.SelectionChanged += (sender, _) =>
         {
             var index = (sender as ComboBox)?.SelectedIndex ?? 0;
             DataSet.SetData(datatype, index);
             MaaProcessor.Instance.SetCurrentTasker();
         };
-
-        panel?.Children.Add(comboBox);
     }
 
     private void AddStartEmulatorOption(Panel? panel = null)
@@ -1368,24 +1186,23 @@ public partial class MainWindow
         var comboBox = new ComboBox
         {
             Style = FindResource("ComboBoxExtend") as Style,
-            Margin = new Thickness(5)
+            Margin = new Thickness(5),
+            DisplayMemberPath = "Name"
         };
-        var c1 = new ComboBoxItem();
-        c1.BindLocalization("None", ContentProperty);
-        var c2 = new ComboBoxItem();
-        c2.BindLocalization("StartupScript", ContentProperty);
-        comboBox.Items.Add(c1);
-        comboBox.Items.Add(c2);
 
+        comboBox.ItemsSource = Data.BeforeTaskList;
         comboBox.BindLocalization("AutoStartOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+        comboBox.SelectedIndex = DataSet.GetData("AutoStartIndex", defaultValue);
 
         comboBox.SelectionChanged += (sender, _) =>
         {
             var index = (sender as ComboBox)?.SelectedIndex ?? 0;
             DataSet.SetData("AutoStartIndex", index);
+            Data.BeforeTask = Data.BeforeTaskList[index].Name;
         };
-        comboBox.SelectedIndex = DataSet.GetData("AutoStartIndex", defaultValue);
+
+
         panel.Children.Add(comboBox);
     }
 
@@ -1395,68 +1212,29 @@ public partial class MainWindow
         var comboBox = new ComboBox
         {
             Style = FindResource("ComboBoxExtend") as Style,
-            Margin = new Thickness(5)
+            Margin = new Thickness(5),
+            DisplayMemberPath = "Name"
         };
-        var c1 = new ComboBoxItem();
-        c1.BindLocalization("None", ContentProperty);
-        var c2 = new ComboBoxItem();
-        c2.BindLocalization("CloseMFA", ContentProperty);
-        var c3 = new ComboBoxItem();
-        c3.BindLocalization("CloseEmulator", ContentProperty);
-        var c4 = new ComboBoxItem();
-        c4.BindLocalization("CloseEmulatorAndMFA", ContentProperty);
-        var c5 = new ComboBoxItem();
-        c5.BindLocalization("ShutDown", ContentProperty);
-        var c6 = new ComboBoxItem();
-        c6.BindLocalization("CloseEmulatorAndRestartMFA", ContentProperty);
-        var c7 = new ComboBoxItem();
-        c7.BindLocalization("Restart", ContentProperty);
-        var c8 = new ComboBoxItem();
-        c8.BindLocalization("DingTalkMessageAsync", ContentProperty);
-        comboBox.Items.Add(c1);
-        comboBox.Items.Add(c2);
-        comboBox.Items.Add(c3);
-        comboBox.Items.Add(c4);
-        comboBox.Items.Add(c5);
-        comboBox.Items.Add(c6);
-        comboBox.Items.Add(c7);
-        comboBox.Items.Add(c8);
+        comboBox.ItemsSource = Data.AfterTaskList;
+
         comboBox.BindLocalization("AfterTaskOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-
+        comboBox.SelectedIndex = DataSet.GetData("AfterTaskIndex", defaultValue);
         comboBox.SelectionChanged += (sender, _) =>
         {
             var index = (sender as ComboBox)?.SelectedIndex ?? 0;
             DataSet.SetData("AfterTaskIndex", index);
+            Data.AfterTask = Data.AfterTaskList[index].Name;
         };
-        comboBox.SelectedIndex = DataSet.GetData("AfterTaskIndex", defaultValue);
+
         panel.Children.Add(comboBox);
     }
 
-    private void AddSaveDrawOption(Panel? panel = null)
+    private void SetRememberAdbOption(CheckBox? checkBox)
     {
-        panel ??= settingPanel;
-        var checkBox = new CheckBox
-        {
-            IsChecked = DataSet.GetData("EnableSaveDraw", false),
-            Margin = new Thickness(5)
-        };
-        checkBox.BindLocalization("EnableSaveDraw", ContentProperty);
-        checkBox.Click += (_, _) => { DataSet.SetData("EnableSaveDraw", checkBox.IsChecked); };
-        panel.Children.Add(checkBox);
-    }
-
-    private void AddRememberAdbOption(Panel? panel = null)
-    {
-        panel ??= settingPanel;
-        var checkBox = new CheckBox
-        {
-            IsChecked = DataSet.GetData("RememberAdb", true),
-            Margin = new Thickness(5)
-        };
+        checkBox.IsChecked = DataSet.GetData("RememberAdb", true);
         checkBox.BindLocalization("RememberAdb", ContentProperty);
         checkBox.Click += (_, _) => { DataSet.SetData("RememberAdb", checkBox.IsChecked); };
-        panel.Children.Add(checkBox);
     }
 
     private void AddStartSettingOption(Panel? panel = null)
@@ -1467,14 +1245,6 @@ public partial class MainWindow
         //     Source = Data,
         //     Mode = BindingMode.OneWay
         // };
-
-        var checkBox = new CheckBox
-        {
-            IsChecked = DataSet.GetData("StartEmulator", false),
-            Margin = new Thickness(5)
-        };
-        checkBox.BindLocalization("StartEmulator", ContentProperty);
-        checkBox.Click += (_, _) => { DataSet.SetData("StartEmulator", checkBox.IsChecked); };
         // checkBox.SetBinding(IsEnabledProperty, binding);
 
 
@@ -1497,18 +1267,17 @@ public partial class MainWindow
 
         var t1 = new TextBox
         {
-            Text = DataSet.GetData("EmulatorPath", string.Empty),
+            Text = DataSet.GetData("SoftwarePath", string.Empty),
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
         t1.TextChanged += (sender, _) =>
         {
             var text = (sender as TextBox)?.Text ?? string.Empty;
-            DataSet.SetData("EmulatorPath", text);
+            DataSet.SetData("SoftwarePath", text);
         };
         t1.SetValue(InfoElement.ShowClearButtonProperty, true);
-        t1.BindLocalization("EmulatorPath");
+        t1.BindLocalization("SoftwarePath");
         Grid.SetColumn(t1, 0);
-
 
         var path = new System.Windows.Shapes.Path
         {
@@ -1551,19 +1320,18 @@ public partial class MainWindow
         var numericUpDown = new NumericUpDown
         {
             Margin = new Thickness(5),
-            Value = DataSet.GetData("WaitEmulatorTime", 60.0),
+            Value = DataSet.GetData("WaitSoftwareTime", 60.0),
             Style = FindResource("NumericUpDownExtend") as Style
         };
 
-        numericUpDown.BindLocalization("WaitEmulator");
+        numericUpDown.BindLocalization("WaitSoftware");
         numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
         // numericUpDown.SetBinding(IsEnabledProperty, binding);
         numericUpDown.ValueChanged += (sender, _) =>
         {
             var value = (sender as NumericUpDown)?.Value ?? 60;
-            DataSet.SetData("WaitEmulatorTime", value);
+            DataSet.SetData("WaitSoftwareTime", value);
         };
-        panel.Children.Add(checkBox);
         panel.Children.Add(grid);
         panel.Children.Add(numericUpDown);
     }
@@ -1920,8 +1688,18 @@ public partial class MainWindow
         {
             InitializationSettings();
             ConnectionTabControl.SelectedIndex = MaaInterface.Instance?.DefaultController == "win32" ? 1 : 0;
-            WaitEmulator();
-
+            ConfigureTaskSettingsPanel();
+            Console.WriteLine(DataSet.GetData("AutoStartIndex", 0) == 1);
+            if (DataSet.GetData("AutoStartIndex", 0) == 1)
+            {
+                MaaProcessor.Instance.TaskQueue.Push(new MFATask
+                {
+                    Name = "启动前",
+                    Type = MFATask.MFATaskType.MFA,
+                    Action = WaitSoftware
+                });
+                Start(null, null);
+            }
             ConnectionTabControl.SelectionChanged += ConnectionTabControlOnSelectionChanged;
             if (Data != null)
                 Data.NotLock = MaaInterface.Instance?.LockController != true;
@@ -1965,66 +1743,6 @@ public partial class MainWindow
         {
             Console.WriteLine("尝试写入失败！");
         }
-    }
-
-    public void WaitEmulator()
-    {
-        Task.Run(
-            async () =>
-            {
-                if (DataSet.GetData("StartEmulator", false))
-                {
-                    await MaaProcessor.Instance.StartEmulator();
-                }
-
-                if ((Data?.IsAdb).IsTrue() && DataSet.GetData("RememberAdb", true) && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) && DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
-                {
-                    var settings = new JsonSerializerSettings();
-                    settings.Converters.Add(new AdbInputMethodsConverter());
-                    settings.Converters.Add(new AdbScreencapMethodsConverter());
-
-                    var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
-                    if (device != null)
-                    {
-                        Growls.Process(() =>
-                        {
-                            deviceComboBox.ItemsSource = new List<AdbDeviceInfo>
-                            {
-                                device
-                            };
-                            deviceComboBox.SelectedIndex = 0;
-                            MaaProcessor.Config.IsConnected = true;
-                            if (DataSet.GetData("AutoStartIndex", 0) == 1)
-                            {
-                                if (MaaProcessor.Instance.ShouldEndStart)
-                                {
-                                    MaaProcessor.Instance.EndAutoStart();
-                                }
-                                else
-                                {
-                                    Start(null, null);
-                                }
-                            }
-                        });
-                    }
-                }
-                else
-                    Growls.Process(() =>
-                    {
-                        AutoDetectDevice();
-                        if ((Data?.IsAdb).IsTrue() && DataSet.GetData("AutoStartIndex", 0) == 1)
-                        {
-                            if (MaaProcessor.Instance.ShouldEndStart)
-                            {
-                                MaaProcessor.Instance.EndAutoStart();
-                            }
-                            else
-                            {
-                                Start(null, null);
-                            }
-                        }
-                    });
-            });
     }
 
     private void ToggleWindowTopMost(object sender, RoutedPropertyChangedEventArgs<bool> e)
@@ -2135,5 +1853,201 @@ public partial class MainWindow
         {
             return false;
         }
+    }
+
+    private void InitializationSettings()
+    {
+        //语言设置
+
+        settingsView.languageSettings.ItemsSource = LanguageManager.SupportedLanguages;
+        settingsView.languageSettings.DisplayMemberPath = "Name";
+        settingsView.languageSettings.BindLocalization("LanguageOption");
+        settingsView.languageSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
+
+        settingsView.languageSettings.SelectionChanged += (sender, _) =>
+        {
+            if ((sender as ComboBox)?.SelectedItem is LanguageManager.SupportedLanguage language)
+                LanguageManager.ChangeLanguage(language);
+            DataSet.SetData("LangIndex", (sender as ComboBox)?.SelectedIndex ?? 0);
+        };
+        var binding2 = new Binding("LanguageIndex")
+        {
+            Source = Data,
+            Mode = BindingMode.OneWay
+        };
+        settingsView.languageSettings.SetBinding(ComboBox.SelectedIndexProperty, binding2);
+
+        //主题设置
+        var light = new ComboBoxItem();
+        light.BindLocalization("LightColor", ContentProperty);
+        var dark = new ComboBoxItem();
+        dark.BindLocalization("DarkColor", ContentProperty);
+        var followSystem = new ComboBoxItem();
+        followSystem.BindLocalization("FollowingSystem", ContentProperty);
+        settingsView.themeSettings.Items.Add(light);
+        settingsView.themeSettings.Items.Add(dark);
+        settingsView.themeSettings.Items.Add(followSystem);
+
+        settingsView.themeSettings.BindLocalization("ThemeOption");
+        settingsView.themeSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
+
+        settingsView.themeSettings.SelectionChanged += (sender, _) =>
+        {
+            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+
+            switch (index)
+            {
+                case 0:
+                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
+                    break;
+                case 1:
+                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
+                    break;
+                default:
+                    FollowSystemTheme();
+                    break;
+            }
+
+            ThemeManager.Current.ApplicationTheme = index == 0 ? ApplicationTheme.Light : ApplicationTheme.Dark;
+            DataSet.SetData("ThemeIndex", index);
+        };
+        settingsView.themeSettings.SelectedIndex = DataSet.GetData("ThemeIndex", 0);
+
+        //性能设置
+        settingsView.performanceSettings.IsChecked = DataSet.GetData("EnableGPU", true);
+        settingsView.performanceSettings.Click += (_, _) => { DataSet.SetData("EnableGPU", settingsView.performanceSettings.IsChecked); };
+
+        //运行设置
+        settingsView.enableSaveDrawSettings.IsChecked = DataSet.GetData("EnableSaveDraw", false);
+        settingsView.enableSaveDrawSettings.Click += (_, _) => { DataSet.SetData("EnableSaveDraw", settingsView.enableSaveDrawSettings.IsChecked); };
+
+        settingsView.beforeTaskSettings.Text = DataSet.GetData("Prescript", string.Empty);
+        settingsView.beforeTaskSettings.BindLocalization("Prescript");
+        settingsView.beforeTaskSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
+        settingsView.beforeTaskSettings.TextChanged += (_, _) => { DataSet.SetData("Prescript", settingsView.beforeTaskSettings.Text); };
+
+        settingsView.afterTaskSettings.Text = DataSet.GetData("Post-script", string.Empty);
+        settingsView.afterTaskSettings.BindLocalization("Post-script");
+        settingsView.afterTaskSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
+        settingsView.afterTaskSettings.TextChanged += (_, _) => { DataSet.SetData("Post-script", settingsView.afterTaskSettings.Text); };
+        //切换配置
+        string configPath = Path.Combine(Environment.CurrentDirectory, "config");
+        foreach (string file in Directory.GetFiles(configPath))
+        {
+            string fileName = Path.GetFileName(file);
+            if (fileName.EndsWith(".json") && fileName != "maa_option.json")
+            {
+                settingsView.swtichConfigs.Items.Add(fileName);
+            }
+        }
+
+
+        SetSettingOption(settingsView.adbCaptureComboBox, "CaptureModeOption",
+            [
+                "Default", "RawWithGzip", "RawByNetcat",
+                "Encode", "EncodeToFileAndPull", "MinicapDirect", "MinicapStream",
+                "EmulatorExtras"
+            ],
+            "AdbControlScreenCapType");
+        SetBindSettingOption(settingsView.adbInputComboBox, "InputModeOption",
+            ["MiniTouch", "MaaTouch", "AdbInput", "AutoDetect"],
+            "AdbControlInputType");
+        
+        SetRememberAdbOption(settingsView.rememberAdbButton);
+
+        SetSettingOption(settingsView.win32CaptureComboBox, "CaptureModeOption",
+            ["FramePool", "DXGIDesktopDup", "GDI"],
+            "Win32ControlScreenCapType");
+
+        SetSettingOption(settingsView.win32InputComboBox, "InputModeOption",
+            ["Seize", "SendMessage"],
+            "Win32ControlInputType");
+
+
+        settingsView.swtichConfigs.SelectionChanged += (sender, _) =>
+        {
+            string selectedItem = (string)settingsView.swtichConfigs.SelectedItem;
+            if (selectedItem == "config.json")
+            {
+                //
+            }
+            // else if (selectedItem == "maa_option.json")
+            // {
+            //     // 什么都不做，等待后续添加逻辑
+            // }
+            else if (selectedItem == "config.json.bak")
+            {
+                string _currentFile = Path.Combine(configPath, "config.json");
+                string _selectedItem = Path.Combine(configPath, "config.json.bak");
+                string _bakContent = File.ReadAllText(_selectedItem);
+                File.WriteAllText(_currentFile, _bakContent);
+                RestartMFA();
+            }
+            else
+            {
+                // 恢复成绝对路径
+                string _currentFile = Path.Combine(configPath, "config.json");
+                string _selectedItem = Path.Combine(configPath, selectedItem);
+                SwapFiles(_currentFile, _selectedItem);
+                RestartMFA();
+            }
+        };
+
+    }
+    private void ConfigureTaskSettingsPanel(object? sender = null, RoutedEventArgs? e = null)
+    {
+        settingPanel.Children.Clear();
+        StackPanel
+            s2 = new()
+            {
+                Margin = new Thickness(2)
+            };
+
+        AddAutoStartOption(s2);
+        AddAfterTaskOption(s2);
+
+        AddStartSettingOption(s2);
+        AddStartEmulatorOption(s2);
+
+
+        ScrollViewer
+            sv2 = new()
+            {
+                Content = s2,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch
+            };
+        settingPanel.Children.Add(sv2);
+    }
+    public async void WaitSoftware()
+    {
+        if (DataSet.GetData("AutoStartIndex", 0) >= 1)
+        {
+            MaaProcessor.Instance.StartSoftware();
+        }
+
+        if ((Data?.IsAdb).IsTrue() && DataSet.GetData("RememberAdb", true) && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) && DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
+        {
+            var settings = new JsonSerializerSettings();
+            settings.Converters.Add(new AdbInputMethodsConverter());
+            settings.Converters.Add(new AdbScreencapMethodsConverter());
+
+            var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
+            if (device != null)
+            {
+                Growls.Process(() =>
+                {
+                    deviceComboBox.ItemsSource = new List<AdbDeviceInfo>
+                    {
+                        device
+                    };
+                    deviceComboBox.SelectedIndex = 0;
+                    MaaProcessor.Config.IsConnected = true;
+                });
+            }
+        }
+        else
+            Growls.Process(AutoDetectDevice);
     }
 }

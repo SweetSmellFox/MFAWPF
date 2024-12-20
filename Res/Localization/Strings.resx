@@ -450,14 +450,14 @@
     <data name="FollowingSystem" xml:space="preserve">
     <value>跟随系统</value>
   </data>
-    <data name="EmulatorPath" xml:space="preserve">
-    <value>模拟器路径</value>
+  <data name="SoftwarePath" xml:space="preserve">
+    <value>软件路径</value>
   </data>
-    <data name="WaitEmulator" xml:space="preserve">
-    <value>等待模拟器启动时间(秒)</value>
+  <data name="WaitSoftware" xml:space="preserve">
+    <value>等待软件启动时间(秒)</value>
   </data>
-    <data name="StartEmulator" xml:space="preserve">
-    <value>启动MFA后启动模拟器</value>
+  <data name="StartEmulator" xml:space="preserve">
+    <value>启动MFA后启动软件</value>
   </data>
     <data name="Select" xml:space="preserve">
     <value>选择</value>
@@ -468,8 +468,8 @@
     <data name="SelectExecutableFile" xml:space="preserve">
     <value>选择可运行文件</value>
   </data>
-    <data name="WaitEmulatorTime" xml:space="preserve">
-    <value>等待模拟器启动时间(秒): {0}(s)</value>
+  <data name="WaitSoftwareTime" xml:space="preserve">
+    <value>等待软件启动时间(秒): {0}(s)</value>
   </data>
     <data name="ProjectLink" xml:space="preserve">
     <value>项目链接: </value>
@@ -486,17 +486,17 @@
     <data name="CloseMFA" xml:space="preserve">
     <value>关闭MFA</value>
   </data>
-    <data name="CloseEmulator" xml:space="preserve">
-    <value>关闭模拟器</value>
+  <data name="CloseEmulator" xml:space="preserve">
+    <value>关闭软件</value>
   </data>
-    <data name="CloseEmulatorAndMFA" xml:space="preserve">
-    <value>关闭MFA和模拟器</value>
+  <data name="CloseEmulatorAndMFA" xml:space="preserve">
+    <value>关闭MFA和软件</value>
   </data>
     <data name="ShutDown" xml:space="preserve">
     <value>关机</value>
   </data>
-    <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
-    <value>重启MFA和关闭模拟器</value>
+  <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
+    <value>重启MFA和关闭软件</value>
   </data>
     <data name="Restart" xml:space="preserve">
     <value>重启系统</value>
@@ -560,5 +560,11 @@
   </data>
   <data name="Post-script" xml:space="preserve">
     <value>结束后脚本</value>
+  </data>
+  <data name="StartupSoftwareAndScript" xml:space="preserve">
+    <value>启动软件并启动脚本</value>
+  </data>
+  <data name="ConnectionSettings" xml:space="preserve">
+    <value>连接设置</value>
   </data>
 </root>

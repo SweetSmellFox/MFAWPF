@@ -683,9 +683,9 @@ namespace MFAWPF.Res.Localization {
         /// <summary>
         ///   Looks up a localized string similar to 模拟器路径.
         /// </summary>
-        internal static string EmulatorPath {
+        internal static string SoftwarePath {
             get {
-                return ResourceManager.GetString("EmulatorPath", resourceCulture);
+                return ResourceManager.GetString("SoftwarePath", resourceCulture);
             }
         }
         
@@ -1538,9 +1538,9 @@ namespace MFAWPF.Res.Localization {
         /// <summary>
         ///   Looks up a localized string similar to 等待模拟器启动时间(秒): {0}(s).
         /// </summary>
-        internal static string WaitEmulatorTime {
+        internal static string WaitSoftwareTime {
             get {
-                return ResourceManager.GetString("WaitEmulatorTime", resourceCulture);
+                return ResourceManager.GetString("WaitSoftwareTime", resourceCulture);
             }
         }
         

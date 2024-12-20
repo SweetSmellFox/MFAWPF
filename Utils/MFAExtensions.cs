@@ -151,4 +151,10 @@ public static class MFAExtensions
     {
         return OCRHelper.ReadTextFromMAAContext(maaContext, imageBuffer, x, y, w, h);
     }
+
+    public static void Push(this Queue<MFATask> queue, MFATask task)
+    {
+        queue.Enqueue(task);
+        MaaProcessor.Instance.OnTaskQueueChanged();
+    }
 }

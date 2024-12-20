@@ -81,7 +81,7 @@ public class DragItemViewModel : ObservableObject
         set
         {
             SetProperty(ref _enableSetting, value);
-            MainWindow.Instance?.SetOption(this, value);
+            MainWindow.Instance.SetOption(this, value);
         }
     }
 

@@ -15,6 +15,7 @@ using MaaFramework.Binding.Custom;
 using MaaFramework.Binding.Notification;
 using MFAWPF.Custom;
 using MFAWPF.Data;
+using MFAWPF.Utils.Converters;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
 using Newtonsoft.Json;
@@ -49,7 +50,7 @@ public class MaaProcessor
     public static string ResourceBase => $"{Resource}/base";
     public static string ResourcePipelineFilePath => $"{ResourceBase}/pipeline/";
 
-    public Queue<TaskAndParam> TaskQueue { get; } = new();
+    public Queue<MFATask> TaskQueue { get; } = new();
     public static int Money { get; set; }
     public static int AllMoney { get; set; }
     public static Config Config { get; } = new();
@@ -78,52 +79,89 @@ public class MaaProcessor
 
     private DateTime? _startTime;
 
+
     public void Start(List<DragItemViewModel>? tasks)
     {
-        if (!Config.IsConnected)
+        SetCurrentTasker();
+        MainWindow.Data?.SetIdle(false);
+        TaskQueue.Push(new MFATask
         {
-            Growls.Warning("Warning_CannotConnect".GetLocalizationString()
-                .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
-                    ? "Emulator".GetLocalizationString()
-                    : "Window".GetLocalizationString()));
-            return;
-        }
-        MainWindow.Instance?.RunScript();
+            Name = "启动脚本",
+            Type = MFATask.MFATaskType.MFA,
+            Action = () =>
+            {
+                MainWindow.Instance.RunScript();
+            }
+        });
+
         _startTime = DateTime.Now;
         IsStopped = false;
         tasks ??= new List<DragItemViewModel>();
         var taskAndParams = tasks.Select(CreateTaskAndParam).ToList();
-
-        foreach (var task in taskAndParams)
-            TaskQueue.Enqueue(task);
-        OnTaskQueueChanged();
-
-        SetCurrentTasker();
-        MainWindow.Data?.SetIdle(false);
-
         _cancellationTokenSource = new CancellationTokenSource();
         var token = _cancellationTokenSource.Token;
+        TaskQueue.Push(new MFATask
+        {
+            Name = "计时",
+            Type = MFATask.MFATaskType.MFA,
+            Action = () =>
+            {
+                MainWindow.AddLogByKey("ConnectingTo", null, (MainWindow.Data?.IsAdb).IsTrue()
+                    ? "Emulator"
+                    : "Window");
+                var instance = Task.Run(GetCurrentTasker, token);
+                instance.Wait();
+                if (instance.Result == null || !instance.Result.Initialized)
+                {
+                    Growls.ErrorGlobal("InitInstanceFailed".GetLocalizationString());
+                    LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
+                    MainWindow.AddLogByKey("InstanceInitFailedLog");
+                    Stop();
+                    throw new Exception();
+                }
+                if (!Config.IsConnected)
+                {
+                    Growls.Warning("Warning_CannotConnect".GetLocalizationString()
+                        .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
+                            ? "Emulator".GetLocalizationString()
+                            : "Window".GetLocalizationString()));
+                    throw new Exception();
+                }
+            }
+        });
+
+        TaskQueue.Push(new MFATask
+        {
+            Name = "计时",
+            Type = MFATask.MFATaskType.MFA,
+            Action = () =>
+            {
+                MeasureExecutionTime(() => _currentTasker?.Controller.Screencap().Wait());
+            }
+        });
+
+
+        foreach (var task in taskAndParams)
+            TaskQueue.Push(new MFATask
+            {
+                Name = task.Name,
+                Type = MFATask.MFATaskType.MAAFW,
+                Count = task.Count ?? 1,
+                Action = () => { TryRunTasks(_currentTasker, task.Entry, task.Param); },
+            });
+
+        TaskQueue.Push(new MFATask
+        {
+            Name = "结束",
+            Type = MFATask.MFATaskType.MAAFW,
+            Action = () => { MainWindow.Instance?.RunScript("Post-script"); }
+        });
 
         TaskManager.RunTaskAsync(async () =>
         {
-            MainWindow.AddLogByKey("ConnectingTo", null, (MainWindow.Data?.IsAdb).IsTrue()
-                ? "Emulator"
-                : "Window");
-            var instance = await Task.Run(GetCurrentTasker, token);
-
-            if (instance == null || !instance.Initialized)
-            {
-                Growls.ErrorGlobal("InitInstanceFailed".GetLocalizationString());
-                LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
-                MainWindow.AddLogByKey("InstanceInitFailedLog");
-                Stop();
-                return;
-            }
-
             var run = await ExecuteTasks(token);
             if (run)
             {
-                MainWindow.Instance?.RunScript("Post-script");
                 Stop(IsStopped);
             }
         }, null, "启动任务");
@@ -134,14 +172,8 @@ public class MaaProcessor
         if (_emulatorCancellationTokenSource != null)
         {
             _emulatorCancellationTokenSource?.Cancel();
-            MainWindow.AddLogByKey("Stopping");
-
-            if (DataSet.GetData("AutoStartIndex", 0) != 1)
-            {
-                EndAutoStart();
-            }
         }
-        else if (_cancellationTokenSource != null)
+        if (_cancellationTokenSource != null)
         {
             IsStopped = setIsStopped;
             _cancellationTokenSource?.Cancel();
@@ -184,16 +216,16 @@ public class MaaProcessor
                 CloseMFA();
                 break;
             case 2:
-                CloseEmulator();
+                CloseSoftware();
                 break;
             case 3:
-                CloseEmulatorAndMFA();
+                CloseSoftwareAndMFA();
                 break;
             case 4:
                 ShutDown();
                 break;
             case 5:
-                CloseEmulatorAndRestartMFA();
+                CloseSoftwareAndRestartMFA();
                 break;
             case 6:
                 Restart();
@@ -206,30 +238,17 @@ public class MaaProcessor
 
 
     private CancellationTokenSource? _emulatorCancellationTokenSource;
-    public bool ShouldEndStart => _emulatorCancellationTokenSource is { IsCancellationRequested: true };
 
-    public void EndAutoStart(bool showTip = true)
-    {
-        _emulatorCancellationTokenSource = null;
-        TaskQueue.Clear();
-        OnTaskQueueChanged();
-        if (showTip)
-            MainWindow.AddLogByKey("TaskAbandoned");
-        MainWindow.Data?.SetIdle(true);
-    }
+    private Process? _softwareProcess;
 
-    public async Task StartEmulator()
+    public void StartSoftware()
     {
         _emulatorCancellationTokenSource = new CancellationTokenSource();
-        MainWindow.Instance?.ToggleTaskButtonsVisibility(true);
-        MainWindow.Data?.SetIdle(false);
-        await StartRunnableFile(DataSet.GetData("EmulatorPath", string.Empty) ?? string.Empty,
-            DataSet.GetData("WaitEmulatorTime", 60.0), _emulatorCancellationTokenSource.Token);
+        StartRunnableFile(DataSet.GetData("SoftwarePath", string.Empty) ?? string.Empty,
+            DataSet.GetData("WaitSoftwareTime", 60.0), _emulatorCancellationTokenSource.Token);
     }
 
-    private Process? _emulatorProcess;
-
-    private async Task StartRunnableFile(string exePath, double waitTimeInSeconds, CancellationToken token)
+    private void StartRunnableFile(string exePath, double waitTimeInSeconds, CancellationToken token)
     {
         if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
             return;
@@ -237,10 +256,10 @@ public class MaaProcessor
         if (Process.GetProcessesByName(processName).Length == 0)
         {
             if (!string.IsNullOrWhiteSpace(DataSet.GetData("EmulatorConfig", string.Empty)))
-                _emulatorProcess =
+                _softwareProcess =
                     Process.Start(exePath, DataSet.GetData("EmulatorConfig", string.Empty) ?? string.Empty);
             else
-                _emulatorProcess = Process.Start(exePath);
+                _softwareProcess = Process.Start(exePath);
         }
         else
         {
@@ -259,25 +278,20 @@ public class MaaProcessor
 
             if (remainingTime % 10 == 0)
             {
-                MainWindow.AddLogByKey("WaitEmulatorTime", null, remainingTime.ToString());
+                MainWindow.AddLogByKey("WaitSoftwareTime", null, remainingTime.ToString());
             }
 
             try
             {
-                await Task.Delay(1000, token);
+                Thread.Sleep(1000);
             }
             catch
             {
             }
         }
 
-        if (DataSet.GetData("AutoStartIndex", 0) == 0)
-            EndAutoStart(false);
-        else
-            _emulatorCancellationTokenSource = null;
     }
 
-// 获取进程的命令行参数的辅助方法
     private static string GetCommandLine(Process process)
     {
         return GetCommandLine(process.Id); // 这里可能需要用 WMI 方法获取参数
@@ -300,20 +314,20 @@ public class MaaProcessor
         return commandLine;
     }
 
-    private void CloseEmulator()
+    private void CloseSoftware()
     {
-        if (_emulatorProcess != null)
+        if (_softwareProcess != null)
         {
-            _emulatorProcess.Kill();
-            _emulatorProcess = null;
+            _softwareProcess.Kill();
+            _softwareProcess = null;
         }
         else
         {
-            var emulatorPath = DataSet.GetData("EmulatorPath", string.Empty);
+            var softwarePath = DataSet.GetData("SoftwarePath", string.Empty);
 
-            if (!string.IsNullOrEmpty(emulatorPath))
+            if (!string.IsNullOrEmpty(softwarePath) && (MainWindow.Data?.IsAdb).IsTrue())
             {
-                string processName = Path.GetFileNameWithoutExtension(emulatorPath);
+                string processName = Path.GetFileNameWithoutExtension(softwarePath);
                 var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
 
                 var processes = Process.GetProcessesByName(processName);
@@ -327,7 +341,7 @@ public class MaaProcessor
                     }
                 }
             }
-            else if (!string.IsNullOrEmpty(Config.AdbDevice.Name))
+            else if (!string.IsNullOrEmpty(Config.AdbDevice.Name) && (MainWindow.Data?.IsAdb).IsTrue())
             {
                 var windowName = Config.AdbDevice.Name;
                 if (windowName.Contains("MuMu"))
@@ -373,28 +387,28 @@ public class MaaProcessor
     }
 
 
-    private void CloseEmulatorAndMFA()
+    private void CloseSoftwareAndMFA()
     {
-        CloseEmulator();
+        CloseSoftware();
         CloseMFA();
     }
 
     private void ShutDown()
     {
-        CloseEmulator();
+        CloseSoftware();
         Process.Start("shutdown", "/s /t 0");
     }
 
-    private void CloseEmulatorAndRestartMFA()
+    private void CloseSoftwareAndRestartMFA()
     {
-        CloseEmulator();
+        CloseSoftware();
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
         Growls.Process(Application.Current.Shutdown);
     }
 
     private void Restart()
     {
-        CloseEmulator();
+        CloseSoftware();
         Process.Start("shutdown", "/r /t 0");
     }
 
@@ -589,28 +603,17 @@ public class MaaProcessor
 
     private async Task<bool> ExecuteTasks(CancellationToken token)
     {
-        MeasureExecutionTime(() => _currentTasker?.Controller.Screencap().Wait());
         while (TaskQueue.Count > 0)
         {
             if (token.IsCancellationRequested) return false;
+            var task = TaskQueue.Dequeue();
 
-            var task = TaskQueue.Peek();
-            for (var i = 0; i < task.Count; i++)
+            if (!task.Run())
             {
-                if (TaskQueue.Count > 0)
-                {
-                    var taskA = TaskQueue.Peek();
-                    MainWindow.AddLogByKey("TaskStart", null, taskA.Name ?? string.Empty);
-                    if (!TryRunTasks(_currentTasker, taskA.Entry, taskA.Param))
-                    {
-                        if (IsStopped) return false;
-                        break;
-                    }
-                }
+                if (IsStopped) return false;
+                break;
             }
 
-            if (TaskQueue.Count > 0)
-                TaskQueue.Dequeue();
             OnTaskQueueChanged();
         }
 
@@ -645,7 +648,7 @@ public class MaaProcessor
         _startTime = null;
     }
 
-    protected virtual void OnTaskQueueChanged()
+    public virtual void OnTaskQueueChanged()
     {
         TaskStackChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -817,6 +820,7 @@ public class MaaProcessor
                 Config.DesktopWindow.Link,
                 Config.DesktopWindow.Check);
     }
+
     // public static IEnumerable<object> LoadAndInstantiateCustomClasses(string directory, string[] interfacesToImplement)
     // {
     //     var customClasses = new List<object>();
@@ -992,11 +996,11 @@ public class MaaProcessor
         return bitmapImage;
     }
 
-    private bool TryRunTasks(MaaTasker? maa, string? task, string? taskParams)
+    private void TryRunTasks(MaaTasker? maa, string? task, string? taskParams)
     {
-        if (maa == null || task == null) return false;
+        if (maa == null || task == null) throw new NullReferenceException();
         if (string.IsNullOrWhiteSpace(taskParams)) taskParams = "{}";
-        return maa.AppendPipeline(task, taskParams).Wait() == MaaJobStatus.Succeeded;
+        maa.AppendPipeline(task, taskParams).Wait().ThrowIfNot(MaaJobStatus.Succeeded);
     }
 
     private static MaaImageBuffer GetImage(IMaaController? maaController)
