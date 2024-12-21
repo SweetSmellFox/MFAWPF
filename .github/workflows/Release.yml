@@ -29,13 +29,17 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Extract and Process Changelog Information
+      - name: Changelog
+        id: Changelog
         run: |
           python3 Tools/changelog_generator.py  # 假设将Python代码保存为changelog_generator.py文件，并放在工作流执行目录下
         env:
           DOTNET_ROOT: /home/runner/.dotnet
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # 如果Python代码中需要通过GitHub API获取信息，需要传递GitHub Token，这里假设你已经在仓库的Secrets中配置好了名为GH_TOKEN的密钥
-
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        shell: bash
+        # 设置输出环境变量，将Python脚本中保存的GENERATED_CHANGELOG环境变量输出，以便后续步骤使用
+        outputs:
+          generated_changelog: ${{ env.GENERATED_CHANGELOG }}
 
       - name: Install dependencies
         run: dotnet restore
@@ -54,7 +58,6 @@ jobs:
           tag_name: ${{ github.ref_name }}
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
-          body: |
-            $(cat CHANGELOG.md)
+          body: ${{ steps.Changelog.outputs.generated_changelog }}
           draft: false
           prerelease: false
