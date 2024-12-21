@@ -23,6 +23,56 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
+      - name: Generate Changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          configurationJson: |
+            [
+              {
+                "template": "#[[CHANGELOG]]\n\n<details>\n<summary>未分类</summary>\n\n[[UNCATEGORIZED]]\n</details>",
+                "categories": [
+                  {
+                    "title": "### 新增 | Feat",
+                    "labels": ["feat"]
+                  }, 
+                  {
+                    "title": "###  修复 | Fix",
+                    "labels": ["fix"]
+                  },
+                  {
+                    "title": "###  杂项 | Chore",
+                    "labels": ["chore"]
+                  },
+                  {
+                    "title": "###  样式 | Style",
+                    "labels": ["style"]
+                  },
+                  {
+                    "title": "###  重构 | Refactor",
+                    "labels": ["refactor"]
+                  },
+                  {
+                    "title": "###  优化 | Perf",
+                    "labels": ["perf"]
+                  },
+                  {
+                    "title": "###  文档 | Docs",
+                    "labels": ["docs"]
+                  },
+                  {
+                    "title": "###  测试 | Test",
+                    "labels": ["test"]
+                  },
+                  {
+                    "title": "###  样式 | Style",
+                    "labels": ["style"]
+                  }
+                ]
+              }
+            ]
+            
       - name: Install dependencies
         run: dotnet restore
 
@@ -45,4 +95,6 @@ jobs:
           tag_name: ${{ github.ref_name }}
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
-          changelog-types: '[{"type": "types", "section":"Types", "hidden": false},{"type": "revert", "section":"Reverts", "hidden": false},{"type": "feat", "section": "Features", "hidden": false},{"type": "fix", "section": "Bug Fixes", "hidden": false},{"type": "improvement", "section": "Feature Improvements", "hidden": false},{"type": "docs", "section":"Docs", "hidden": false},{"type": "style", "section":"Styling", "hidden": false},{"type": "refactor", "section":"Code Refactoring", "hidden": false},{"type": "perf", "section":"Performance Improvements", "hidden": false},{"type": "test", "section":"Tests", "hidden": false},{"type": "build", "section":"Build System", "hidden": false},{"type": "ci", "section":"CI", "hidden":false}]'
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
