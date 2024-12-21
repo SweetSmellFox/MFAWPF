@@ -12,7 +12,6 @@ permissions:
 jobs:
   build_and_release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -22,8 +21,8 @@ jobs:
       - name: Setup Python Environment
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'  
-          
+          python-version: '3.x'
+
       - name: Setup.NET Core Environment
         uses: actions/setup-dotnet@v1
         with:
@@ -32,14 +31,12 @@ jobs:
       - name: Changelog
         id: Changelog
         run: |
-          python3 Tools/changelog_generator.py  # 假设将Python代码保存为changelog_generator.py文件，并放在工作流执行目录下
+          python3 Tools/changelog_generator.py
+          echo "::set-output name=generated_changelog::$(cat CHANGELOG.md)"  # 使用set-output输出变更日志内容
         env:
           DOTNET_ROOT: /home/runner/.dotnet
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         shell: bash
-        # 设置输出环境变量，将Python脚本中保存的GENERATED_CHANGELOG环境变量输出，以便后续步骤使用
-        outputs:
-          generated_changelog: ${{ env.GENERATED_CHANGELOG }}
 
       - name: Install dependencies
         run: dotnet restore
@@ -50,7 +47,7 @@ jobs:
       - name: Zip
         run: |
           cd /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/
-          zip -r ../MFAWPF-${{ github.ref_name }}.zip *  
+          zip -r../MFAWPF-${{ github.ref_name }}.zip *  
 
       - name: Release
         uses: softprops/action-gh-release@v1
