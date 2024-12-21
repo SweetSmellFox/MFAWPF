@@ -22,13 +22,13 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.0.x
-
-      - name: Changelog
+          
+      - name: Generate a changelog
+        uses: orhun/git-cliff-action@v4
         id: git-cliff
-        uses: orhun/git-cliff-action@v3
         with:
           config: cliff.toml
-          args: --verbose
+          args: -vv --latest --strip header
         env:
           OUTPUT: CHANGELOG.md
           GITHUB_REPO: ${{ github.repository }}
