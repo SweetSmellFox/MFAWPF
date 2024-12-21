@@ -33,14 +33,15 @@ jobs:
         run: |  
           cd /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/
           zip -r ../MFAWPF-${{ github.ref_name }}.zip *  
+          echo "Generated zip file:../MFAWPF-${{ github.ref_name }}.zip"
           
       - name: List files in publish directory
         run: |
-         ls /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/
+         ls /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/
           
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
           files: |
-            /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/*.zip
+            /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
