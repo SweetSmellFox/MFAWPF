@@ -118,7 +118,6 @@ jobs:
               [author]="${raw_commit_info[author]}"
               [committer]="${raw_commit_info[committer]}"
               [message]="${raw_commit_info[message]}"
-              [branch]=()
               [skip]="${raw_commit_info[skip]}"
             )
             build_commits_tree "${raw_commit_info[parent]}"
