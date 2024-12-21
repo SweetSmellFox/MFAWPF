@@ -235,6 +235,7 @@ def print_commits(commits):
 
 
 changelog_content = f"## {tag_name}\n{print_commits(commit_tree)}"
+print("结果:" + changelog_content)
 os.environ["GENERATED_CHANGELOG"] = changelog_content
 try:
     with open(changelog_path, "w") as f:

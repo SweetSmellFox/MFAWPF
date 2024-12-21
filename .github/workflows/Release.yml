@@ -32,7 +32,6 @@ jobs:
         id: Changelog
         run: |
           python3 Tools/changelog_generator.py
-          echo "::set-output name=generated_changelog::$(cat CHANGELOG.md)"  # 使用set-output输出变更日志内容
         env:
           DOTNET_ROOT: /home/runner/.dotnet
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
