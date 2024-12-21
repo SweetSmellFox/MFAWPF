@@ -285,9 +285,9 @@
                                     hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
                                     hc:VisualElement.HighlightBackground="Transparent"
                                     hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
+                                    Foreground="{DynamicResource GrayColor4}"
                                     Background="Transparent" Checked="ConfigureTaskSettingsPanel"
                                     BorderThickness="0"
-                                    Foreground="{DynamicResource SecondaryTextBrush}"
                                     GroupName="TaskSettings"
                                     Style="{DynamicResource RadioGroupItemSingle}"
                                     ToolTip="{lex:Loc TaskSettings}" />
