@@ -149,19 +149,16 @@ public class VersionChecker
         }
         catch (HttpRequestException e) when (e.Message.Contains("403"))
         {
-            Console.WriteLine("GitHub API速率限制已超出，请稍后再试。");
             LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
             throw new Exception("GitHub API速率限制已超出，请稍后再试。");
         }
         catch (HttpRequestException e)
         {
-            Console.WriteLine($"请求GitHub时发生错误: {e.Message}");
             LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
             throw new Exception("请求GitHub时发生错误。");
         }
         catch (Exception e)
         {
-            Console.WriteLine($"处理GitHub响应时发生错误: {e.Message}");
             LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
             throw new Exception("处理GitHub响应时发生错误。");
         }
