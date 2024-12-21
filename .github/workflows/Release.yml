@@ -38,6 +38,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{substring(github.ref_name, 1)}}
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/*.zip
