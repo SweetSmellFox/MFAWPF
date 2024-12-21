@@ -25,23 +25,13 @@ jobs:
 
       - name: Changelog
         id: Changelog
-        run: |
-          cargo install git-cliff
-          cat << EOF >.gitcliff.toml
-          [changelog]
-            feat = "### 新增 | Feat"
-            fix = "### 修复 | Fix"
-            chore = "### 杂项 | Chore"
-            style = "### 样式 | Style"
-            refactor = "### 重构 | Refactor"
-            perf = "### 优化 | Perf"
-            docs = "### 文档 | Docs"
-            test = "### 测试 | Test"
-          EOF
-          # 使用git-cliff生成变更日志，输出到CHANGELOG.md文件中，会根据配置文件的规则生成相应格式的内容
-          git cliff -o CHANGELOG.md
-          # 将生成的变更日志内容设置为工作流的输出，方便后续步骤使用
-          echo "changelog=$(cat CHANGELOG.md)" >> $GITHUB_OUTPUT
+        uses: orhun/git-cliff-action@v3
+        with:
+          config: cliff.toml
+          args: --verbose
+        env:
+          OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
           
       - name: Install dependencies
         run: dotnet restore
@@ -60,6 +50,6 @@ jobs:
           tag_name: ${{ github.ref_name }}
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
-          body: ${{ steps.Changelog.outputs.changelog }}
+          body: ${{ steps.Changelog.outputs.body }}
           draft: true
           prerelease: false
