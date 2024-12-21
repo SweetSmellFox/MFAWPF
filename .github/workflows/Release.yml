@@ -24,7 +24,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Changelog
-        id: Changelog
+        id: git-cliff
         uses: orhun/git-cliff-action@v3
         with:
           config: cliff.toml
@@ -50,6 +50,6 @@ jobs:
           tag_name: ${{ github.ref_name }}
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
-          body: ${{ steps.Changelog.outputs.body }}
+          body: ${{ steps.git-cliff.outputs.content }}
           draft: true
           prerelease: false
