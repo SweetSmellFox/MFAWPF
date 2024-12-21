@@ -1,0 +1,13 @@
+[git-cliff]
+tag_pattern = "v[0-9]*"
+commit_parsers = [
+    { message = "feat", changelog = "### 新增 | Feat" },
+    { message = "fix", changelog = "### 修复 | Fix" },
+    { message = "perf", changelog = "### 优化 | Perf" },
+    { message = "refactor", changelog = "### 重构 | Refactor" },
+    { message = "docs", changelog = "### 文档 | Docs" },
+    { message = "style", changelog = "### 样式 | Style" },
+    { message = "test", changelog = "### 测试 | Test" },
+    { message = "chore", changelog = "### 杂项 | Chore" },
+    { message = "ci", changelog = "### 集成 | CI" }
+]
