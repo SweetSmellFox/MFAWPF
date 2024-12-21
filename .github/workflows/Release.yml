@@ -1,4 +1,5 @@
 name: Release
+
 on:
   push:
     tags:
@@ -23,7 +24,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Changelog
-        id: Changelog
+        id: changelog
         run: |
           # 先安装git-cliff（假设已安装了Rust的包管理器Cargo），如果未安装Cargo，需要先安装Cargo
           cargo install git-cliff
@@ -51,7 +52,7 @@ jobs:
           git cliff -o CHANGELOG.md
           # 将生成的变更日志内容设置为工作流的输出，方便后续步骤使用
           echo "changelog=$(cat CHANGELOG.md)" >> $GITHUB_OUTPUT
-
+          
       - name: Install dependencies
         run: dotnet restore
 
@@ -67,8 +68,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
-        files: |
-          /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
-        body: ${{ steps.Changelog.outputs.changelog }}
-        draft: true
-        prerelease: false
+          files: |
+            /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: true
+          prerelease: false
