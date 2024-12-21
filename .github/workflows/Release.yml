@@ -23,25 +23,24 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.0.x
-
+      
       - name: Extract and Process Changelog Information
         run: |
           repo="SweetSmellFox/MFAWPF"
           cur_dir=$(pwd)
           contributors_path="${cur_dir}/contributors.json"
           changelog_path="${cur_dir}/../CHANGELOG.md"
-
-          # 从哪个tag开始
-          latest=$(git describe --tags --match "v*" --abbrev=0)
-          # 当前tag名称
-          tag_name=$(git describe --tags --match "v*")
-
-          echo "From: $latest, To: $tag_name"
-
+          
+          # 从哪个tag开始，尝试获取最近的非beta版本标签（更稳定的旧版本标签方式获取）
+          latest_stable_tag=$(git tag -l 'v*' | grep -v '-' | sort -V | tail -n 1)
+          # 当前tag名称，获取最新的匹配v*的标签
+          tag_name=$(git describe --tags --match "v*" --abbrev=0)
+          echo "From: $latest_stable_tag, To: $tag_name"
+          
           # 获取详细的git log信息
-          git_command="git log $latest..HEAD --pretty=format:\"%H\n%aN\n%cN\n%s\n%P\n\""
+          git_command="git log $latest_stable_tag..HEAD --pretty=format:\"%H\n%aN\n%cN\n%s\n%P\n\""
           raw_gitlogs=$(eval $git_command)
-
+          
           raw_commits_info=()
           while IFS= read -r line; do
             if [ -z "${commit_hash+x}" ]; then
@@ -65,9 +64,9 @@ jobs:
               unset commit_hash author committer message parent
             fi
           done <<< "$raw_gitlogs"
-
+          
           # 处理Co-authors
-          git_coauthor_command="git log $latest..HEAD --pretty=format:\"%H\n\" --grep=\"Co-authored-by\""
+          git_coauthor_command="git log $latest_stable_tag..HEAD --pretty=format:\"%H\n\" --grep=\"Co-authored-by\""
           raw_gitlogs=$(eval $git_coauthor_command)
           for commit_hash in $raw_gitlogs; do
             if [ -n "${raw_commits_info[$commit_hash]+x}" ]; then
@@ -83,8 +82,9 @@ jobs:
               raw_commits_info["$commit_hash][coauthors]"="${coauthors[@]}"
             fi
           done
-
-          git_skip_command="git log $latest..HEAD --pretty=format:\"%H\n\" --grep=\"\[skip changelog\]\""
+          
+          # 处理跳过的提交
+          git_skip_command="git log $latest_stable_tag..HEAD --pretty=format:\"%H\n\" --grep=\"\[skip changelog\]\""
           raw_gitlogs=$(eval $git_skip_command)
           for commit_hash in $raw_gitlogs; do
             if [ -n "${raw_commits_info[$commit_hash]+x}" ]; then
@@ -97,7 +97,8 @@ jobs:
               done
             fi
           done
-
+          
+          # 构建提交树并生成变更日志内容
           commit_tree=()
           function build_commits_tree {
             local commit_hash="$1"
@@ -135,27 +136,29 @@ jobs:
             commit_tree=("${res[@]}")
           }
           build_commits_tree "${!raw_commits_info[@]}"
-
+          
           sorted_commits=(
             [perf]=()
             [feat]=()
             [fix]=()
             [docs]=()
-            [chore]=()  
+            [chore]=()
             [other]=()
           )
           function update_commits {
             local commit_message="$1"
             local update_dict=("$2")
             local oper="other"
-            for trans in "FIX" "FEAT" "PERF" "DOCS" "CHORE"; do  
+            # 优先检查commit_message中是否有明确的前缀（英文）
+            for trans in "FIX" "FEAT" "PERF" "DOCS" "CHORE"; do
               if [[ "${commit_message}" =~ ^$trans ]]; then
                 oper=$(echo "$trans" | tr 'A-Z' 'a-z')
                 break
               fi
             done
+            # 如果没有明确前缀，则检查翻译的中文关键词
             if [ "$oper" = "other" ]; then
-              for key in "修复" "新增" "更新" "改进" "优化" "重构" "文档" "杂项" "其他"; do  # 添加对"杂项"中文关键词的检查
+              for key in "修复" "新增" "更新" "改进" "优化" "重构" "文档" "杂项" "其他"; do
                 if [[ "${commit_message}" =~ $key ]]; then
                   case $key in
                     "修复") oper="fix" ;;
@@ -165,7 +168,7 @@ jobs:
                     "优化") oper="perf" ;;
                     "重构") oper="perf" ;;
                     "文档") oper="docs" ;;
-                    "杂项") oper="chore" ;;  
+                    "杂项") oper="chore" ;;
                     "其他") oper="other" ;;
                   esac
                   break
@@ -211,6 +214,9 @@ jobs:
           }
           changelog_content="## $tag_name\n$(print_commits "${commit_tree[@]}")"
           echo "$changelog_content" > $changelog_path
+        shell: /usr/bin/bash -e {0}
+        env:
+          DOTNET_ROOT: /home/runner/.dotnet
 
       - name: Install dependencies
         run: dotnet restore
