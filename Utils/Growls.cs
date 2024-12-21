@@ -12,9 +12,12 @@ public static class Growls
         {
             Growl.Warning(new GrowlInfo
             {
+                IsCustom = true,
                 Message = message,
                 WaitTime = 3,
-                Token = token
+                Token = token,
+                IconKey = ResourceToken.WarningGeometry,
+                IconBrushKey = ResourceToken.WarningBrush,
             });
         });
     }
@@ -23,10 +26,13 @@ public static class Growls
     {
         Process(() =>
         {
-            Growl.WarningGlobal(new GrowlInfo
+            Growl.InfoGlobal(new GrowlInfo
             {
+                IsCustom = true,
                 Message = message,
                 WaitTime = 3,
+                IconKey = ResourceToken.WarningGeometry,
+                IconBrushKey = ResourceToken.WarningBrush,
                 Token = token
             });
         });
@@ -36,8 +42,9 @@ public static class Growls
     {
         Process(() =>
         {
-            Growl.Warning(new GrowlInfo
+            Growl.Info(new GrowlInfo
             {
+                IsCustom = true,
                 Message = message,
                 WaitTime = 6,
                 IconKey = ResourceToken.ErrorGeometry,
@@ -45,6 +52,7 @@ public static class Growls
                 Icon = null,
                 Token = token
             });
+
         });
     }
 
@@ -52,8 +60,9 @@ public static class Growls
     {
         Process(() =>
         {
-            Growl.WarningGlobal(new GrowlInfo
+            Growl.InfoGlobal(new GrowlInfo
             {
+                IsCustom = true,
                 Message = message,
                 WaitTime = 6,
                 IconKey = ResourceToken.ErrorGeometry,
@@ -70,7 +79,7 @@ public static class Growls
             Growl.InfoGlobal(message);
         });
     }
-    
+
     public static void Info(string message, string token = "")
     {
         Process(() =>
@@ -78,7 +87,7 @@ public static class Growls
             Growl.Info(message);
         });
     }
-    
+
     public static void Process(Action action)
     {
         if (Application.Current.Dispatcher.CheckAccess())
