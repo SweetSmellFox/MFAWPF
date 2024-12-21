@@ -39,4 +39,4 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           files: |
-            /home/runner/work/MFAWPF/bin/AnyCPU/*.zip
+            /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/*.zip
