@@ -79,7 +79,7 @@ jobs:
                   coauthors+=("$coauthor")
                 fi
               done <<< "$(echo "$addition" | grep -oP "Co-authored-by: \K.*(?= <)")"
-              raw_commits_info["$commit_hash][coauthors]"="${coauthors[@]}"
+              raw_commits_info["$commit_hash"]="[coauthors]"="${coauthors[@]}"
             fi
           done
           
