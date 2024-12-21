@@ -33,7 +33,11 @@ jobs:
         run: |  
           cd /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/
           zip -r ../MFAWPF-${{ github.ref_name }}.zip *  
-
+          
+      - name: List files in publish directory
+        run: |
+         ls /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/
+          
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
