@@ -33,7 +33,7 @@
             properties:ScrollViewerBinding.ViewportHeight="{Binding ScrollViewportHeight}"
             IsInertiaEnabled="True"
             PanningMode="Both">
-            <StackPanel>
+            <StackPanel x:Name="settingStackPanel">
                 <hc:Divider Content="{Binding ListTitle[0].Name}" />
                 <hc:ComboBox Margin="30 10 30 10" x:Name="swtichConfigs"
                              hc:TitleElement.HorizontalAlignment="Right" IsEnabled="{calcBinding:Binding 'Idle'}"
@@ -92,6 +92,7 @@
                 <CheckBox Margin="30 10 30 10" x:Name="enableSaveDrawSettings" Content="{lex:Loc EnableSaveDraw}" IsEnabled="{calcBinding:Binding 'Idle'}"
                           HorizontalAlignment="Center">
                 </CheckBox>
+                <hc:Divider Content="{Binding ListTitle[6].Name}" />
             </StackPanel>
         </hc:ScrollViewer>
     </Grid>

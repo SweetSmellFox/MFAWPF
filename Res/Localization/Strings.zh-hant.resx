@@ -344,8 +344,8 @@
     <data name="ResourceVersion" xml:space="preserve">
     <value>資源版本</value>
   </data>
-    <data name="About" xml:space="preserve">
-    <value>關於</value>
+  <data name="About" xml:space="preserve">
+    <value>關於我們</value>
   </data>
     <data name="ScreenshotTime" xml:space="preserve">
     <value>截圖耗時: {0}ms({1})</value>
