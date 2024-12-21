@@ -1,42 +1,77 @@
 name: Release
 
-# 当推送以'v'开头的tag时触发工作流
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*' # 匹配以'v'开头的tag
 
 permissions:
-  contents: write
+  contents: write  # 给工作流写入仓库内容的权限
 
 jobs:
-  build_and_release:
+  build:
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # 获取完整历史记录以访问所有tags  
 
-      - name: Setup Python Environment
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Setup.NET Core Environment
+      - name: .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.0.x
 
-      - name: Changelog
-        id: Changelog
-        run: |
-          python3 Tools/changelog_generator.py
-        env:
-          DOTNET_ROOT: /home/runner/.dotnet
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        shell: bash
-
+      - name: Generate Changelog
+        id: changelog
+        uses: mikepenz/release-changelog-builder-action@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          configurationJson: |
+            [
+              {
+                "template": "#[[CHANGELOG]]\n\n<details>\n<summary>未分类</summary>\n\n[[UNCATEGORIZED]]\n</details>",
+                "categories": [
+                  {
+                    "title": "### 新增 | Feat",
+                    "labels": ["feat"]
+                  }, 
+                  {
+                    "title": "###  修复 | Fix",
+                    "labels": ["fix"]
+                  },
+                  {
+                    "title": "###  杂项 | Chore",
+                    "labels": ["chore"]
+                  },
+                  {
+                    "title": "###  样式 | Style",
+                    "labels": ["style"]
+                  },
+                  {
+                    "title": "###  重构 | Refactor",
+                    "labels": ["refactor"]
+                  },
+                  {
+                    "title": "###  优化 | Perf",
+                    "labels": ["perf"]
+                  },
+                  {
+                    "title": "###  文档 | Docs",
+                    "labels": ["docs"]
+                  },
+                  {
+                    "title": "###  测试 | Test",
+                    "labels": ["test"]
+                  },
+                  {
+                    "title": "###  样式 | Style",
+                    "labels": ["style"]
+                  }
+                ]
+              }
+            ]
       - name: Install dependencies
         run: dotnet restore
 
@@ -48,12 +83,11 @@ jobs:
           cd /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/
           zip -r ../MFAWPF-${{ github.ref_name }}.zip *  
 
-      - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
-          body: ${{ env.GENERATED_CHANGELOG }}
-          draft: true
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
           prerelease: false
