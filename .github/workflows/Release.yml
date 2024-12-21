@@ -46,7 +46,7 @@ jobs:
       - name: Zip
         run: |
           cd /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/
-          zip -r../MFAWPF-${{ github.ref_name }}.zip *
+          zip -r ../MFAWPF-${{ github.ref_name }}.zip *  
 
       - name: Release
         uses: softprops/action-gh-release@v1

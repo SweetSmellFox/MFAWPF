@@ -112,7 +112,7 @@ if latest_stable_tag:
 skip_commits_info = {}
 if latest_stable_tag:
     try:
-        git_skip_command = ["git", "log", f"{latest_stable_tag}..HEAD", "--pretty=format:%H", "--grep=\[skip changelog\]"]
+        git_skip_command = ["git", "log", f"{latest_stable_tag}..HEAD", "--pretty=format:%H", r"--grep=[skip changelog]"]
         result = subprocess.run(git_skip_command, capture_output=True, text=True)
         skip_hashes = result.stdout.strip().splitlines()
         for commit_hash in skip_hashes:
@@ -120,7 +120,7 @@ if latest_stable_tag:
                 git_show_command = ["git", "show", "-s", "--format=%b", commit_hash]
                 result = subprocess.run(git_show_command, capture_output=True, text=True)
                 commit_body = result.stdout.strip()
-                if not commit_body.startswith("*") and "\[skip changelog\]" in commit_body:
+                if not commit_body.startswith("*") and r"[skip changelog]" in commit_body:
                     skip_commits_info[commit_hash] = True
     except subprocess.CalledProcessError as e:
         print(f"处理跳过的提交信息出现错误: {e}")
@@ -145,7 +145,7 @@ def build_commits_tree(commit_hash):
         "branch": [],
         "skip": False
     }
-    if "skip_commits_info" in locals() and commit_hash in skip_commits_info:
+    if commit_hash in skip_commits_info:
         res["skip"] = True
     parent = raw_commit_info["parent"]
     build_commits_tree(parent[0])
@@ -222,7 +222,7 @@ def print_commits(commits):
             message = re.sub(r"^(build|chore|ci|docs?|feat!?|fix|perf|refactor|rft|style|test|i18n|typo|debug), *", "", commit_message)
         ret_message += f"* {message}"
         mes = print_commits(commit_info["branch"])
-        if "merge_author" in locals() or not commit_info["branch"]:
+        if not commit_info["branch"]:
             ctrs = []
             for ctr in [commit_info["author"], commit_info.get("coauthors", []), commit_info["committer"]]:
                 if ctr and ctr!= "web-flow" and ctr not in ret_contributor:
