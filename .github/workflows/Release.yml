@@ -79,7 +79,10 @@ jobs:
                   coauthors+=("$coauthor")
                 fi
               done <<< "$(echo "$addition" | grep -oP "Co-authored-by: \K.*(?= <)")"
-              raw_commits_info["$commit_hash"]="[coauthors]"="${coauthors[@]}"
+              if [[! -v raw_commits_info["$commit_hash"] ]]; then
+                declare -A raw_commits_info["$commit_hash"]
+              fi
+                raw_commits_info["$commit_hash"]["coauthors"]="${coauthors[@]}"
             fi
           done
           
@@ -92,7 +95,7 @@ jobs:
               raw_git_shows=$(eval $git_show_command)
               for commit_body in $raw_git_shows; do
                 if [! "${commit_body}" =~ ^\* ] && [[ "${commit_body}" =~ "\[skip changelog\]" ]]; then
-                  raw_commits_info["$commit_hash][skip]"=true
+                  raw_commits_info["$commit_hash"]["skip"]=true
                 fi
               done
             fi
