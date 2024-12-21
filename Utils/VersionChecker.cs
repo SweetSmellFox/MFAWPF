@@ -95,6 +95,10 @@ public class VersionChecker
         using HttpClient client = new HttpClient();
         client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
         client.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
+        var authHeader = new AuthenticationHeaderValue("Bearer", "");
+        var schemeField = typeof(AuthenticationHeaderValue).GetField("_scheme", BindingFlags.Instance | BindingFlags.NonPublic);
+        schemeField.SetValue(authHeader, "");
+        client.DefaultRequestHeaders.Authorization = authHeader;
         try
         {
             HttpResponseMessage response = await client.GetAsync(url);
@@ -130,6 +134,10 @@ public class VersionChecker
         client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
         client.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
 
+        var authHeader = new AuthenticationHeaderValue("Bearer", "");
+        var schemeField = typeof(AuthenticationHeaderValue).GetField("_scheme", BindingFlags.Instance | BindingFlags.NonPublic);
+        schemeField.SetValue(authHeader, "");
+        client.DefaultRequestHeaders.Authorization = authHeader;
         try
         {
             HttpResponseMessage response = await client.GetAsync(url);
