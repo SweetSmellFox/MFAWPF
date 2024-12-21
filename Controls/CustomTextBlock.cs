@@ -11,6 +11,7 @@
 // but WITHOUT ANY WARRANTY
 // </copyright>
 
+using MFAWPF.Utils;
 using System.Windows;
 using System.Windows.Media;
 using MFAWPF.Views;
@@ -24,6 +25,49 @@ namespace MFAWPF.Controls
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomTextBlock),
                 new FrameworkPropertyMetadata(typeof(CustomTextBlock)));
+        }
+
+        public static readonly DependencyProperty ResourceKeyProperty =
+            DependencyProperty.Register(
+                nameof(ResourceKey),
+                typeof(string),
+                typeof(CustomTextBlock),
+                new FrameworkPropertyMetadata(
+                    string.Empty, OnResourceKeyChanged));
+
+        public string ResourceKey
+        {
+            get => (string)GetValue(ResourceKeyProperty);
+            set => SetValue(ResourceKeyProperty, value);
+        }
+
+        public CustomTextBlock()
+        {
+            UpdateText();
+            LanguageManager.LanguageChanged += OnLanguageChanged;
+        }
+
+        private void UpdateText()
+        {
+            if (string.IsNullOrEmpty(ResourceKey))
+                return;
+            Text = ResourceKey.GetLocalizationString();
+        }
+
+        private static void OnResourceKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            OnResourceKeyChanged(d, (string)e.NewValue);
+        }
+
+        private static void OnResourceKeyChanged(DependencyObject d, string newText)
+        {
+            CustomTextBlock text = (CustomTextBlock)d;
+            text.UpdateText();
+        }
+
+        private void OnLanguageChanged(object? sender, EventArgs e)
+        {
+            UpdateText();
         }
 
         public static readonly DependencyProperty CustomForegroundProperty =

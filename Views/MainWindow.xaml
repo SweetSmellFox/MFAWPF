@@ -110,7 +110,7 @@
                       ClipToBounds="False">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="7*" MaxWidth="330" />
-                        <ColumnDefinition Width="6*" MaxWidth="300" />
+                        <ColumnDefinition Width="6*" />
                         <ColumnDefinition Width="7*" />
                     </Grid.ColumnDefinitions>
 
@@ -268,14 +268,14 @@
                                 <controls:CustomTextBlock
                                     Margin="20,5,0,0"
                                     HorizontalAlignment="Center"
-                                    Text="{Binding BeforeTask}"
+                                    ResourceKey="{Binding BeforeTask}"
                                     TextAlignment="Center" />
                                 <hc:Divider Margin="10,2,10,5" />
                                 <controls:CustomTextBlock
                                     Width="160"
                                     Margin="20,0,0,0"
                                     HorizontalAlignment="Center"
-                                    Text="{Binding AfterTask}"
+                                    ResourceKey="{Binding AfterTask}"
                                     TextAlignment="Center"
                                     TextWrapping="Wrap" />
                             </StackPanel>
@@ -409,17 +409,17 @@
                                     Padding="0" hc:IconElement.Width="14"
                                     hc:IconElement.Geometry="{StaticResource CustomGeometry}" />
 
-                            <RadioButton ToolTip="{lex:Loc About}" Visibility="Collapsed" VerticalAlignment="Center"
-                                         Margin="0"
-                                         Padding="5,0,5,0"
-                                         hc:IconElement.Geometry="{StaticResource AboutGeometry}"
-                                         hc:VisualElement.HighlightBackground="Transparent"
-                                         hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
-                                         Foreground="{DynamicResource GrayColor4}"
-                                         Background="Transparent"
-                                         BorderThickness="0"
-                                         GroupName="TaskSettings" Checked="About"
-                                         Style="{DynamicResource RadioGroupItemSingle}" />
+                            <!-- <RadioButton ToolTip="{lex:Loc About}" Visibility="Collapsed" VerticalAlignment="Center" -->
+                            <!--              Margin="0" -->
+                            <!--              Padding="5,0,5,0" -->
+                            <!--              hc:IconElement.Geometry="{StaticResource AboutGeometry}" -->
+                            <!--              hc:VisualElement.HighlightBackground="Transparent" -->
+                            <!--              hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}" -->
+                            <!--              Foreground="{DynamicResource GrayColor4}" -->
+                            <!--              Background="Transparent" -->
+                            <!--              BorderThickness="0" -->
+                            <!--              GroupName="TaskSettings" Checked="About" -->
+                            <!--              Style="{DynamicResource RadioGroupItemSingle}" /> -->
                         </WrapPanel>
                     </Grid>
                     <hc:SimpleStackPanel Grid.Row="1" Margin="10" Grid.Column="1" Orientation="Vertical"

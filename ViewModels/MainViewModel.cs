@@ -303,6 +303,7 @@ public class MainViewModel : ObservableObject
         new("ConnectionSettings"),
         new("PerformanceSettings"),
         new("RunningSettings"),
+        new("About"),
     ];
 
     /// <summary>
@@ -336,8 +337,8 @@ public class MainViewModel : ObservableObject
     {
         get
         {
-            if (_beforeTask != BeforeTaskList[DataSet.GetData("AutoStartIndex", 0)].Name)
-                _beforeTask = BeforeTaskList[DataSet.GetData("AutoStartIndex", 0)].Name;
+            if (_beforeTask != BeforeTaskList[DataSet.GetData("AutoStartIndex", 0)].ResourceKey)
+                _beforeTask = BeforeTaskList[DataSet.GetData("AutoStartIndex", 0)].ResourceKey;
             return _beforeTask;
         }
         set => SetProperty(ref _beforeTask, value);
@@ -349,8 +350,8 @@ public class MainViewModel : ObservableObject
     {
         get
         {
-            if (_afterTask != AfterTaskList[DataSet.GetData("AfterTaskIndex", 0)].Name)
-                _afterTask = AfterTaskList[DataSet.GetData("AfterTaskIndex", 0)].Name;
+            if (_afterTask != AfterTaskList[DataSet.GetData("AfterTaskIndex", 0)].ResourceKey)
+                _afterTask = AfterTaskList[DataSet.GetData("AfterTaskIndex", 0)].ResourceKey;
             return _afterTask;
         }
         set => SetProperty(ref _afterTask, value);

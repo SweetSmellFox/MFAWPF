@@ -1,6 +1,4 @@
-﻿using HandyControl.Tools.Extension;
-using Newtonsoft.Json;
-using System.Diagnostics;
+﻿using Newtonsoft.Json;
 using System.Globalization;
 using System.IO;
 using WPFLocalizeExtension.Engine;
@@ -8,7 +6,7 @@ using WPFLocalizeExtension.Engine;
 
 namespace MFAWPF.Utils;
 
-public class LanguageManager
+public static class LanguageManager
 {
     public static event EventHandler? LanguageChanged;
 
@@ -27,12 +25,12 @@ public class LanguageManager
     [
         new("zh-hans", "简体中文"),
         new("zh-hant", "繁體中文"),
-        new("en-us", "English")
+        new("en-us", "English"),
     ];
 
     public static SupportedLanguage GetLanguage(string key)
     {
-        foreach (SupportedLanguage lang in SupportedLanguages)
+        foreach (var lang in SupportedLanguages)
         {
             if (lang.Key == key)
             {
@@ -54,7 +52,7 @@ public class LanguageManager
     }
 
     // 存储语言的字典
-    private static readonly Dictionary<string, Dictionary<string, string>> _langs = new();
+    private static readonly Dictionary<string, Dictionary<string, string>> Langs = new();
     private static string _currentLanguage = SupportedLanguages[0].Key;
     public static void Initialize()
     {
@@ -82,16 +80,16 @@ public class LanguageManager
                 string jsonContent = File.ReadAllText(langFile);
                 var langResources = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonContent);
                 if (langResources is not null)
-                    _langs[langCode] = langResources;
+                    Langs[langCode] = langResources;
             }
         }
     }
 
     private static Dictionary<string, string> GetLocalizedStrings()
     {
-        return _langs.TryGetValue(_currentLanguage,
-            out var dict) 
-            ? dict 
+        return Langs.TryGetValue(_currentLanguage,
+            out var dict)
+            ? dict
             : new Dictionary<string, string>();
     }
 
@@ -106,11 +104,11 @@ public class LanguageManager
     private static bool IsSimplifiedChinese(string langCode)
     {
         string[] simplifiedPrefixes =
-        {
+        [
             "zh-hans",
             "zh-cn",
             "zh-sg"
-        };
+        ];
         foreach (string prefix in simplifiedPrefixes)
         {
             if (langCode.StartsWith(prefix))
@@ -124,12 +122,12 @@ public class LanguageManager
     private static bool IsTraditionalChinese(string langCode)
     {
         string[] traditionalPrefixes =
-        {
+        [
             "zh-hant",
             "zh-tw",
             "zh-hk",
             "zh-mo"
-        };
+        ];
         foreach (string prefix in traditionalPrefixes)
         {
             if (langCode.StartsWith(prefix))

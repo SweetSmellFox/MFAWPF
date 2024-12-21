@@ -815,9 +815,8 @@ public partial class MainWindow
     }
 
 
-    private void About(object? sender = null, RoutedEventArgs? e = null)
+    private void AddAbout()
     {
-        settingPanel.Children.Clear();
         StackPanel s1 = new()
             {
                 Orientation = Orientation.Horizontal,
@@ -868,8 +867,8 @@ public partial class MainWindow
             });
         }
 
-        settingPanel.Children.Add(s1);
-        settingPanel.Children.Add(s2);
+        settingsView.settingStackPanel.Children.Add(s1);
+        settingsView.settingStackPanel.Children.Add(s2);
     }
 
     private void AddResourcesOption(Panel? panel = null, int defaultValue = 0)
@@ -1689,14 +1688,13 @@ public partial class MainWindow
             InitializationSettings();
             ConnectionTabControl.SelectedIndex = MaaInterface.Instance?.DefaultController == "win32" ? 1 : 0;
             ConfigureTaskSettingsPanel();
-            Console.WriteLine(DataSet.GetData("AutoStartIndex", 0) == 1);
             if (DataSet.GetData("AutoStartIndex", 0) == 1)
             {
                 MaaProcessor.Instance.TaskQueue.Push(new MFATask
                 {
                     Name = "启动前",
                     Type = MFATask.MFATaskType.MFA,
-                    Action = WaitSoftware
+                    Action = WaitSoftware,
                 });
                 Start(null, null);
             }
@@ -1992,7 +1990,7 @@ public partial class MainWindow
                 RestartMFA();
             }
         };
-
+        AddAbout();
     }
     private void ConfigureTaskSettingsPanel(object? sender = null, RoutedEventArgs? e = null)
     {

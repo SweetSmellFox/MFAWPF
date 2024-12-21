@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using HandyControl.Controls;
+using System.Net.Http.Headers;
 
 namespace MFAWPF.Utils;
 
@@ -93,7 +94,7 @@ public class VersionChecker
             return string.Empty;
         using HttpClient client = new HttpClient();
         client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
-
+        client.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
         try
         {
             HttpResponseMessage response = await client.GetAsync(url);
@@ -125,7 +126,9 @@ public class VersionChecker
         string url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
 
         using HttpClient client = new HttpClient();
+        
         client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
+        client.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
 
         try
         {
