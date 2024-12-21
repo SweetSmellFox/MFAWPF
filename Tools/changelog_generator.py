@@ -161,7 +161,8 @@ def build_commits_tree(commit_hash):
             return
     commit_tree = [res]
 
-print("提交树：" + commit_tree)
+print("提交树：")
+print(commit_tree)
 
 if raw_commits_info:
     build_commits_tree(list(raw_commits_info.keys())[0])
