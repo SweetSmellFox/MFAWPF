@@ -55,5 +55,5 @@ jobs:
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
           body: ${{ env.GENERATED_CHANGELOG }}
-          draft: false
+          draft: true
           prerelease: false

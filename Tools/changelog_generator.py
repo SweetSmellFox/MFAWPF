@@ -128,7 +128,6 @@ if latest_stable_tag:
 # 构建提交树并生成变更日志内容
 commit_tree = []
 
-
 def build_commits_tree(commit_hash):
     global commit_tree
     if commit_hash not in raw_commits_info:
@@ -161,11 +160,16 @@ def build_commits_tree(commit_hash):
             return
     commit_tree = [res]
 
-print("提交树：")
-print(commit_tree)
+
+
 
 if raw_commits_info:
     build_commits_tree(list(raw_commits_info.keys())[0])
+    
+print("提交树：")
+print(commit_tree)
+print("raw_commits_info：")
+print(raw_commits_info)
 
 sorted_commits = {
     "perf": [],
@@ -217,6 +221,7 @@ def print_commits(commits):
         if commit_info.get("skip", False):
             continue
         commit_message = commit_info["message"]
+        update_commits(commit_message, commit_info)
         if re.match(r"^(build|ci|style|debug)", commit_message):
             continue
         message = commit_message
@@ -236,8 +241,11 @@ def print_commits(commits):
     return ret_message
 
 changelog_content = f"## {tag_name}\n{print_commits(commit_tree)}"
+
 print("结果:")
 print(changelog_content)
+print("结果1:")
+print(sorted_commits)
 os.environ["GENERATED_CHANGELOG"] = changelog_content
 try:
     with open(changelog_path, "w") as f:
