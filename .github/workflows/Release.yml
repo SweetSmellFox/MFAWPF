@@ -19,199 +19,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Python Environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'  
+          
       - name: Setup.NET Core Environment
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.0.x
-      
+
       - name: Extract and Process Changelog Information
         run: |
-          repo="SweetSmellFox/MFAWPF"
-          cur_dir=$(pwd)
-          contributors_path="${cur_dir}/contributors.json"
-          changelog_path="${cur_dir}/../CHANGELOG.md"
-          
-          # 从哪个tag开始，尝试获取最近的非beta版本标签（更稳定的旧版本标签方式获取）
-          latest_stable_tag=$(git tag -l 'v*' | grep -v '-' | sort -V | tail -n 1)
-          # 当前tag名称，获取最新的匹配v*的标签
-          tag_name=$(git describe --tags --match "v*" --abbrev=0)
-          echo "From: $latest_stable_tag, To: $tag_name"
-          
-          # 获取详细的git log信息
-          git_command="git log $latest_stable_tag..HEAD --pretty=format:\"%H\n%aN\n%cN\n%s\n%P\n\""
-          raw_gitlogs=$(eval $git_command)
-          
-          raw_commits_info=()
-          while IFS= read -r line; do
-            if [ -z "${commit_hash+x}" ]; then
-              commit_hash="$line"
-            elif [ -z "${author+x}" ]; then
-              author=$(python3 -c "import urllib.request, json, os; token = os.environ.get('GH_TOKEN', os.environ.get('GITHUB_TOKEN', None)); if token: req = urllib.request.Request('https://api.github.com/repos/$repo/commits/$commit_hash'); req.add_header('Authorization', 'Bearer'+ token); resp = urllib.request.urlopen(req).read(); print(json.loads(resp)['author']['login'])")
-            elif [ -z "${committer+x}" ]; then
-              committer=$(python3 -c "import urllib.request, json, os; token = os.environ.get('GH_TOKEN', os.environ.get('GITHUB_TOKEN', None)); if token: req = urllib.request.Request('https://api.github.com/repos/$repo/commits/$commit_hash'); req.add_header('Authorization', 'Bearer'+ token); resp = urllib.request.urlopen(req).read(); print(json.loads(resp)['committer']['login'])")
-            elif [ -z "${message+x}" ]; then
-              message="$line"
-            elif [ -z "${parent+x}" ]; then
-              parent="$line"
-              raw_commit_info=(
-                [hash]="${commit_hash:0:8}"
-                [author]="$author"
-                [committer]="$committer"
-                [message]="$message"
-                [parent]="$parent"
-              )
-              raw_commits_info["$commit_hash"]="${raw_commit_info[@]}"
-              unset commit_hash author committer message parent
-            fi
-          done <<< "$raw_gitlogs"
-          
-          # 处理Co-authors
-          git_coauthor_command="git log $latest_stable_tag..HEAD --pretty=format:\"%H\n\" --grep=\"Co-authored-by\""
-          raw_gitlogs=$(eval $git_coauthor_command)
-          for commit_hash in $raw_gitlogs; do
-            if [ -n "${raw_commits_info[$commit_hash]+x}" ]; then
-              git_addition_command="git log $commit_hash --no-walk --pretty=format:\"%b\""
-              addition=$(eval $git_addition_command)
-              coauthors=()
-              while IFS= read -r coauthor; do
-                coauthor=$(python3 -c "import urllib.request, json, os; token = os.environ.get('GH_TOKEN', os.environ.get('GITHUB_TOKEN', None)); if token: req = urllib.request.Request('https://api.github.com/repos/$repo/commits/$commit_hash'); req.add_header('Authorization', 'Bearer'+ token); resp = urllib.request.urlopen(req).read(); try: print(json.loads(resp)['author']['login']) except: pass")
-                if [ -n "$coauthor" ] && [ "$coauthor"!= "web-flow" ]; then
-                  coauthors+=("$coauthor")
-                fi
-              done <<< "$(echo "$addition" | grep -oP "Co-authored-by: \K.*(?= <)")"
-              if [[! -v raw_commits_info["$commit_hash"] ]]; then
-                declare -A raw_commits_info["$commit_hash"]
-              fi
-                raw_commits_info["$commit_hash"]["coauthors"]="${coauthors[@]}"
-            fi
-          done
-          
-          # 处理跳过的提交
-          git_skip_command="git log $latest_stable_tag..HEAD --pretty=format:\"%H\n\" --grep=\"\[skip changelog\]\""
-          raw_gitlogs=$(eval $git_skip_command)
-          for commit_hash in $raw_gitlogs; do
-            if [ -n "${raw_commits_info[$commit_hash]+x}" ]; then
-              git_show_command="git show -s --format=%b $commit_hash"
-              raw_git_shows=$(eval $git_show_command)
-              for commit_body in $raw_git_shows; do
-                if [! "${commit_body}" =~ ^\* ] && [[ "${commit_body}" =~ "\[skip changelog\]" ]]; then
-                  raw_commits_info["$commit_hash"]["skip"]=true
-                fi
-              done
-            fi
-          done
-          
-          # 构建提交树并生成变更日志内容
-          commit_tree=()
-          function build_commits_tree {
-            local commit_hash="$1"
-            if [ -z "${raw_commits_info[$commit_hash]+x}" ]; then
-              return
-            fi
-            local raw_commit_info=("${raw_commits_info[$commit_hash]}")
-            if [ "${raw_commit_info[visited]}" ]; then
-              return
-            fi
-            raw_commit_info[visited]=true
-            local res=(
-              [hash]="${raw_commit_info[hash]}"
-              [author]="${raw_commit_info[author]}"
-              [committer]="${raw_commit_info[committer]}"
-              [message]="${raw_commit_info[message]}"
-              [skip]="${raw_commit_info[skip]}"
-            )
-            build_commits_tree "${raw_commit_info[parent]}"
-            res["branch"]="${commit_tree[@]}"
-            if [ "${#raw_commit_info[parent]}" -eq 2 ]; then
-              if [[ "${raw_commit_info[message]}" =~ ^(Release|Merge) ]]; then
-                build_commits_tree "${raw_commit_info[parent][1]}"
-              else
-                local branch_tree=()
-                build_commits_tree "${raw_commit_info[parent][1]}"
-                res["branch"]="${branch_tree[@]}"
-              fi
-              if [[ "${raw_commit_info[message]}" =~ ^Merge ]] && [ -z "${res["branch"]}" ]; then
-                unset res
-                return
-              fi
-            fi
-            commit_tree=("${res[@]}")
-          }
-          build_commits_tree "${!raw_commits_info[@]}"
-          
-          sorted_commits=()
-          function update_commits {
-            local commit_message="$1"
-            local update_dict=("$2")
-            local oper="other"
-            # 优先检查commit_message中是否有明确的前缀（英文）
-            for trans in "FIX" "FEAT" "PERF" "DOCS" "CHORE"; do
-              if [[ "${commit_message}" =~ ^$trans ]]; then
-                oper=$(echo "$trans" | tr 'A-Z' 'a-z')
-                break
-              fi
-            done
-            # 如果没有明确前缀，则检查翻译的中文关键词
-            if [ "$oper" = "other" ]; then
-              for key in "修复" "新增" "更新" "改进" "优化" "重构" "文档" "杂项" "其他"; do
-                if [[ "${commit_message}" =~ $key ]]; then
-                  case $key in
-                    "修复") oper="fix" ;;
-                    "新增") oper="feat" ;;
-                    "更新") oper="perf" ;;
-                    "改进") oper="perf" ;;
-                    "优化") oper="perf" ;;
-                    "重构") oper="perf" ;;
-                    "文档") oper="docs" ;;
-                    "杂项") oper="chore" ;;
-                    "其他") oper="other" ;;
-                  esac
-                  break
-                fi
-              done
-            fi
-            sorted_commits["$oper"]+=( "${update_dict[@]}" )
-          }
-          function print_commits {
-            local commits=("$1")
-            local ret_message=""
-            local ret_contributor=()
-            for commit_hash in "${commits[@]}"; do
-              local commit_info=("${!commit_hash}")
-              if [ "${commit_info[skip]}" ]; then
-                continue
-              fi
-              local commit_message="${commit_info[message]}"
-              if [[ "${commit_message}" =~ ^(build|ci|style|debug) *(?:\([^\)]*\))*: ]]; then
-                continue
-              fi
-              local message="${commit_message}"
-              if [[! "${commit_message}" =~ ^(build|chore|ci|docs?|feat!?|fix|perf|refactor|rft|style|test|i18n|typo|debug) *(?:\([^\)]*\))*: ]]; then
-                message=$(echo "${commit_message}" | sed -E's/^(build|chore|ci|docs?|feat!?|fix|perf|refactor|rft|style|test|i18n|typo|debug), *//g')
-              fi
-              ret_message+="* $message"
-              local mes ctrs
-              eval "mes=\$({ print_commits "${commit_info[branch]}" })"
-              if [ "${merge_author}" ] || [ -z "${commit_info[branch]}" ]; then
-                local ctrs=()
-                for ctr in "${commit_info[author]}" "${commit_info[coauthors]}" "${commit_info[committer]}"; do
-                  if [[ -n "${ctr}" ]] && [[ "${ctr}"!= "web-flow" ]] && [[! "${ret_contributor[@]}" =~ "${ctr}" ]]; then
-                    ctrs+=("$ctr")
-                  fi
-                done
-                ret_contributor+=("${ctrs[@]}")
-              fi
-              ret_message+=$(printf " @%s" "${ctrs[@]}")
-              ret_message+=" (${commit_hash})\n"
-              ret_message+="$mes"
-            done
-            echo -e "$ret_message"
-          }
-          changelog_content="## $tag_name\n$(print_commits "${commit_tree[@]}")"
-          echo "$changelog_content" > $changelog_path
-        shell: /usr/bin/bash -e {0}
+          python3 Tools/changelog_generator.py  # 假设将Python代码保存为changelog_generator.py文件，并放在工作流执行目录下
         env:
           DOTNET_ROOT: /home/runner/.dotnet
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}  # 如果Python代码中需要通过GitHub API获取信息，需要传递GitHub Token，这里假设你已经在仓库的Secrets中配置好了名为GH_TOKEN的密钥
+
 
       - name: Install dependencies
         run: dotnet restore
