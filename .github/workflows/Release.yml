@@ -1,100 +1,237 @@
 name: Release
 
-on:  
-  push:  
-    tags:  
-      - 'v*' # 匹配以'v'开头的tag
+# 当推送以'v'开头的tag时触发工作流
+on:
+  push:
+    tags:
+      - 'v*'
 
 permissions:
-  contents: write  # 给工作流写入仓库内容的权限
-  
-jobs:  
-  build:  
-    runs-on: ubuntu-latest  
+  contents: write
 
-    steps:  
-      - name: Checkout code  
-        uses: actions/checkout@v3  
-        with:  
-          fetch-depth: 0 # 获取完整历史记录以访问所有tags  
+jobs:
+  build_and_release:
+    runs-on: ubuntu-latest
 
-      - name: .NET Core
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup.NET Core Environment
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 8.0.x
 
-      - name: Generate Changelog
-        id: changelog
-        uses: mikepenz/release-changelog-builder-action@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          configurationJson: |
-            [
-              {
-                "template": "#[[CHANGELOG]]\n\n<details>\n<summary>未分类</summary>\n\n[[UNCATEGORIZED]]\n</details>",
-                "categories": [
-                  {
-                    "title": "### 新增 | Feat",
-                    "labels": ["feat"]
-                  }, 
-                  {
-                    "title": "###  修复 | Fix",
-                    "labels": ["fix"]
-                  },
-                  {
-                    "title": "###  杂项 | Chore",
-                    "labels": ["chore"]
-                  },
-                  {
-                    "title": "###  样式 | Style",
-                    "labels": ["style"]
-                  },
-                  {
-                    "title": "###  重构 | Refactor",
-                    "labels": ["refactor"]
-                  },
-                  {
-                    "title": "###  优化 | Perf",
-                    "labels": ["perf"]
-                  },
-                  {
-                    "title": "###  文档 | Docs",
-                    "labels": ["docs"]
-                  },
-                  {
-                    "title": "###  测试 | Test",
-                    "labels": ["test"]
-                  },
-                  {
-                    "title": "###  样式 | Style",
-                    "labels": ["style"]
-                  }
-                ]
-              }
-            ]
-            
+      - name: Extract and Process Changelog Information
+        run: |
+          repo="SweetSmellFox/MFAWPF"
+          cur_dir=$(pwd)
+          contributors_path="${cur_dir}/contributors.json"
+          changelog_path="${cur_dir}/../CHANGELOG.md"
+
+          # 从哪个 tag 开始
+          latest=$(git describe --tags --match "v*" --abbrev=0)
+          # 当前 tag 名称
+          tag_name=$(git describe --tags --match "v*")
+
+          echo "From: $latest, To: $tag_name"
+
+          # 获取详细的 git log 信息
+          git_command="git log $latest..HEAD --pretty=format:\"%H\n%aN\n%cN\n%s\n%P\n\""
+          raw_gitlogs=$(eval $git_command)
+
+          raw_commits_info=()
+          while IFS= read -r line; do
+            if [ -z "${commit_hash+x}" ]; then
+              commit_hash="$line"
+            elif [ -z "${author+x}" ]; then
+              author=$(python3 -c "import urllib.request, json, os; token = os.environ.get('GH_TOKEN', os.environ.get('GITHUB_TOKEN', None)); if token: req = urllib.request.Request('https://api.github.com/repos/$repo/commits/$commit_hash'); req.add_header('Authorization', 'Bearer'+ token); resp = urllib.request.urlopen(req).read(); print(json.loads(resp)['author']['login'])")
+            elif [ -z "${committer+x}" ]; then
+              committer=$(python3 -c "import urllib.request, json, os; token = os.environ.get('GH_TOKEN', os.environ.get('GITHUB_TOKEN', None)); if token: req = urllib.request.Request('https://api.github.com/repos/$repo/commits/$commit_hash'); req.add_header('Authorization', 'Bearer'+ token); resp = urllib.request.urlopen(req).read(); print(json.loads(resp)['committer']['login'])")
+            elif [ -z "${message+x}" ]; then
+              message="$line"
+            elif [ -z "${parent+x}" ]; then
+              parent="$line"
+              raw_commit_info=(
+                [hash]="${commit_hash:0:8}"
+                [author]="$author"
+                [committer]="$committer"
+                [message]="$message"
+                [parent]="$parent"
+              )
+              raw_commits_info["$commit_hash"]="${raw_commit_info[@]}"
+              unset commit_hash author committer message parent
+            fi
+          done <<< "$raw_gitlogs"
+
+          # 处理 Co-authors
+          git_coauthor_command="git log $latest..HEAD --pretty=format:\"%H\n\" --grep=\"Co-authored-by\""
+          raw_gitlogs=$(eval $git_coauthor_command)
+          for commit_hash in $raw_gitlogs; do
+            if [ -n "${raw_commits_info[$commit_hash]+x}" ]; then
+              git_addition_command="git log $commit_hash --no-walk --pretty=format:\"%b\""
+              addition=$(eval $git_addition_command)
+              coauthors=()
+              while IFS= read -r coauthor; do
+                coauthor=$(python3 -c "import urllib.request, json, os; token = os.environ.get('GH_TOKEN', os.environ.get('GITHUB_TOKEN', None)); if token: req = urllib.request.Request('https://api.github.com/repos/$repo/commits/$commit_hash'); req.add_header('Authorization', 'Bearer'+ token); resp = urllib.request.urlopen(req).read(); try: print(json.loads(resp)['author']['login']) except: pass")
+                if [ -n "$coauthor" ]; then
+                  coauthors+=("$coauthor")
+                fi
+              done <<< "$(echo "$addition" | grep -oP "Co-authored-by: \K.*(?= <)")"
+              raw_commits_info["$commit_hash][coauthors]"="${coauthors[@]}"
+            fi
+          done
+
+          # 处理跳过的提交
+          git_skip_command="git log $latest..HEAD --pretty=format:\"%H\n\" --grep=\"\[skip changelog\]\""
+          raw_gitlogs=$(eval $git_skip_command)
+          for commit_hash in $raw_gitlogs; do
+            if [ -n "${raw_commits_info[$commit_hash]+x}" ]; then
+              git_show_command="git show -s --format=%b $commit_hash"
+              raw_git_shows=$(eval $git_show_command)
+              for commit_body in $raw_git_shows; do
+                if [! "${commit_body}" =~ ^\* ] && [[ "${commit_body}" =~ "\[skip changelog\]" ]]; then
+                  raw_commits_info["$commit_hash][skip]"=true
+                fi
+              done
+            fi
+          done
+
+          # 构建提交树并生成变更日志内容
+          commit_tree=()
+          function build_commits_tree {
+            local commit_hash="$1"
+            if [ -z "${raw_commits_info[$commit_hash]+x}" ]; then
+              return
+            fi
+            local raw_commit_info=("${raw_commits_info[$commit_hash]}")
+            if [ "${raw_commit_info[visited]}" ]; then
+              return
+            fi
+            raw_commit_info[visited]=true
+            local res=(
+              [hash]="${raw_commit_info[hash]}"
+              [author]="${raw_commit_info[author]}"
+              [committer]="${raw_commit_info[committer]}"
+              [message]="${raw_commit_info[message]}"
+              [branch]=()
+              [skip]="${raw_commit_info[skip]}"
+            )
+            build_commits_tree "${raw_commit_info[parent]}"
+            res["branch"]="${commit_tree[@]}"
+            if [ "${#raw_commit_info[parent]}" -eq 2 ]; then
+              if [[ "${raw_commit_info[message]}" =~ ^(Release|Merge) ]]; then
+                build_commits_tree "${raw_commit_info[parent][1]}"
+              else
+                local branch_tree=()
+                build_commits_tree "${raw_commit_info[parent][1]}"
+                res["branch"]="${branch_tree[@]}"
+              fi
+              if [[ "${raw_commit_info[message]}" =~ ^Merge ]] && [ -z "${res["branch"]}" ]; then
+                unset res
+                return
+              fi
+            fi
+            commit_tree=("${res[@]}")
+          }
+          build_commits_tree "${!raw_commits_info[@]}"
+
+          sorted_commits=(
+            [perf]=()
+            [feat]=()
+            [fix]=()
+            [docs]=()
+            [other]=()
+          )
+          function update_commits {
+            local commit_message="$1"
+            local update_dict=("$2")
+            local oper="other"
+            # 优先检查 commit_message 中是否有明确的前缀
+            for trans in "FIX" "FEAT" "PERF" "DOCS"; do
+              if [[ "${commit_message}" =~ ^$trans ]]; then
+                oper=$(echo "$trans" | tr 'A-Z' 'a-z')
+                break
+              fi
+            done
+            # 如果没有明确前缀，则检查翻译的中文关键词
+            if [ "$oper" = "other" ]; then
+              for key in "修复" "新增" "更新" "改进" "优化" "重构" "文档" "其他"; do
+                if [[ "${commit_message}" =~ $key ]]; then
+                  case $key in
+                    "修复") oper="fix" ;;
+                    "新增") oper="feat" ;;
+                    "更新") oper="perf" ;;
+                    "改进") oper="perf" ;;
+                    "优化") oper="perf" ;;
+                    "重构") oper="perf" ;;
+                    "文档") oper="docs" ;;
+                    "其他") oper="other" ;;
+                  esac
+                  break
+                fi
+              end
+            fi
+            sorted_commits["$oper"]+=( "${update_dict[@]}" )
+          }
+          function print_commits {
+            local commits=("$1")
+            local ret_message=""
+            local ret_contributor=()
+            for commit_hash in "${commits[@]}"; do
+              local commit_info=("${!commit_hash}")
+              if [ "${commit_info[skip]}" ]; then
+                continue
+              fi
+              local commit_message="${commit_info[message]}"
+              if [[ "${commit_message}" =~ ^(build|ci|style|debug) *(?:\([^\)]*\))*: ]]; then
+                continue
+              fi
+              local message="${commit_message}"
+              if [! "${commit_message}" =~ ^(build|chore|ci|docs?|feat!?|fix|perf|refactor|rft|style|test|i18n|typo|debug) *(?:\([^\)]*\))*: ]]; then
+                message=$(echo "${commit_message}" | sed -E's/^(build|chore|ci|docs?|feat!?|fix|perf|refactor|rft|style|test|i18n|typo|debug), *//g')
+              fi
+              ret_message+="* $message"
+              local mes ctrs
+              eval "mes=\$({ print_commits "${commit_info[branch]}" })"
+              if [ "${merge_author}" ] || [ -z "${commit_info[branch]}" ]; then
+                local ctrs=()
+                for ctr in "${commit_info[author]}" "${commit_info[coauthors]}" "${commit_info[committer]}"; do
+                  if [ -n "${ctr}" ] && [ "${ctr}"!= "web-flow" ] &&! "${ret_contributor[@]}" =~ "${ctr}" ]; then
+                    ctrs+=("$ctr")
+                  fi
+                done
+                ret_contributor+=("${ctrs[@]}")
+              fi
+              ret_message+=$(printf " @%s" "${ctrs[@]}")
+              ret_message+=" (${commit_hash})\n"
+              ret_message+="$mes"
+            done
+            echo -e "$ret_message"
+          }
+          changelog_content="## $tag_name\n$(print_commits "${commit_tree[@]}")"
+          echo "$changelog_content" > $changelog_path
+
       - name: Install dependencies
         run: dotnet restore
 
-      - name: Build 
+      - name: Build
         run: dotnet publish -c Release
 
-      - name: Zip   
-        run: |  
-          cd /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/
-          zip -r ../MFAWPF-${{ github.ref_name }}.zip *  
-          echo "Generated zip file:../MFAWPF-${{ github.ref_name }}.zip"
-          
-      - name: List files in publish directory
+      - name: Zip
         run: |
-         ls /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/
-          
+          cd /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/
+          zip -r../MFAWPF-${{ github.ref_name }}.zip *
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
-          body: ${{ steps.changelog.outputs.changelog }}
+          body: |
+            $(cat CHANGELOG.md)
           draft: false
           prerelease: false
