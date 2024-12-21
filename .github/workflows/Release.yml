@@ -55,6 +55,6 @@ jobs:
           tag_name: ${{ github.ref_name }}
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
-          body: ${{ steps.Changelog.outputs.generated_changelog }}
+          body: ${{ env.GENERATED_CHANGELOG }}
           draft: false
           prerelease: false
