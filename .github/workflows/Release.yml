@@ -200,7 +200,7 @@ jobs:
               if [ "${merge_author}" ] || [ -z "${commit_info[branch]}" ]; then
                 local ctrs=()
                 for ctr in "${commit_info[author]}" "${commit_info[coauthors]}" "${commit_info[committer]}"; do
-                  if [ -n "${ctr}" ] && [ "${ctr}"!= "web-flow" ] &&! "${ret_contributor[@]}" =~ "${ctr}" ]; then
+                  if [[ -n "${ctr}" ]] && [[ "${ctr}"!= "web-flow" ]] && [[! "${ret_contributor[@]}" =~ "${ctr}" ]]; then
                     ctrs+=("$ctr")
                   fi
                 done
