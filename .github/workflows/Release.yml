@@ -39,5 +39,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           tag_name: ${{substring(github.ref_name, 1)}}
+          release_title: MFAWPF ${{ github.ref_name }}
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/*.zip
