@@ -36,9 +36,8 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
         with:
-          tag_name: ${{ startsWith(github.ref_name, 'v') && substr(github.ref_name, 1) || github.ref_name }}
-          release_title: MFAWPF v${{ startsWith(github.ref_name, 'v') && substr(github.ref_name, 1) || github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          release_title: MFAWPF v${{ github.ref_name }}
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/*.zip
