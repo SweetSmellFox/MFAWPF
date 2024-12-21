@@ -161,6 +161,7 @@ def build_commits_tree(commit_hash):
             return
     commit_tree = [res]
 
+print("提交树：" + commit_tree)
 
 if raw_commits_info:
     build_commits_tree(list(raw_commits_info.keys())[0])
@@ -232,7 +233,6 @@ def print_commits(commits):
         ret_message += f" ({commit_info['hash']})\n"
         ret_message += mes
     return ret_message
-
 
 changelog_content = f"## {tag_name}\n{print_commits(commit_tree)}"
 print("结果:" + changelog_content)
