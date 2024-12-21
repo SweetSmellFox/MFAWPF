@@ -139,14 +139,15 @@ jobs:
           }
           build_commits_tree "${!raw_commits_info[@]}"
           
-          sorted_commits=(
-            [perf]=()
-            [feat]=()
-            [fix]=()
-            [docs]=()
-            [chore]=()
-            [other]=()
-          )
+# 先声明sorted_commits为关联数组（确保bash支持关联数组的基础语法）
+          declare -A sorted_commits
+  # 再分别初始化各个元素为一个空数组
+          sorted_commits["perf"]=()
+          sorted_commits["feat"]=()
+          sorted_commits["fix"]=()
+          sorted_commits["docs"]=()
+          sorted_commits["chore"]=()
+          sorted_commits["other"]=()
           function update_commits {
             local commit_message="$1"
             local update_dict=("$2")
