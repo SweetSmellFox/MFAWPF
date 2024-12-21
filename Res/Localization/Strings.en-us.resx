@@ -560,4 +560,10 @@
   <data name="ConnectionSettings" xml:space="preserve">
     <value>Connection Settings</value>
   </data>
+  <data name="SoftwareUpdate" xml:space="preserve">
+    <value>Software Update</value>
+  </data>
+  <data name="AutomaticDetectionUpdate" xml:space="preserve">
+    <value>Automatic Detection Update</value>
+  </data>
 </root>

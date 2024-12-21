@@ -567,4 +567,10 @@
   <data name="ConnectionSettings" xml:space="preserve">
     <value>连接设置</value>
   </data>
+  <data name="SoftwareUpdate" xml:space="preserve">
+    <value>软件更新</value>
+  </data>
+  <data name="AutomaticDetectionUpdate" xml:space="preserve">
+    <value>自动检测更新</value>
+  </data>
 </root>

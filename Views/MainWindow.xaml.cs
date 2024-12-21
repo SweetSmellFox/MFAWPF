@@ -1939,7 +1939,7 @@ public partial class MainWindow
             }
         }
 
-
+        //连接设置
         SetSettingOption(settingsView.adbCaptureComboBox, "CaptureModeOption",
             [
                 "Default", "RawWithGzip", "RawByNetcat",
@@ -1950,7 +1950,7 @@ public partial class MainWindow
         SetBindSettingOption(settingsView.adbInputComboBox, "InputModeOption",
             ["MiniTouch", "MaaTouch", "AdbInput", "AutoDetect"],
             "AdbControlInputType");
-        
+
         SetRememberAdbOption(settingsView.rememberAdbButton);
 
         SetSettingOption(settingsView.win32CaptureComboBox, "CaptureModeOption",
@@ -1990,6 +1990,10 @@ public partial class MainWindow
                 RestartMFA();
             }
         };
+        //软件更新
+        settingsView.enableCheckVersionSettings.IsChecked = DataSet.GetData("EnableCheckVersion", false);
+        settingsView.enableCheckVersionSettings.Click += (_, _) => { DataSet.SetData("EnableCheckVersion", settingsView.enableCheckVersionSettings.IsChecked); };
+        //关于我们
         AddAbout();
     }
     private void ConfigureTaskSettingsPanel(object? sender = null, RoutedEventArgs? e = null)

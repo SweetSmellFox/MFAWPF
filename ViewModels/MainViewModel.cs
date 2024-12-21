@@ -303,6 +303,7 @@ public class MainViewModel : ObservableObject
         new("ConnectionSettings"),
         new("PerformanceSettings"),
         new("RunningSettings"),
+        new("SoftwareUpdate"),
         new("About"),
     ];
 

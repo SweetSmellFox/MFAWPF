@@ -560,4 +560,10 @@
   <data name="ConnectionSettings" xml:space="preserve">
     <value>連接設置</value>
   </data>
+  <data name="SoftwareUpdate" xml:space="preserve">
+    <value>軟件更新</value>
+  </data>
+  <data name="AutomaticDetectionUpdate" xml:space="preserve">
+    <value>自動檢測更新</value>
+  </data>
 </root>

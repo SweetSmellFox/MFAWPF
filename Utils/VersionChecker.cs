@@ -1,6 +1,8 @@
 using System.Text.RegularExpressions;
 using HandyControl.Controls;
+using System.Data;
 using System.Net.Http.Headers;
+using DataSet = MFAWPF.Data.DataSet;
 
 namespace MFAWPF.Utils;
 
@@ -16,8 +18,11 @@ public class VersionChecker
 
     public static void CheckVersion()
     {
-        TaskManager.RunTaskAsync(() => Checker.CheckForGUIUpdatesAsync(), null, "检测MFA版本");
-        TaskManager.RunTaskAsync(() => Checker.CheckForResourceUpdatesAsync(), null, "检测资源版本");
+        if (DataSet.GetData("EnableCheckVersion", true))
+        {
+            TaskManager.RunTaskAsync(() => Checker.CheckForGUIUpdatesAsync(), null, "检测MFA版本");
+            TaskManager.RunTaskAsync(() => Checker.CheckForResourceUpdatesAsync(), null, "检测资源版本");
+        }
     }
 
     public async Task CheckForGUIUpdatesAsync(string owner = "SweetSmellFox", string repo = "MFAWPF")
@@ -130,7 +135,7 @@ public class VersionChecker
         string url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
 
         using HttpClient client = new HttpClient();
-        
+
         client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
         client.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
 
