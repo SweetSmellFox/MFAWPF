@@ -24,7 +24,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Changelog
-        id: changelog
+        id: Changelog
         run: |
           cargo install git-cliff
           cat << EOF >.gitcliff.toml
@@ -60,6 +60,6 @@ jobs:
           tag_name: ${{ github.ref_name }}
           files: |
             /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
-          body: ${{ steps.changelog.outputs.changelog }}
+          body: ${{ steps.Changelog.outputs.changelog }}
           draft: true
           prerelease: false
