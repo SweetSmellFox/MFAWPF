@@ -46,9 +46,9 @@ public class MFATask : ObservableObject
         {
             for (int i = 0; i < Count; i++)
             {
-                Action();
                 if (Type == MFATaskType.MAAFW)
                     MainWindow.AddLogByKey("TaskStart", null, Name ?? string.Empty);
+                Action();
             }
             return true;
         }
