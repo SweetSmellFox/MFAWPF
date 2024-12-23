@@ -125,7 +125,7 @@ public class MaaProcessor
                     Stop();
                     throw new Exception();
                 }
-                if (!Config.IsConnected)
+                if (MainWindow.Instance.IsConnected())
                 {
                     Growls.Warning("Warning_CannotConnect".GetLocalizationString()
                         .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
@@ -826,16 +826,16 @@ public class MaaProcessor
                 Config.DesktopWindow.Link,
                 Config.DesktopWindow.Check);
     }
-   
+
     static List<MetadataReference>? MetadataReferences;
-    
+
     static List<MetadataReference> GetMetadataReferences()
     {
         if (MetadataReferences == null)
         {
             var domainAssemblys = AppDomain.CurrentDomain.GetAssemblies();
             MetadataReferences = new List<MetadataReference>();
-            
+
             foreach (var assembly in domainAssemblys)
             {
                 if (!assembly.IsDynamic)

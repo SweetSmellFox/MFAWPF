@@ -67,6 +67,24 @@
                            Visibility="Collapsed"
                            Margin="2 0 4 0" x:Name="resourceVersion" Text="Debug">
                 </TextBlock>
+
+                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}" IsHitTestVisible="False"
+                           Visibility="{c:Binding '!IsConnected'}"
+                           Margin="8 0 4 0"  Text="{lex:Loc Unconnected}">
+                </TextBlock>
+                <Path Data="{StaticResource UnconnectedGeometry}" Fill="Red" Stretch="Uniform" Width="15" Height="15"  Margin="2 0 4 0"
+                      Visibility="{c:Binding '!IsConnected'}">
+                </Path>
+                
+                <TextBlock VerticalAlignment="Center" Foreground="{StaticResource GrayColor1}" IsHitTestVisible="False"
+                           Visibility="{c:Binding 'IsConnected'}"
+
+                           Margin="8 0 4 0" Text="{lex:Loc Connected}">
+
+                </TextBlock>
+                <Path Data="{StaticResource ConnectedGeometry}" Fill="LimeGreen" Stretch="Uniform" Width="15" Height="15"  Margin="2 0 4 0"
+                      Visibility="{c:Binding 'IsConnected'}">
+                </Path>
             </StackPanel>
 
             <controls:PinButton Grid.Column="1" x:Name="btnPin" Width="42" CheckedChanged="ToggleWindowTopMost"
@@ -145,7 +163,7 @@
                                         Foreground="{DynamicResource GrayColor4}"
                                         Click="SelectNone" IsEnabled="{Binding Idle}"
                                         Padding="0"
-                                        hc:IconElement.Geometry="{StaticResource SelectNoneGeometry}" />
+                                        hc:IconElement.Geometry="{DynamicResource SelectNoneGeometry}" />
                                 <Button ToolTip="{lex:Loc EditTask}" Width="15" Height="15"
                                         Margin="7 0 0 0"
                                         x:Name="EditButton"
@@ -293,7 +311,7 @@
                                     ToolTip="{lex:Loc TaskSettings}" />
                             </hc:ButtonGroup>
                         </StackPanel>
-                        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center"> 
+                        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button
                                 Content="{lex:Loc StartTask}" x:Name="startButton"
                                 Foreground="{DynamicResource BlackColor}"

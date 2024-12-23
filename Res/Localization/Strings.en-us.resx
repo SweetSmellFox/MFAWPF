@@ -566,4 +566,10 @@
   <data name="AutomaticDetectionUpdate" xml:space="preserve">
     <value>Automatic Detection Update</value>
   </data>
+  <data name="Connected" xml:space="preserve">
+    <value>Connected</value>
+  </data>
+  <data name="Unconnected" xml:space="preserve">
+    <value>Unconnected</value>
+  </data>
 </root>

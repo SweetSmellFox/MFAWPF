@@ -573,4 +573,10 @@
   <data name="AutomaticDetectionUpdate" xml:space="preserve">
     <value>自动检测更新</value>
   </data>
+  <data name="Connected" xml:space="preserve">
+    <value>已连接</value>
+  </data>
+  <data name="Unconnected" xml:space="preserve">
+    <value>未连接</value>
+  </data>
 </root>

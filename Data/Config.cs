@@ -8,7 +8,6 @@ public class Config
     public AdbDeviceCoreConfig AdbDevice { get; set; } = new();
     public DesktopWindowCoreConfig DesktopWindow { get; set; } = new();
     public string BasePath = MaaProcessor.ResourceBase;
-    public bool IsConnected = false;
 }
 
 public class DesktopWindowCoreConfig
