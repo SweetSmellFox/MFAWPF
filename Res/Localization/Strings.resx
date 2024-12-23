@@ -469,7 +469,7 @@
     <value>选择可运行文件</value>
   </data>
   <data name="WaitSoftwareTime" xml:space="preserve">
-    <value>等待软件启动时间(秒): {0}(s)</value>
+    <value>等待{0}启动时间(秒): {1}(s)</value>
   </data>
     <data name="ProjectLink" xml:space="preserve">
     <value>项目链接: </value>

@@ -459,7 +459,7 @@
     <value>Select Executable File</value>
   </data>
   <data name="WaitSoftwareTime" xml:space="preserve">
-    <value>Wait time for Software to start (seconds): {0}(s)</value>
+    <value>Wait time for {0} to start (seconds): {1}(s)</value>
   </data>
     <data name="ProjectLink" xml:space="preserve">
     <value>Project Link: </value>
