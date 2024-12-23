@@ -116,7 +116,7 @@ public static class MFAExtensions
         return maaContext.Tasker.Controller.TouchMove(contact, x, y, pressure);
 
     }
-    public static MaaJob TouchUp(this IMaaContext maaContext, int contact, int x, int y, int pressure)
+    public static MaaJob TouchUp(this IMaaContext maaContext, int contact)
     {
         return maaContext.Tasker.Controller.TouchUp(contact);
     }

@@ -49,8 +49,8 @@ public class MoneyRecognition : IMaaCustomRecognition
         //   LoggerService.LogError("Error"); Log output error
         //   context.Click(980, 495); Click
         //   context.Swipe(980, 495, 0, 0, 1000); Swipe
-        //   context.TouchDown(0, 980, 495, 5); Press down
-        //   context.TouchMove(0, 980, 495, 5); Move
+        //   context.TouchDown(1, 980, 495, 5); Press down
+        //   context.TouchMove(1); Move
         //   context.PressKey(0); Press a key
         //   context.Screencap().Wait(); Take another screenshot
         //   context.GetCachedImage(imageBuffer); Get the image after screenshot
