@@ -125,7 +125,7 @@ public class MaaProcessor
                     Stop();
                     throw new Exception();
                 }
-                if (MainWindow.Instance.IsConnected())
+                if (!MainWindow.Instance.IsConnected())
                 {
                     Growls.Warning("Warning_CannotConnect".GetLocalizationString()
                         .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
@@ -284,7 +284,12 @@ public class MaaProcessor
 
             if (remainingTime % 10 == 0)
             {
-                MainWindow.AddLogByKey("WaitSoftwareTime", null, remainingTime.ToString());
+                MainWindow.AddLogByKey("WaitSoftwareTime", null,
+                    (MainWindow.Data?.IsAdb).IsTrue()
+                        ? "Emulator"
+                        : "Window",
+                    remainingTime.ToString()
+                );
             }
 
             try
