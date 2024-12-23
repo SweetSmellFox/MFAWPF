@@ -460,7 +460,7 @@ public partial class MainWindow
                 dialog.Output
             };
             deviceComboBox.SelectedIndex = 0;
-            MaaProcessor.Config.IsConnected = true;
+            SetConnected(true);
         }
     }
 
@@ -506,32 +506,34 @@ public partial class MainWindow
             Growl.Info((Data?.IsAdb).IsTrue()
                 ? LocExtension.GetLocalizedValue<string>("EmulatorDetectionStarted")
                 : LocExtension.GetLocalizedValue<string>("WindowDetectionStarted"));
-            MaaProcessor.Config.IsConnected = false;
+            SetConnected(false);
             if ((Data?.IsAdb).IsTrue())
             {
                 var devices = await _maaToolkit.AdbDevice.FindAsync();
                 deviceComboBox.ItemsSource = devices;
-                MaaProcessor.Config.IsConnected = devices.Count > 0;
+                SetConnected(devices.Count > 0);
                 var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
+                var resultIndex = 0;
                 if (!string.IsNullOrWhiteSpace(emulatorConfig))
                 {
                     var extractedNumber = ExtractNumberFromEmulatorConfig(emulatorConfig);
-
+                    
                     foreach (var device in devices)
                     {
                         if (TryGetIndexFromConfig(device.Config, out int index))
                         {
                             if (index == extractedNumber)
                             {
-                                deviceComboBox.SelectedIndex = devices.IndexOf(device);
+                                resultIndex = devices.IndexOf(device);
+                                break;
                             }
                         }
-                        else deviceComboBox.SelectedIndex = 0;
+                        else resultIndex = 0;
                     }
                 }
                 else
-                    deviceComboBox.SelectedIndex = 0;
-                Console.WriteLine("设置一次！");
+                    resultIndex = 0;
+                deviceComboBox.SelectedIndex = resultIndex;
                 if (MaaInterface.Instance?.Controller != null)
                 {
                     if (MaaInterface.Instance.Controller.Any(controller => controller.Type != null && controller.Type.ToLower().Equals("adb")))
@@ -593,8 +595,8 @@ public partial class MainWindow
             {
                 var windows = _maaToolkit.Desktop.Window.Find().ToList();
                 deviceComboBox.ItemsSource = windows;
-                MaaProcessor.Config.IsConnected = windows.Count > 0;
-                deviceComboBox.SelectedIndex = windows.Count > 0
+                SetConnected(windows.Count > 0);
+                var resultIndex = windows.Count > 0
                     ? windows.ToList().FindIndex(win => !string.IsNullOrWhiteSpace(win.Name))
                     : 0;
                 if (MaaInterface.Instance?.Controller != null)
@@ -605,11 +607,12 @@ public partial class MainWindow
                         if (win32Controller?.Win32 != null)
                         {
                             var filteredWindows = windows.Where(win => !string.IsNullOrWhiteSpace(win.Name) || !string.IsNullOrWhiteSpace(win.ClassName)).ToList();
+                            
                             if (!string.IsNullOrWhiteSpace(win32Controller.Win32.WindowRegex))
                             {
                                 var windowRegex = new Regex(win32Controller.Win32.WindowRegex);
                                 filteredWindows = filteredWindows.Where(win => windowRegex.IsMatch(win.Name)).ToList();
-                                deviceComboBox.SelectedIndex = filteredWindows.Count > 0
+                                resultIndex = filteredWindows.Count > 0
                                     ? windows.FindIndex(win => win.Name.Equals(filteredWindows.First().Name))
                                     : 0;
                             }
@@ -618,11 +621,11 @@ public partial class MainWindow
                             {
                                 var classRegex = new Regex(win32Controller.Win32.ClassRegex);
                                 var filteredWindowsByClass = filteredWindows.Where(win => classRegex.IsMatch(win.ClassName)).ToList();
-                                deviceComboBox.SelectedIndex = filteredWindowsByClass.Count > 0
+                                resultIndex = filteredWindowsByClass.Count > 0
                                     ? windows.FindIndex(win => win.ClassName.Equals(filteredWindowsByClass.First().ClassName))
                                     : 0;
                             }
-
+                    
                             if (win32Controller.Win32.Input != null)
                             {
                                 int result = 0;
@@ -657,9 +660,10 @@ public partial class MainWindow
                         }
                     }
                 }
+                deviceComboBox.SelectedIndex = resultIndex;
             }
 
-            if (!MaaProcessor.Config.IsConnected)
+            if (!IsConnected())
             {
                 Growl.Info((Data?.IsAdb).IsTrue()
                     ? LocExtension.GetLocalizedValue<string>("NoEmulatorFound")
@@ -668,10 +672,10 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Growls.WarningGlobal(string.Format(LocExtension.GetLocalizedValue<string>("TaskStackError"),
+            Growls.Warning(string.Format(LocExtension.GetLocalizedValue<string>("TaskStackError"),
                 (Data?.IsAdb).IsTrue() ? "Emulator".GetLocalizationString() : "Window".GetLocalizationString(),
                 ex.Message));
-            MaaProcessor.Config.IsConnected = false;
+            SetConnected(false);
             LoggerService.LogError(ex);
             Console.WriteLine(ex);
         }
@@ -1497,7 +1501,7 @@ public partial class MainWindow
 
     private void Edit(object sender, RoutedEventArgs e)
     {
-        if (!MaaProcessor.Config.IsConnected)
+        if (!IsConnected())
         {
             Growls.Warning(
                 "Warning_CannotConnect".GetLocalizedFormattedString((Data?.IsAdb).IsTrue()
@@ -1717,7 +1721,7 @@ public partial class MainWindow
                                 device
                             };
                             deviceComboBox.SelectedIndex = 0;
-                            MaaProcessor.Config.IsConnected = true;
+                            SetConnected(true);
                         });
                     }
                 }
@@ -1771,7 +1775,7 @@ public partial class MainWindow
     {
         Topmost = e.NewValue;
     }
-    
+
     public static void AddLog(string content,
         string? color = "",
         string weight = "Regular",
@@ -2069,11 +2073,21 @@ public partial class MainWindow
                         device
                     };
                     deviceComboBox.SelectedIndex = 0;
-                    MaaProcessor.Config.IsConnected = true;
+                    SetConnected(true);
                 });
             }
         }
         else
             Growls.Process(AutoDetectDevice);
+    }
+    public bool IsConnected()
+    {
+        return (Data?.IsConnected).IsTrue();
+    }
+
+    public void SetConnected(bool isConnected)
+    {
+        if (Data == null) return;
+        Data.IsConnected = isConnected;
     }
 }

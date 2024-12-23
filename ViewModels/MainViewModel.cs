@@ -137,6 +137,14 @@ public class MainViewModel : ObservableObject
         set => SetProperty(ref _isAdb, value);
     }
 
+    private bool _isConnected;
+
+    public bool IsConnected
+    {
+        get => _isConnected;
+        set => SetProperty(ref _isConnected, value);
+    }
+
     private bool _isVisible = true;
 
     public bool IsVisible
