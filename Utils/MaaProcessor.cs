@@ -159,7 +159,7 @@ public class MaaProcessor
         TaskQueue.Push(new MFATask
         {
             Name = "结束",
-            Type = MFATask.MFATaskType.MAAFW,
+            Type = MFATask.MFATaskType.MFA,
             Action = () => { MainWindow.Instance?.RunScript("Post-script"); }
         });
 
