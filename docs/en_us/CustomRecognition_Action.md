@@ -1,6 +1,6 @@
 # Custom Recognition/Action
 
-> Note: This document is about how to use C# for registration word corresponding recognition/action
+> Note: This document is about how to use C# to register the corresponding custom recognition/action.
 
 ## Custom Recognition
 
