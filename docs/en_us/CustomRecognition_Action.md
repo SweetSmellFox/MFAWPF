@@ -44,9 +44,6 @@ public class MoneyRecognition : IMaaCustomRecognition
         //   Growls.WarningGlobal("Global warning"); Global prompt warning
         //   Growls.Error("Error"); Prompt error
         //   Growls.ErrorGlobal("Global error"); Global prompt error
-        //   Growls.LogInfo("Message"); Log output information
-        //   LoggerService.LogWarning("Warning"); Log output warning
-        //   LoggerService.LogError("Error"); Log output error
         //   context.Click(980, 495); Click
         //   context.Swipe(980, 495, 0, 0, 1000); Swipe
         //   context.TouchDown(1, 980, 495, 5); Press down
