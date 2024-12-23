@@ -1777,7 +1777,6 @@ public partial class MainWindow
         string weight = "Regular",
         bool showTime = true)
     {
-
         Data?.AddLog(content, color, weight, showTime);
     }
 

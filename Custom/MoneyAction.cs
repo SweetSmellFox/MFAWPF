@@ -1,5 +1,6 @@
-﻿using MaaFramework.Binding;
-using MaaFramework.Binding.Buffers;
+﻿using MFAWPF.Utils;
+using MFAWPF.Views;
+using MaaFramework.Binding;
 using MaaFramework.Binding.Custom;
 
 namespace MFAWPF.Custom;
@@ -10,6 +11,7 @@ public class MoneyAction : IMaaCustomAction
 
     public bool Run(in IMaaContext context, in RunArgs args)
     {
+        
         return false;
     }
 

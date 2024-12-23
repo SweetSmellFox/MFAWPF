@@ -267,7 +267,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="docs\" />
         <Folder Include="obj\Debug\Styles\Style\" />
         <Folder Include="obj\Release\Assets\Icons\" />
         <Folder Include="obj\Release\Styles\Primary\" />
