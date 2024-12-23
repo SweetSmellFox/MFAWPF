@@ -77,10 +77,17 @@ public partial class ErrorView : INotifyPropertyChanged
 
         base.OnClosed(e);
     }
-
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        base.OnClosing(e);
+        Application.Current.Shutdown();
+    }
     private void Hyperlink_OnClick(object sender, RoutedEventArgs _)
     {
-        Process.Start(new ProcessStartInfo(((Hyperlink)sender).NavigateUri.AbsoluteUri) { UseShellExecute = true });
+        Process.Start(new ProcessStartInfo(((Hyperlink)sender).NavigateUri.AbsoluteUri)
+        {
+            UseShellExecute = true
+        });
     }
 
     private void CopyToClipboard()

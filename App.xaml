@@ -9,6 +9,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MFAWPF;component/Res/Theme.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MFAWPF;component/Res/Style.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

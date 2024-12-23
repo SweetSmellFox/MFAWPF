@@ -18,15 +18,21 @@ using MFAWPF.Data;
 using MFAWPF.Utils.Converters;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using System;
+using System.CodeDom.Compiler;
 using System.Runtime.Intrinsics.Arm;
 using System.Collections;
 using System.Net;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Web;
 
 namespace MFAWPF.Utils;
@@ -113,7 +119,7 @@ public class MaaProcessor
                 instance.Wait();
                 if (instance.Result == null || !instance.Result.Initialized)
                 {
-                    Growls.ErrorGlobal("InitInstanceFailed".GetLocalizationString());
+                    Growls.Error("InitInstanceFailed".GetLocalizationString());
                     LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
                     MainWindow.AddLogByKey("InstanceInitFailedLog");
                     Stop();
@@ -188,7 +194,7 @@ public class MaaProcessor
                 }
                 else
                 {
-                    Growls.ErrorGlobal("StoppingFailed".GetLocalizationString());
+                    Growls.Error("StoppingFailed".GetLocalizationString());
                 }
             }, null, "停止任务");
             TaskQueue.Clear();
@@ -648,7 +654,7 @@ public class MaaProcessor
         _startTime = null;
     }
 
-    public virtual void OnTaskQueueChanged()
+    public void OnTaskQueueChanged()
     {
         TaskStackChanged?.Invoke(this, EventArgs.Empty);
     }
@@ -820,90 +826,118 @@ public class MaaProcessor
                 Config.DesktopWindow.Link,
                 Config.DesktopWindow.Check);
     }
+   
+    static List<MetadataReference>? MetadataReferences;
+    
+    static List<MetadataReference> GetMetadataReferences()
+    {
+        if (MetadataReferences == null)
+        {
+            var domainAssemblys = AppDomain.CurrentDomain.GetAssemblies();
+            MetadataReferences = new List<MetadataReference>();
+            
+            foreach (var assembly in domainAssemblys)
+            {
+                if (!assembly.IsDynamic)
+                {
+                    unsafe
+                    {
+                        assembly.TryGetRawMetadata(out byte* blob, out int length);
+                        var moduleMetadata = ModuleMetadata.CreateFromMetadata((IntPtr)blob, length);
+                        var assemblyMetadata = AssemblyMetadata.Create(moduleMetadata);
+                        var metadataReference = assemblyMetadata.GetReference();
+                        MetadataReferences.Add(metadataReference);
+                    }
+                }
+            }
 
-    // public static IEnumerable<object> LoadAndInstantiateCustomClasses(string directory, string[] interfacesToImplement)
-    // {
-    //     var customClasses = new List<object>();
-    //     var csFiles = Directory.GetFiles(directory, "*.cs");
-    //
-    //     foreach (var filePath in csFiles)
-    //     {
-    //         // 读取.cs文件内容
-    //         string code = File.ReadAllText(filePath);
-    //
-    //         // 使用Roslyn编译代码
-    //         var syntaxTree = CSharpSyntaxTree.ParseText(code);
-    //         var compilation = CSharpCompilation.Create("DynamicAssembly")
-    //             .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-    //             .AddSyntaxTrees(syntaxTree)
-    //             .AddReferences(
-    //                 MetadataReference.CreateFromFile(typeof(object).Assembly.Location));
-    //         foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-    //         {
-    //             if (!string.IsNullOrEmpty(assembly.Location))
-    //             {
-    //                 compilation.AddReferences(MetadataReference.CreateFromFile(assembly.Location));
-    //                 Console.WriteLine(assembly.FullName + ":"+ assembly.Location);
-    //             }
-    //         }
-    //         using (var ms = new MemoryStream())
-    //         {
-    //             EmitResult result = compilation.Emit(ms);
-    //             if (!result.Success)
-    //             {
-    //                 var failures = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
-    //                 foreach (var diagnostic in failures)
-    //                 {
-    //                     Console.WriteLine($"{diagnostic.Id}: {diagnostic.GetMessage()}");
-    //                 }
-    //                 continue;
-    //             }
-    //
-    //             ms.Seek(0, SeekOrigin.Begin);
-    //             var assembly = Assembly.Load(ms.ToArray());
-    //
-    //             // 查找实现了指定接口的类
-    //             foreach (var type in assembly.GetTypes())
-    //             {
-    //                 foreach (var iface in interfacesToImplement)
-    //                 {
-    //                     if (type.GetInterfaces().Any(i => i.Name == iface))
-    //                     {
-    //                         customClasses.Add(Activator.CreateInstance(type));
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //
-    //     return customClasses;
-    // }
+            unsafe
+            {
+                typeof(System.Linq.Expressions.Expression).Assembly.TryGetRawMetadata(out byte* blob, out int length);
+                MetadataReferences.Add(AssemblyMetadata.Create(ModuleMetadata.CreateFromMetadata((IntPtr)blob, length)).GetReference());
+            }
+        }
+        return MetadataReferences;
+    }
+
+    public static IEnumerable<CustomValue<object>> LoadAndInstantiateCustomClasses(string directory, string[] interfacesToImplement)
+    {
+        var customClasses = new List<CustomValue<object>>();
+        var csFiles = Directory.GetFiles(directory, "*.cs");
+
+        var references = GetMetadataReferences();
+
+        foreach (var filePath in csFiles)
+        {
+            var name = Path.GetFileNameWithoutExtension(filePath);
+            LoggerService.LogInfo("Trying to parse " + name);
+            string code = File.ReadAllText(filePath);
+
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("DynamicAssembly")
+                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                .AddSyntaxTrees(syntaxTree)
+                .AddReferences(references);
+
+            using (var ms = new MemoryStream())
+            {
+                EmitResult result = compilation.Emit(ms);
+                if (!result.Success)
+                {
+                    var failures = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
+                    foreach (var diagnostic in failures)
+                    {
+                        LoggerService.LogError($"{diagnostic.Id}: {diagnostic.GetMessage()}");
+                    }
+                    continue;
+                }
+
+                ms.Seek(0, SeekOrigin.Begin);
+                var assembly = Assembly.Load(ms.ToArray());
+
+                foreach (var type in assembly.GetTypes())
+                {
+                    foreach (var iface in interfacesToImplement)
+                    {
+                        if (type.GetInterfaces().Any(i => i.Name == iface))
+                        {
+                            var instance = Activator.CreateInstance(type);
+                            if (instance != null)
+                                customClasses.Add(new CustomValue<object>(name, instance));
+                        }
+                    }
+                }
+            }
+        }
+
+        return customClasses;
+    }
+
     private void RegisterCustomRecognitionsAndActions(MaaTasker instance)
     {
         if (MaaInterface.Instance == null) return;
         LoggerService.LogInfo("RegisteringCustomRecognizer".GetLocalizationString());
+        LoggerService.LogInfo("RegisteringCustomAction".GetLocalizationString());
+        // instance.Resource.Register(new MoneyDetectRecognition());
+        // instance.Resource.Register(new MoneyRecognition());
+        var customClasses = LoadAndInstantiateCustomClasses($"{Resource}/custom", [
+            "IMaaCustomRecognition",
+            "IMaaCustomAction",
+        ]);
 
-        instance.Resource.Register(new MoneyDetectRecognition());
-        instance.Resource.Register(new MoneyRecognition());
-        // var customClasses = LoadAndInstantiateCustomClasses($"{Resource}/custom", new[]
-        // {
-        //     "IMaaCustomRecognition",
-        //     "IMaaCustomAction"
-        // });
-        // foreach (var customClass in customClasses)
-        // {
-        //     if (customClass is IMaaCustomRecognition recognition)
-        //     {
-        //         instance.Resource.Register(recognition);
-        //
-        //     }
-        //     else if (customClass is IMaaCustomAction action)
-        //     {
-        //         instance.Resource.Register(action);
-        //     }
-        //     LoggerService.LogInfo("Registering " + nameof(customClass));
-        //
-        // }
+        foreach (var customClass in customClasses)
+        {
+            if (customClass.Value is IMaaCustomRecognition recognition)
+            {
+                instance.Resource.Register(recognition);
+                LoggerService.LogInfo("Registering IMaaCustomRecognition " + customClass.Name);
+            }
+            else if (customClass.Value is IMaaCustomAction action)
+            {
+                instance.Resource.Register(action);
+                LoggerService.LogInfo("Registering IMaaCustomAction " + customClass.Name);
+            }
+        }
         instance.Callback += (_, args) =>
         {
             var jObject = JObject.Parse(args.Details);
@@ -954,7 +988,7 @@ public class MaaProcessor
         OnTaskQueueChanged();
         if (MainWindow.Data != null)
             MainWindow.Data.Idle = true;
-        Growls.ErrorGlobal(message);
+        Growls.Error(message);
         if (hasWarning)
             LoggerService.LogWarning(waringMessage);
         LoggerService.LogError(e.ToString());
@@ -968,7 +1002,7 @@ public class MaaProcessor
         var encodedDataHandle = buffer.GetEncodedData(out var size);
         if (encodedDataHandle == IntPtr.Zero)
         {
-            Growls.ErrorGlobal("Handle为空！");
+            Growls.Error("Handle为空！");
             return null;
         }
 

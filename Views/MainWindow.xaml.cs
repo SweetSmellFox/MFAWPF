@@ -251,7 +251,7 @@ public partial class MainWindow
                         {
                             if (!taskDictionaryA.TryAdd(task.Key, task.Value))
                             {
-                                Growls.ErrorGlobal(string.Format(
+                                Growls.Error(string.Format(
                                     LocExtension.GetLocalizedValue<string>("DuplicateTaskError"), task.Key));
                                 return false;
                             }
@@ -312,7 +312,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Growls.ErrorGlobal(string.Format(LocExtension.GetLocalizedValue<string>("PipelineLoadError"),
+            Growls.Error(string.Format(LocExtension.GetLocalizedValue<string>("PipelineLoadError"),
                 ex.Message));
             Console.WriteLine(ex);
             LoggerService.LogError(ex);
@@ -348,7 +348,7 @@ public partial class MainWindow
             {
                 if (!taskDictionary.ContainsKey(task))
                 {
-                    Growls.ErrorGlobal(string.Format(LocExtension.GetLocalizedValue<string>("TaskNotFoundError"),
+                    Growls.Error(string.Format(LocExtension.GetLocalizedValue<string>("TaskNotFoundError"),
                         name, task));
                 }
             }
@@ -531,6 +531,7 @@ public partial class MainWindow
                 }
                 else
                     deviceComboBox.SelectedIndex = 0;
+                Console.WriteLine("设置一次！");
                 if (MaaInterface.Instance?.Controller != null)
                 {
                     if (MaaInterface.Instance.Controller.Any(controller => controller.Type != null && controller.Type.ToLower().Equals("adb")))
@@ -1698,6 +1699,29 @@ public partial class MainWindow
                 });
                 Start(null, null);
             }
+            else
+            {
+                if (Data?.IsAdb == true && DataSet.GetData("RememberAdb", true) && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) && DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
+                {
+                    var settings = new JsonSerializerSettings();
+                    settings.Converters.Add(new AdbInputMethodsConverter());
+                    settings.Converters.Add(new AdbScreencapMethodsConverter());
+
+                    var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
+                    if (device != null)
+                    {
+                        Growls.Process(() =>
+                        {
+                            deviceComboBox.ItemsSource = new List<AdbDeviceInfo>
+                            {
+                                device
+                            };
+                            deviceComboBox.SelectedIndex = 0;
+                            MaaProcessor.Config.IsConnected = true;
+                        });
+                    }
+                }
+            }
             ConnectionTabControl.SelectionChanged += ConnectionTabControlOnSelectionChanged;
             if (Data != null)
                 Data.NotLock = MaaInterface.Instance?.LockController != true;
@@ -1747,6 +1771,7 @@ public partial class MainWindow
     {
         Topmost = e.NewValue;
     }
+    
     public static void AddLog(string content,
         string? color = "",
         string weight = "Regular",
@@ -1996,14 +2021,14 @@ public partial class MainWindow
         //关于我们
         AddAbout();
     }
+
     private void ConfigureTaskSettingsPanel(object? sender = null, RoutedEventArgs? e = null)
     {
         settingPanel.Children.Clear();
-        StackPanel
-            s2 = new()
-            {
-                Margin = new Thickness(2)
-            };
+        StackPanel s2 = new()
+        {
+            Margin = new Thickness(2)
+        };
 
         AddAutoStartOption(s2);
         AddAfterTaskOption(s2);
@@ -2012,16 +2037,16 @@ public partial class MainWindow
         AddStartEmulatorOption(s2);
 
 
-        ScrollViewer
-            sv2 = new()
-            {
-                Content = s2,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch
-            };
+        ScrollViewer sv2 = new()
+        {
+            Content = s2,
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch
+        };
         settingPanel.Children.Add(sv2);
     }
+
     public async void WaitSoftware()
     {
         if (DataSet.GetData("AutoStartIndex", 0) >= 1)

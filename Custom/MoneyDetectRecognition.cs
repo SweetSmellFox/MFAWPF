@@ -17,7 +17,7 @@ public class MoneyDetectRecognition : IMaaCustomRecognition
         var text = context.GetText(466, 299, 131, 63, imageBuffer);
         if (int.TryParse(text, out var currentMoney))
         {
-            int getMoney = currentMoney - MaaProcessor.AllMoney;
+            var getMoney = currentMoney - MaaProcessor.AllMoney;
             MaaProcessor.Money += getMoney;
             MaaProcessor.AllMoney = currentMoney;
             MainWindow.AddLog(

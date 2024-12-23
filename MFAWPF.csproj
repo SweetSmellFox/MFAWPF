@@ -22,7 +22,11 @@
     <PackageReference Include="Lierda.WPFHelper" Version="1.0.3" />
     <PackageReference Include="Maa.Framework.Native" Version="2.3.1" />
     <PackageReference Include="Maa.Framework.Runtime.win-arm64" Version="2.3.1" />
+	<PackageReference Include="Maa.Framework.Runtime.win-x64" Version="2.3.1" />
+
   </ItemGroup>
+
+ 
     <!-- Info -->
     <PropertyGroup>
         <ApplicationIcon>logo.ico</ApplicationIcon>
@@ -34,9 +38,10 @@
     </PropertyGroup>
 	
     <!-- Ignore Warings -->
-  <PropertyGroup>
-    <NoWarn>NU1602;NU1701;CS0169;CS0612;CS0618;CS1998;CS4014;CS8618;CS8601;CS8602;CS8603</NoWarn>
-  </PropertyGroup>
+	  <PropertyGroup>
+		<NoWarn>NU1602;NU1701;CS0169;CS0612;CS0618;CS1998;CS4014;CS8618;CS8601;CS8602;CS8603</NoWarn>
+	  </PropertyGroup>
+	  
 	<PropertyGroup>
 		<UICulture>zh-hans</UICulture>
 	</PropertyGroup>
@@ -46,7 +51,7 @@
         <ApplicationVersion>1.1.0</ApplicationVersion>
         <Version>1.1</Version>
         <FileVersion>0.0.1</FileVersion>
-        <AssemblyVersion>1.2.3.2</AssemblyVersion>
+        <AssemblyVersion>1.2.3.3</AssemblyVersion>
         <InformationalVersion>0.0.1</InformationalVersion>
     </PropertyGroup>
   
@@ -58,6 +63,7 @@
         <PublishSingleFile>true</PublishSingleFile>
         <PublishTrimmed>false</PublishTrimmed>
         <SelfContained>false</SelfContained>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     </PropertyGroup>
@@ -68,13 +74,13 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
-  
+
     <ItemGroup>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
         <PackageReference Include="GraphSharp" Version="1.1.0" />
         <PackageReference Include="HandyControls" Version="3.5.3" />
-        <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="2.3.1" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="NLog" Version="5.3.4" />
         <PackageReference Include="NLog.Config" Version="4.7.15" />
