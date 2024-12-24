@@ -139,7 +139,7 @@
 - [MaaFramework](https://github.com/MaaAssistantArknights/MaaFramework)：自动化测试框架
 - [MaaFramework.Binding.CSharp](https://github.com/MaaXYZ/MaaFramework.Binding.CSharp)：MaaFramework 的 C# 包装
 - [HandyControls](https://github.com/ghost1372/HandyControls)：C# WPF 控件库
-- [NLog](https://github.com/NLog/NLog)：C# 日志记录库
+- [Serilog](https://github.com/serilog/serilog)：C# 日志记录库
 - [Newtonsoft.Json](https://github.com/CommunityToolkit/dotnet)：C# JSON 库
 
 ## 画大饼

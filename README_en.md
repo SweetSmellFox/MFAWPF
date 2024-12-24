@@ -137,7 +137,7 @@ Modify it as follows:
 - [MaaFramework](https://github.com/MaaAssistantArknights/MaaFramework)：Automation testing framework
 - [MaaFramework.Binding.CSharp](https://github.com/MaaXYZ/MaaFramework.Binding.CSharp)：The csharp binding of MaaFramework
 - [HandyControls](https://github.com/ghost1372/HandyControls)：WPF control library
-- [NLog](https://github.com/NLog/NLog)：C# logging library
+- [Serilog](https://github.com/serilog/serilog)：C# logging library
 - [Newtonsoft.Json](https://github.com/CommunityToolkit/dotnet)：C# JSON library
 
 ## Roadmap

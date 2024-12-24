@@ -1,15 +1,18 @@
-﻿using NLog;
+﻿using Serilog;
 
 namespace MFAWPF.Utils;
 
 public static class LoggerService
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
+    private static readonly ILogger Logger = new LoggerConfiguration()
+        .WriteTo.File(
+            $"logs/log-{DateTime.Now.ToString("yyyy-MM-dd")}.txt",
+            outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}][{Level:u3}] {Message:lj}{NewLine}{Exception}").CreateLogger();
 
     public static void LogInfo(string message)
     {
-        Logger.Info(message);
+        ;
+        Logger.Information(message);
         Console.WriteLine("[INFO]" + message);
     }
 
@@ -28,7 +31,7 @@ public static class LoggerService
 
     public static void LogWarning(string message)
     {
-        Logger.Warn(message);
+        Logger.Warning(message);
         Console.WriteLine("[WARN]" + message);
     }
 }
