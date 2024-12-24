@@ -347,9 +347,5 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Resource>
       <None Remove="NLog.config" />
-      <Resource Include="Resource\base\model\ocr\det.onnx" />
-      <Resource Include="Resource\base\model\ocr\keys.txt" />
-      <Resource Include="Resource\base\model\ocr\README.md" />
-      <Resource Include="Resource\base\model\ocr\rec.onnx" />
     </ItemGroup>
 </Project>

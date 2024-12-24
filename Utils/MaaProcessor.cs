@@ -785,7 +785,10 @@ public class MaaProcessor
             };
             RegisterCustomRecognitionsAndActions(tasker);
             if (!DataSet.GetData("EnableGPU", true))
+            {
                 tasker.Resource.SetOptionInferenceDevice(InferenceDevice.CPU);
+                LoggerService.LogInfo("已禁用GPU加速！");
+            }
             tasker.Utility.SetOptionSaveDraw(DataSet.GetData("EnableSaveDraw", false));
             return tasker;
         }
@@ -868,53 +871,55 @@ public class MaaProcessor
     public static IEnumerable<CustomValue<object>> LoadAndInstantiateCustomClasses(string directory, string[] interfacesToImplement)
     {
         var customClasses = new List<CustomValue<object>>();
-        var csFiles = Directory.GetFiles(directory, "*.cs");
-
-        var references = GetMetadataReferences();
-
-        foreach (var filePath in csFiles)
+        if (Path.Exists(directory))
         {
-            var name = Path.GetFileNameWithoutExtension(filePath);
-            LoggerService.LogInfo("Trying to parse " + name);
-            string code = File.ReadAllText(filePath);
+            var csFiles = Directory.GetFiles(directory, "*.cs");
 
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("DynamicAssembly")
-                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-                .AddSyntaxTrees(syntaxTree)
-                .AddReferences(references);
+            var references = GetMetadataReferences();
 
-            using (var ms = new MemoryStream())
+            foreach (var filePath in csFiles)
             {
-                EmitResult result = compilation.Emit(ms);
-                if (!result.Success)
-                {
-                    var failures = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
-                    foreach (var diagnostic in failures)
-                    {
-                        LoggerService.LogError($"{diagnostic.Id}: {diagnostic.GetMessage()}");
-                    }
-                    continue;
-                }
+                var name = Path.GetFileNameWithoutExtension(filePath);
+                LoggerService.LogInfo("Trying to parse " + name);
+                string code = File.ReadAllText(filePath);
 
-                ms.Seek(0, SeekOrigin.Begin);
-                var assembly = Assembly.Load(ms.ToArray());
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("DynamicAssembly")
+                    .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                    .AddSyntaxTrees(syntaxTree)
+                    .AddReferences(references);
 
-                foreach (var type in assembly.GetTypes())
+                using (var ms = new MemoryStream())
                 {
-                    foreach (var iface in interfacesToImplement)
+                    EmitResult result = compilation.Emit(ms);
+                    if (!result.Success)
                     {
-                        if (type.GetInterfaces().Any(i => i.Name == iface))
+                        var failures = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
+                        foreach (var diagnostic in failures)
                         {
-                            var instance = Activator.CreateInstance(type);
-                            if (instance != null)
-                                customClasses.Add(new CustomValue<object>(name, instance));
+                            LoggerService.LogError($"{diagnostic.Id}: {diagnostic.GetMessage()}");
+                        }
+                        continue;
+                    }
+
+                    ms.Seek(0, SeekOrigin.Begin);
+                    var assembly = Assembly.Load(ms.ToArray());
+
+                    foreach (var type in assembly.GetTypes())
+                    {
+                        foreach (var iface in interfacesToImplement)
+                        {
+                            if (type.GetInterfaces().Any(i => i.Name == iface))
+                            {
+                                var instance = Activator.CreateInstance(type);
+                                if (instance != null)
+                                    customClasses.Add(new CustomValue<object>(name, instance));
+                            }
                         }
                     }
                 }
             }
         }
-
         return customClasses;
     }
 

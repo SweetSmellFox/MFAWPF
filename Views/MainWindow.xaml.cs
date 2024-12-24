@@ -239,6 +239,8 @@ public partial class MainWindow
             {
                 foreach (var resourcePath in MaaProcessor.CurrentResources)
                 {
+                    if (!Path.Exists($"{resourcePath}/pipeline/"))
+                        break;
                     var jsonFiles = Directory.GetFiles($"{resourcePath}/pipeline/", "*.json");
                     var taskDictionaryA = new Dictionary<string, TaskModel>();
                     foreach (var file in jsonFiles)
@@ -264,12 +266,12 @@ public partial class MainWindow
 
             if (taskDictionary.Count == 0)
             {
-                string? directoryPath = Path.GetDirectoryName($"{MaaProcessor.ResourceBase}/pipeline");
-                if (!string.IsNullOrWhiteSpace(directoryPath) && !Directory.Exists(directoryPath))
+
+                if (!string.IsNullOrWhiteSpace($"{MaaProcessor.ResourceBase}/pipeline") && !Directory.Exists($"{MaaProcessor.ResourceBase}/pipeline"))
                 {
                     try
                     {
-                        Directory.CreateDirectory(directoryPath);
+                        Directory.CreateDirectory($"{MaaProcessor.ResourceBase}/pipeline");
                     }
                     catch (Exception ex)
                     {
@@ -517,7 +519,7 @@ public partial class MainWindow
                 if (!string.IsNullOrWhiteSpace(emulatorConfig))
                 {
                     var extractedNumber = ExtractNumberFromEmulatorConfig(emulatorConfig);
-                    
+
                     foreach (var device in devices)
                     {
                         if (TryGetIndexFromConfig(device.Config, out int index))
@@ -607,7 +609,7 @@ public partial class MainWindow
                         if (win32Controller?.Win32 != null)
                         {
                             var filteredWindows = windows.Where(win => !string.IsNullOrWhiteSpace(win.Name) || !string.IsNullOrWhiteSpace(win.ClassName)).ToList();
-                            
+
                             if (!string.IsNullOrWhiteSpace(win32Controller.Win32.WindowRegex))
                             {
                                 var windowRegex = new Regex(win32Controller.Win32.WindowRegex);
@@ -625,7 +627,7 @@ public partial class MainWindow
                                     ? windows.FindIndex(win => win.ClassName.Equals(filteredWindowsByClass.First().ClassName))
                                     : 0;
                             }
-                    
+
                             if (win32Controller.Win32.Input != null)
                             {
                                 int result = 0;
