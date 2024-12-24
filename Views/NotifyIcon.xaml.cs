@@ -1,8 +1,6 @@
 using MFAWPF.Data;
 using MFAWPF.Utils;
 using MFAWPF.ViewModels;
-using NLog;
-using NLog.Fluent;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Windows;

@@ -272,6 +272,7 @@
         <Folder Include="obj\Release\Styles\Primary\" />
         <Folder Include="obj\Release\Styles\Style\" />
         <Folder Include="obj\Release\Styles\Theme\" />
+        <Folder Include="Resource\base\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -346,8 +347,9 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Resource>
       <None Remove="NLog.config" />
-      <Resource Include="NLog.config">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
+      <Resource Include="Resource\base\model\ocr\det.onnx" />
+      <Resource Include="Resource\base\model\ocr\keys.txt" />
+      <Resource Include="Resource\base\model\ocr\README.md" />
+      <Resource Include="Resource\base\model\ocr\rec.onnx" />
     </ItemGroup>
 </Project>
