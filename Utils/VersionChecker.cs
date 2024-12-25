@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using HandyControl.Controls;
 using HandyControl.Data;
 using MFAWPF.Data;
+using MFAWPF.Res.Localization;
 using MFAWPF.Utils.Converters;
 using MFAWPF.Views;
 using Newtonsoft.Json;
@@ -122,12 +123,8 @@ public class VersionChecker
         var url = MaaInterface.Instance?.Url ?? string.Empty;
         dialog.UpdateProgress(10);
         var strings = GetRepoFromUrl(url);
-        if (!string.IsNullOrWhiteSpace(url))
-        {
-            url = ConvertToApiUrl(url);
-        }
 
-        var latestVersion = GetLatestVersionFromGitHubUrl(url);
+        var latestVersion = strings.Length > 1 ? GetLatestVersionFromGithub(strings[0], strings[1]) : string.Empty;
         dialog.UpdateProgress(50);
 
         if (string.IsNullOrWhiteSpace(latestVersion))
@@ -280,7 +277,7 @@ public class VersionChecker
             url = ConvertToApiUrl(url);
         }
 
-        var latestVersion = GetLatestVersionFromGitHubUrl(url);
+        var latestVersion = GetLatestVersionFromGithub();
         dialog.UpdateProgress(50);
 
         if (string.IsNullOrWhiteSpace(latestVersion))
@@ -399,10 +396,26 @@ public class VersionChecker
             var jsonResponse = client.DownloadString(releaseUrl);
             var releaseData = JObject.Parse(jsonResponse);
             var assets = releaseData["assets"] as JArray;
-            // 这里简单假设第一个资产就是我们要下载的资源压缩包，实际可能需要根据文件名等更准确判断
             if (assets != null && assets.Count > 0)
             {
-                return assets[0]["browser_download_url"]?.ToString();
+                var targetUrl = "";
+                foreach (var asset in assets)
+                {
+                    var browserDownloadUrl = asset["browser_download_url"]?.ToString();
+                    if (!string.IsNullOrEmpty(browserDownloadUrl))
+                    {
+                        if (browserDownloadUrl.EndsWith(".zip") || browserDownloadUrl.EndsWith(".7z") || browserDownloadUrl.EndsWith(".rar"))
+                        {
+                            targetUrl = browserDownloadUrl;
+                            break;
+                        }
+                    }
+                }
+                if (string.IsNullOrEmpty(targetUrl))
+                {
+                    targetUrl = assets[0]["browser_download_url"]?.ToString();
+                }
+                return targetUrl;
             }
         }
         catch (WebException e) when (e.Message.Contains("403"))
@@ -443,12 +456,12 @@ public class VersionChecker
     }
 
 
-    public void CheckForGUIUpdates(string owner = "SweetSmellFox", string repo = "MFAWPF")
+    public void CheckForGUIUpdates()
     {
         try
         {
             MainWindow.Instance.SetUpdating(true);
-            var latestVersion = GetLatestVersionFromGitHub(owner, repo);
+            var latestVersion = GetLatestVersionFromGithub();
             var localVersion = GetLocalVersion();
             if (IsNewVersionAvailable(latestVersion, localVersion))
             {
@@ -509,10 +522,10 @@ public class VersionChecker
         {
             url = ConvertToApiUrl(url);
         }
-
+        var strings = GetRepoFromUrl(url);
         try
         {
-            var latestVersion = GetLatestVersionFromGitHubUrl(url);
+            var latestVersion = strings.Length > 1 ? GetLatestVersionFromGithub(strings[0], strings[1]) : string.Empty;
             if (string.IsNullOrWhiteSpace(latestVersion))
             {
                 MainWindow.Instance.SetUpdating(false);
@@ -544,68 +557,129 @@ public class VersionChecker
         }
     }
 
-    private string GetLatestVersionFromGitHubUrl(string url)
+    // private string GetLatestVersionFromGitHubUrl(string url)
+    // {
+    //
+    //     if (string.IsNullOrWhiteSpace(url))
+    //     {
+    //         return string.Empty;
+    //     }
+    //     using var client = new WebClient();
+    //     client.Headers.Add("User-Agent", "request");
+    //     client.Headers.Add("Accept", "application/json");
+    //
+    //     try
+    //     {
+    //         string jsonResponse = client.DownloadString(url);
+    //         var releaseData = JObject.Parse(jsonResponse);
+    //
+    //         return releaseData["tag_name"]?.ToString();
+    //     }
+    //     catch (WebException e) when (e.Message.Contains("403"))
+    //     {
+    //         LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
+    //         throw;
+    //     }
+    //     catch (WebException e)
+    //     {
+    //         LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
+    //         throw;
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
+    //         throw;
+    //     }
+    // }
+    //
+    public string GetLatestVersionFromGithub(string owner = "SweetSmellFox", string repo = "MFAWPF")
     {
-        if (string.IsNullOrWhiteSpace(url))
-        {
+        if (string.IsNullOrWhiteSpace(owner) || string.IsNullOrWhiteSpace(repo))
             return string.Empty;
-        }
-        using var client = new WebClient();
-        client.Headers.Add("User-Agent", "request");
-        client.Headers.Add("Accept", "application/json");
-
-        try
+        var releaseUrl = $"https://api.github.com/repos/{owner}/{repo}/releases";
+        int page = 1;
+        const int perPage = 5;
+        using var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
+        httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
+        while (page < 101)
         {
-            string jsonResponse = client.DownloadString(url);
-            var releaseData = JObject.Parse(jsonResponse);
-            return releaseData["tag_name"]?.ToString();
+            string urlWithParams = $"{releaseUrl}?per_page={perPage}&page={page}";
+            try
+            {
+                var response = httpClient.GetAsync(urlWithParams).Result;
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = response.Content.ReadAsStringAsync().Result;
+                    var tags = JArray.Parse(json);
+                    if (tags.Count == 0)
+                    {
+                        break;
+                    }
+                    foreach (var tag in tags)
+                    {
+                        if ((bool)tag["prerelease"])
+                        {
+                            continue;
+                        }
+                        return tag["tag_name"]?.ToString();
+                    }
+                }
+                else
+                {
+                    LoggerService.LogError($"获取最新版时发生错误: {response.StatusCode}");
+                    return string.Empty;
+                }
+            }
+            catch (WebException e) when (e.Message.Contains("403"))
+            {
+                LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
+                throw;
+            }
+            catch (WebException e)
+            {
+                LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
+                return string.Empty;
+            }
+            catch (Exception e)
+            {
+                LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
+                return string.Empty;
+            }
+            page++;
         }
-        catch (WebException e) when (e.Message.Contains("403"))
-        {
-            LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
-            throw;
-        }
-        catch (WebException e)
-        {
-            LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
-            throw;
-        }
-        catch (Exception e)
-        {
-            LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
-            throw;
-        }
+        return string.Empty;
     }
 
-    private string GetLatestVersionFromGitHub(string owner, string repo)
-    {
-        var url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
-        using var client = new WebClient();
-        client.Headers.Add("User-Agent", "request");
-        client.Headers.Add("Accept", "application/json");
-
-        try
-        {
-            string jsonResponse = client.DownloadString(url);
-            var releaseData = JObject.Parse(jsonResponse);
-            return releaseData["tag_name"]?.ToString();
-        }
-        catch (WebException e) when (e.Message.Contains("403"))
-        {
-            LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
-            throw;
-        }
-        catch (WebException e)
-        {
-            LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
-            throw;
-        }
-        catch (Exception e)
-        {
-            LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
-            throw;
-        }
-    }
+    // private string GetLatestVersionFromGitHub(string owner, string repo)
+    // {
+    //     var url = $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
+    //     using var client = new WebClient();
+    //     client.Headers.Add("User-Agent", "request");
+    //     client.Headers.Add("Accept", "application/json");
+    //
+    //     try
+    //     {
+    //         string jsonResponse = client.DownloadString(url);
+    //         var releaseData = JObject.Parse(jsonResponse);
+    //         return releaseData["tag_name"]?.ToString();
+    //     }
+    //     catch (WebException e) when (e.Message.Contains("403"))
+    //     {
+    //         LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
+    //         throw;
+    //     }
+    //     catch (WebException e)
+    //     {
+    //         LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
+    //         throw;
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
+    //         throw;
+    //     }
+    // }
 
     private string GetLocalVersion()
     {
@@ -641,24 +715,25 @@ public class VersionChecker
     {
         if (versionString == "Debug")
             versionString = "0.0.1";
-        string pattern = @"^[vV]?(?<version>\d+(\.\d+){0,3})([-_][a-zA-Z0-9]+)?$";
-        var match = Regex.Match(versionString, pattern);
-
-        if (match.Success)
+        
+        if (versionString.StartsWith("v") || versionString.StartsWith("V"))
         {
-            string versionPart = match.Groups["version"].Value;
+            versionString = versionString.Substring(1);
+        }
+        
+        var parts = versionString.Split('-');
+        var mainVersionPart = parts[0];
 
-            string[] versionComponents = versionPart.Split('.');
-            while (versionComponents.Length < 4)
-            {
-                versionPart += ".0";
-                versionComponents = versionPart.Split('.');
-            }
+        var versionComponents = mainVersionPart.Split('.');
+        while (versionComponents.Length < 4)
+        {
+            mainVersionPart += ".0";
+            versionComponents = mainVersionPart.Split('.');
+        }
 
-            if (Version.TryParse(versionPart, out _))
-            {
-                return versionPart;
-            }
+        if (Version.TryParse(mainVersionPart, out _))
+        {
+            return mainVersionPart;
         }
 
         throw new FormatException("无法解析版本号: " + versionString);
