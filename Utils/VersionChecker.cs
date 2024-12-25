@@ -387,55 +387,63 @@ public class VersionChecker
     private string GetDownloadUrlFromGitHubRelease(string version, string owner, string repo)
     {
         var releaseUrl = $"https://api.github.com/repos/{owner}/{repo}/releases/tags/{version}";
-        using var client = new WebClient();
-        client.Headers.Add("User-Agent", "request");
-        client.Headers.Add("Accept", "application/json");
-
+        var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
+        httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
         try
         {
-            var jsonResponse = client.DownloadString(releaseUrl);
-            var releaseData = JObject.Parse(jsonResponse);
-            var assets = releaseData["assets"] as JArray;
-            if (assets != null && assets.Count > 0)
+            var response = httpClient.GetAsync(releaseUrl).Result;
+            if (response.IsSuccessStatusCode)
             {
-                var targetUrl = "";
-                foreach (var asset in assets)
+                var jsonResponse = response.Content.ReadAsStringAsync().Result;
+                var releaseData = JObject.Parse(jsonResponse);
+                var assets = releaseData["assets"] as JArray;
+                if (assets != null && assets.Count > 0)
                 {
-                    var browserDownloadUrl = asset["browser_download_url"]?.ToString();
-                    if (!string.IsNullOrEmpty(browserDownloadUrl))
+                    var targetUrl = "";
+                    foreach (var asset in assets)
                     {
-                        if (browserDownloadUrl.EndsWith(".zip") || browserDownloadUrl.EndsWith(".7z") || browserDownloadUrl.EndsWith(".rar"))
+                        var browserDownloadUrl = asset["browser_download_url"]?.ToString();
+                        if (!string.IsNullOrEmpty(browserDownloadUrl))
                         {
-                            targetUrl = browserDownloadUrl;
-                            break;
+                            if (browserDownloadUrl.EndsWith(".zip") || browserDownloadUrl.EndsWith(".7z") || browserDownloadUrl.EndsWith(".rar"))
+                            {
+                                targetUrl = browserDownloadUrl;
+                                break;
+                            }
                         }
                     }
+                    if (string.IsNullOrEmpty(targetUrl))
+                    {
+                        targetUrl = assets[0]["browser_downloadUrl"]?.ToString();
+                    }
+                    return targetUrl;
                 }
-                if (string.IsNullOrEmpty(targetUrl))
-                {
-                    targetUrl = assets[0]["browser_download_url"]?.ToString();
-                }
-                return targetUrl;
             }
-        }
-        catch (WebException e) when (e.Message.Contains("403"))
-        {
-            LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
-            throw;
-        }
-        catch (WebException e)
-        {
-            LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
-            throw;
+            else if (response.StatusCode == HttpStatusCode.Forbidden && response.ReasonPhrase.Contains("403"))
+            {
+                LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
+                throw new Exception("GitHub API速率限制已超出，请稍后再试。");
+            }
+            else
+            {
+                LoggerService.LogError($"请求GitHub时发生错误: {response.StatusCode} - {response.ReasonPhrase}");
+                throw new Exception($"请求GitHub时发生错误: {response.StatusCode} - {response.ReasonPhrase}");
+            }
         }
         catch (Exception e)
         {
             LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
-            throw;
+            throw new Exception($"处理GitHub响应时发生错误: {e.Message}");
+        }
+        finally
+        {
+            httpClient.Dispose();
         }
 
         return string.Empty;
     }
+
     private async Task DownloadFileAsync(string url, string filePath, DownloadDialog dialog, Action action)
     {
         using var client = new WebClient();
@@ -604,7 +612,7 @@ public class VersionChecker
         httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
         while (page < 101)
         {
-            string urlWithParams = $"{releaseUrl}?per_page={perPage}&page={page}";
+            var urlWithParams = $"{releaseUrl}?per_page={perPage}&page={page}";
             try
             {
                 var response = httpClient.GetAsync(urlWithParams).Result;
@@ -625,26 +633,25 @@ public class VersionChecker
                         return tag["tag_name"]?.ToString();
                     }
                 }
+                else if (response.StatusCode == HttpStatusCode.Forbidden && response.ReasonPhrase.Contains("403"))
+                {
+                    LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
+                    throw new Exception("GitHub API速率限制已超出，请稍后再试。");
+                }
                 else
                 {
-                    LoggerService.LogError($"获取最新版时发生错误: {response.StatusCode}");
-                    return string.Empty;
+                    LoggerService.LogError($"请求GitHub时发生错误: {response.StatusCode} - {response.ReasonPhrase}");
+                    throw new Exception($"请求GitHub时发生错误: {response.StatusCode} - {response.ReasonPhrase}");
                 }
-            }
-            catch (WebException e) when (e.Message.Contains("403"))
-            {
-                LoggerService.LogError("GitHub API速率限制已超出，请稍后再试。");
-                throw;
-            }
-            catch (WebException e)
-            {
-                LoggerService.LogError($"请求GitHub时发生错误: {e.Message}");
-                return string.Empty;
             }
             catch (Exception e)
             {
                 LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
-                return string.Empty;
+                throw new Exception($"处理GitHub响应时发生错误: {e.Message}");
+            }
+            finally
+            {
+                httpClient.Dispose();
             }
             page++;
         }
@@ -715,12 +722,12 @@ public class VersionChecker
     {
         if (versionString == "Debug")
             versionString = "0.0.1";
-        
+
         if (versionString.StartsWith("v") || versionString.StartsWith("V"))
         {
             versionString = versionString.Substring(1);
         }
-        
+
         var parts = versionString.Split('-');
         var mainVersionPart = parts[0];
 
