@@ -272,11 +272,6 @@ public class VersionChecker
         dialog.UpdateProgress(10);
 
         var strings = GetRepoFromUrl(url);
-        if (!string.IsNullOrWhiteSpace(url))
-        {
-            url = ConvertToApiUrl(url);
-        }
-
         var latestVersion = GetLatestVersionFromGithub();
         dialog.UpdateProgress(50);
 
@@ -395,10 +390,11 @@ public class VersionChecker
             var response = httpClient.GetAsync(releaseUrl).Result;
             if (response.IsSuccessStatusCode)
             {
-                var jsonResponse = response.Content.ReadAsStringAsync().Result;
+                var read = response.Content.ReadAsStringAsync();
+                read.Wait();
+                var jsonResponse = read.Result;
                 var releaseData = JObject.Parse(jsonResponse);
-                var assets = releaseData["assets"] as JArray;
-                if (assets != null && assets.Count > 0)
+                if (releaseData["assets"] is JArray assets && assets.Count > 0)
                 {
                     var targetUrl = "";
                     foreach (var asset in assets)
@@ -526,10 +522,6 @@ public class VersionChecker
     {
         MainWindow.Instance.SetUpdating(true);
         var url = MaaInterface.Instance?.Url ?? string.Empty;
-        if (!string.IsNullOrWhiteSpace(url))
-        {
-            url = ConvertToApiUrl(url);
-        }
         var strings = GetRepoFromUrl(url);
         try
         {
@@ -610,6 +602,7 @@ public class VersionChecker
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
         httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
+
         while (page < 101)
         {
             var urlWithParams = $"{releaseUrl}?per_page={perPage}&page={page}";
@@ -618,7 +611,9 @@ public class VersionChecker
                 var response = httpClient.GetAsync(urlWithParams).Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    string json = response.Content.ReadAsStringAsync().Result;
+                    var read = response.Content.ReadAsStringAsync();
+                    read.Wait();
+                    string json = read.Result;
                     var tags = JArray.Parse(json);
                     if (tags.Count == 0)
                     {
