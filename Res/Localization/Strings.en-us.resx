@@ -488,8 +488,8 @@
   <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
     <value>Disable MFA and Restart Software</value>
   </data>
-    <data name="Restart" xml:space="preserve">
-    <value>RestartDevice</value>
+  <data name="Restart" xml:space="preserve">
+    <value>Restart</value>
   </data>
     <data name="AdbConfig" xml:space="preserve">
     <value>Extras</value>
@@ -571,5 +571,56 @@
   </data>
   <data name="Unconnected" xml:space="preserve">
     <value>Unconnected</value>
+  </data>
+  <data name="UpdateResource" xml:space="preserve">
+    <value>Update Resources</value>
+  </data>
+  <data name="CheckResource" xml:space="preserve">
+    <value>Check resources</value>
+  </data>
+  <data name="GettingLatestResources" xml:space="preserve">
+    <value>Getting the latest resources...</value>
+  </data>
+  <data name="FailToGetLatestVersionInfo" xml:space="preserve">
+    <value>Failed to get the latest version information and cannot update.</value>
+  </data>
+  <data name="FailToGetDownloadUrl" xml:space="preserve">
+    <value>Unable to get the resource download link, update failed.</value>
+  </data>
+  <data name="Downloading" xml:space="preserve">
+    <value>Downloading…</value>
+  </data>
+  <data name="ApplyingUpdate" xml:space="preserve">
+    <value>Applying update...</value>
+  </data>
+  <data name="UpdateCompleted" xml:space="preserve">
+    <value>Update completed</value>
+  </data>
+  <data name="ResourcesAreLatestVersion" xml:space="preserve">
+    <value>Resources are already in the latest version!</value>
+  </data>
+  <data name="NewVersionAvailableLatestVersion" xml:space="preserve">
+    <value> new version is available! Latest version:</value>
+  </data>
+  <data name="FailToGetCurrentVersionInfo" xml:space="preserve">
+    <value>Failed to get the current version information and cannot update.</value>
+  </data>
+  <data name="RestartPC" xml:space="preserve">
+    <value>Restart computer</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="AutomaticUpdateResource" xml:space="preserve">
+    <value>Automatic resource update</value>
+  </data>
+  <data name="AutomaticUpdateMFA" xml:space="preserve">
+    <value>Automatic software update</value>
+  </data>
+  <data name="MFAIsLatestVersion" xml:space="preserve">
+    <value>Software is already in the latest version!</value>
+  </data>
+  <data name="SoftwareVersion" xml:space="preserve">
+    <value>Software Version</value>
   </data>
 </root>

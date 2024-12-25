@@ -46,42 +46,51 @@
                 </hc:ComboBox>
                 <hc:Divider Content="{Binding ListTitle[2].Name}" />
                 <hc:ComboBox Margin="30 10 30 10" x:Name="themeSettings" hc:TitleElement.TitleWidth="110"
-                             hc:TitleElement.HorizontalAlignment="Right" Width="360" IsEnabled="{calcBinding:Binding 'Idle'}"
+                             hc:TitleElement.HorizontalAlignment="Right" Width="360"
+                             IsEnabled="{calcBinding:Binding 'Idle'}"
                              HorizontalAlignment="Center">
                 </hc:ComboBox>
                 <hc:Divider Content="{Binding ListTitle[3].Name}" />
                 <hc:ComboBox Margin="30 10 30 10" x:Name="adbCaptureComboBox" hc:TitleElement.TitleWidth="110"
-                             hc:TitleElement.HorizontalAlignment="Right" Width="360" Visibility="{calcBinding:Binding IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                             hc:TitleElement.HorizontalAlignment="Right" Width="360"
+                             Visibility="{calcBinding:Binding IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
                              HorizontalAlignment="Center">
                 </hc:ComboBox>
                 <hc:ComboBox Margin="30 10 30 10" x:Name="adbInputComboBox" hc:TitleElement.TitleWidth="110"
-                             hc:TitleElement.HorizontalAlignment="Right" Width="360" Visibility="{calcBinding:Binding IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                             hc:TitleElement.HorizontalAlignment="Right" Width="360"
+                             Visibility="{calcBinding:Binding IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
                              HorizontalAlignment="Center">
                 </hc:ComboBox>
-                <CheckBox Margin="30 10 30 10" x:Name="rememberAdbButton" Visibility="{calcBinding:Binding IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                <CheckBox Margin="30 10 30 10" x:Name="rememberAdbButton" Visibility="{calcBinding:Binding IsAdb}"
+                          IsEnabled="{calcBinding:Binding 'Idle'}"
                           HorizontalAlignment="Center">
                 </CheckBox>
                 <hc:ComboBox Margin="30 10 30 10" x:Name="win32CaptureComboBox" hc:TitleElement.TitleWidth="110"
-                             hc:TitleElement.HorizontalAlignment="Right" Width="360" Visibility="{calcBinding:Binding !IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                             hc:TitleElement.HorizontalAlignment="Right" Width="360"
+                             Visibility="{calcBinding:Binding !IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
                              HorizontalAlignment="Center">
                 </hc:ComboBox>
                 <hc:ComboBox Margin="30 10 30 10" x:Name="win32InputComboBox" hc:TitleElement.TitleWidth="110"
-                             hc:TitleElement.HorizontalAlignment="Right" Width="360" Visibility="{calcBinding:Binding !IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                             hc:TitleElement.HorizontalAlignment="Right" Width="360"
+                             Visibility="{calcBinding:Binding !IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
                              HorizontalAlignment="Center">
                 </hc:ComboBox>
                 <hc:Divider Content="{Binding ListTitle[4].Name}" />
-                <CheckBox Margin="30 10 30 10" x:Name="performanceSettings" Content="{lex:Loc EnableGPU}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                <CheckBox Margin="30 10 30 10" x:Name="performanceSettings" Content="{lex:Loc EnableGPU}"
+                          IsEnabled="{calcBinding:Binding 'Idle'}"
                           HorizontalAlignment="Center">
                 </CheckBox>
                 <hc:Divider Content="{Binding ListTitle[5].Name}" />
-                <hc:TextBox Margin="30 10 30 10" x:Name="beforeTaskSettings" hc:TitleElement.TitleWidth="110" IsEnabled="{calcBinding:Binding 'Idle'}"
+                <hc:TextBox Margin="30 10 30 10" x:Name="beforeTaskSettings" hc:TitleElement.TitleWidth="110"
+                            IsEnabled="{calcBinding:Binding 'Idle'}"
                             hc:TitleElement.HorizontalAlignment="Right"
                             hc:InfoElement.Placeholder="Example: &quot;C:\1.cmd&quot; -minimized" AllowDrop="True"
                             Drop="StartsWithScript_Drop"
                             PreviewDragOver="TextBox_PreviewDragOver"
                             Width="360">
                 </hc:TextBox>
-                <hc:TextBox Margin="30 10 30 10" x:Name="afterTaskSettings" hc:TitleElement.TitleWidth="110" IsEnabled="{calcBinding:Binding 'Idle'}"
+                <hc:TextBox Margin="30 10 30 10" x:Name="afterTaskSettings" hc:TitleElement.TitleWidth="110"
+                            IsEnabled="{calcBinding:Binding 'Idle'}"
                             hc:TitleElement.HorizontalAlignment="Right"
                             hc:InfoElement.Placeholder="Example: &quot;C:\1.cmd&quot; -noWindow"
                             AllowDrop="True"
@@ -89,13 +98,64 @@
                             PreviewDragOver="TextBox_PreviewDragOver"
                             Width="360">
                 </hc:TextBox>
-                <CheckBox Margin="30 10 30 10" x:Name="enableSaveDrawSettings" Content="{lex:Loc EnableSaveDraw}" IsEnabled="{calcBinding:Binding 'Idle'}"
+                <CheckBox Margin="30 10 30 10" x:Name="enableSaveDrawSettings" Content="{lex:Loc EnableSaveDraw}"
+                          IsEnabled="{calcBinding:Binding 'Idle'}"
                           HorizontalAlignment="Center">
                 </CheckBox>
                 <hc:Divider Content="{Binding ListTitle[6].Name}" />
-                <CheckBox Margin="30 10 30 10" x:Name="enableCheckVersionSettings" Content="{lex:Loc AutomaticDetectionUpdate}" IsEnabled="{calcBinding:Binding 'Idle'}"
-                          HorizontalAlignment="Center">
-                </CheckBox>
+
+                <Grid Margin="30 10 30 10" HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
+                        <CheckBox x:Name="enableCheckVersionSettings" Margin="10"
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Center"
+                                  Content="{lex:Loc AutomaticDetectionUpdate}" IsEnabled="{calcBinding:Binding 'Idle'}">
+                        </CheckBox>
+                        <CheckBox x:Name="enableAutoUpdateResourceSettings" Margin="10"
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Center"
+                                  Content="{lex:Loc AutomaticUpdateResource}" IsEnabled="{calcBinding:Binding 'Idle'}">
+                        </CheckBox>
+                        <CheckBox x:Name="enableAutoUpdateMFASettings" Margin="10"
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Center"
+                                  Content="{lex:Loc AutomaticUpdateMFA}" IsEnabled="{calcBinding:Binding 'Idle'}">
+                        </CheckBox>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10 0 0 0">
+                        <hc:Shield x:Name="MFAShield" Color="#6969AA" Subject="{lex:Loc SoftwareVersion}" Margin="5" HorizontalAlignment="Center">
+                            <TextBlock
+                                MaxWidth="150"
+                                Margin="0,3,0,3"
+                                d:MinWidth="50"
+                                Foreground="White" x:Name="MFAShieldTextBlock"
+                                TextWrapping="Wrap" />
+                        </hc:Shield>
+                        <hc:Shield x:Name="ResourceShield" Color="#6969AA" Subject="{lex:Loc ResourceVersion}" Margin="5" HorizontalAlignment="Center"> 
+                            <TextBlock
+                                MaxWidth="150"
+                                Margin="0,3,0,3"
+                                d:MinWidth="50"
+                                Foreground="White" x:Name="ResourceShieldTextBlock"
+                                TextWrapping="Wrap" />
+                        </hc:Shield>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Margin="5" Click="CheckResourceUpdate" Content="{lex:Loc CheckResource}"  IsEnabled="{calcBinding:Binding '!IsUpdating'}"></Button>
+                            <Button Margin="5" Click="UpdateResource" Content="{lex:Loc UpdateResource}"
+                                    IsEnabled="{calcBinding:Binding '!IsUpdating'}">
+                            </Button>
+                        </StackPanel>
+                        <Button Margin="5" Click="UpdateMFA" Content="{lex:Loc SoftwareUpdate}"
+                                IsEnabled="{calcBinding:Binding '!IsUpdating'}">
+                        </Button>
+                    </StackPanel>
+
+                </Grid>
                 <hc:Divider Content="{Binding ListTitle[7].Name}" />
             </StackPanel>
         </hc:ScrollViewer>

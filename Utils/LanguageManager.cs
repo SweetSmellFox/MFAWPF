@@ -62,7 +62,7 @@ public static class LanguageManager
 
     private static void LoadLanguages()
     {
-        string langPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "lang");
+        string langPath = Path.Combine(AppContext.BaseDirectory, "lang");
         if (Directory.Exists(langPath))
         {
             string[] langFiles = Directory.GetFiles(langPath, "*.json");

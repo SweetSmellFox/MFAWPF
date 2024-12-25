@@ -145,6 +145,14 @@ public class MainViewModel : ObservableObject
         set => SetProperty(ref _isConnected, value);
     }
 
+    private bool _isUpdating;
+
+    public bool IsUpdating
+    {
+        get => _isUpdating;
+        set => SetProperty(ref _isUpdating, value);
+    }
+
     private bool _isVisible = true;
 
     public bool IsVisible
@@ -387,7 +395,7 @@ public class MainViewModel : ObservableObject
         new("CloseEmulatorAndMFA"),
         new("ShutDown"),
         new("CloseEmulatorAndRestartMFA"),
-        new("Restart"),
+        new("RestartPC"),
         new("DingTalkMessageAsync"),
     ];
 

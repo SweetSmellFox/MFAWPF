@@ -1,0 +1,22 @@
+<hc:Window x:Class="MFAWPF.Views.DownloadDialog"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+           xmlns:local="clr-namespace:MFAWPF.Views"
+           xmlns:hc="https://handyorg.github.io/handycontrol" xmlns:lex="http://wpflocalizeextension.codeplex.com"
+           mc:Ignorable="d" Icon="../logo.ico" WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+           Height="250" Width="700">
+    <Grid Background="{DynamicResource SecundaryBackgroundColor}">
+
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock Margin="5 5 5 5" x:Name="TextBlock" HorizontalAlignment="Center" TextAlignment="Center" FontSize="14"
+                       Foreground="{DynamicResource GrayColor1}">
+            </TextBlock>
+            <ProgressBar x:Name="ProgressBar" Margin="5" Width="500" />
+            <Button Margin="10 40 10 10" Visibility="Hidden" Click="Restart" x:Name="RestartButton"
+                    Content="{lex:Loc Restart}">
+            </Button>
+        </StackPanel>
+    </Grid>
+</hc:Window>

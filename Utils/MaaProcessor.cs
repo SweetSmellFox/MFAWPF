@@ -51,7 +51,7 @@ public class MaaProcessor
 
     private MaaTasker? _currentTasker;
 
-    public static string Resource => AppDomain.CurrentDomain.BaseDirectory + "Resource";
+    public static string Resource => AppContext.BaseDirectory + "Resource";
     public static string ModelResource => $"{Resource}/model/";
     public static string ResourceBase => $"{Resource}/base";
     public static string ResourcePipelineFilePath => $"{ResourceBase}/pipeline/";

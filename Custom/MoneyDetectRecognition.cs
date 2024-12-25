@@ -13,7 +13,7 @@ public class MoneyDetectRecognition : IMaaCustomRecognition
     public bool Analyze(in IMaaContext context, in AnalyzeArgs args, in AnalyzeResults results)
     {
         var imageBuffer = args.Image;
-        var text = context.GetText(466, 299, 131, 63, imageBuffer);
+        var text = context.GetText(466, 299, 131, 63, imageBuffer).Replace("b", "6").Replace("B", "8");
         if (int.TryParse(text, out var currentMoney))
         {
             var getMoney = currentMoney - MaaProcessor.AllMoney;

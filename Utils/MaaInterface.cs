@@ -10,6 +10,7 @@ public class MaaInterface
     {
         [JsonProperty("name")]
         public string? Name { get; set; }
+        
         [JsonProperty("pipeline_override")]
         public Dictionary<string, TaskModel>? PipelineOverride { get; set; }
 
@@ -223,7 +224,7 @@ public class MaaInterface
                 foreach (var customResource in value.Resource)
                 {
                     var paths = ReplacePlaceholder(customResource.Path ?? new List<string>(),
-                        AppDomain.CurrentDomain.BaseDirectory);
+                        AppContext.BaseDirectory);
                     if (_instance != null)
                         _instance.Resources[customResource.Name ?? string.Empty] = paths;
                 }

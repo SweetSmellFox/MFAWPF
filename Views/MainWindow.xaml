@@ -318,7 +318,7 @@
                                 FontSize="11"
                                 Visibility="{c:Binding '!IsRunning'}"
                                 VerticalContentAlignment="Center" Click="Start"
-                                Width="90" Height="30"
+                                Width="90" Height="40"
                                 Margin="20,5,20,8">
                             </Button>
                             <Button
@@ -327,7 +327,7 @@
                                 FontSize="11"
                                 Visibility="{c:Binding 'IsRunning'}"
                                 VerticalContentAlignment="Center" Click="Stop"
-                                Width="90" Height="30"
+                                Width="90" Height="40"
                                 Margin="20,5,20,8">
                             </Button>
                         </StackPanel>

@@ -57,7 +57,7 @@ public partial class MainWindow
         Loaded += (_, _) => { LoadUI(); };
         InitializeData();
         OCRHelper.Initialize();
-        VersionChecker.CheckVersion();
+
         _maaToolkit = new MaaToolkit(init: true);
         MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
         SetIconFromExeDirectory();
@@ -65,7 +65,7 @@ public partial class MainWindow
 
     private void SetIconFromExeDirectory()
     {
-        string exeDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        string exeDirectory = AppContext.BaseDirectory;
         string iconPath = Path.Combine(exeDirectory, "logo.ico");
 
         if (File.Exists(iconPath))
@@ -76,28 +76,33 @@ public partial class MainWindow
 
     private bool InitializeData()
     {
-        if (!File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}/interface.json"))
+        if (!File.Exists($"{AppContext.BaseDirectory}/interface.json"))
         {
             LoggerService.LogInfo("未找到interface文件，生成interface.json...");
             MaaInterface.Instance = new MaaInterface
                 {
                     Version = "1.0",
                     Name = "Debug",
-                    Task = new List<TaskInterfaceItem>(),
-                    Resource = new List<MaaInterface.MaaCustomResource>
-                    {
-                        new()
+                    Task = [],
+                    Resource =
+                    [
+                        new MaaInterface.MaaCustomResource
                         {
                             Name = "默认",
                             Path =
                             [
-                                "{PROJECT_DIR}/resource/base"
-                            ]
-
-                        }
-                    },
-                    Recognition = new Dictionary<string, MaaInterface.CustomExecutor>(),
-                    Action = new Dictionary<string, MaaInterface.CustomExecutor>(),
+                                "{PROJECT_DIR}/resource/base",
+                            ],
+                        },
+                    ],
+                    Controller =
+                    [
+                        new MaaInterface.MaaResourceController()
+                        {
+                            Name = "adb 默认方式",
+                            Type = "adb"
+                        },
+                    ],
                     Option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
                     {
                         {
@@ -122,13 +127,13 @@ public partial class MainWindow
                     }
                 }
                 ;
-            JsonHelper.WriteToJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
+            JsonHelper.WriteToJsonFilePath(AppContext.BaseDirectory, "interface",
                 MaaInterface.Instance, new MaaInterfaceSelectOptionConverter(true));
         }
         else
         {
             MaaInterface.Instance =
-                JsonHelper.ReadFromJsonFilePath(AppDomain.CurrentDomain.BaseDirectory, "interface",
+                JsonHelper.ReadFromJsonFilePath(AppContext.BaseDirectory, "interface",
                     new MaaInterface(),
                     () => { }, new MaaInterfaceSelectOptionConverter(false));
         }
@@ -873,7 +878,16 @@ public partial class MainWindow
                 CommandParameter = resourceLink
             });
         }
-
+        settingsView.MFAShieldTextBlock.Text = Version;
+        var resourceVersion = MaaInterface.Instance?.Version;
+        if (!string.IsNullOrWhiteSpace(resourceVersion))
+        {
+            settingsView.ResourceShieldTextBlock.Text = resourceVersion;
+        }
+        else
+        {
+            settingsView.ResourceShield.Visibility = Visibility.Collapsed;
+        }
         settingsView.settingStackPanel.Children.Add(s1);
         settingsView.settingStackPanel.Children.Add(s2);
     }
@@ -1741,13 +1755,13 @@ public partial class MainWindow
             {
                 Growl.Info(MaaInterface.Instance.Message);
             }
-
+            VersionChecker.Check();
         });
     }
 
     public static void AppendVersionLog(string? resourceVersion)
     {
-        string debugFolderPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug");
+        string debugFolderPath = Path.Combine(AppContext.BaseDirectory, "debug");
         if (!Directory.Exists(debugFolderPath))
         {
             Directory.CreateDirectory(debugFolderPath);
@@ -2021,8 +2035,14 @@ public partial class MainWindow
             }
         };
         //软件更新
-        settingsView.enableCheckVersionSettings.IsChecked = DataSet.GetData("EnableCheckVersion", false);
+        settingsView.enableCheckVersionSettings.IsChecked = DataSet.GetData("EnableCheckVersion", true);
         settingsView.enableCheckVersionSettings.Click += (_, _) => { DataSet.SetData("EnableCheckVersion", settingsView.enableCheckVersionSettings.IsChecked); };
+
+        settingsView.enableAutoUpdateResourceSettings.IsChecked = DataSet.GetData("EnableAutoUpdateResource", false);
+        settingsView.enableAutoUpdateResourceSettings.Click += (_, _) => { DataSet.SetData("EnableAutoUpdateResource", settingsView.enableAutoUpdateResourceSettings.IsChecked); };
+
+        settingsView.enableAutoUpdateMFASettings.IsChecked = DataSet.GetData("EnableAutoUpdateMFA", false);
+        settingsView.enableAutoUpdateMFASettings.Click += (_, _) => { DataSet.SetData("EnableAutoUpdateMFA", settingsView.enableAutoUpdateMFASettings.IsChecked); };
         //关于我们
         AddAbout();
     }
@@ -2091,5 +2111,11 @@ public partial class MainWindow
     {
         if (Data == null) return;
         Data.IsConnected = isConnected;
+    }
+
+    public void SetUpdating(bool isUpdating)
+    {
+        if (Data == null) return;
+        Data.IsUpdating = isUpdating;
     }
 }

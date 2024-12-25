@@ -488,8 +488,8 @@
   <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
     <value>重啟MFA和關閉軟件</value>
   </data>
-    <data name="Restart" xml:space="preserve">
-    <value>重啟系統</value>
+  <data name="Restart" xml:space="preserve">
+    <value>重新啟動</value>
   </data>
     <data name="AdbConfig" xml:space="preserve">
     <value>額外參數</value>
@@ -568,5 +568,56 @@
   </data>
   <data name="Unconnected" xml:space="preserve">
     <value>未連接</value>
+  </data>
+  <data name="UpdateResource" xml:space="preserve">
+    <value>資源更新</value>
+  </data>
+  <data name="CheckResource" xml:space="preserve">
+    <value>檢查資源</value>
+  </data>
+  <data name="GettingLatestResources" xml:space="preserve">
+    <value>正在獲取最新資源.....</value>
+  </data>
+  <data name="FailToGetLatestVersionInfo" xml:space="preserve">
+    <value>获取最新版本信息失敗，無法更新。</value>
+  </data>
+  <data name="FailToGetDownloadUrl" xml:space="preserve">
+    <value>無法獲取資源下載鏈接，更新失敗。</value>
+  </data>
+  <data name="Downloading" xml:space="preserve">
+    <value>下載中.....</value>
+  </data>
+  <data name="ApplyingUpdate" xml:space="preserve">
+    <value>正在應用更新.....</value>
+  </data>
+  <data name="UpdateCompleted" xml:space="preserve">
+    <value>更新完成</value>
+  </data>
+  <data name="ResourcesAreLatestVersion" xml:space="preserve">
+    <value>資源已為最新版本！</value>
+  </data>
+  <data name="NewVersionAvailableLatestVersion" xml:space="preserve">
+    <value>有新版本可用！最新版本:</value>
+  </data>
+  <data name="FailToGetCurrentVersionInfo" xml:space="preserve">
+    <value>获取當前版本信息失敗，無法更新。</value>
+  </data>
+  <data name="RestartPC" xml:space="preserve">
+    <value>重啟電腦</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="AutomaticUpdateResource" xml:space="preserve">
+    <value>自動更新資源</value>
+  </data>
+  <data name="AutomaticUpdateMFA" xml:space="preserve">
+    <value>自動更新軟件</value>
+  </data>
+  <data name="MFAIsLatestVersion" xml:space="preserve">
+    <value>軟件已為最新版本！</value>
+  </data>
+  <data name="SoftwareVersion" xml:space="preserve">
+    <value>軟件版本</value>
   </data>
 </root>

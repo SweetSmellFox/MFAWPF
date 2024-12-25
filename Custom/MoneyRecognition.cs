@@ -15,7 +15,7 @@ public class MoneyRecognition : IMaaCustomRecognition
     {
         var imageBuffer = args.Image;
         var param = args.RecognitionParam;
-        var text = context.GetText(578, 342, 131, 57, imageBuffer);
+        var text = context.GetText(578, 342, 131, 57, imageBuffer).Replace("b", "6").Replace("B", "8");
         if (int.TryParse(text, out var i))
         {
             MaaProcessor.AllMoney = i;

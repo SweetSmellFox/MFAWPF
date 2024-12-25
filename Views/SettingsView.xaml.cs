@@ -1,3 +1,4 @@
+using MFAWPF.Utils;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -9,7 +10,7 @@ public partial class SettingsView
     {
         InitializeComponent();
     }
-    
+
     private void StartsWithScript_Drop(object sender, DragEventArgs e)
     {
         if (!e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -38,5 +39,19 @@ public partial class SettingsView
     {
         e.Handled = true;
     }
-}
 
+    private void UpdateResource(object sender, RoutedEventArgs e)
+    {
+        VersionChecker.UpdateResourceAsync();
+    }
+    
+    private void CheckResourceUpdate(object sender, RoutedEventArgs e)
+    {
+        VersionChecker.CheckResourceVersionAsync();
+    }
+    
+    private void UpdateMFA(object sender, RoutedEventArgs e)
+    {
+        VersionChecker.UpdateMFAAsync();
+    }
+}
