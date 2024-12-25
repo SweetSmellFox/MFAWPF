@@ -287,7 +287,10 @@ public class VersionChecker
         {
             Growls.ErrorGlobal("FailToGetLatestVersionInfo".GetLocalizationString());
             MainWindow.Instance.SetUpdating(false);
-            dialog.Close();
+            Growls.Process(() =>
+            {
+                dialog.Close();
+            });
             return;
         }
 
@@ -297,7 +300,10 @@ public class VersionChecker
         {
             Growls.ErrorGlobal("FailToGetCurrentVersionInfo".GetLocalizationString());
             MainWindow.Instance.SetUpdating(false);
-            dialog.Close();
+            Growls.Process(() =>
+            {
+                dialog.Close();
+            });
             return;
         }
 
@@ -305,7 +311,10 @@ public class VersionChecker
         {
             Growl.InfoGlobal("MFAIsLatestVersion".GetLocalizationString());
             MainWindow.Instance.SetUpdating(false);
-            dialog.Close();
+            Growls.Process(() =>
+            {
+                dialog.Close();
+            });
             return;
         }
 
@@ -335,9 +344,9 @@ public class VersionChecker
         }
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
 
-        string currentExeFileName = Assembly.GetEntryAssembly().GetName().Name + ".exe";
+        var currentExeFileName = Assembly.GetEntryAssembly().GetName().Name + ".exe";
 
-        string batFilePath = Path.Combine(AppContext.BaseDirectory, "temp", "update_mfa.bat");
+        var batFilePath = Path.Combine(AppContext.BaseDirectory, "temp", "update_mfa.bat");
         using (StreamWriter sw = new StreamWriter(batFilePath))
         {
             sw.WriteLine("ping 127.0.0.1 -n 3 > nul");
