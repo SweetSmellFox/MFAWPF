@@ -268,8 +268,8 @@ public class VersionChecker
                 dialog?.Close();
             if (noDialog)
             {
-                
-                if (MessageBoxHelper.Show("GameResourceUpdated".GetLocalizationString(),buttons:MessageBoxButton.YesNo,icon:MessageBoxImage.Question) == MessageBoxResult.Yes)
+
+                if (MessageBoxHelper.Show("GameResourceUpdated".GetLocalizationString(), buttons: MessageBoxButton.YesNo, icon: MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
                     Growls.Process(Application.Current.Shutdown);
@@ -291,7 +291,7 @@ public class VersionChecker
             dialog?.Show();
         });
 
-        SetText("GettingLatestResources", dialog, noDialog);
+        SetText("GettingLatestSoftware", dialog, noDialog);
 
         var url = "https://github.com/SweetSmellFox/MFAWPF";
 
@@ -368,16 +368,22 @@ public class VersionChecker
 
         var currentExeFileName = Assembly.GetEntryAssembly().GetName().Name + ".exe";
 
-        var batFilePath = Path.Combine(AppContext.BaseDirectory, "temp", "update_mfa.bat");
+        byte[] utf8Bytes = Encoding.UTF8.GetBytes(AppContext.BaseDirectory);
+        string utf8BaseDirectory = Encoding.UTF8.GetString(utf8Bytes);
+        var batFilePath = Path.Combine(utf8BaseDirectory, "temp", "update_mfa.bat");
         using (StreamWriter sw = new StreamWriter(batFilePath))
         {
-            sw.WriteLine("ping 127.0.0.1 -n 3 > nul");
-            sw.WriteLine($"xcopy /E /Y \"{AppContext.BaseDirectory}temp\\mfa_{latestVersion}_extracted\\*.*\" \"{AppContext.BaseDirectory}\"");
-            sw.WriteLine($"start /d \"{AppContext.BaseDirectory}\" {currentExeFileName}");
-            sw.WriteLine("ping 127.0.0.1 -n 1 > nul");
-            sw.WriteLine($"rd /S /Q \"{AppContext.BaseDirectory}temp\"");
-        }
+            sw.WriteLine("@echo off");
+            sw.WriteLine("chcp 65001");
 
+            sw.WriteLine("ping 127.0.0.1 -n 3 > nul");
+            var extractedPath = $"\"{utf8BaseDirectory}temp\\mfa_{latestVersion}_extracted\\*.*\"";
+            var targetPath = $"\"{utf8BaseDirectory}\"";
+            sw.WriteLine($"xcopy /E /Y {extractedPath} {targetPath}");
+            sw.WriteLine($"start /d \"{utf8BaseDirectory}\" {currentExeFileName}");
+            sw.WriteLine("ping 127.0.0.1 -n 1 > nul");
+            sw.WriteLine($"rd /S /Q \"{utf8BaseDirectory}temp\"");
+        }
         var psi = new ProcessStartInfo(batFilePath)
         {
             CreateNoWindow = true,

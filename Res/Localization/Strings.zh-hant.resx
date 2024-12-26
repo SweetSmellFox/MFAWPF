@@ -653,4 +653,7 @@
   <data name="ConfirmExitTitle" xml:space="preserve">
     <value>MFA 正在執行任務</value>
   </data>
+  <data name="GettingLatestSoftware" xml:space="preserve">
+    <value>正在獲取最新軟件.....</value>
+  </data>
 </root>

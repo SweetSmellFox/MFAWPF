@@ -653,4 +653,7 @@
   <data name="ConfirmExitTitle" xml:space="preserve">
     <value>MFA is running tasks</value>
   </data>
+  <data name="GettingLatestSoftware" xml:space="preserve">
+    <value>Getting the latest software...</value>
+  </data>
 </root>
