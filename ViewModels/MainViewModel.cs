@@ -451,7 +451,7 @@ public class MainViewModel : ObservableObject
             }
             else if (!string.IsNullOrEmpty(output))
             {
-                LogItemViewModels.Insert(0,log);
+                LogItemViewModels.Insert(0, log);
             }
         });
     }
