@@ -23,6 +23,7 @@ using MFAWPF.ViewModels;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel;
 using System.Text;
 using WPFLocalizeExtension.Extensions;
 using ComboBox = HandyControl.Controls.ComboBox;
@@ -209,6 +210,12 @@ public partial class MainWindow
         });
     }
 
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        e.Cancel = !ConfirmExit();
+        base.OnClosed(e);
+    }
+
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
@@ -387,9 +394,10 @@ public partial class MainWindow
         }
     }
 
-    public void Start(object? sender, RoutedEventArgs? e)
+    public void Start(object? sender, RoutedEventArgs? e) => Start();
+
+    public void Start(bool onlyStart = false)
     {
-        Console.WriteLine("正在启动！");
         if (Data?.Idle == false)
         {
             Growls.Warning("CannotStart".GetLocalizationString());
@@ -400,11 +408,13 @@ public partial class MainWindow
             MaaProcessor.Money = 0;
             var tasks = Data?.TaskItemViewModels.ToList().FindAll(task => task.IsChecked);
             ConnectToMAA();
-            MaaProcessor.Instance.Start(tasks);
+            MaaProcessor.Instance.Start(tasks, onlyStart);
         }
     }
-
-    public void Stop(object? sender, RoutedEventArgs? e)
+    
+    public void Stop(object? sender, RoutedEventArgs? e) => Stop();
+    
+    public void Stop()
     {
         MaaProcessor.Instance.Stop();
     }
@@ -1709,7 +1719,7 @@ public partial class MainWindow
             InitializationSettings();
             ConnectionTabControl.SelectedIndex = MaaInterface.Instance?.DefaultController == "win32" ? 1 : 0;
             ConfigureTaskSettingsPanel();
-            if (DataSet.GetData("AutoStartIndex", 0) == 1)
+            if (DataSet.GetData("AutoStartIndex", 0) >= 1)
             {
                 MaaProcessor.Instance.TaskQueue.Push(new MFATask
                 {
@@ -1717,7 +1727,7 @@ public partial class MainWindow
                     Type = MFATask.MFATaskType.MFA,
                     Action = WaitSoftware,
                 });
-                Start(null, null);
+                Start(DataSet.GetData("AutoStartIndex", 0) == 1);
             }
             else
             {
@@ -2117,5 +2127,14 @@ public partial class MainWindow
     {
         if (Data == null) return;
         Data.IsUpdating = isUpdating;
+    }
+
+    public bool ConfirmExit()
+    {
+        if (!Data.IsRunning)
+            return true;
+        var result = MessageBoxHelper.Show("ConfirmExitText".GetLocalizationString(),
+            "ConfirmExitTitle".GetLocalizationString(), buttons: MessageBoxButton.YesNo, icon: MessageBoxImage.Question);
+        return result == MessageBoxResult.Yes;
     }
 }

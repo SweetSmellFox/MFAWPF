@@ -456,8 +456,8 @@
   <data name="WaitSoftware" xml:space="preserve">
     <value>等待软件启动时间(秒)</value>
   </data>
-  <data name="StartEmulator" xml:space="preserve">
-    <value>启动MFA后启动软件</value>
+  <data name="StartupSoftware" xml:space="preserve">
+    <value>启动软件</value>
   </data>
     <data name="Select" xml:space="preserve">
     <value>选择</value>
@@ -647,5 +647,17 @@
   </data>
   <data name="Tip" xml:space="preserve">
     <value>提示</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>好的</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>确认</value>
+  </data>
+  <data name="ConfirmExitText" xml:space="preserve">
+    <value>确定要退出吗？</value>
+  </data>
+  <data name="ConfirmExitTitle" xml:space="preserve">
+    <value>MFA 正在运行任务</value>
   </data>
 </root>

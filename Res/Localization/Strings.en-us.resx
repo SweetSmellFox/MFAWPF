@@ -446,8 +446,8 @@
   <data name="WaitSoftware" xml:space="preserve">
     <value>Wait time for Software to start (seconds)</value>
   </data>
-  <data name="StartEmulator" xml:space="preserve">
-    <value>Start the software after starting the MFA</value>
+  <data name="StartupSoftware" xml:space="preserve">
+    <value>Startup software</value>
   </data>
     <data name="Select" xml:space="preserve">
     <value>Select</value>
@@ -640,5 +640,17 @@
   </data>
   <data name="Tip" xml:space="preserve">
     <value>Tip</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="ConfirmExitText" xml:space="preserve">
+    <value>Are you sure want to exit?</value>
+  </data>
+  <data name="ConfirmExitTitle" xml:space="preserve">
+    <value>MFA is running tasks</value>
   </data>
 </root>

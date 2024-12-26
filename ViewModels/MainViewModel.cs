@@ -377,6 +377,7 @@ public class MainViewModel : ObservableObject
     private List<SettingViewModel> _beforeTaskList =
     [
         new("None"),
+        new("StartupSoftware"),
         new("StartupSoftwareAndScript"),
     ];
 
@@ -450,8 +451,7 @@ public class MainViewModel : ObservableObject
             }
             else if (!string.IsNullOrEmpty(output))
             {
-                LogItemViewModels.Clear();
-                LogItemViewModels.Add(log);
+                LogItemViewModels.Insert(0,log);
             }
         });
     }
