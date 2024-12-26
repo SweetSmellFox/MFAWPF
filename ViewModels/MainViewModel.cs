@@ -404,4 +404,55 @@ public class MainViewModel : ObservableObject
         get => _afterTaskList;
         set => SetProperty(ref _listTitle, value);
     }
+
+    public void OutputDownloadProgress(long value = 0, long maximum = 1, int len = 0, double ts = 1)
+    {
+        OutputDownloadProgress(
+            $"[{value / 1048576.0:F}MiB/{maximum / 1048576.0:F}MiB({100 * value / maximum}%) {len / ts / 1024.0:F} KiB/s]");
+    }
+
+    public void ClearDownloadProgress()
+    {
+        Growls.Process(() =>
+        {
+
+            if (LogItemViewModels.Count > 0 && LogItemViewModels[0].IsDownloading)
+            {
+                LogItemViewModels.RemoveAt(0);
+            }
+        });
+    }
+
+    public void OutputDownloadProgress(string output, bool downloading = true)
+    {
+        if (LogItemViewModels == null)
+        {
+            return;
+        }
+
+        Growls.Process(() =>
+        {
+            var log = new LogItemViewModel(downloading ? "NewVersionFoundDescDownloading".GetLocalizationString() + "\n" + output : output, Application.Current.MainWindow.FindResource("DownloadLogBrush") as Brush,
+                dateFormat: "HH':'mm':'ss")
+            {
+                IsDownloading = true,
+            };
+            if (LogItemViewModels.Count > 0 && LogItemViewModels[0].IsDownloading)
+            {
+                if (!string.IsNullOrEmpty(output))
+                {
+                    LogItemViewModels[0] = log;
+                }
+                else
+                {
+                    LogItemViewModels.RemoveAt(0);
+                }
+            }
+            else if (!string.IsNullOrEmpty(output))
+            {
+                LogItemViewModels.Clear();
+                LogItemViewModels.Add(log);
+            }
+        });
+    }
 }
