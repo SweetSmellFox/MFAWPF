@@ -9,8 +9,13 @@ namespace MFAWPF.ViewModels
     {
         private readonly string[]? _formatArgsKeys;
 
-        public LogItemViewModel(string resourceKey, Brush color, string weight = "Regular", bool useKey = false,
-            string dateFormat = "MM'-'dd'  'HH':'mm':'ss", bool showTime = true, params string[]? formatArgsKeys)
+        public LogItemViewModel(string resourceKey,
+            Brush color,
+            string weight = "Regular",
+            bool useKey = false,
+            string dateFormat = "MM'-'dd'  'HH':'mm':'ss",
+            bool showTime = true,
+            params string[]? formatArgsKeys)
         {
             _resourceKey = resourceKey;
 
@@ -30,14 +35,16 @@ namespace MFAWPF.ViewModels
                 Content = resourceKey;
         }
 
-        public LogItemViewModel(string content, Brush color, string weight = "Regular",
-            string dateFormat = "MM'-'dd'  'HH':'mm':'ss", bool showTime = true)
+        public LogItemViewModel(string content,
+            Brush color,
+            string weight = "Regular",
+            string dateFormat = "MM'-'dd'  'HH':'mm':'ss",
+            bool showTime = true)
         {
             Time = DateTime.Now.ToString(dateFormat);
             Color = color;
             Weight = weight;
             ShowTime = showTime;
-
             Content = content;
         }
 
@@ -115,6 +122,13 @@ namespace MFAWPF.ViewModels
                     Content = _resourceKey.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray());
                 }
             }
+        }
+        private bool _isDownloading = false;
+
+        public bool IsDownloading
+        {
+            get => _isDownloading;
+            set => SetProperty(ref _isDownloading, value);
         }
 
         private void OnLanguageChanged(object? sender, EventArgs e)

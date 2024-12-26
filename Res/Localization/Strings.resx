@@ -630,4 +630,22 @@
   <data name="SoftwareVersion" xml:space="preserve">
     <value>软件版本</value>
   </data>
+  <data name="NewVersionFoundDescDownloading" xml:space="preserve">
+    <value>正在后台下载……</value>
+  </data>
+  <data name="NewVersionDownloadCompletedTitle" xml:space="preserve">
+    <value>新版本下载完成</value>
+  </data>
+  <data name="GameResourceUpdated" xml:space="preserve">
+    <value>游戏资源已更新，请重启软件。</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>是</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>否</value>
+  </data>
+  <data name="Tip" xml:space="preserve">
+    <value>提示</value>
+  </data>
 </root>

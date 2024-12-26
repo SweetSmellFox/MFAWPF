@@ -91,7 +91,7 @@
     <SolidColorBrush x:Key="PurpleColor1" Color="#6F59D4" />
 
     <SolidColorBrush x:Key="RedColor1" Color="#F72626" />
-
+    <SolidColorBrush x:Key="DownloadLogBrush" Color="Violet" />
     <SolidColorBrush x:Key="BlueColor2" Color="LightBlue" />
     <SolidColorBrush x:Key="BlueColor1" Color="LightSkyBlue" />
 </ResourceDictionary>

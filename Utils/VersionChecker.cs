@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Text;
 using System.Reflection;
 using System.Windows;
+using MessageBox = HandyControl.Controls.MessageBox;
 
 namespace MFAWPF.Utils;
 // 移除了一些不必要的using，只保留实际用到的相关命名空间引用
@@ -33,10 +34,10 @@ public class VersionChecker
         {
             Checker.Queue.Enqueue(new MFATask
             {
-                Action = () => Checker.UpdateResource(DataSet.GetData("EnableAutoUpdateMFA", false), () =>
+                Action = () => Checker.UpdateResource(DataSet.GetData("EnableAutoUpdateMFA", false), true, action: () =>
                 {
                     if (DataSet.GetData("EnableAutoUpdateMFA", false))
-                        Checker.UpdateMFA();
+                        Checker.UpdateMFA(true);
                 }),
                 Name = "更新资源"
             });
@@ -54,7 +55,7 @@ public class VersionChecker
         {
             Checker.Queue.Enqueue(new MFATask
             {
-                Action = () => Checker.UpdateMFA(),
+                Action = () => Checker.UpdateMFA(true),
                 Name = "更新软件"
             });
         }
@@ -107,34 +108,44 @@ public class VersionChecker
         TaskManager.RunTaskAsync(() => Checker.UpdateMFA());
 
     }
+    public void SetText(string text, DownloadDialog? dialog, bool noDialog = false)
+    {
+        if (noDialog)
+            MainWindow.Data.OutputDownloadProgress(text.GetLocalizationString(), false);
+        else
+            dialog?.SetText(text.GetLocalizationString());
 
-    public async void UpdateResource(bool closeDialog = false, Action? action = null)
+    }
+    public async void UpdateResource(bool closeDialog = false, bool noDialog = false, Action? action = null)
     {
         MainWindow.Instance.SetUpdating(true);
         DownloadDialog? dialog = null;
         Growls.Process(() =>
         {
-            dialog = new DownloadDialog("UpdateResource".GetLocalizationString());
-            dialog.Show();
+            if (!noDialog)
+                dialog = new DownloadDialog("UpdateResource".GetLocalizationString());
+            dialog?.Show();
         });
 
-        dialog.SetText("GettingLatestResources".GetLocalizationString());
+        SetText("GettingLatestResources", dialog, noDialog);
 
         var url = MaaInterface.Instance?.Url ?? string.Empty;
-        dialog.UpdateProgress(10);
+        dialog?.UpdateProgress(10);
         var strings = GetRepoFromUrl(url);
 
         var latestVersion = strings.Length > 1 ? GetLatestVersionFromGithub(strings[0], strings[1]) : string.Empty;
-        dialog.UpdateProgress(50);
+        dialog?.UpdateProgress(50);
 
         if (string.IsNullOrWhiteSpace(latestVersion))
         {
             Growls.ErrorGlobal("FailToGetLatestVersionInfo".GetLocalizationString());
+
             MainWindow.Instance.SetUpdating(false);
             Growls.Process(() =>
             {
-                dialog.Close();
+                dialog?.Close();
             });
+            MainWindow.Data.ClearDownloadProgress();
             return;
         }
 
@@ -146,8 +157,9 @@ public class VersionChecker
             MainWindow.Instance.SetUpdating(false);
             Growls.Process(() =>
             {
-                dialog.Close();
+                dialog?.Close();
             });
+            MainWindow.Data.ClearDownloadProgress();
             return;
         }
 
@@ -157,18 +169,21 @@ public class VersionChecker
             MainWindow.Instance.SetUpdating(false);
             Growls.Process(() =>
             {
-                dialog.Close();
+                dialog?.Close();
             });
+            MainWindow.Data.ClearDownloadProgress();
+            action?.Invoke();
             return;
         }
 
         var downloadUrl = GetDownloadUrlFromGitHubRelease(latestVersion, strings[0], strings[1]);
-        dialog.UpdateProgress(100);
+        dialog?.UpdateProgress(100);
 
         if (string.IsNullOrWhiteSpace(downloadUrl))
         {
             Growls.ErrorGlobal("FailToGetDownloadUrl".GetLocalizationString());
             MainWindow.Instance.SetUpdating(false);
+            MainWindow.Data.ClearDownloadProgress();
             return;
         }
 
@@ -178,11 +193,11 @@ public class VersionChecker
             Directory.CreateDirectory(tempPath);
         }
         var tempZipFilePath = Path.Combine(tempPath, $"resource_{latestVersion}.zip");
-        dialog.SetText("Downloading".GetLocalizationString());
-        dialog.UpdateProgress(0);
-        await DownloadFileAsync(downloadUrl, tempZipFilePath, dialog, () => { });
-        dialog.SetText("ApplyingUpdate".GetLocalizationString());
-        dialog.UpdateProgress(5);
+        dialog?.SetText("Downloading".GetLocalizationString());
+        dialog?.UpdateProgress(0);
+        await DownloadFileAsync(downloadUrl, tempZipFilePath, dialog, "GameResourceUpdated");
+        dialog?.SetText("ApplyingUpdate".GetLocalizationString());
+        dialog?.UpdateProgress(5);
 
         var tempExtractDir = Path.Combine(tempPath, $"resource_{latestVersion}_extracted");
         if (Directory.Exists(tempExtractDir))
@@ -190,7 +205,7 @@ public class VersionChecker
             Directory.Delete(tempExtractDir, true);
         }
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
-        dialog.UpdateProgress(50);
+        dialog?.UpdateProgress(50);
 
         var interfacePath = Path.Combine(tempExtractDir, "interface.json");
         var resourceDirPath = Path.Combine(tempExtractDir, "resource");
@@ -202,18 +217,18 @@ public class VersionChecker
             var targetPath = Path.Combine(wpfDir, "interface.json");
             file.CopyTo(targetPath, true);
         }
-        dialog.UpdateProgress(60);
+        dialog?.UpdateProgress(60);
 
         var di = new DirectoryInfo(resourceDirPath);
         if (di.Exists)
         {
             CopyFolder(resourceDirPath, Path.Combine(wpfDir, "resource"));
         }
-        dialog.UpdateProgress(70);
+        dialog?.UpdateProgress(70);
 
         File.Delete(tempZipFilePath);
         Directory.Delete(tempExtractDir, true);
-        dialog.UpdateProgress(80);
+        dialog?.UpdateProgress(80);
 
         var newInterfacePath = Path.Combine(wpfDir, "interface.json");
         if (File.Exists(newInterfacePath))
@@ -238,42 +253,62 @@ public class VersionChecker
 
             File.WriteAllText(newInterfacePath, updatedJsonContent);
         }
-        dialog.UpdateProgress(100);
+        dialog?.UpdateProgress(100);
 
-        dialog.SetText("UpdateCompleted".GetLocalizationString());
-        dialog.Dispatcher.Invoke(() =>
+        dialog?.SetText("UpdateCompleted".GetLocalizationString());
+        dialog?.Dispatcher?.Invoke(() =>
         {
-            dialog.RestartButton.Visibility = Visibility.Visible;
+            if (dialog != null)
+                dialog.RestartButton.Visibility = Visibility.Visible;
         });
         MainWindow.Instance.SetUpdating(false);
         Growls.Process(() =>
         {
             if (closeDialog)
-                dialog.Close();
+                dialog?.Close();
+            if (noDialog)
+            {
+                var info = new MessageBoxInfo
+                {
+                    Message = "GameResourceUpdated".GetLocalizationString(),
+                    Caption = "Tip".GetLocalizationString(),
+                    Button = MessageBoxButton.YesNo,
+                    IconKey = ResourceToken.AskGeometry,
+                    IconBrushKey = ResourceToken.AccentBrush,
+                    YesContent = "Yes".GetLocalizationString(),
+                    NoContent = "No".GetLocalizationString(),
+                };
+                if (MessageBox.Show(info) == MessageBoxResult.Yes)
+                {
+                    Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
+                    Growls.Process(Application.Current.Shutdown);
+                }
+            }
         });
         action?.Invoke();
     }
 
-    public async void UpdateMFA()
+    public async void UpdateMFA(bool noDialog = false)
     {
         MainWindow.Instance.SetUpdating(true);
 
         DownloadDialog? dialog = null;
         Growls.Process(() =>
         {
-            dialog = new DownloadDialog("SoftwareUpdate".GetLocalizationString());
-            dialog.Show();
+            if (!noDialog)
+                dialog = new DownloadDialog("SoftwareUpdate".GetLocalizationString());
+            dialog?.Show();
         });
 
-        dialog.SetText("GettingLatestResources".GetLocalizationString());
+        SetText("GettingLatestResources", dialog, noDialog);
 
         var url = "https://github.com/SweetSmellFox/MFAWPF";
 
-        dialog.UpdateProgress(10);
+        dialog?.UpdateProgress(10);
 
         var strings = GetRepoFromUrl(url);
         var latestVersion = GetLatestVersionFromGithub();
-        dialog.UpdateProgress(50);
+        dialog?.UpdateProgress(50);
 
         if (string.IsNullOrWhiteSpace(latestVersion))
         {
@@ -281,8 +316,9 @@ public class VersionChecker
             MainWindow.Instance.SetUpdating(false);
             Growls.Process(() =>
             {
-                dialog.Close();
+                dialog?.Close();
             });
+            MainWindow.Data.ClearDownloadProgress();
             return;
         }
 
@@ -294,8 +330,9 @@ public class VersionChecker
             MainWindow.Instance.SetUpdating(false);
             Growls.Process(() =>
             {
-                dialog.Close();
+                dialog?.Close();
             });
+            MainWindow.Data.ClearDownloadProgress();
             return;
         }
 
@@ -305,18 +342,20 @@ public class VersionChecker
             MainWindow.Instance.SetUpdating(false);
             Growls.Process(() =>
             {
-                dialog.Close();
+                dialog?.Close();
             });
+            MainWindow.Data.ClearDownloadProgress();
             return;
         }
 
         var downloadUrl = GetDownloadUrlFromGitHubRelease(latestVersion, strings[0], strings[1]);
-        dialog.UpdateProgress(100);
+        dialog?.UpdateProgress(100);
 
         if (string.IsNullOrWhiteSpace(downloadUrl))
         {
             Growls.ErrorGlobal("FailToGetDownloadUrl".GetLocalizationString());
             MainWindow.Instance.SetUpdating(false);
+            MainWindow.Data.ClearDownloadProgress();
             return;
         }
 
@@ -326,9 +365,9 @@ public class VersionChecker
             Directory.CreateDirectory(tempPath);
         }
         var tempZipFilePath = Path.Combine(tempPath, $"mfa_{latestVersion}.zip");
-        dialog.SetText("Downloading".GetLocalizationString());
-        dialog.UpdateProgress(0);
-        await DownloadFileAsync(downloadUrl, tempZipFilePath, dialog, () => { });
+        dialog?.SetText("Downloading".GetLocalizationString());
+        dialog?.UpdateProgress(0);
+        await DownloadFileAsync(downloadUrl, tempZipFilePath, dialog, "NewVersionDownloadCompletedTitle");
         var tempExtractDir = Path.Combine(tempPath, $"mfa_{latestVersion}_extracted");
         if (Directory.Exists(tempExtractDir))
         {
@@ -440,25 +479,89 @@ public class VersionChecker
         return string.Empty;
     }
 
-    private async Task DownloadFileAsync(string url, string filePath, DownloadDialog dialog, Action action)
+    // private async Task DownloadFileAsync(string url, string filePath, DownloadDialog dialog, Action action)
+    // {
+    //     using var client = new WebClient();
+    //     client.Headers.Add("User-Agent", "request");
+    //     client.Headers.Add("Accept", "application/json");
+    //
+    //     client.DownloadFileCompleted += (_, _) =>
+    //     {
+    //         action();
+    //     };
+    //     client.DownloadProgressChanged += (_, e) =>
+    //     {
+    //         var progressPercentage = (double)e.BytesReceived / e.TotalBytesToReceive * 100;
+    //         dialog.UpdateProgress(progressPercentage);
+    //     };
+    //
+    //     await client.DownloadFileTaskAsync(url, filePath);
+    // }
+
+    public async Task DownloadFileAsync(string url, string filePath, DownloadDialog? dialog, string key)
     {
-        using var client = new WebClient();
-        client.Headers.Add("User-Agent", "request");
-        client.Headers.Add("Accept", "application/json");
-
-        client.DownloadFileCompleted += (_, _) =>
+        try
         {
-            action();
-        };
-        client.DownloadProgressChanged += (_, e) =>
-        {
-            var progressPercentage = (double)e.BytesReceived / e.TotalBytesToReceive * 100;
-            dialog.UpdateProgress(progressPercentage);
-        };
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
+            client.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
 
-        await client.DownloadFileTaskAsync(url, filePath);
+            var response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            await using var contentStream = await response.Content.ReadAsStreamAsync();
+            await using var fileStream = File.Create(filePath);
+
+            var totalBytes = contentStream.CanSeek ? contentStream.Length : -1;
+            long currentBytes = 0;
+
+            var buffer = new byte[8192];
+            int bytesRead;
+            var startTime = DateTime.Now;
+            var lastOutputTime = startTime;
+            var bytesPerSecond = 0L;
+            var totalBytesReadSinceLastOutput = 0L;
+
+            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            {
+                await fileStream.WriteAsync(buffer, 0, bytesRead);
+                currentBytes += bytesRead;
+                totalBytesReadSinceLastOutput += bytesRead;
+
+                var currentTime = DateTime.Now;
+                var timeSpan = currentTime - lastOutputTime;
+                if (timeSpan.TotalSeconds >= 1)
+                {
+                    bytesPerSecond = totalBytesReadSinceLastOutput;
+                    totalBytesReadSinceLastOutput = 0;
+                    lastOutputTime = currentTime;
+                }
+
+                var progressPercentage = totalBytes > 0 ? (double)currentBytes / totalBytes * 100 : 0;
+                dialog?.UpdateProgress(progressPercentage);
+                Growls.Process(() =>
+                    MainWindow.Data.OutputDownloadProgress(currentBytes, totalBytes, (int)bytesPerSecond, timeSpan.TotalSeconds));
+                if (progressPercentage >= 100)
+                {
+                    Growls.Process(() => MainWindow.Data.OutputDownloadProgress(downloading: false, output: key.GetLocalizationString()));
+                }
+            }
+
+            fileStream.Close();
+        }
+        catch (HttpRequestException httpEx)
+        {
+            LoggerService.LogError($"HTTP请求出现异常: {httpEx.Message}");
+        }
+        catch (IOException ioEx)
+        {
+            LoggerService.LogError($"文件操作出现异常: {ioEx.Message}");
+        }
+        catch (Exception ex)
+        {
+            LoggerService.LogError($"出现未知异常: {ex.Message}");
+        }
     }
-
 
     public void CheckForGUIUpdates()
     {

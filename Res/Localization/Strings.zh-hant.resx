@@ -620,4 +620,25 @@
   <data name="SoftwareVersion" xml:space="preserve">
     <value>軟件版本</value>
   </data>
+  <data name="NewVersionFoundDescDownloading" xml:space="preserve">
+    <value>正在後臺下載……</value>
+  </data>
+  <data name="NewVersionDownloadCompletedTitle" xml:space="preserve">
+    <value>新版本下載完成</value>
+  </data>
+  <data name="GameResourceUpdated" xml:space="preserve">
+    <value>遊戲資源已更新，請重啟軟件。</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>否</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>是</value>
+  </data>
+  <data name="Tip" xml:space="preserve">
+    <value>提示</value>
+  </data>
+  <data name="Connected" xml:space="preserve">
+    <value>已連接</value>
+  </data>
 </root>

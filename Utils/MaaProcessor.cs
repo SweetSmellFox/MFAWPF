@@ -952,9 +952,9 @@ public class MaaProcessor
         {
             var jObject = JObject.Parse(args.Details);
             var name = jObject["name"]?.ToString() ?? string.Empty;
-            if (args.Message.Equals(MaaMsg.Task.Action.Starting))
+            if (args.Message == MaaMsg.Task.Recognition.Succeeded || args.Message == MaaMsg.Task.Action.Failed || args.Message == MaaMsg.Task.Action.Starting)
             {
-                if (MainWindow.Instance.TaskDictionary.TryGetValue(name, out var taskModel) == true)
+                if (MainWindow.Instance.TaskDictionary.TryGetValue(name, out var taskModel))
                 {
                     DisplayFocusTip(taskModel);
                 }
