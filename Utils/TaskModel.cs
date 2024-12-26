@@ -33,6 +33,10 @@ public class TaskModel : ObservableObject
     private bool? _focus;
     private List<string>? _focus_tip;
     private List<string>? _focus_tip_color;
+    private List<string>? _focus_succeeded;
+    private List<string>? _focus_succeeded_color;
+    private List<string>? _focus_failed;
+    private List<string>? _focus_failed_color;
     private List<string>? _expected;
     private List<string[]>? _replace;
     private bool? _only_rec;
@@ -251,7 +255,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("focus_tip")]
     [Category("任务回调")]
     [Description(
-        "当执行某任务时，在MFA右侧日志输出的内容。可选，默认空。\n需要 focus 开启才会生效。"
+        "当执行某任务前时，在MFA右侧日志输出的内容。可选，默认空。\n需要 focus 开启才会生效。"
     )]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
@@ -264,7 +268,7 @@ public class TaskModel : ObservableObject
     [JsonProperty("focus_tip_color")]
     [Category("任务回调")]
     [Description(
-        "当执行某任务时，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。\n需要 focus 开启才会生效。"
+        "当执行某任务前时，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。\n需要 focus 开启才会生效。"
     )]
     [JsonConverter(typeof(SingleOrListConverter))]
     [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
@@ -272,6 +276,59 @@ public class TaskModel : ObservableObject
     {
         get => _focus_tip_color;
         set => SetNewProperty(ref _focus_tip_color, value);
+    }
+
+    [JsonProperty("focus_succeeded")]
+    [Category("任务回调")]
+    [Description(
+        "当执行某任务成功后，在MFA右侧日志输出的内容。可选，默认空。\n需要 focus 开启才会生效。"
+    )]
+    [JsonConverter(typeof(SingleOrListConverter))]
+    [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
+    public List<string>? FocusSucceeded
+    {
+        get => _focus_succeeded;
+        set => SetNewProperty(ref _focus_succeeded, value);
+    }
+
+    [JsonProperty("focus_succeeded_color")]
+    [Category("任务回调")]
+    [Description(
+        "当执行某任务成功后，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。\n需要 focus 开启才会生效。"
+    )]
+    [JsonConverter(typeof(SingleOrListConverter))]
+    [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
+    public List<string>? FocusSucceededColor
+    {
+        get => _focus_succeeded_color;
+        set => SetNewProperty(ref _focus_succeeded_color, value);
+    }
+
+    
+    [JsonProperty("focus_failed")]
+    [Category("任务回调")]
+    [Description(
+        "当执行某任务失败后，在MFA右侧日志输出的内容。可选，默认空。\n需要 focus 开启才会生效。"
+    )]
+    [JsonConverter(typeof(SingleOrListConverter))]
+    [Editor(typeof(ListStringEditor), typeof(ListStringEditor))]
+    public List<string>? FocusFailed
+    {
+        get => _focus_failed;
+        set => SetNewProperty(ref _focus_failed, value);
+    }
+
+    [JsonProperty("focus_failed_color")]
+    [Category("任务回调")]
+    [Description(
+        "当执行某任务失败后，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。\n需要 focus 开启才会生效。"
+    )]
+    [JsonConverter(typeof(SingleOrListConverter))]
+    [Editor(typeof(ListAutoStringEditor), typeof(ListAutoStringEditor))]
+    public List<string>? FocusFailedColor
+    {
+        get => _focus_failed_color;
+        set => SetNewProperty(ref _focus_failed_color, value);
     }
 
     [JsonProperty("roi")]

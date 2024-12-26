@@ -952,40 +952,89 @@ public class MaaProcessor
         {
             var jObject = JObject.Parse(args.Details);
             var name = jObject["name"]?.ToString() ?? string.Empty;
-            if (args.Message == MaaMsg.Task.Recognition.Succeeded || args.Message == MaaMsg.Task.Action.Failed || args.Message == MaaMsg.Task.Action.Starting)
+            if (args.Message.StartsWith(MaaMsg.Task.Action.Prefix))
             {
                 if (MainWindow.Instance.TaskDictionary.TryGetValue(name, out var taskModel))
                 {
-                    DisplayFocusTip(taskModel);
+                    DisplayFocus(taskModel, args.Message);
                 }
             }
         };
     }
 
-    private void DisplayFocusTip(TaskModel taskModel)
+    private void DisplayFocus(TaskModel taskModel, string message)
     {
         var converter = new BrushConverter();
-
-        if (taskModel.FocusTip != null)
+        switch (message)
         {
-            for (int i = 0; i < taskModel.FocusTip.Count; i++)
-            {
-                Brush? brush = null;
-                var tip = taskModel.FocusTip[i];
-                try
+            case MaaMsg.Task.Action.Succeeded:
+                if (taskModel.FocusSucceeded != null)
                 {
-                    if (taskModel.FocusTipColor != null && taskModel.FocusTipColor.Count > i)
-                        brush = converter.ConvertFromString(taskModel.FocusTipColor[i]) as Brush;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    LoggerService.LogError(e);
-                }
+                    for (int i = 0; i < taskModel.FocusSucceeded.Count; i++)
+                    {
+                        Brush? brush = null;
+                        var tip = taskModel.FocusSucceeded[i];
+                        try
+                        {
+                            if (taskModel.FocusSucceededColor != null && taskModel.FocusSucceededColor.Count > i)
+                                brush = converter.ConvertFromString(taskModel.FocusSucceededColor[i]) as Brush;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            LoggerService.LogError(e);
+                        }
 
-                MainWindow.AddLog(HandleStringsWithVariables(tip), brush);
-            }
+                        MainWindow.AddLog(HandleStringsWithVariables(tip), brush);
+                    }
+                }
+                break;
+            case MaaMsg.Task.Action.Failed:
+                if (taskModel.FocusFailed != null)
+                {
+                    for (int i = 0; i < taskModel.FocusFailed.Count; i++)
+                    {
+                        Brush? brush = null;
+                        var tip = taskModel.FocusFailed[i];
+                        try
+                        {
+                            if (taskModel.FocusFailedColor != null && taskModel.FocusFailedColor.Count > i)
+                                brush = converter.ConvertFromString(taskModel.FocusFailedColor[i]) as Brush;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            LoggerService.LogError(e);
+                        }
+
+                        MainWindow.AddLog(HandleStringsWithVariables(tip), brush);
+                    }
+                }
+                break;
+            case MaaMsg.Task.Action.Starting:
+                if (taskModel.FocusTip != null)
+                {
+                    for (int i = 0; i < taskModel.FocusTip.Count; i++)
+                    {
+                        Brush? brush = null;
+                        var tip = taskModel.FocusTip[i];
+                        try
+                        {
+                            if (taskModel.FocusTipColor != null && taskModel.FocusTipColor.Count > i)
+                                brush = converter.ConvertFromString(taskModel.FocusTipColor[i]) as Brush;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                            LoggerService.LogError(e);
+                        }
+
+                        MainWindow.AddLog(HandleStringsWithVariables(tip), brush);
+                    }
+                }
+                break;
         }
+
     }
 
     private void HandleInitializationError(Exception e,

@@ -623,4 +623,22 @@
   <data name="SoftwareVersion" xml:space="preserve">
     <value>Software Version</value>
   </data>
+  <data name="NewVersionFoundDescDownloading" xml:space="preserve">
+    <value>Downloading in the background……</value>
+  </data>
+  <data name="NewVersionDownloadCompletedTitle" xml:space="preserve">
+    <value>Update Package Download Completed</value>
+  </data>
+  <data name="GameResourceUpdated" xml:space="preserve">
+    <value>Game resources updated, please restart software.</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Tip" xml:space="preserve">
+    <value>Tip</value>
+  </data>
 </root>
