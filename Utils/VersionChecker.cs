@@ -268,17 +268,8 @@ public class VersionChecker
                 dialog?.Close();
             if (noDialog)
             {
-                var info = new MessageBoxInfo
-                {
-                    Message = "GameResourceUpdated".GetLocalizationString(),
-                    Caption = "Tip".GetLocalizationString(),
-                    Button = MessageBoxButton.YesNo,
-                    IconKey = ResourceToken.AskGeometry,
-                    IconBrushKey = ResourceToken.AccentBrush,
-                    YesContent = "Yes".GetLocalizationString(),
-                    NoContent = "No".GetLocalizationString(),
-                };
-                if (MessageBox.Show(info) == MessageBoxResult.Yes)
+                
+                if (MessageBoxHelper.Show("GameResourceUpdated".GetLocalizationString(),buttons:MessageBoxButton.YesNo,icon:MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
                     Growls.Process(Application.Current.Shutdown);

@@ -88,17 +88,18 @@ public partial class NotifyIcon
 
     private static void StartTask(object sender, RoutedEventArgs e)
     {
-        MainWindow.Instance?.Start(null, null);
+        MainWindow.Instance.Start();
     }
 
     private static void StopTask(object sender, RoutedEventArgs e)
     {
-        MainWindow.Instance?.Stop(null, null);
+        MainWindow.Instance.Stop();
     }
 
     private static void App_exit(object sender, RoutedEventArgs e)
     {
-        Application.Current.Shutdown();
+        if (MainWindow.Instance.ConfirmExit())
+            Application.Current.Shutdown();
     }
 
     private void App_hide(object sender, RoutedEventArgs e)

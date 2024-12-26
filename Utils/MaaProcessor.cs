@@ -86,19 +86,20 @@ public class MaaProcessor
     private DateTime? _startTime;
 
 
-    public void Start(List<DragItemViewModel>? tasks)
+    public void Start(List<DragItemViewModel>? tasks, bool onlyStart = false)
     {
         SetCurrentTasker();
         MainWindow.Data?.SetIdle(false);
-        TaskQueue.Push(new MFATask
-        {
-            Name = "启动脚本",
-            Type = MFATask.MFATaskType.MFA,
-            Action = () =>
+        if (!onlyStart)
+            TaskQueue.Push(new MFATask
             {
-                MainWindow.Instance.RunScript();
-            }
-        });
+                Name = "启动脚本",
+                Type = MFATask.MFATaskType.MFA,
+                Action = () =>
+                {
+                    MainWindow.Instance.RunScript();
+                }
+            });
 
         _startTime = DateTime.Now;
         IsStopped = false;
@@ -106,6 +107,7 @@ public class MaaProcessor
         var taskAndParams = tasks.Select(CreateTaskAndParam).ToList();
         _cancellationTokenSource = new CancellationTokenSource();
         var token = _cancellationTokenSource.Token;
+        if (!onlyStart)
         TaskQueue.Push(new MFATask
         {
             Name = "计时",
@@ -135,7 +137,7 @@ public class MaaProcessor
                 }
             }
         });
-
+        if (!onlyStart)
         TaskQueue.Push(new MFATask
         {
             Name = "计时",
@@ -146,16 +148,18 @@ public class MaaProcessor
             }
         });
 
-
-        foreach (var task in taskAndParams)
-            TaskQueue.Push(new MFATask
-            {
-                Name = task.Name,
-                Type = MFATask.MFATaskType.MAAFW,
-                Count = task.Count ?? 1,
-                Action = () => { TryRunTasks(_currentTasker, task.Entry, task.Param); },
-            });
-
+        if (!onlyStart)
+        {
+            foreach (var task in taskAndParams)
+                TaskQueue.Push(new MFATask
+                {
+                    Name = task.Name,
+                    Type = MFATask.MFATaskType.MAAFW,
+                    Count = task.Count ?? 1,
+                    Action = () => { TryRunTasks(_currentTasker, task.Entry, task.Param); },
+                });
+        }
+        if (!onlyStart)
         TaskQueue.Push(new MFATask
         {
             Name = "结束",
@@ -275,7 +279,7 @@ public class MaaProcessor
                 Process.Start(exePath);
         }
 
-        for (double remainingTime = waitTimeInSeconds; remainingTime > 0; remainingTime -= 1)
+        for (double remainingTime = waitTimeInSeconds + 1; remainingTime > 0; remainingTime -= 1)
         {
             if (token.IsCancellationRequested)
             {
@@ -622,7 +626,6 @@ public class MaaProcessor
             if (!task.Run())
             {
                 if (IsStopped) return false;
-                break;
             }
 
             OnTaskQueueChanged();
@@ -644,7 +647,7 @@ public class MaaProcessor
             Growl.Info("TaskCompleted".GetLocalizationString());
             if (_startTime != null)
             {
-                TimeSpan elapsedTime = DateTime.Now - (DateTime)_startTime;
+                var elapsedTime = DateTime.Now - (DateTime)_startTime;
                 MainWindow.AddLogByKey("TaskAllCompletedWithTime", null, ((int)elapsedTime.TotalHours).ToString(),
                     ((int)elapsedTime.TotalMinutes % 60).ToString(), ((int)elapsedTime.TotalSeconds % 60).ToString());
             }

@@ -446,8 +446,8 @@
   <data name="WaitSoftware" xml:space="preserve">
     <value>等待軟件啟動時間(秒)</value>
   </data>
-  <data name="StartEmulator" xml:space="preserve">
-    <value>啟動MFA後啟動軟件</value>
+  <data name="StartupSoftware" xml:space="preserve">
+    <value>啟動軟件</value>
   </data>
     <data name="Select" xml:space="preserve">
     <value>選擇</value>
@@ -640,5 +640,17 @@
   </data>
   <data name="Connected" xml:space="preserve">
     <value>已連接</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>好的</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>確認</value>
+  </data>
+  <data name="ConfirmExitText" xml:space="preserve">
+    <value>確定要退出嗎？</value>
+  </data>
+  <data name="ConfirmExitTitle" xml:space="preserve">
+    <value>MFA 正在執行任務</value>
   </data>
 </root>

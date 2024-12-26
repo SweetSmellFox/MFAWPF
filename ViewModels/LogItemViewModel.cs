@@ -123,7 +123,7 @@ namespace MFAWPF.ViewModels
                 }
             }
         }
-        private bool _isDownloading = false;
+        private bool _isDownloading;
 
         public bool IsDownloading
         {
