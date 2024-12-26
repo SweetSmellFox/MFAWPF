@@ -126,12 +126,19 @@
 **注：在MFA中，于Pipeline中任务新增了俩个属性字段，分别为 `focus_tip` 和 `focus_tip_color`。**
 
 - `focus` : *bool*  
-  是否启用`focus_tip`。可选，默认false。
+  是否启用`focus_tip` 、`focus_succeeded`、 `focus_failed`。可选，默认false。
 - `focus_tip` : *string* | *list<string, >*  
-  当执行某任务时，在MFA右侧日志输出的内容。可选，默认空。
+  当执行某任务前，在MFA右侧日志输出的内容。可选，默认空。
 - `focus_tip_color` : *string* | *list<string, >*  
-  当执行某任务时，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。
-
+  当执行某任务前，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。
+- `focus_succeeded` : *string* | *list<string, >*  
+  当执行某任务成功后，在MFA右侧日志输出的内容。可选，默认空。
+- `focus_succeeded_color` : *string* | *list<string, >*  
+  当执行某任务成功后，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。
+- `focus_failed` : *string* | *list<string, >*  
+  当执行某任务失败时，在MFA右侧日志输出的内容。可选，默认空。
+- `focus_failed_color` : *string* | *list<string, >*  
+  当执行某任务失败时，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。
 ## 致谢
 
 ### 开源库
