@@ -406,10 +406,78 @@ public class MainViewModel : ObservableObject
         set => SetProperty(ref _listTitle, value);
     }
 
+    public static string FormatFileSize(long size)
+    {
+        string unit;
+        double value;
+        if (size >= 1024l * 1024 * 1024 * 1024)
+        {
+            value = (double)size / (1024l * 1024 * 1024 * 1024);
+            unit = "TB";
+        }
+        else if (size >= 1024 * 1024 * 1024)
+        {
+            value = (double)size / (1024 * 1024 * 1024);
+            unit = "GB";
+        }
+        else if (size >= 1024 * 1024)
+        {
+            value = (double)size / (1024 * 1024);
+            unit = "MB";
+        }
+        else if (size >= 1024)
+        {
+            value = (double)size / 1024;
+            unit = "KB";
+        }
+        else
+        {
+            value = size;
+            unit = "B";
+        }
+
+        return $"{value:F} {unit}";
+    }
+
+    public static string FormatDownloadSpeed(double speed)
+    {
+        string unit;
+        double value = speed;
+        if (value >= 1024l * 1024 * 1024 * 1024)
+        {
+            value /= 1024l * 1024 * 1024 * 1024;
+            unit = "TB/s";
+        }
+        else if (value >= 1024l * 1024 * 1024)
+        {
+            value /= 1024l * 1024 * 1024;
+            unit = "GB/s";
+        }
+        else if (value >= 1024 * 1024)
+        {
+            value /= 1024 * 1024;
+            unit = "MB/s";
+        }
+        else if (value >= 1024)
+        {
+            value /= 1024;
+            unit = "KB/s";
+        }
+        else
+        {
+            unit = "B/s";
+        }
+
+        return $"{value:F} {unit}";
+    }
     public void OutputDownloadProgress(long value = 0, long maximum = 1, int len = 0, double ts = 1)
     {
-        OutputDownloadProgress(
-            $"[{value / 1048576.0:F}MiB/{maximum / 1048576.0:F}MiB({100 * value / maximum}%) {len / ts / 1024.0:F} KiB/s]");
+        string sizeValueStr = FormatFileSize(value);
+        string maxSizeValueStr = FormatFileSize(maximum);
+        string speedValueStr = FormatDownloadSpeed(len / ts);
+
+        string progressInfo = $"[{sizeValueStr}/{maxSizeValueStr}({100 * value / maximum}%) {speedValueStr}]";
+        OutputDownloadProgress(progressInfo);
     }
 
     public void ClearDownloadProgress()
