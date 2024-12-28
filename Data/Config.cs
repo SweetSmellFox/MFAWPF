@@ -12,6 +12,7 @@ public class Config
 
 public class DesktopWindowCoreConfig
 {
+    public string Name { get; set; } = string.Empty;
     public nint HWnd { get; set; }
 
     public Win32InputMethod Input { get; set; } = Win32InputMethod.Seize;

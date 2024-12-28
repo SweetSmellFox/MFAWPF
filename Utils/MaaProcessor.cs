@@ -108,45 +108,45 @@ public class MaaProcessor
         _cancellationTokenSource = new CancellationTokenSource();
         var token = _cancellationTokenSource.Token;
         if (!onlyStart)
-        TaskQueue.Push(new MFATask
-        {
-            Name = "计时",
-            Type = MFATask.MFATaskType.MFA,
-            Action = () =>
+            TaskQueue.Push(new MFATask
             {
-                MainWindow.AddLogByKey("ConnectingTo", null, (MainWindow.Data?.IsAdb).IsTrue()
-                    ? "Emulator"
-                    : "Window");
-                var instance = Task.Run(GetCurrentTasker, token);
-                instance.Wait();
-                if (instance.Result == null || !instance.Result.Initialized)
+                Name = "计时",
+                Type = MFATask.MFATaskType.MFA,
+                Action = () =>
                 {
-                    Growls.Error("InitInstanceFailed".GetLocalizationString());
-                    LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
-                    MainWindow.AddLogByKey("InstanceInitFailedLog");
-                    Stop();
-                    throw new Exception();
+                    MainWindow.AddLogByKey("ConnectingTo", null, (MainWindow.Data?.IsAdb).IsTrue()
+                        ? "Emulator"
+                        : "Window");
+                    var instance = Task.Run(GetCurrentTasker, token);
+                    instance.Wait();
+                    if (instance.Result == null || !instance.Result.Initialized)
+                    {
+                        Growls.Error("InitInstanceFailed".GetLocalizationString());
+                        LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
+                        MainWindow.AddLogByKey("InstanceInitFailedLog");
+                        Stop();
+                        throw new Exception();
+                    }
+                    if (!MainWindow.Instance.IsConnected())
+                    {
+                        Growls.Warning("Warning_CannotConnect".GetLocalizationString()
+                            .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
+                                ? "Emulator".GetLocalizationString()
+                                : "Window".GetLocalizationString()));
+                        throw new Exception();
+                    }
                 }
-                if (!MainWindow.Instance.IsConnected())
-                {
-                    Growls.Warning("Warning_CannotConnect".GetLocalizationString()
-                        .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
-                            ? "Emulator".GetLocalizationString()
-                            : "Window".GetLocalizationString()));
-                    throw new Exception();
-                }
-            }
-        });
+            });
         if (!onlyStart)
-        TaskQueue.Push(new MFATask
-        {
-            Name = "计时",
-            Type = MFATask.MFATaskType.MFA,
-            Action = () =>
+            TaskQueue.Push(new MFATask
             {
-                MeasureExecutionTime(() => _currentTasker?.Controller.Screencap().Wait());
-            }
-        });
+                Name = "计时",
+                Type = MFATask.MFATaskType.MFA,
+                Action = () =>
+                {
+                    MeasureExecutionTime(() => _currentTasker?.Controller.Screencap().Wait());
+                }
+            });
 
         if (!onlyStart)
         {
@@ -160,12 +160,12 @@ public class MaaProcessor
                 });
         }
         if (!onlyStart)
-        TaskQueue.Push(new MFATask
-        {
-            Name = "结束",
-            Type = MFATask.MFATaskType.MFA,
-            Action = () => { MainWindow.Instance?.RunScript("Post-script"); }
-        });
+            TaskQueue.Push(new MFATask
+            {
+                Name = "结束",
+                Type = MFATask.MFATaskType.MFA,
+                Action = () => { MainWindow.Instance?.RunScript("Post-script"); }
+            });
 
         TaskManager.RunTaskAsync(async () =>
         {
@@ -331,68 +331,100 @@ public class MaaProcessor
 
     private void CloseSoftware()
     {
-        if (_softwareProcess != null)
+        if (_softwareProcess is { HasExited: false })
+        {
+            _softwareProcess = null;
+        }
+        if (_softwareProcess is { HasExited: true })
         {
             _softwareProcess.Kill();
             _softwareProcess = null;
         }
         else
         {
-            var softwarePath = DataSet.GetData("SoftwarePath", string.Empty);
-
-            if (!string.IsNullOrEmpty(softwarePath) && (MainWindow.Data?.IsAdb).IsTrue())
+            if ((MainWindow.Data?.IsAdb).IsTrue())
+                EmulatorHelper.KillEmulatorModeSwitcher();
+            else
             {
-                string processName = Path.GetFileNameWithoutExtension(softwarePath);
-                var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
-
-                var processes = Process.GetProcessesByName(processName);
-                foreach (var process in processes)
+                if (!string.IsNullOrWhiteSpace(Config.DesktopWindow.Name))
                 {
-                    var commandLine = GetCommandLine(process);
-                    if (string.IsNullOrEmpty(emulatorConfig) || MainWindow.ExtractNumberFromEmulatorConfig(emulatorConfig) == 0 && commandLine.Split(" ").Length == 1 || commandLine.ToLower().Contains(emulatorConfig.ToLower()))
+                    var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
+                    var processes = Process.GetProcesses().Where(p =>
+                        p.ProcessName.StartsWith(Config.DesktopWindow.Name));
+                    foreach (var process in processes)
                     {
-                        process.Kill();
-                        break;
-                    }
-                }
-            }
-            else if (!string.IsNullOrEmpty(Config.AdbDevice.Name) && (MainWindow.Data?.IsAdb).IsTrue())
-            {
-                var windowName = Config.AdbDevice.Name;
-                if (windowName.Contains("MuMu"))
-                    windowName = "MuMuPlayer";
-                else if (windowName.Contains("Nox"))
-                    windowName = "Nox";
-                else if (windowName.Contains("LDPlayer"))
-                    windowName = "LDPlayer";
-                else if (windowName.Contains("XYAZ"))
-                    windowName = "MEmu";
-                else if (windowName.Contains("BlueStacks"))
-                    windowName = "HD-Player";
-
-                var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
-
-                var processes = Process.GetProcesses().Where(p =>
-                    p.ProcessName.StartsWith(windowName));
-
-                foreach (var process in processes)
-                {
-                    try
-                    {
-                        var commandLine = GetCommandLine(process);
-
-                        if (string.IsNullOrEmpty(emulatorConfig) || commandLine.ToLower().Contains(emulatorConfig.ToLower()))
+                        try
                         {
-                            process.Kill();
-                            break;
+                            var commandLine = GetCommandLine(process);
+
+                            if (string.IsNullOrEmpty(emulatorConfig) || commandLine.ToLower().Contains(emulatorConfig.ToLower()))
+                            {
+                                process.Kill();
+                                break;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"关闭进程时出错: {ex.Message}");
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"关闭进程时出错: {ex.Message}");
-                    }
                 }
             }
+            // var softwarePath = DataSet.GetData("SoftwarePath", string.Empty);
+            //
+            // if (!string.IsNullOrEmpty(softwarePath) && (MainWindow.Data?.IsAdb).IsTrue())
+            // {
+            //     string processName = Path.GetFileNameWithoutExtension(softwarePath);
+            //     var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
+            //
+            //     var processes = Process.GetProcessesByName(processName);
+            //     foreach (var process in processes)
+            //     {
+            //         var commandLine = GetCommandLine(process);
+            //         if (string.IsNullOrEmpty(emulatorConfig) || MainWindow.ExtractNumberFromEmulatorConfig(emulatorConfig) == 0 && commandLine.Split(" ").Length == 1 || commandLine.ToLower().Contains(emulatorConfig.ToLower()))
+            //         {
+            //             process.Kill();
+            //             break;
+            //         }
+            //     }
+            // }
+            // else if (!string.IsNullOrEmpty(Config.AdbDevice.Name) && (MainWindow.Data?.IsAdb).IsTrue())
+            // {
+            //     var windowName = Config.AdbDevice.Name;
+            //     if (windowName.Contains("MuMu"))
+            //         windowName = "MuMuPlayer";
+            //     else if (windowName.Contains("Nox"))
+            //         windowName = "Nox";
+            //     else if (windowName.Contains("LDPlayer"))
+            //         windowName = "LDPlayer";
+            //     else if (windowName.Contains("XYAZ"))
+            //         windowName = "MEmu";
+            //     else if (windowName.Contains("BlueStacks"))
+            //         windowName = "HD-Player";
+            //
+            //     var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
+            //
+            //     var processes = Process.GetProcesses().Where(p =>
+            //         p.ProcessName.StartsWith(windowName));
+            //
+            //     foreach (var process in processes)
+            //     {
+            //         try
+            //         {
+            //             var commandLine = GetCommandLine(process);
+            //
+            //             if (string.IsNullOrEmpty(emulatorConfig) || commandLine.ToLower().Contains(emulatorConfig.ToLower()))
+            //             {
+            //                 process.Kill();
+            //                 break;
+            //             }
+            //         }
+            //         catch (Exception ex)
+            //         {
+            //             Console.WriteLine($"关闭进程时出错: {ex.Message}");
+            //         }
+            //     }
+            // }
         }
     }
 

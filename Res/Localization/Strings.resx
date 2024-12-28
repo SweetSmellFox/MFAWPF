@@ -663,4 +663,19 @@
   <data name="GettingLatestSoftware" xml:space="preserve">
     <value>正在获取最新软件.....</value>
   </data>
+  <data name="General" xml:space="preserve">
+    <value>通用模式</value>
+  </data>
+  <data name="BlueStacks" xml:space="preserve">
+    <value>蓝叠模拟器</value>
+  </data>
+  <data name="MuMuEmulator12" xml:space="preserve">
+    <value>MuMu模拟器12</value>
+  </data>
+  <data name="LDPlayer" xml:space="preserve">
+    <value>雷电模拟器</value>
+  </data>
+  <data name="Nox" xml:space="preserve">
+    <value>夜神模拟器</value>
+  </data>
 </root>

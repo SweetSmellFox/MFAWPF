@@ -656,4 +656,19 @@
   <data name="GettingLatestSoftware" xml:space="preserve">
     <value>Getting the latest software...</value>
   </data>
+  <data name="General" xml:space="preserve">
+    <value>General Mode</value>
+  </data>
+  <data name="BlueStacks" xml:space="preserve">
+    <value>BlueStacks</value>
+  </data>
+  <data name="MuMuEmulator12" xml:space="preserve">
+    <value>MuMu Emulator 12</value>
+  </data>
+  <data name="LDPlayer" xml:space="preserve">
+    <value>LD Player</value>
+  </data>
+  <data name="Nox" xml:space="preserve">
+    <value>Nox</value>
+  </data>
 </root>

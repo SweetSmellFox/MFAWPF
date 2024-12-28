@@ -411,9 +411,9 @@ public partial class MainWindow
             MaaProcessor.Instance.Start(tasks, onlyStart);
         }
     }
-    
+
     public void Stop(object? sender, RoutedEventArgs? e) => Stop();
-    
+
     public void Stop()
     {
         MaaProcessor.Instance.Stop();
@@ -442,6 +442,7 @@ public partial class MainWindow
         {
             Growl.Info(string.Format(LocExtension.GetLocalizedValue<string>("WindowSelectionMessage"),
                 window.Name));
+            MaaProcessor.Config.DesktopWindow.Name = window.Name;
             MaaProcessor.Config.DesktopWindow.HWnd = window.Handle;
             MaaProcessor.Instance.SetCurrentTasker();
         }
@@ -1025,6 +1026,7 @@ public partial class MainWindow
             Source = Data,
             Mode = BindingMode.OneWay
         };
+
         comboBox.SetBinding(IsEnabledProperty, binding);
         comboBox.BindLocalization("LanguageOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
@@ -1105,6 +1107,50 @@ public partial class MainWindow
             var text = (sender as TextBox)?.Text ?? string.Empty;
             DataSet.SetData("EmulatorConfig", text);
         };
+
+        textBox.PreviewDragOver += File_Drop;
+
+        // var comboBox = new ComboBox
+        // {
+        //     Style = FindResource("ComboBoxExtend") as Style,
+        //     Margin = new Thickness(5),
+        //     DisplayMemberPath = "Name",
+        //     ItemsSource = new List<SettingViewModel>
+        //     {
+        //         new("General"),
+        //         new("BlueStacks"),
+        //         new("MuMuEmulator12"),
+        //         new("LDPlayer"),
+        //         new("Nox"),
+        //         new("XYAZ"),
+        //     }
+        // };
+        // var cBinding = new CalcBinding.Binding
+        // {
+        //     Path = "IsAdb",
+        //     Source = Data,
+        // };
+        // comboBox.ItemsSource = LanguageManager.SupportedLanguages;
+        //
+        // var binding = new Binding("Idle")
+        // {
+        //     Source = Data,
+        //     Mode = BindingMode.OneWay
+        // };
+        //
+        // comboBox.SetBinding(IsEnabledProperty, binding);
+        // comboBox.BindLocalization("LanguageOption");
+        // comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+        //
+        // comboBox.SelectionChanged += (sender, _) =>
+        // {
+        //     if ((sender as ComboBox)?.SelectedItem is LanguageManager.SupportedLanguage language)
+        //         LanguageManager.ChangeLanguage(language);
+        //     DataSet.SetData("ConnectEmulatorMode", (sender as ComboBox)?.SelectedIndex ?? 0);
+        // };
+        //
+        // comboBox.SelectedIndex = DataSet.GetData("ConnectEmulatorMode", "General");
+        // panel.Children.Add(comboBox);
         panel.Children.Add(textBox);
     }
 
@@ -2136,5 +2182,18 @@ public partial class MainWindow
         var result = MessageBoxHelper.Show("ConfirmExitText".GetLocalizationString(),
             "ConfirmExitTitle".GetLocalizationString(), buttons: MessageBoxButton.YesNo, icon: MessageBoxImage.Question);
         return result == MessageBoxResult.Yes;
+    }
+
+    private void File_Drop(object sender, DragEventArgs e)
+    {
+        if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            return;
+        }
+
+        // Note that you can have more than one file.
+        var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+        if (sender is TextBox textBox)
+            textBox.Text = files?[0] ?? string.Empty;
     }
 }

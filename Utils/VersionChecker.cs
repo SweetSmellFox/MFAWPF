@@ -268,7 +268,6 @@ public class VersionChecker
                 dialog?.Close();
             if (noDialog)
             {
-
                 if (MessageBoxHelper.Show("GameResourceUpdated".GetLocalizationString(), buttons: MessageBoxButton.YesNo, icon: MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);

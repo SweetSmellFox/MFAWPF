@@ -9,12 +9,12 @@ public static class MessageBoxHelper
         /// OK text
         /// </summary>
         // ReSharper disable once InconsistentNaming
-        public static string OK = "OK";
+        public static string OK = "Ok";
 
         /// <summary>
         /// Cancel text
         /// </summary>
-        public static string Cancel = "Cancel";
+        public static string Cancel = "ButtonCancel";
 
         /// <summary>
         /// Abort text
@@ -88,10 +88,10 @@ public static class MessageBoxHelper
             string no = "")
         {
             caption = string.IsNullOrEmpty(caption) ? "Tip".GetLocalizationString() : caption;
-            ok = string.IsNullOrEmpty(ok) ? "Ok".GetLocalizationString() : ok;
-            cancel = string.IsNullOrEmpty(cancel) ? "ButtonCancel".GetLocalizationString() : cancel;
-            yes = string.IsNullOrEmpty(yes) ? "Yes".GetLocalizationString() : yes;
-            no = string.IsNullOrEmpty(no) ? "No".GetLocalizationString() : no;
+            ok = string.IsNullOrEmpty(ok) ? OK.GetLocalizationString() : ok;
+            cancel = string.IsNullOrEmpty(cancel) ? Cancel.GetLocalizationString() : cancel;
+            yes = string.IsNullOrEmpty(yes) ? Yes.GetLocalizationString() : yes;
+            no = string.IsNullOrEmpty(no) ? No.GetLocalizationString() : no;
             
                 SetImage(icon, ref iconKey, ref iconBrushKey);
                 var info = new MessageBoxInfo
