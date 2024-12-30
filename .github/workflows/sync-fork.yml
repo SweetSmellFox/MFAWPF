@@ -19,13 +19,13 @@ jobs:
         uses: tgymnich/fork-sync@v2.0.10
         with:
           token: ${{ secrets.YLOVEXLN }} # 使用存储在Secrets中的个人访问令牌
-          owner: SweetSmellFox # 原仓库的所有者
-          repo: MFAWPF # 原仓库的名称
+          owner: SweetSmellFox # 原库的所有者
+          repo: MFAWPF # 原库的名称
           base: master # 目标分支，因为只有一个分支，所以设置为master
           head: master # 源分支，因为只有一个分支，所以设置为master
           merge_method: merge # 合并方法，可以是merge、squash或rebase
-          pr_title: '同步' # Pull Request的标题
-          pr_message: '同步原仓库' # Pull Request的消息
+          pr_title: '原库更新' # Pull Request的标题
+          pr_message: '原库更新，拉去到本库并合并' # Pull Request的消息
           auto_approve: true # 自动批准Pull Request
 
       - name: Get latest tag from upstream
