@@ -53,15 +53,15 @@ jobs:
 
       - name: Zip
         run: |
-          cd /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/publish/
-          zip -r ../MFAWPF-${{ github.ref_name }}.zip *  
+          cd /home/runner/work/MFAWPF-MZA/bin/AnyCPU/Release/win-x64/publish/
+          zip -r ../MFAWPF-MZA-${{ github.ref_name }}.zip *  
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref_name }}
           files: |
-            /home/runner/work/MFAWPF/bin/AnyCPU/Release/win-x64/*.zip
+            /home/runner/work/MFAWPF-MZA/bin/AnyCPU/Release/win-x64/*.zip
           body: ${{ needs.changelog.outputs.release_body }}
           draft: false
           prerelease: false
