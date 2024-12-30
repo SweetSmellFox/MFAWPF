@@ -26,8 +26,15 @@ jobs:
           merge_method: merge # 合并方法，可以是merge、squash或rebase
           pr_title: '原库更新' # Pull Request的标题
           pr_message: '原库更新，拉取到本库并且合并' # Pull Request的消息
-          auto_approve: true # 自动批准Pull Request
-
+          auto_approve: false # 自动批准Pull Request
+      
+      - name: Approve Pull Request
+        if: success()
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.YlovexLN_PUBLIC }} # 使用第二个令牌
+          event-type: approve-pull-request
+     
       - name: Get latest tag from upstream
         id: get-tag
         run: |
