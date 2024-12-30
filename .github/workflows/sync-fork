@@ -1,0 +1,45 @@
+name: Sync Fork and Create Tag
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # 每6小时运行一次，您可以根据需要调整这个时间
+  workflow_dispatch: # 可以通过按钮手动触发
+
+jobs:
+  sync-and-tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Sync Fork
+        uses: tgymnich/fork-sync@v2.0.10
+        with:
+          token: ${{ secrets.YLOVEXLN }} # 使用存储在Secrets中的个人访问令牌
+          owner: SweetSmellFox # 原仓库的所有者
+          repo: MFAWPF # 原仓库的名称
+          base: main # 目标分支，因为只有一个分支，所以设置为main
+          head: main # 源分支，因为只有一个分支，所以设置为main
+          merge_method: merge # 合并方法，可以是merge、squash或rebase
+          pr_title: '同步' # Pull Request的标题
+          pr_message: '同步原仓库' # Pull Request的消息
+          auto_approve: true # 自动批准Pull Request
+
+     - name: Get latest tag from upstream
+       id: get-tag
+       run: |
+         LATEST_TAG=$(git ls-remote --tags upstream | grep -Po 'refs/tags/\K[0-9.]+(?=$)' | sort -V | tail -n1)
+         echo "latest_tag=${LATEST_TAG}" >>$GITHUB_OUTPUT
+
+     - name: Create and push tag
+       run: |
+         if [ "${{ steps.get-tag.outputs.latest_tag }}" != "" ]; then
+           git tag "${{ steps.get-tag.outputs.latest_tag }}"
+           git push origin "${{ steps.get-tag.outputs.latest_tag }}"
+         else
+           echo "No tags found in the upstream repository."
+         fi
+
