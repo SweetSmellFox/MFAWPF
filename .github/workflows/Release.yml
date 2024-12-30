@@ -50,7 +50,7 @@ jobs:
 
       - name: Build
         run: dotnet publish -c Release
-
+      
       - name: Zip
         run: |
           cd /home/runner/work/MFAWPF-MZA/bin/AnyCPU/Release/win-x64/publish/

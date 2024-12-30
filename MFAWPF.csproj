@@ -31,7 +31,9 @@
     <PropertyGroup>
         <ApplicationIcon>logo.ico</ApplicationIcon>
         <RootNamespace>MFAWPF</RootNamespace>
-        <AssemblyName>MFAWPF</AssemblyName>
+        <!-- <AssemblyName>MFAWPF</AssemblyName> -->
+        <!-- 修改程序名为MZA -->
+        <AssemblyName>MZA</AssemblyName>
         <ProductName>MFAWPF</ProductName>
         <PublisherName>SweetFox</PublisherName>
         <SuiteName>MFAWPF</SuiteName>
