@@ -1,7 +1,7 @@
 <div align="center">
-<img alt="LOGO" src="https://github.com/SweetSmellFox/MFAWPF/blob/master/logo.png" width="256" height="256" />
+<img alt="LOGO" src="https://github.com/YlovexLN/MFAWPF-MZA/blob/master/logo.png" width="256" height="256" />
 
-# MFAWPF
+# MFAWPF-MZA
 [English](./README_en.md) | [简体中文](./README.md)
 
 </div>
