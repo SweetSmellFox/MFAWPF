@@ -25,7 +25,7 @@ jobs:
           head: master # 源分支，因为只有一个分支，所以设置为master
           merge_method: merge # 合并方法，可以是merge、squash或rebase
           pr_title: '原库更新' # Pull Request的标题
-          pr_message: '原库更新，拉去到本库并合并' # Pull Request的消息
+          pr_message: '原库更新，拉取到本库并且合并' # Pull Request的消息
           auto_approve: true # 自动批准Pull Request
 
       - name: Get latest tag from upstream
