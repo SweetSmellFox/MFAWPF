@@ -631,8 +631,23 @@ public class MaaProcessor
         stopwatch.Stop();
         long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-        MainWindow.AddLogByKey("ScreenshotTime", null, elapsedMilliseconds.ToString(),
-            MainWindow.Instance?.ScreenshotType() ?? string.Empty);
+        switch (elapsedMilliseconds)
+        {
+            case >= 800:
+                MainWindow.AddLogByKey("ToScreencapErrorTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
+                    MainWindow.Instance.ScreenshotType());
+                break;
+
+            case >= 400:
+                MainWindow.AddLogByKey("ScreencapWarningTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
+                    MainWindow.Instance.ScreenshotType());
+                break;
+
+            default:
+                MainWindow.AddLogByKey("ScreencapCost", null, elapsedMilliseconds.ToString(),
+                    MainWindow.Instance.ScreenshotType());
+                break;
+        }
     }
 
     static async Task MeasureExecutionTimeAsync(Func<Task> methodToMeasure)
@@ -643,9 +658,24 @@ public class MaaProcessor
 
         stopwatch.Stop();
         long elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+        switch (elapsedMilliseconds)
+        {
+            case >= 800:
+                MainWindow.AddLogByKey("ToScreencapErrorTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
+                    MainWindow.Instance.ScreenshotType());
+                break;
 
-        MainWindow.AddLogByKey("ScreenshotTime", null, elapsedMilliseconds.ToString(),
-            MainWindow.Instance?.ScreenshotType() ?? string.Empty);
+            case >= 400:
+                MainWindow.AddLogByKey("ScreencapWarningTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
+                    MainWindow.Instance.ScreenshotType());
+                break;
+
+            default:
+                MainWindow.AddLogByKey("ScreencapCost", null, elapsedMilliseconds.ToString(),
+                    MainWindow.Instance.ScreenshotType() );
+                break;
+        }
+
     }
 
     private async Task<bool> ExecuteTasks(CancellationToken token)

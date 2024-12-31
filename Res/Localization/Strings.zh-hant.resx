@@ -347,7 +347,7 @@
   <data name="About" xml:space="preserve">
     <value>關於我們</value>
   </data>
-    <data name="ScreenshotTime" xml:space="preserve">
+    <data name="ScreencapCost" xml:space="preserve">
     <value>截圖耗時: {0}ms({1})</value>
   </data>
     <data name="Error" xml:space="preserve">
@@ -670,5 +670,11 @@
   </data>
   <data name="Nox" xml:space="preserve">
     <value>夜神模擬器</value>
+  </data>
+  <data name="ScreencapWarningTip" xml:space="preserve">
+    <value>截圖用時較長: {0}ms({1})</value>
+  </data>
+  <data name="ScreencapErrorTip" xml:space="preserve">
+    <value>截圖用時過長: {0}ms({1})</value>
   </data>
 </root>

@@ -410,9 +410,9 @@ public class MainViewModel : ObservableObject
     {
         string unit;
         double value;
-        if (size >= 1024l * 1024 * 1024 * 1024)
+        if (size >= 1024L * 1024 * 1024 * 1024)
         {
-            value = (double)size / (1024l * 1024 * 1024 * 1024);
+            value = (double)size / (1024L * 1024 * 1024 * 1024);
             unit = "TB";
         }
         else if (size >= 1024 * 1024 * 1024)
@@ -443,14 +443,14 @@ public class MainViewModel : ObservableObject
     {
         string unit;
         double value = speed;
-        if (value >= 1024l * 1024 * 1024 * 1024)
+        if (value >= 1024L * 1024 * 1024 * 1024)
         {
-            value /= 1024l * 1024 * 1024 * 1024;
+            value /= 1024L * 1024 * 1024 * 1024;
             unit = "TB/s";
         }
-        else if (value >= 1024l * 1024 * 1024)
+        else if (value >= 1024L * 1024 * 1024)
         {
-            value /= 1024l * 1024 * 1024;
+            value /= 1024L * 1024 * 1024;
             unit = "GB/s";
         }
         else if (value >= 1024 * 1024)
