@@ -34,19 +34,4 @@ jobs:
         with:
           token: ${{ secrets.YlovexLN_PUBLIC }} # 使用第二个令牌
           event-type: approve-pull-request
-     
-      - name: Get latest tag from upstream
-        id: get-tag
-        run: |
-          LATEST_TAG=$(git ls-remote --tags upstream | grep -Po 'refs/tags/\K[0-9.]+(?=$)' | sort -V | tail -n1)
-          echo "latest_tag=${LATEST_TAG}" >>$GITHUB_OUTPUT
-
-      - name: Create and push tag
-        run: |
-          if [ "${{ steps.get-tag.outputs.latest_tag }}" != "" ]; then
-            git tag "${{ steps.get-tag.outputs.latest_tag }}"
-            git push origin "${{ steps.get-tag.outputs.latest_tag }}"
-          else
-            echo "上游仓库中没有找到标签"
-          fi
 
