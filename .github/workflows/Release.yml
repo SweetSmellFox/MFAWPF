@@ -50,7 +50,11 @@ jobs:
 
       - name: Build
         run: dotnet publish -c Release
-      
+
+      - name: Rename MFAWPF.exe to MZA.exe
+        run: |
+          mv /home/runner/work/MFAWPF-MZA/bin/AnyCPU/Release/win-x64/publish/MFAWPF.exe /home/runner/work/MFAWPF-MZA/bin/AnyCPU/Release/win-x64/publish/MZA.exe
+   
       - name: Zip
         run: |
           cd /home/runner/work/MFAWPF-MZA/bin/AnyCPU/Release/win-x64/publish/
