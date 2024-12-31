@@ -8,7 +8,7 @@ namespace MFAWPF.Utils;
 public static class EmulatorHelper
 {
     [DllImport("User32.dll", EntryPoint = "FindWindow")]
-    private extern static IntPtr FindWindow(string lpClassName, string lpWindowName);
+    private extern static IntPtr FindWindow(string? lpClassName, string lpWindowName);
 
     [DllImport("User32.dll", CharSet = CharSet.Auto)]
     private extern static int GetWindowThreadProcessId(IntPtr hwnd, out int id);
@@ -65,13 +65,13 @@ public static class EmulatorHelper
             emuIndex = (port - 16384) / 32;
         }
 
-        Process[] processes = Process.GetProcessesByName("MuMuPlayer");
+        var processes = Process.GetProcessesByName("MuMuPlayer");
         if (processes.Length <= 0)
         {
             return false;
         }
 
-        ProcessModule processModule;
+        ProcessModule? processModule;
         try
         {
             processModule = processes[0].MainModule;
@@ -88,8 +88,7 @@ public static class EmulatorHelper
             return false;
         }
 
-        string emuLocation = processModule.FileName;
-        emuLocation = Path.GetDirectoryName(emuLocation);
+        var emuLocation = Path.GetDirectoryName(processModule.FileName);
         if (emuLocation == null)
         {
             return false;
@@ -99,7 +98,7 @@ public static class EmulatorHelper
 
         if (File.Exists(consolePath))
         {
-            ProcessStartInfo startInfo = new ProcessStartInfo(consolePath)
+            var startInfo = new ProcessStartInfo(consolePath)
             {
                 Arguments = $"api -v {emuIndex} shutdown_player",
                 CreateNoWindow = true,
@@ -126,28 +125,28 @@ public static class EmulatorHelper
     /// <returns>是否关闭成功</returns>
     private static bool KillEmulatorLdPlayer()
     {
-        string address = MaaProcessor.Config.AdbDevice.AdbSerial;
+        var address = MaaProcessor.Config.AdbDevice.AdbSerial;
         int emuIndex;
         if (address.Contains(':'))
         {
-            string portStr = address.Split(':')[1];
-            int port = int.Parse(portStr);
+            var portStr = address.Split(':')[1];
+            var port = int.Parse(portStr);
             emuIndex = (port - 5555) / 2;
         }
         else
         {
-            string portStr = address.Split('-')[1];
-            int port = int.Parse(portStr);
+            var portStr = address.Split('-')[1];
+            var port = int.Parse(portStr);
             emuIndex = (port - 5554) / 2;
         }
 
-        Process[] processes = Process.GetProcessesByName("dnplayer");
+        var processes = Process.GetProcessesByName("dnplayer");
         if (processes.Length <= 0)
         {
             return false;
         }
 
-        ProcessModule processModule;
+        ProcessModule? processModule;
         try
         {
             processModule = processes[0].MainModule;
@@ -164,18 +163,18 @@ public static class EmulatorHelper
             return false;
         }
 
-        string emuLocation = processModule.FileName;
-        emuLocation = Path.GetDirectoryName(emuLocation);
+
+        var emuLocation = Path.GetDirectoryName(processModule.FileName);
         if (emuLocation == null)
         {
             return false;
         }
 
-        string consolePath = Path.Combine(emuLocation, "ldconsole.exe");
+        var consolePath = Path.Combine(emuLocation, "ldconsole.exe");
 
         if (File.Exists(consolePath))
         {
-            ProcessStartInfo startInfo = new ProcessStartInfo(consolePath)
+            var startInfo = new ProcessStartInfo(consolePath)
             {
                 Arguments = $"quit --index {emuIndex}",
                 CreateNoWindow = true,
@@ -215,13 +214,13 @@ public static class EmulatorHelper
             emuIndex = port - 62024;
         }
 
-        Process[] processes = Process.GetProcessesByName("Nox");
+        var processes = Process.GetProcessesByName("Nox");
         if (processes.Length <= 0)
         {
             return false;
         }
 
-        ProcessModule processModule;
+        ProcessModule? processModule;
         try
         {
             processModule = processes[0].MainModule;
@@ -238,8 +237,7 @@ public static class EmulatorHelper
             return false;
         }
 
-        string emuLocation = processModule.FileName;
-        emuLocation = Path.GetDirectoryName(emuLocation);
+        var emuLocation = Path.GetDirectoryName(processModule.FileName);
         if (emuLocation == null)
         {
             return false;
@@ -287,7 +285,7 @@ public static class EmulatorHelper
             return false;
         }
 
-        ProcessModule processModule;
+        ProcessModule? processModule;
         try
         {
             processModule = processes[0].MainModule;
@@ -304,8 +302,7 @@ public static class EmulatorHelper
             return false;
         }
 
-        string emuLocation = processModule.FileName;
-        emuLocation = Path.GetDirectoryName(emuLocation);
+        var emuLocation = Path.GetDirectoryName(processModule.FileName);
         if (emuLocation == null)
         {
             return false;
@@ -348,7 +345,7 @@ public static class EmulatorHelper
             return false;
         }
 
-        ProcessModule processModule;
+        ProcessModule? processModule;
         try
         {
             processModule = processes[0].MainModule;
@@ -365,8 +362,8 @@ public static class EmulatorHelper
             return false;
         }
 
-        string emuLocation = processModule.FileName;
-        emuLocation = Path.GetDirectoryName(emuLocation);
+
+        var emuLocation = Path.GetDirectoryName(processModule.FileName);
         if (emuLocation == null)
         {
             return false;
@@ -411,9 +408,9 @@ public static class EmulatorHelper
     /// Kills emulator by Window hwnd.
     /// </summary>
     /// <returns>Whether the operation is successful.</returns>
-    private static bool KillEmulatorByWindow()
+    public static bool KillEmulatorByWindow()
     {
-        int pid = 0;
+        var pid = 0;
         var windowName = new[]
         {
             "明日方舟",
@@ -428,7 +425,7 @@ public static class EmulatorHelper
             {
                 continue;
             }
-
+        
             GetWindowThreadProcessId(hwnd, out pid);
             break;
         }

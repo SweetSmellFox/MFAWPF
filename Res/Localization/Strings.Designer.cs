@@ -1214,9 +1214,9 @@ namespace MFAWPF.Res.Localization {
         /// <summary>
         ///   Looks up a localized string similar to 截图耗时: {0}ms({1}).
         /// </summary>
-        internal static string ScreenshotTime {
+        internal static string ScreencapCost {
             get {
-                return ResourceManager.GetString("ScreenshotTime", resourceCulture);
+                return ResourceManager.GetString("ScreencapCost", resourceCulture);
             }
         }
         
