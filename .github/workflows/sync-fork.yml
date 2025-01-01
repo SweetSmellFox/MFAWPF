@@ -52,15 +52,15 @@ jobs:
             echo "No new tag found" 
             exit 1
           fi
+          if git rev-parse "${{ env.tag }}" >/dev/null 2>&1; then
+            echo "Tag ${{ env.tag }} already exists"
+            exit 0
+          fi
           echo "New tag found: ${{ env.tag }}"
       
       # 创建并推送新标签
       - name: Create and push tag
         if: success()
         run: |
-          if git rev-parse ${{ env.tag }} >/dev/null 2>&1; then
-            echo "Tag ${{ env.tag }} already exists"
-            exit 1
-          fi
           git tag ${{ env.tag }}
           git push origin ${{ env.tag }}
