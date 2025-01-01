@@ -54,13 +54,15 @@ jobs:
           fi
           if git rev-parse "${{ env.tag }}" >/dev/null 2>&1; then
             echo "Tag ${{ env.tag }} already exists"
+            echo "::set-output name=result::exists"
             exit 0
           fi
           echo "New tag found: ${{ env.tag }}"
+          echo "::set-output name=result::new"
       
       # 创建并推送新标签
       - name: Create and push tag
-        if: success() && steps.tag_exists.outputs.result == ''
+        if: success() && steps.tag_exists.outputs.result == 'new'
         run: |
           git tag ${{ env.tag }}
           git push origin ${{ env.tag }}
