@@ -43,7 +43,7 @@ jobs:
         run: |
           latest_tag=$(git ls-remote --tags https://github.com/SweetSmellFox/MFAWPF.git | tail -n 1 | sed 's/.*\///; s/\^{}//')
           echo "tag=$latest_tag" >> $GITHUB_ENV
-
+      
       # 检查是否有新标签
       - name: Check if tag exists
         id: tag_exists
@@ -60,7 +60,7 @@ jobs:
       
       # 创建并推送新标签
       - name: Create and push tag
-        if: success()
+        if: success() && steps.tag_exists.outputs.result != 'Tag ${{ env.tag }} already exists'
         run: |
           git tag ${{ env.tag }}
           git push origin ${{ env.tag }}
