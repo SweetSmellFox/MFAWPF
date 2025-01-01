@@ -60,7 +60,7 @@ jobs:
       
       # 创建并推送新标签
       - name: Create and push tag
-        if: success() && steps.tag_exists.outputs.result != 'Tag ${{ env.tag }} already exists'
+        if: success() && steps.tag_exists.outputs.result == ''
         run: |
           git tag ${{ env.tag }}
           git push origin ${{ env.tag }}
