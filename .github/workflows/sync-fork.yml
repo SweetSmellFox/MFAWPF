@@ -1,4 +1,4 @@
-name: Sync Fork
+name: Sync Fork and tag
 
 on:
   schedule:
@@ -35,3 +35,12 @@ jobs:
           token: ${{ secrets.YlovexLN_PUBLIC }} # 使用第二个令牌
           event-type: approve-pull-request
 
+      # 以下代码是为同步原库的最新tag到本库的最新tag
+      - name: Get latest tag from original repo
+        id: get-tag
+        run: echo "::set-output name=tag::$(git ls-remote --tags https://github.com/SweetSmellFox/MFAWPF.git | tail -n 1 | sed 's/.*\///; s/\^{}//')"
+
+      - name: Create and push tag
+        run: |
+          git tag ${{ steps.get-tag.outputs.tag }}
+          git push origin ${{ steps.get-tag.outputs.tag }}
