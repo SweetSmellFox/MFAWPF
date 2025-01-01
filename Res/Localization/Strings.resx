@@ -684,4 +684,7 @@
   <data name="ScreencapErrorTip" xml:space="preserve">
     <value>截图用时过长: {0}ms({1})</value>
   </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>新版本下载失败</value>
+  </data>
 </root>
