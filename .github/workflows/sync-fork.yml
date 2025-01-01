@@ -1,4 +1,4 @@
-name: Sync Fork and Create Tag
+name: Sync Fork
 
 on:
   schedule:
