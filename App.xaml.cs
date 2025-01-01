@@ -5,6 +5,8 @@ using Lierda.WPFHelper;
 using MFAWPF.Utils;
 using MFAWPF.Views;
 using Microsoft.Win32;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace MFAWPF;
 
@@ -17,6 +19,27 @@ public partial class App
     {
         Startup += App_Startup;
         Exit += App_Exit;
+    }
+    
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+    private extern static IntPtr LoadLibrary(string lpFileName);
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        var dllFolderPath = Path.Combine(AppContext.BaseDirectory, "DLL");
+        if (Directory.Exists(dllFolderPath))
+        {
+            var dllFiles = Directory.GetFiles(dllFolderPath, "*.dll");
+            var allDllsLoaded = true;
+            foreach (var dllName in dllFiles)
+            {
+                var handle = LoadLibrary(dllName);
+                if (handle == IntPtr.Zero)
+                {
+                    LoggerService.LogError($"Can't load {Path.GetFileName(dllName)}");
+                }
+            }
+        }
+        base.OnStartup(e);
     }
 
     void App_Startup(object sender, StartupEventArgs e)
@@ -36,9 +59,7 @@ public partial class App
 
     private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
     {
-        if (e.Category is UserPreferenceCategory.Color or
-            UserPreferenceCategory.VisualStyle or
-            UserPreferenceCategory.General)
+        if (e.Category is UserPreferenceCategory.Color or UserPreferenceCategory.VisualStyle or UserPreferenceCategory.General)
         {
             Views.MainWindow.FollowSystemTheme();
         }

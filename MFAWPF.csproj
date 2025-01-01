@@ -264,6 +264,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="DLL\" />
         <Folder Include="obj\Debug\Styles\Style\" />
         <Folder Include="obj\Release\Assets\Icons\" />
         <Folder Include="obj\Release\Styles\Primary\" />
@@ -344,5 +345,17 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Resource>
       <None Remove="NLog.config" />
+      <None Remove="DLL\msvcp140.dll" />
+      <Resource Include="DLL\msvcp140.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <None Remove="DLL\vcruntime140.dll" />
+      <Resource Include="DLL\vcruntime140.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
+      <Compile Remove="App.xaml.cs" />
+      <Resource Include="App.xaml.cs">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Resource>
     </ItemGroup>
 </Project>
