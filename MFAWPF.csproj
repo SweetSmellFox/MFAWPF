@@ -21,8 +21,8 @@
     <PackageReference Include="CalcBinding" Version="2.5.2" />
     <PackageReference Include="Lierda.WPFHelper" Version="1.0.3" />
     <PackageReference Include="Maa.Framework.Native" Version="2.3.1" />
-    <PackageReference Include="Maa.Framework.Runtime.win-arm64" Version="2.4.1" />
-	<PackageReference Include="Maa.Framework.Runtime.win-x64" Version="2.4.1" />
+    <PackageReference Include="Maa.Framework.Runtime.win-arm64" Version="2.4.2" />
+	<PackageReference Include="Maa.Framework.Runtime.win-x64" Version="2.4.2" />
 
   </ItemGroup>
 
@@ -48,7 +48,7 @@
         <ApplicationVersion>1.1.0</ApplicationVersion>
         <Version>1.1</Version>
         <FileVersion>0.0.1</FileVersion>
-        <AssemblyVersion>1.2.3.6</AssemblyVersion>
+        <AssemblyVersion>1.2.3.7</AssemblyVersion>
         <InformationalVersion>0.0.1</InformationalVersion>
     </PropertyGroup>
   

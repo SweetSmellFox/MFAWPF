@@ -195,7 +195,15 @@ public class VersionChecker
         var tempZipFilePath = Path.Combine(tempPath, $"resource_{latestVersion}.zip");
         dialog?.SetText("Downloading".GetLocalizationString());
         dialog?.UpdateProgress(0);
-        await DownloadFileAsync(downloadUrl, tempZipFilePath, dialog, "GameResourceUpdated");
+        if (!await DownloadFileAsync(downloadUrl, tempZipFilePath, dialog, "GameResourceUpdated"))
+        {
+            SetText("DownloadFailed", dialog, noDialog);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            return;
+        }
         dialog?.SetText("ApplyingUpdate".GetLocalizationString());
         dialog?.UpdateProgress(5);
 
@@ -203,6 +211,15 @@ public class VersionChecker
         if (Directory.Exists(tempExtractDir))
         {
             Directory.Delete(tempExtractDir, true);
+        }
+        if (!File.Exists(tempZipFilePath))
+        {
+            SetText("DownloadFailed", dialog, noDialog);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            return;
         }
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
         dialog?.UpdateProgress(50);
@@ -357,31 +374,48 @@ public class VersionChecker
         var tempZipFilePath = Path.Combine(tempPath, $"mfa_{latestVersion}.zip");
         dialog?.SetText("Downloading".GetLocalizationString());
         dialog?.UpdateProgress(0);
-        await DownloadFileAsync(downloadUrl, tempZipFilePath, dialog, "NewVersionDownloadCompletedTitle");
+        if (!await DownloadFileAsync(downloadUrl, tempZipFilePath, dialog, "GameResourceUpdated"))
+        {
+            SetText("DownloadFailed", dialog, noDialog);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            return;
+        }
         var tempExtractDir = Path.Combine(tempPath, $"mfa_{latestVersion}_extracted");
         if (Directory.Exists(tempExtractDir))
         {
             Directory.Delete(tempExtractDir, true);
         }
+        if (!File.Exists(tempZipFilePath))
+        {
+            SetText("DownloadFailed", dialog, noDialog);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            return;
+        }
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
 
         var currentExeFileName = Assembly.GetEntryAssembly().GetName().Name + ".exe";
 
-        byte[] utf8Bytes = Encoding.UTF8.GetBytes(AppContext.BaseDirectory);
-        string utf8BaseDirectory = Encoding.UTF8.GetString(utf8Bytes);
+        var utf8Bytes = Encoding.UTF8.GetBytes(AppContext.BaseDirectory);
+        var utf8BaseDirectory = Encoding.UTF8.GetString(utf8Bytes);
         var batFilePath = Path.Combine(utf8BaseDirectory, "temp", "update_mfa.bat");
-        using (StreamWriter sw = new StreamWriter(batFilePath))
+        await using (StreamWriter sw = new StreamWriter(batFilePath))
         {
-            sw.WriteLine("@echo off");
-            sw.WriteLine("chcp 65001");
+            await sw.WriteLineAsync("@echo off");
+            await sw.WriteLineAsync("chcp 65001");
 
-            sw.WriteLine("ping 127.0.0.1 -n 3 > nul");
+            await sw.WriteLineAsync("ping 127.0.0.1 -n 3 > nul");
             var extractedPath = $"\"{utf8BaseDirectory}temp\\mfa_{latestVersion}_extracted\\*.*\"";
             var targetPath = $"\"{utf8BaseDirectory}\"";
-            sw.WriteLine($"xcopy /E /Y {extractedPath} {targetPath}");
-            sw.WriteLine($"start /d \"{utf8BaseDirectory}\" {currentExeFileName}");
-            sw.WriteLine("ping 127.0.0.1 -n 1 > nul");
-            sw.WriteLine($"rd /S /Q \"{utf8BaseDirectory}temp\"");
+            await sw.WriteLineAsync($"xcopy /E /Y {extractedPath} {targetPath}");
+            await sw.WriteLineAsync($"start /d \"{utf8BaseDirectory}\" {currentExeFileName}");
+            await sw.WriteLineAsync("ping 127.0.0.1 -n 1 > nul");
+            await sw.WriteLineAsync($"rd /S /Q \"{utf8BaseDirectory}temp\"");
         }
         var psi = new ProcessStartInfo(batFilePath)
         {
@@ -392,7 +426,7 @@ public class VersionChecker
         Growls.Process(Application.Current.Shutdown);
     }
 
-    static void CopyFolder(string sourceFolder, string destinationFolder)
+    private static void CopyFolder(string sourceFolder, string destinationFolder)
     {
         if (!Directory.Exists(destinationFolder))
         {
@@ -494,7 +528,7 @@ public class VersionChecker
     //     await client.DownloadFileTaskAsync(url, filePath);
     // }
 
-    public async Task DownloadFileAsync(string url, string filePath, DownloadDialog? dialog, string key)
+    async private Task<bool> DownloadFileAsync(string url, string filePath, DownloadDialog? dialog, string key)
     {
         try
         {
@@ -548,15 +582,19 @@ public class VersionChecker
         catch (HttpRequestException httpEx)
         {
             LoggerService.LogError($"HTTP请求出现异常: {httpEx.Message}");
+            return false;
         }
         catch (IOException ioEx)
         {
             LoggerService.LogError($"文件操作出现异常: {ioEx.Message}");
+            return false;
         }
         catch (Exception ex)
         {
             LoggerService.LogError($"出现未知异常: {ex.Message}");
+            return false;
         }
+        return true;
     }
 
     public void CheckForGUIUpdates()

@@ -677,4 +677,7 @@
   <data name="ScreencapErrorTip" xml:space="preserve">
     <value>Screencap takes too long: {0}ms({1})</value>
   </data>
+  <data name="DownloadFailed" xml:space="preserve">
+    <value>Download of Update Package Failed</value>
+  </data>
 </root>
