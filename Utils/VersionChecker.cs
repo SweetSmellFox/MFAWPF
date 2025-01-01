@@ -309,7 +309,8 @@ public class VersionChecker
 
         SetText("GettingLatestSoftware", dialog, noDialog);
 
-        var url = "https://github.com/SweetSmellFox/MFAWPF";
+        //var url = "https://github.com/SweetSmellFox/MFAWPF"; 原仓库链接
+        var url = "https://github.com/YlovexLN/MFAWPF-MZA";
 
         dialog?.UpdateProgress(10);
 
