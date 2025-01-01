@@ -42,21 +42,25 @@ jobs:
         id: get-tag
         run: |
           latest_tag=$(git ls-remote --tags https://github.com/SweetSmellFox/MFAWPF.git | tail -n 1 | sed 's/.*\///; s/\^{}//')
-          echo "::set-output name=tag::$latest_tag"
+          echo "tag=$latest_tag" >> $GITHUB_ENV
 
       # 检查是否有新标签
       - name: Check if tag exists
         id: tag_exists
         run: |
-          if [ -z "${{ steps.get-tag.outputs.tag }}" ]; then
+          if [ -z "${{ env.tag }}" ]; then
             echo "No new tag found" 
             exit 1
           fi
-          echo "New tag found: ${{ steps.get-tag.outputs.tag }}"
+          echo "New tag found: ${{ env.tag }}"
       
       # 创建并推送新标签
       - name: Create and push tag
         if: success()
         run: |
-          git tag ${{ steps.get-tag.outputs.tag }}
-          git push origin ${{ steps.get-tag.outputs.tag }}
+          if git rev-parse ${{ env.tag }} >/dev/null 2>&1; then
+            echo "Tag ${{ env.tag }} already exists"
+            exit 1
+          fi
+          git tag ${{ env.tag }}
+          git push origin ${{ env.tag }}
