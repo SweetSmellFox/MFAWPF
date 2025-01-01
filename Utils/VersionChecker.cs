@@ -202,6 +202,7 @@ public class VersionChecker
             {
                 dialog?.Close();
             });
+            return;
         }
         dialog?.SetText("ApplyingUpdate".GetLocalizationString());
         dialog?.UpdateProgress(5);
@@ -218,6 +219,7 @@ public class VersionChecker
             {
                 dialog?.Close();
             });
+            return;
         }
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
         dialog?.UpdateProgress(50);
@@ -379,6 +381,7 @@ public class VersionChecker
             {
                 dialog?.Close();
             });
+            return;
         }
         var tempExtractDir = Path.Combine(tempPath, $"mfa_{latestVersion}_extracted");
         if (Directory.Exists(tempExtractDir))
@@ -392,6 +395,7 @@ public class VersionChecker
             {
                 dialog?.Close();
             });
+            return;
         }
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
 
