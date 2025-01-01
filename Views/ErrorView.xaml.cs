@@ -77,11 +77,7 @@ public partial class ErrorView : INotifyPropertyChanged
 
         base.OnClosed(e);
     }
-    protected override void OnClosing(CancelEventArgs e)
-    {
-        base.OnClosing(e);
-        Application.Current.Shutdown();
-    }
+
     private void Hyperlink_OnClick(object sender, RoutedEventArgs _)
     {
         Process.Start(new ProcessStartInfo(((Hyperlink)sender).NavigateUri.AbsoluteUri)
@@ -115,7 +111,7 @@ public partial class ErrorView : INotifyPropertyChanged
         }
     }
 
-    private async void CopyErrorMessage_Click(object sender, RoutedEventArgs e)
+    async private void CopyErrorMessage_Click(object sender, RoutedEventArgs e)
     {
         CopyToClipboard();
         CopiedTip.IsOpen = true;
