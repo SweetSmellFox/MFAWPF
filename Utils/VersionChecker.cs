@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using HandyControl.Controls;
-using HandyControl.Data;
 using MFAWPF.Data;
-using MFAWPF.Res.Localization;
 using MFAWPF.Utils.Converters;
 using MFAWPF.Views;
 using Newtonsoft.Json;
@@ -17,10 +13,8 @@ using System.Net.Http;
 using System.Text;
 using System.Reflection;
 using System.Windows;
-using MessageBox = HandyControl.Controls.MessageBox;
 
 namespace MFAWPF.Utils;
-// 移除了一些不必要的using，只保留实际用到的相关命名空间引用
 
 public class VersionChecker
 {
@@ -132,8 +126,19 @@ public class VersionChecker
         var url = MaaInterface.Instance?.Url ?? string.Empty;
         dialog?.UpdateProgress(10);
         var strings = GetRepoFromUrl(url);
+        string latestVersion = String.Empty;
+        try
+        {
+            latestVersion = strings.Length > 1 ? GetLatestVersionFromGithub(strings[0], strings[1]) : string.Empty;
+        }
+        catch (Exception ex)
+        {
+            SetText($"{"FailToGetLatestVersionInfo".GetLocalizationString()}: {ex.Message}", dialog, noDialog);
+            MainWindow.Instance.SetUpdating(false);
+            LoggerService.LogError(ex);
+            return;
+        }
 
-        var latestVersion = strings.Length > 1 ? GetLatestVersionFromGithub(strings[0], strings[1]) : string.Empty;
         dialog?.UpdateProgress(50);
 
         if (string.IsNullOrWhiteSpace(latestVersion))
@@ -176,7 +181,18 @@ public class VersionChecker
             return;
         }
 
-        var downloadUrl = GetDownloadUrlFromGitHubRelease(latestVersion, strings[0], strings[1]);
+        string downloadUrl = String.Empty;
+        try
+        {
+            downloadUrl = GetDownloadUrlFromGitHubRelease(latestVersion, strings[0], strings[1]);
+        }
+        catch (Exception ex)
+        {
+            SetText($"{"FailToGetDownloadUrl".GetLocalizationString()}: {ex.Message}", dialog, noDialog);
+            MainWindow.Instance.SetUpdating(false);
+            LoggerService.LogError(ex);
+            return;
+        }
         dialog?.UpdateProgress(100);
 
         if (string.IsNullOrWhiteSpace(downloadUrl))
@@ -314,7 +330,18 @@ public class VersionChecker
         dialog?.UpdateProgress(10);
 
         var strings = GetRepoFromUrl(url);
-        var latestVersion = GetLatestVersionFromGithub();
+        string latestVersion = String.Empty;
+        try
+        {
+            latestVersion = GetLatestVersionFromGithub();
+        }
+        catch (Exception ex)
+        {
+            SetText($"{"FailToGetLatestVersionInfo".GetLocalizationString()}: {ex.Message}", dialog, noDialog);
+            MainWindow.Instance.SetUpdating(false);
+            LoggerService.LogError(ex);
+            return;
+        }
         dialog?.UpdateProgress(50);
 
         if (string.IsNullOrWhiteSpace(latestVersion))
@@ -355,7 +382,20 @@ public class VersionChecker
             return;
         }
 
-        var downloadUrl = GetDownloadUrlFromGitHubRelease(latestVersion, strings[0], strings[1]);
+
+        string downloadUrl = String.Empty;
+        try
+        {
+            downloadUrl = GetDownloadUrlFromGitHubRelease(latestVersion, strings[0], strings[1]);
+        }
+        catch (Exception ex)
+        {
+            SetText($"{"FailToGetDownloadUrl".GetLocalizationString()}: {ex.Message}", dialog, noDialog);
+            MainWindow.Instance.SetUpdating(false);
+            LoggerService.LogError(ex);
+            return;
+        }
+        
         dialog?.UpdateProgress(100);
 
         if (string.IsNullOrWhiteSpace(downloadUrl))
@@ -462,6 +502,7 @@ public class VersionChecker
                 var read = response.Content.ReadAsStringAsync();
                 read.Wait();
                 var jsonResponse = read.Result;
+
                 var releaseData = JObject.Parse(jsonResponse);
                 if (releaseData["assets"] is JArray assets && assets.Count > 0)
                 {
