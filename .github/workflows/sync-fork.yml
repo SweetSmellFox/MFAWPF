@@ -66,3 +66,20 @@ jobs:
         run: |
           git tag ${{ env.tag }}
           git push origin ${{ env.tag }}
+
+      # 触发Release工作流
+      - name: Trigger Release workflow
+        if: success() && env.result == 'new'
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.YLOVEXLN }}
+          script: |
+            await github.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'Release.yml',
+              ref: context.ref,
+              inputs: {
+                tag_name: '${{ env.tag }}'
+              }
+            })
