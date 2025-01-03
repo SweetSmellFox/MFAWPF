@@ -346,13 +346,13 @@
       </Resource>
       <None Remove="NLog.config" />
       <None Remove="DLL\msvcp140.dll" />
-      <Resource Include="DLL\msvcp140.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
+      <Content Include="DLL\msvcp140.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
       <None Remove="DLL\vcruntime140.dll" />
-      <Resource Include="DLL\vcruntime140.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Resource>
+      <Content Include="DLL\vcruntime140.dll">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
       <Compile Remove="App.xaml.cs" />
       <Resource Include="App.xaml.cs">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
