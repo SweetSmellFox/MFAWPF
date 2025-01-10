@@ -10,13 +10,18 @@ public class SingleOrListConverter : JsonConverter
         return objectType == typeof(object);
     }
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+    public override object? ReadJson(JsonReader reader,
+        Type objectType,
+        object? existingValue,
         JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
         if (token is { Type: JTokenType.String })
         {
-            return new List<string> { token.ToString() };
+            return new List<string>
+            {
+                token.ToString()
+            };
         }
 
         if (token is { Type: JTokenType.Array })
@@ -31,14 +36,7 @@ public class SingleOrListConverter : JsonConverter
     {
         if (value is List<string> list)
         {
-            if (list.Count == 1)
-            {
-                writer.WriteValue(list[0]);
-            }
-            else
-            {
-                serializer.Serialize(writer, list);
-            }
+            serializer.Serialize(writer, list);
         }
     }
 }

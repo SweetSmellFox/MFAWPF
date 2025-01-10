@@ -125,14 +125,49 @@ public static class MFAExtensions
     {
         return maaContext.Tasker.Controller.PressKey(key);
     }
+    public static MaaJob InputText(this IMaaContext maaContext, string text)
+    {
+        return maaContext.Tasker.Controller.InputText(text);
+    }
     public static MaaJob Screencap(this IMaaContext maaContext)
     {
         return maaContext.Tasker.Controller.Screencap();
     }
+
     public static bool GetCachedImage(this IMaaContext maaContext, IMaaImageBuffer imageBuffer)
     {
         return maaContext.Tasker.Controller.GetCachedImage(imageBuffer);
     }
+    
+    public static void StartApp(this IMaaContext maaContext, string intent)
+    {
+        maaContext.Tasker.Controller.StartApp(intent).Wait();
+    }
+    
+    public static void StopApp(this IMaaContext maaContext, string intent)
+    {
+        maaContext.Tasker.Controller.StopApp(intent).Wait();
+    }
+    
+    public static bool TemplateMatch(this IMaaContext maaContext, string template, IMaaImageBuffer imageBuffer, double threshold = 0.8D, int x = 0, int y = 0, int w = 0, int h = 0)
+    {
+        return maaContext.RunRecognition(new TaskModel
+        {
+            Template = [template],
+            Threshold = threshold,
+            Roi = new List<int>[x, y, w, h]
+        }, imageBuffer).IsHit();
+    }
+
+    public static bool OCRMatch(this IMaaContext maaContext, string text, IMaaImageBuffer imageBuffer, int x = 0, int y = 0, int w = 0, int h = 0)
+    {
+        return maaContext.RunRecognition(new TaskModel
+        {
+            Expected = [text],
+            Roi = new List<int>[x, y, w, h]
+        }, imageBuffer).IsHit();
+    }
+
     public static RecognitionDetail? RunRecognition(this IMaaContext maaContext, TaskModel taskModel, IMaaImageBuffer imageBuffer)
     {
         return maaContext.RunRecognition(new TaskItemViewModel
@@ -141,7 +176,8 @@ public static class MFAExtensions
             Name = taskModel.Name
         }, imageBuffer);
     }
-    
+
+
     public static RecognitionDetail? RunRecognition(this IMaaContext maaContext, TaskItemViewModel taskModel, IMaaImageBuffer imageBuffer)
     {
         return maaContext.RunRecognition(taskModel.Name, taskModel.ToString(), imageBuffer);
