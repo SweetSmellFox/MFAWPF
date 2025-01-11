@@ -46,7 +46,10 @@ public class TaskItemViewModel : ObservableObject
         };
         Dictionary<string, TaskModel> taskModels = new Dictionary<string, TaskModel>();
         if (Task != null)
+        {
             taskModels.Add(Name, Task);
+        }
+
         return JsonConvert.SerializeObject(taskModels, settings);
     }
     

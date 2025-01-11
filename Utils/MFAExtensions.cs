@@ -95,93 +95,247 @@ public static class MFAExtensions
     {
         return hitBox is null or { X: 0, Y: 0, Width: 0, Height: 0 };
     }
-
-    public static MaaJob Click(this IMaaContext maaContext, int x, int y)
+    public static MaaTaskJob AppendPipeline(this IMaaTasker maaTasker, TaskItemViewModel task)
     {
-        return maaContext.Tasker.Controller.Click(x, y);
+        return maaTasker.AppendPipeline(task.Name, task.ToString());
+    }
+    public static MaaTaskJob AppendPipeline(this IMaaTasker maaTasker, TaskModel taskModel)
+    {
+        return maaTasker.AppendPipeline(new TaskItemViewModel
+        {
+            Name = taskModel.Name,
+            Task = taskModel,
+        });
     }
 
-    public static MaaJob Swipe(this IMaaContext maaContext, int x1, int y1, int x2, int y2, int duration)
+    public static void Click(this IMaaTasker maaTasker, int x, int y)
     {
-        return maaContext.Tasker.Controller.Swipe(x1, y1, x2, y2, duration);
+        maaTasker.Controller.Click(x, y).Wait();
     }
 
-    public static MaaJob TouchDown(this IMaaContext maaContext, int contact, int x, int y, int pressure)
+    public static void Swipe(this IMaaTasker maaTasker, int x1, int y1, int x2, int y2, int duration)
     {
-        return maaContext.Tasker.Controller.TouchDown(contact, x, y, pressure);
+        maaTasker.Controller.Swipe(x1, y1, x2, y2, duration).Wait();
     }
 
-    public static MaaJob TouchMove(this IMaaContext maaContext, int contact, int x, int y, int pressure)
+    public static void TouchDown(this IMaaTasker maaTasker, int contact, int x, int y, int pressure)
     {
-        return maaContext.Tasker.Controller.TouchMove(contact, x, y, pressure);
-
-    }
-    public static MaaJob TouchUp(this IMaaContext maaContext, int contact)
-    {
-        return maaContext.Tasker.Controller.TouchUp(contact);
+        maaTasker.Controller.TouchDown(contact, x, y, pressure).Wait();
     }
 
-    public static MaaJob PressKey(this IMaaContext maaContext, int key)
+    public static void TouchMove(this IMaaTasker maaTasker, int contact, int x, int y, int pressure)
     {
-        return maaContext.Tasker.Controller.PressKey(key);
+        maaTasker.Controller.TouchMove(contact, x, y, pressure).Wait();
+
     }
-    public static MaaJob InputText(this IMaaContext maaContext, string text)
+    public static void TouchUp(this IMaaTasker maaTasker, int contact)
     {
-        return maaContext.Tasker.Controller.InputText(text);
+        maaTasker.Controller.TouchUp(contact).Wait();
     }
-    public static MaaJob Screencap(this IMaaContext maaContext)
+
+    public static void PressKey(this IMaaTasker maaTasker, int key)
     {
-        return maaContext.Tasker.Controller.Screencap();
+        maaTasker.Controller.PressKey(key).Wait();
+    }
+    public static void InputText(this IMaaTasker maaTasker, string text)
+    {
+        maaTasker.Controller.InputText(text).Wait();
+    }
+
+    public static void Screencap(this IMaaTasker maaTasker)
+    {
+        maaTasker.Controller.Screencap().Wait();
+    }
+
+    public static bool GetCachedImage(this IMaaTasker maaTasker, IMaaImageBuffer imageBuffer)
+    {
+        return maaTasker.Controller.GetCachedImage(imageBuffer);
+    }
+
+    public static void StartApp(this IMaaTasker maaTasker, string intent)
+    {
+        maaTasker.Controller.StartApp(intent).Wait();
+    }
+
+    public static void StopApp(this IMaaTasker maaTasker, string intent)
+    {
+        maaTasker.Controller.StopApp(intent).Wait();
+    }
+    //
+    public static void Click(this IMaaContext maaContext, int x, int y)
+    {
+        maaContext.Tasker.Click(x, y);
+    }
+
+    public static void Swipe(this IMaaContext maaContext, int x1, int y1, int x2, int y2, int duration)
+    {
+        maaContext.Tasker.Swipe(x1, y1, x2, y2, duration);
+    }
+
+    public static void TouchDown(this IMaaContext maaContext, int contact, int x, int y, int pressure)
+    {
+        maaContext.Tasker.TouchDown(contact, x, y, pressure);
+    }
+
+    public static void TouchMove(this IMaaContext maaContext, int contact, int x, int y, int pressure)
+    {
+        maaContext.Tasker.TouchMove(contact, x, y, pressure);
+
+    }
+    public static void SmoothTouchMove(this IMaaContext maaContext, int contact, int startX, int startY, int endX, int endY, int durationMs, int steps = 1)
+    {
+        if (steps <= 0)
+        {
+            throw new ArgumentException("步数必须大于0", nameof(steps));
+        }
+
+        if (durationMs <= 0)
+        {
+            throw new ArgumentException("持续时间必须大于0", nameof(durationMs));
+        }
+
+        var xStep = (endX - startX) / steps;
+        var yStep = (endY - startY) / steps;
+
+        for (var i = 0; i < steps; i++)
+        {
+            var currentX = startX + i * xStep;
+            var currentY = startY + i * yStep;
+            maaContext.TouchMove(contact, currentX, currentY, 100);
+            int sleepTime = durationMs / steps;
+            Thread.Sleep(sleepTime);
+        }
+    }
+    public static void TouchUp(this IMaaContext maaContext, int contact)
+    {
+        maaContext.Tasker.TouchUp(contact);
+    }
+
+    public static void PressKey(this IMaaContext maaContext, int key)
+    {
+        maaContext.Tasker.PressKey(key);
+    }
+    public static void InputText(this IMaaContext maaContext, string text)
+    {
+        maaContext.Tasker.InputText(text);
+    }
+    public static void Screencap(this IMaaContext maaContext)
+    {
+        maaContext.Tasker.Screencap();
     }
 
     public static bool GetCachedImage(this IMaaContext maaContext, IMaaImageBuffer imageBuffer)
     {
-        return maaContext.Tasker.Controller.GetCachedImage(imageBuffer);
+        return maaContext.Tasker.GetCachedImage(imageBuffer);
     }
-    
-    public static void StartApp(this IMaaContext maaContext, string intent)
+    public static IMaaImageBuffer? GetImage(this IMaaContext maaContext)
     {
-        maaContext.Tasker.Controller.StartApp(intent).Wait();
-    }
-    
-    public static void StopApp(this IMaaContext maaContext, string intent)
-    {
-        maaContext.Tasker.Controller.StopApp(intent).Wait();
-    }
-    
-    public static bool TemplateMatch(this IMaaContext maaContext, string template, IMaaImageBuffer imageBuffer, double threshold = 0.8D, int x = 0, int y = 0, int w = 0, int h = 0)
-    {
-        return maaContext.RunRecognition(new TaskModel
-        {
-            Template = [template],
-            Threshold = threshold,
-            Roi = new List<int>[x, y, w, h]
-        }, imageBuffer).IsHit();
+        maaContext.Tasker.Screencap();
+        IMaaImageBuffer imageBuffer = new MaaImageBuffer();
+        if (!maaContext.Tasker.GetCachedImage(imageBuffer))
+            return null;
+        return imageBuffer;
     }
 
-    public static bool OCRMatch(this IMaaContext maaContext, string text, IMaaImageBuffer imageBuffer, int x = 0, int y = 0, int w = 0, int h = 0)
+    public static IMaaImageBuffer? GetImage(this IMaaContext maaContext, ref IMaaImageBuffer buffer)
     {
-        return maaContext.RunRecognition(new TaskModel
+        maaContext.Tasker.Screencap();
+        if (!maaContext.Tasker.GetCachedImage(buffer))
+            return null;
+        return buffer;
+    }
+    public static void StartApp(this IMaaContext maaContext, string intent)
+    {
+        maaContext.Tasker.StartApp(intent);
+    }
+
+    public static void StopApp(this IMaaContext maaContext, string intent)
+    {
+        maaContext.Tasker.StopApp(intent);
+    }
+
+    public static bool TemplateMatch(this IMaaTasker maaTasker, string template, double threshold = 0.8D, int x = 0, int y = 0, int w = 0, int h = 0)
+    {
+        var job = maaTasker.AppendPipeline(new TaskModel
+        {
+            Template = [template],
+            Recognition = "TemplateMatch",
+            Threshold = threshold,
+            Roi = new[]
+            {
+                x,
+                y,
+                w,
+                h
+            }
+        });
+        if (job.WaitFor(MaaJobStatus.Succeeded) == null)
+            return false;
+        return job.QueryRecognitionDetail().IsHit();
+    }
+
+    public static bool OCR(this IMaaTasker maaTasker, string text, int x = 0, int y = 0, int w = 0, int h = 0)
+    {
+        var job = maaTasker.AppendPipeline(new TaskModel
         {
             Expected = [text],
-            Roi = new List<int>[x, y, w, h]
-        }, imageBuffer).IsHit();
+            Recognition = "OCR",
+            Roi = new[]
+            {
+                x,
+                y,
+                w,
+                h
+            }
+        });
+        if (job.WaitFor(MaaJobStatus.Succeeded) == null)
+            return false;
+        return job.QueryRecognitionDetail().IsHit();
+    }
+
+    public static bool TemplateMatch(this IMaaContext maaContext, string template, IMaaImageBuffer imageBuffer, out RecognitionDetail detail, double threshold = 0.8D, int x = 0, int y = 0, int w = 0, int h = 0, bool greenmask = false)
+    {
+        detail = maaContext.RunRecognition(new TaskModel
+        {
+            Template = [template],
+            GreenMask = greenmask,
+            Recognition = "TemplateMatch",
+            Threshold = threshold,
+            OrderBy = "Score",
+            Roi = new[]
+            {
+                x,
+                y,
+                w,
+                h
+            },
+        }, imageBuffer);
+        LoggerService.LogInfo($"TemplateMatch: {template}");
+        return detail.IsHit();
+    }
+
+    public static bool OCR(this IMaaContext maaContext, string text, IMaaImageBuffer imageBuffer, out RecognitionDetail detail, int x = 0, int y = 0, int w = 0, int h = 0)
+    {
+        detail = maaContext.RunRecognition(new TaskModel
+        {
+            Expected = [text],
+            Recognition = "OCR",
+            Roi = new[]
+            {
+                x,
+                y,
+                w,
+                h
+            },
+        }, imageBuffer);
+        return detail.IsHit();
     }
 
     public static RecognitionDetail? RunRecognition(this IMaaContext maaContext, TaskModel taskModel, IMaaImageBuffer imageBuffer)
     {
-        return maaContext.RunRecognition(new TaskItemViewModel
-        {
-            Task = taskModel,
-            Name = taskModel.Name
-        }, imageBuffer);
+        return maaContext.RunRecognition(taskModel.Name, taskModel.ToJson(), imageBuffer);
     }
 
-
-    public static RecognitionDetail? RunRecognition(this IMaaContext maaContext, TaskItemViewModel taskModel, IMaaImageBuffer imageBuffer)
-    {
-        return maaContext.RunRecognition(taskModel.Name, taskModel.ToString(), imageBuffer);
-    }
 
     public static string GetText(this IMaaContext maaContext, int x, int y, int w, int h, IMaaImageBuffer imageBuffer)
     {
@@ -192,5 +346,46 @@ public static class MFAExtensions
     {
         queue.Enqueue(task);
         MaaProcessor.Instance.OnTaskQueueChanged();
+    }
+
+    public static bool Until(
+        this Func<bool> action,
+        int sleepMilliseconds = 500,
+        bool condition = true,
+        int maxCount = 12,
+        Action? errorAction = null,
+        CancellationToken? cancellationToken = null
+    )
+    {
+        cancellationToken ??= MaaProcessor.Instance.CancellationTokenSource?.Token;
+        try
+        {
+            int count = 0;
+            while (true)
+            {
+                if (cancellationToken?.IsCancellationRequested == true)
+                {
+                    Console.WriteLine("Operation was cancelled.");
+                    return false;
+                }
+
+                if (action() == condition)
+                    break;
+
+                if (++count >= maxCount)
+                {
+                    errorAction?.Invoke();
+                    return false;
+                }
+
+                if (sleepMilliseconds >= 0)
+                    Thread.Sleep(sleepMilliseconds);
+            }
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+        return true;
     }
 }

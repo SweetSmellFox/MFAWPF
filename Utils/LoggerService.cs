@@ -11,11 +11,14 @@ public static class LoggerService
 
     public static void LogInfo(string message)
     {
-        ;
         Logger.Information(message);
         Console.WriteLine("[INFO]" + message);
     }
-
+    public static void LogInfo(object message)
+    {
+        Logger.Information(message.ToString());
+        Console.WriteLine("[INFO]" + message);
+    }
     public static void LogError(object? e)
     {
         Logger.Error(e?.ToString() ?? string.Empty);

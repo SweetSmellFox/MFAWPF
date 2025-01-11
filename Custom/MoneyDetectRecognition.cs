@@ -19,7 +19,7 @@ public class MoneyDetectRecognition : IMaaCustomRecognition
             var getMoney = currentMoney - MaaProcessor.AllMoney;
             MaaProcessor.Money += getMoney;
             MaaProcessor.AllMoney = currentMoney;
-            MainWindow.AddLog(
+            MainWindow.AddLogByColor(
                 $"已投资 {MaaProcessor.Money}(+{getMoney}),存款: {MaaProcessor.AllMoney}",
                 "LightSeaGreen");
             if (MaaProcessor.AllMoney == 999)

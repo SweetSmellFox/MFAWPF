@@ -1,5 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections;
+using System.Text;
+using System.Windows.Documents;
 
 namespace MFAWPF.Utils.Converters;
 
@@ -7,11 +10,12 @@ public class SingleOrNestedListConverter : JsonConverter
 {
     public override bool CanConvert(Type objectType)
     {
-        return objectType == typeof(List<int>) || objectType == typeof(List<List<int>>) ||
-               objectType == typeof(string) || objectType == typeof(bool);
+        return objectType == typeof(List<int>) || objectType == typeof(List<List<int>>) || objectType == typeof(string) || objectType == typeof(bool);
     }
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+    public override object? ReadJson(JsonReader reader,
+        Type objectType,
+        object? existingValue,
         JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
@@ -39,15 +43,11 @@ public class SingleOrNestedListConverter : JsonConverter
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        if (value is List<List<int>> nestedList)
+        if (value is IEnumerable<IEnumerable<int>> nestedList)
         {
-            if (nestedList.Count == 1)
-                serializer.Serialize(writer, nestedList[0]);
-            else
-                serializer.Serialize(writer, nestedList);
             serializer.Serialize(writer, nestedList);
         }
-        else if (value is List<int> singleList)
+        else if (value is IEnumerable<int> singleList)
         {
             serializer.Serialize(writer, singleList);
         }
@@ -61,7 +61,30 @@ public class SingleOrNestedListConverter : JsonConverter
         }
         else
         {
-            throw new JsonSerializationException($"Unexpected value type \"{value?.GetType()}\" for SingleOrNestedListConverter.");
+            throw new JsonSerializationException($"Unexpected value type \"{value?.GetType()}\" for CustomListConverter.");
         }
+    }
+
+    private List<int> FlattenMultiDimArray(Array multiDimArray)
+    {
+        List<int> result = new List<int>();
+        if (multiDimArray.Rank == 1)
+        {
+            foreach (int element in multiDimArray)
+            {
+                result.Add(element);
+            }
+        }
+        else
+        {
+            foreach (var element in multiDimArray)
+            {
+                if (element is Array subArray)
+                {
+                    result.AddRange(FlattenMultiDimArray(subArray));
+                }
+            }
+        }
+        return result;
     }
 }
