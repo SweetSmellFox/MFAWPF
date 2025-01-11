@@ -74,6 +74,7 @@ public class TaskModel : ObservableObject
     private string? _exec;
     private List<string>? _args;
     private bool? _detach;
+
     [Browsable(false)]
     [JsonIgnore]
     [JsonProperty("name")]
@@ -304,7 +305,7 @@ public class TaskModel : ObservableObject
         set => SetNewProperty(ref _focus_succeeded_color, value);
     }
 
-    
+
     [JsonProperty("focus_failed")]
     [Category("任务回调")]
     [Description(
@@ -741,7 +742,7 @@ public class TaskModel : ObservableObject
         get => _input_text;
         set => SetNewProperty(ref _input_text, value);
     }
-    
+
     [JsonProperty("package")]
     [Category("动作")]
     [Description(
@@ -753,7 +754,7 @@ public class TaskModel : ObservableObject
         get => _package;
         set => SetNewProperty(ref _package, value);
     }
-    
+
     [JsonProperty("exec")]
     [Category("动作")]
     [Description(
@@ -778,7 +779,7 @@ public class TaskModel : ObservableObject
         get => _args;
         set => SetNewProperty(ref _args, value);
     }
-    
+
     [JsonProperty("detach")]
     [Category("动作")]
     [Description(
@@ -790,7 +791,7 @@ public class TaskModel : ObservableObject
         get => _detach;
         set => SetNewProperty(ref _detach, value);
     }
-    
+
     [Browsable(false)]
     [JsonExtensionData]
     public Dictionary<string, object> AdditionalData { get; set; } = new();
@@ -928,5 +929,46 @@ public class TaskModel : ObservableObject
         }
 
         return attributes;
+    }
+
+    public static TaskModel DirectHit()
+    {
+        return new TaskModel
+        {
+            Recognition = "DirectHit"
+        };
+    }
+
+    public static TaskModel TemplateMatch(string template)
+    {
+        return new TaskModel
+        {
+            Template = [template],
+            Recognition = "TemplateMatch"
+        };
+    }
+
+    public static TaskModel OCR(string text)
+    {
+        return new TaskModel
+        {
+            Expected = [text],
+            Recognition = "OCR"
+        };
+    }
+
+    public string ToJson()
+    {
+        var settings = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        };
+        var taskModels = new Dictionary<string, TaskModel>();
+
+        taskModels.Add(Name, this);
+
+        return JsonConvert.SerializeObject(taskModels, settings);
     }
 }

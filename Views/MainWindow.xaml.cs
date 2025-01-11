@@ -1848,8 +1848,8 @@ public partial class MainWindow
         Topmost = e.NewValue;
     }
 
-    public static void AddLog(string content,
-        string? color = "",
+    public static void AddLogByColor(string content,
+        string? color = "Gray",
         string weight = "Regular",
         bool showTime = true)
     {

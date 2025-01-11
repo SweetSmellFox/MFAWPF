@@ -49,7 +49,7 @@ public class MoneyRecognition : IMaaCustomRecognition
         //   context.TouchDown(1, 980, 495, 5); Press down
         //   context.TouchMove(1); Move
         //   context.PressKey(0); Press a key
-        //   context.Screencap().Wait(); Take another screenshot
+        //   context.Screencap(); Take another screenshot
         //   context.GetCachedImage(imageBuffer); Get the image after screenshot
         //   var text = context.GetText(578, 342, 131, 57, imageBuffer); Recognize the text in the specified roi of the imageBuffer screenshot
         //   MainWindow.AddLog("Message","LightSeaGreen"); Output a message in the right log of MFA. The second parameter is the color of the message, which can be omitted and defaults to Gray

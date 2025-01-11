@@ -49,6 +49,7 @@ public class MaaProcessor
         set => _isStopped = value;
     }
 
+    public CancellationTokenSource? CancellationTokenSource => _cancellationTokenSource;
     private MaaTasker? _currentTasker;
 
     public static string Resource => AppContext.BaseDirectory + "Resource";
@@ -124,6 +125,10 @@ public class MaaProcessor
                         Growls.Error("InitInstanceFailed".GetLocalizationString());
                         LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
                         MainWindow.AddLogByKey("InstanceInitFailedLog");
+                        MainWindow.Instance.SetConnected(false);
+                        MainWindow.Instance.deviceComboBox.ItemsSource = new List<string>
+                        {
+                        };
                         Stop();
                         throw new Exception();
                     }
@@ -672,7 +677,7 @@ public class MaaProcessor
 
             default:
                 MainWindow.AddLogByKey("ScreencapCost", null, elapsedMilliseconds.ToString(),
-                    MainWindow.Instance.ScreenshotType() );
+                    MainWindow.Instance.ScreenshotType());
                 break;
         }
 
@@ -733,7 +738,10 @@ public class MaaProcessor
     {
         return _currentTasker ??= InitializeMaaTasker();
     }
-
+    public bool HasTasker()
+    {
+        return _currentTasker != null;
+    }
     public void SetCurrentTasker(MaaTasker? tasker = null)
     {
         _currentTasker = tasker;
@@ -947,6 +955,11 @@ public class MaaProcessor
                 var name = Path.GetFileNameWithoutExtension(filePath);
                 LoggerService.LogInfo("Trying to parse " + name);
                 string code = File.ReadAllText(filePath);
+                // 将代码文件按行拆分，存储每行内容到列表中
+                var codeLines = code.Split(new[]
+                {
+                    '\n'
+                }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("DynamicAssembly")
@@ -962,7 +975,12 @@ public class MaaProcessor
                         var failures = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
                         foreach (var diagnostic in failures)
                         {
-                            LoggerService.LogError($"{diagnostic.Id}: {diagnostic.GetMessage()}");
+                            // 尝试从错误诊断信息中提取行号相关内容，这里假设格式类似 "(行号, 列号)"，不同环境格式可能不同，需按需调整
+                            var lineInfo = diagnostic.Location.GetLineSpan().StartLinePosition;
+                            int lineNumber = lineInfo.Line + 1; // 通常行号从1开始计数，所以加1
+                            // 根据行号获取对应的代码行内容
+                            string errorLine = lineNumber <= codeLines.Count ? codeLines[lineNumber - 1].Trim() : "无法获取对应代码行（行号超出范围）";
+                            LoggerService.LogError($"{diagnostic.Id}: {diagnostic.GetMessage()}  [错误行号: {lineNumber}]  [错误代码行: {errorLine}]");
                         }
                         continue;
                     }

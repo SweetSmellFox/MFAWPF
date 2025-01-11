@@ -2,7 +2,8 @@
 using MFAWPF.Views;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Custom;
-
+using System.Collections.Generic;
+using System.Linq;
 namespace MFAWPF.Custom;
 
 public class MoneyRecognition : IMaaCustomRecognition
@@ -14,18 +15,17 @@ public class MoneyRecognition : IMaaCustomRecognition
     public bool Analyze(in IMaaContext context, in AnalyzeArgs args, in AnalyzeResults results)
     {
         var imageBuffer = args.Image;
-        var param = args.RecognitionParam;
         var text = context.GetText(578, 342, 131, 57, imageBuffer).Replace("b", "6").Replace("B", "8");
         if (int.TryParse(text, out var i))
         {
             MaaProcessor.AllMoney = i;
-            Console.WriteLine($"存钱前余额：{i}");
+            LoggerService.LogInfo($"存钱前余额：{i}");
         }
 
         while (true)
         {
             context.Click(980, 495);
-            context.Screencap().Wait();
+            context.Screencap();
             context.GetCachedImage(imageBuffer);
             TaskModel t1 = new()
                 {
@@ -89,6 +89,7 @@ public class MoneyRecognition : IMaaCustomRecognition
                 break;
             }
             context.Click(980, 495);
+
         }
 
         return true;

@@ -27,27 +27,24 @@ public class OCRHelper
     {
     }
 
-    public static string ReadTextFromMAATasker(int x, int y, int width, int height)
+    public static string ReadTextFromMAATasker(int x, int y, int width, int height, IMaaTasker? tasker = null)
     {
+        tasker ??= MaaProcessor.Instance.GetCurrentTasker();
         string result = string.Empty;
-        TaskItemViewModel taskItemViewModel = new TaskItemViewModel
+
+        var job = tasker.AppendPipeline(new TaskModel
         {
-            Task = new TaskModel
+            Recognition = "OCR",
+            Roi = new []
             {
-                Recognition = "OCR",
-                Roi = new List<int>
-                {
-                    x,
-                    y,
-                    width,
-                    height
-                }
-            },
-            Name = "AppendOCR",
-        };
-        var job = MaaProcessor.Instance.GetCurrentTasker()?
-            .AppendPipeline(taskItemViewModel.Name, taskItemViewModel.ToString());
-        if (job?.Wait() == MaaJobStatus.Succeeded)
+                x,
+                y,
+                width,
+                height
+            }
+        });
+        
+        if (job.WaitFor(MaaJobStatus.Succeeded) != null)
         {
             var query =
                 JsonConvert.DeserializeObject<RecognitionQuery>(job.QueryRecognitionDetail()?
