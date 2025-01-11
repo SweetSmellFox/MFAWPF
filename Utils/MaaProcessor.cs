@@ -125,6 +125,10 @@ public class MaaProcessor
                         Growls.Error("InitInstanceFailed".GetLocalizationString());
                         LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
                         MainWindow.AddLogByKey("InstanceInitFailedLog");
+                        MainWindow.Instance.SetConnected(false);
+                        MainWindow.Instance.deviceComboBox.ItemsSource = new List<string>
+                        {
+                        };
                         Stop();
                         throw new Exception();
                     }
