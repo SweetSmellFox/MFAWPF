@@ -120,10 +120,19 @@ public class VersionChecker
                 dialog = new DownloadDialog("UpdateResource".GetLocalizationString());
             dialog?.Show();
         });
-
+        var url = MaaInterface.Instance?.Url ?? string.Empty;
+        if (string.IsNullOrEmpty(url))
+        {
+            MainWindow.Instance.SetUpdating(false);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            return;
+        }
         SetText("GettingLatestResources", dialog, noDialog);
 
-        var url = MaaInterface.Instance?.Url ?? string.Empty;
+  
         dialog?.UpdateProgress(10);
         var strings = GetRepoFromUrl(url);
         string latestVersion = String.Empty;
