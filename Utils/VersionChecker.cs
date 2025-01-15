@@ -132,7 +132,7 @@ public class VersionChecker
         }
         SetText("GettingLatestResources", dialog, noDialog);
 
-  
+
         dialog?.UpdateProgress(10);
         var strings = GetRepoFromUrl(url);
         string latestVersion = String.Empty;
@@ -405,7 +405,7 @@ public class VersionChecker
             LoggerService.LogError(ex);
             return;
         }
-        
+
         dialog?.UpdateProgress(100);
 
         if (string.IsNullOrWhiteSpace(downloadUrl))
@@ -449,23 +449,30 @@ public class VersionChecker
         }
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
 
-        var currentExeFileName = Assembly.GetEntryAssembly().GetName().Name + ".exe";
+        var currentExeFileName = Process.GetCurrentProcess().MainModule.ModuleName;
 
         var utf8Bytes = Encoding.UTF8.GetBytes(AppContext.BaseDirectory);
         var utf8BaseDirectory = Encoding.UTF8.GetString(utf8Bytes);
         var batFilePath = Path.Combine(utf8BaseDirectory, "temp", "update_mfa.bat");
-        await using (StreamWriter sw = new StreamWriter(batFilePath))
+        await using (var sw = new StreamWriter(batFilePath))
         {
             await sw.WriteLineAsync("@echo off");
             await sw.WriteLineAsync("chcp 65001");
 
             await sw.WriteLineAsync("ping 127.0.0.1 -n 3 > nul");
             var extractedPath = $"\"{utf8BaseDirectory}temp\\mfa_{latestVersion}_extracted\\*.*\"";
+            var extracted = $"{utf8BaseDirectory}temp\\mfa_{latestVersion}_extracted\\";
             var targetPath = $"\"{utf8BaseDirectory}\"";
-            await sw.WriteLineAsync($"xcopy /E /Y {extractedPath} {targetPath}");
-            await sw.WriteLineAsync($"start /d \"{utf8BaseDirectory}\" {currentExeFileName}");
+            await sw.WriteLineAsync($"copy /Y \"{extracted}{Assembly.GetEntryAssembly().GetName().Name}.exe\" \"{utf8BaseDirectory}{currentExeFileName}\"");
             await sw.WriteLineAsync("ping 127.0.0.1 -n 1 > nul");
+            await sw.WriteLineAsync($"del \"{extracted}{Assembly.GetEntryAssembly().GetName().Name}.exe\"");
+            // 将新的可执行文件重命名为旧的可执行文件名
+            await sw.WriteLineAsync("ping 127.0.0.1 -n 1 > nul");
+            await sw.WriteLineAsync($"xcopy /E /Y {extractedPath} {targetPath}");
+            await sw.WriteLineAsync("ping 127.0.0.1 -n 1 > nul");
+            await sw.WriteLineAsync($"start /d \"{utf8BaseDirectory}\" {currentExeFileName}");
             await sw.WriteLineAsync($"rd /S /Q \"{utf8BaseDirectory}temp\"");
+
         }
         var psi = new ProcessStartInfo(batFilePath)
         {
@@ -473,6 +480,7 @@ public class VersionChecker
             WindowStyle = ProcessWindowStyle.Hidden
         };
         Process.Start(psi);
+        Thread.Sleep(50);
         Growls.Process(Application.Current.Shutdown);
     }
 
