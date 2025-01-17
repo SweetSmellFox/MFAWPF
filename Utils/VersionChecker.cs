@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using HandyControl.Controls;
 using MFAWPF.Data;
 using MFAWPF.Utils.Converters;
+using MFAWPF.ViewModels;
 using MFAWPF.Views;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -304,6 +305,7 @@ public class VersionChecker
                 dialog.RestartButton.Visibility = Visibility.Visible;
         });
         MainWindow.Instance.SetUpdating(false);
+
         Growls.Process(() =>
         {
             if (closeDialog)
@@ -317,6 +319,9 @@ public class VersionChecker
                 }
             }
         });
+        DataSet.SetData("TaskItems",
+            new List<DragItemViewModel>());
+        MainWindow.Instance.InitializeData();
         action?.Invoke();
     }
 
