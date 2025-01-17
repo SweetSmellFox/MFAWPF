@@ -17,6 +17,7 @@ public class AnomalyDetectionAction : IMaaCustomAction
     {
         var context = icontext;
         var args = iargs;
+        var shouldWaiting = false;
         context.StartApp(DataSet.GetData("ResourceIndex", 0) == 0 ? "com.hypergryph.arknights" : "com.hypergryph.arknights.bilibili");
         var handle = () =>
         {
@@ -35,9 +36,9 @@ public class AnomalyDetectionAction : IMaaCustomAction
                 return true;
             }
 
-            if (context.TemplateMatch("Roguelike@ExitThenAbandon.png", image, out detail, 0.75, 0, 0, 130, 60))
+            if (context.TemplateMatch("money.png", image, out _, 0.8, 0, 429, 78, 72))
             {
-                context.OverrideNext(args.TaskName, ["离开肉鸽"]);
+                shouldWaiting = true;
                 return true;
             }
 
@@ -51,7 +52,24 @@ public class AnomalyDetectionAction : IMaaCustomAction
                 }
                 return true;
             };
-            tryReturn.Until(700);
+
+            if (context.TemplateMatch("back2.png", image, out detail, 0.8, 0, 0, 167, 65))
+            {
+                context.Click(detail.HitBox.X, detail.HitBox.Y);
+                return false;
+            }
+
+            if (context.TemplateMatch("Roguelike@ExitThenAbandon.png", image, out detail, 0.75, 0, 0, 130, 60))
+            {
+                context.OverrideNext(args.TaskName, ["离开肉鸽"]);
+                return true;
+            }
+
+
+            if (!tryReturn.Until(700, errorAction: () =>
+                {
+                    context.OverrideNext(args.TaskName, ["启动检测"]);
+                })) return true;
 
             var inStartUI = context.TemplateMatch("startGame.png", image, out detail, 0.75, 568, 624, 149, 95);
             if (inStartUI)
@@ -86,7 +104,28 @@ public class AnomalyDetectionAction : IMaaCustomAction
             context.Click(631, 610);
             return false;
         };
-        handle.Until();
+        if (!handle.Until(errorAction: () =>
+            {
+                context.OverrideNext(args.TaskName, ["启动检测"]);
+            })) return true;
+        if (shouldWaiting)
+        {
+            var waiting = () =>
+            {
+                var image = context.GetImage();
+                if (context.TemplateMatch("Sarkaz@Roguelike@StartExplore.png", image, out _, 0.8, 958, 530, 322, 189))
+                {
+                    context.OverrideNext(args.TaskName, ["开始肉鸽"]);
+                    return true;
+                }
+                return false;
+            };
+
+            if (!waiting.Until(3000, errorAction: () =>
+                {
+                    context.OverrideNext(args.TaskName, ["启动检测"]);
+                }, maxCount: 200)) return true;
+        }
         return true;
     }
 

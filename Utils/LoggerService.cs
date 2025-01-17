@@ -14,6 +14,7 @@ public static class LoggerService
         Logger.Information(message);
         Console.WriteLine("[INFO]" + message);
     }
+    
     public static void LogInfo(object message)
     {
         Logger.Information(message.ToString());

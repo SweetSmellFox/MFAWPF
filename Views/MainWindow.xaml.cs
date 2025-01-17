@@ -75,7 +75,7 @@ public partial class MainWindow
         }
     }
 
-    private bool InitializeData()
+    public bool InitializeData()
     {
         if (!File.Exists($"{AppContext.BaseDirectory}/interface.json"))
         {

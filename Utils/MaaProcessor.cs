@@ -58,7 +58,7 @@ public class MaaProcessor
     public static string ResourcePipelineFilePath => $"{ResourceBase}/pipeline/";
 
     public Queue<MFATask> TaskQueue { get; } = new();
-    public static int Money { get; set; }
+    public static int Money { get; set; } = 0;
     public static int AllMoney { get; set; }
     public static Config Config { get; } = new();
     public static List<string>? CurrentResources { get; set; }
@@ -184,10 +184,9 @@ public class MaaProcessor
 
     public void Stop(bool setIsStopped = true)
     {
-        if (_emulatorCancellationTokenSource != null)
-        {
-            _emulatorCancellationTokenSource?.Cancel();
-        }
+
+        _emulatorCancellationTokenSource?.Cancel();
+
         if (_cancellationTokenSource != null)
         {
             IsStopped = setIsStopped;
