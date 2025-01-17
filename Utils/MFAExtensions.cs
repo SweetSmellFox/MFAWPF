@@ -310,7 +310,7 @@ public static class MFAExtensions
                 h
             },
         }, imageBuffer);
-        LoggerService.LogInfo($"TemplateMatch: {template}");
+        LoggerService.LogInfo($"TemplateMatch: {template} ,Hit: {detail.IsHit()}");
         return detail.IsHit();
     }
 
@@ -328,6 +328,7 @@ public static class MFAExtensions
                 h
             },
         }, imageBuffer);
+        LoggerService.LogInfo($"OCR: {text} ,Hit: {detail.IsHit()}");
         return detail.IsHit();
     }
 
@@ -353,19 +354,18 @@ public static class MFAExtensions
         int sleepMilliseconds = 500,
         bool condition = true,
         int maxCount = 12,
-        Action? errorAction = null,
-        CancellationToken? cancellationToken = null
+        Action? errorAction = null
     )
     {
-        cancellationToken ??= MaaProcessor.Instance.CancellationTokenSource?.Token;
+        errorAction = null;
         try
         {
             int count = 0;
             while (true)
             {
-                if (cancellationToken?.IsCancellationRequested == true)
+                if (MaaProcessor.Instance.CancellationTokenSource.IsCancellationRequested)
                 {
-                    Console.WriteLine("Operation was cancelled.");
+                    LoggerService.LogInfo("Operation was cancelled.");
                     return false;
                 }
 
@@ -387,5 +387,16 @@ public static class MFAExtensions
             return false;
         }
         return true;
+    }
+
+    public static int ToInt(this string str)
+    {
+        string numberStr = new string(str.Replace(" ", "").Replace('b', '6').Replace('B', '8')
+            .Where(char.IsDigit).ToArray());
+        if (int.TryParse(numberStr, out int result))
+        {
+            return result;
+        }
+        return 0;
     }
 }

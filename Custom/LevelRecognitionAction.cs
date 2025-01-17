@@ -30,16 +30,18 @@ public class LevelRecognitionAction : IMaaCustomAction
         {
             if (i++ == 0)
             {
-                res = Find(context, 280, 120, 220, 460);
+                res = Find(context, 280, 120, 220, 460, args.TaskName);
             }
             else
             {
-                res = Find(context, 480, 90, 485, 520);
+                res = Find(context, 480, 90, 485, 520, args.TaskName);
             }
             IMaaImageBuffer image = new MaaImageBuffer();
             RecognitionDetail? detail;
             switch (res)
             {
+                case -1:
+                    return true;
                 case 0:
                     Thread.Sleep(700);
                     var enteringEncouter = () =>
@@ -47,15 +49,16 @@ public class LevelRecognitionAction : IMaaCustomAction
                         context.GetImage(ref image);
                         if (context.TemplateMatch("Sarkaz@Roguelike@StageEncounterEnter.png", image, out detail, 0.8, 1035, 453, 240, 178))
                         {
-
                             int x = detail.HitBox.X + 100, y = detail.HitBox.Y + 50;
-                            LoggerService.LogInfo($"{x}, {y}");
                             context.Click(x, y);
                             return true;
                         }
                         return false;
                     };
-                    enteringEncouter.Until();
+                    if (!enteringEncouter.Until(errorAction: () =>
+                        {
+                            context.OverrideNext(args.TaskName, ["启动检测"]);
+                        })) return true;
                     MeetByChance(context, args.TaskName);
                     break;
                 case 1:
@@ -74,13 +77,16 @@ public class LevelRecognitionAction : IMaaCustomAction
                         }
                         return false;
                     };
-                    enteringTrader.Until();
-                    context.OverrideNext(args.TaskName, ["进入前瞻性投资系统"]);
+                    if (!enteringTrader.Until(errorAction: () =>
+                        {
+                            context.OverrideNext(args.TaskName, ["启动检测"]);
+                        })) return true;
+                    context.OverrideNext(args.TaskName, ["存钱插件"]);
                     return true;
             }
             return false;
         };
-        level.Until();
+        if (!level.Until()) return true;
         return true;
     }
 
@@ -136,7 +142,10 @@ public class LevelRecognitionAction : IMaaCustomAction
             }
             return false;
         };
-        entering.Until();
+        if (!entering.Until(errorAction: () =>
+            {
+                context.OverrideNext(taskName, ["启动检测"]);
+            })) return;
         HandleAllMeeting(context, taskName, ix);
         var leaving = () =>
         {
@@ -148,7 +157,10 @@ public class LevelRecognitionAction : IMaaCustomAction
             context.Click(628, 621);
             return false;
         };
-        leaving.Until();
+        leaving.Until(errorAction: () =>
+        {
+            context.OverrideNext(taskName, ["启动检测"]);
+        });
     }
     public void HandleAllMeeting(IMaaContext context, string taskName, int i)
     {
@@ -182,7 +194,6 @@ public class LevelRecognitionAction : IMaaCustomAction
         var refresh = () =>
         {
             context.GetImage(ref image);
-            LoggerService.LogInfo("刷新");
             if (context.OCR("刷新", image, out detail, 780, 90, 80, 220))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);
@@ -190,7 +201,11 @@ public class LevelRecognitionAction : IMaaCustomAction
             }
             return false;
         };
-        refresh.Until();
+        if (!refresh.Until(errorAction: () =>
+            {
+                context.OverrideNext(taskName, ["启动检测"]);
+            }))
+            return false;
         var confirmRefresh = () =>
         {
             context.GetImage(ref image);
@@ -207,14 +222,17 @@ public class LevelRecognitionAction : IMaaCustomAction
             }
             return false;
         };
-        confirmRefresh.Until();
+        if (!confirmRefresh.Until(errorAction: () =>
+            {
+                context.OverrideNext(taskName, ["启动检测"]);
+            })) return false;
 
         return !shouldClose;
     }
 
     public void SelectOne(IMaaContext context, int targetOptionIndex, int totalOptions)
     {
-        Thread.Sleep(1000);
+        Thread.Sleep(600);
         var screenHeight = 720;
 
         var optionHeight = 140;
@@ -234,9 +252,8 @@ public class LevelRecognitionAction : IMaaCustomAction
         Thread.Sleep(500);
         var select = () =>
         {
-            RecognitionDetail? detail;
             context.GetImage(ref image);
-            if (context.TemplateMatch("Sarkaz@Roguelike@StageEncounterLeaveConfirm.png", image, out detail, 0.8, 1032, 0, 247, 720))
+            if (context.TemplateMatch("Sarkaz@Roguelike@StageEncounterLeaveConfirm.png", image, out var detail, 0.8, 1032, 0, 247, 720))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);
                 return true;
@@ -245,10 +262,10 @@ public class LevelRecognitionAction : IMaaCustomAction
             context.Click(clickX, (int)clickY);
             return false;
         };
-        select.Until();
+        if (!select.Until()) return;
     }
 
-    public int Find(IMaaContext context, int x, int y, int width, int height)
+    public int Find(IMaaContext context, int x, int y, int width, int height, string taskName)
     {
         int i = 0;
         var find = () =>
@@ -285,7 +302,10 @@ public class LevelRecognitionAction : IMaaCustomAction
 
             return false;
         };
-        find.Until(700);
+        if (!find.Until(700, errorAction: () =>
+            {
+                context.OverrideNext(taskName, ["启动检测"]);
+            })) return -1;
         return i;
     }
 }

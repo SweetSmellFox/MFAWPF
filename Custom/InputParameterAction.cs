@@ -35,7 +35,11 @@ public class InputParameterAction : IMaaCustomAction
             }
             return false;
         };
-        enter1.Until();
+        if (!enter1.Until(errorAction: () =>
+            {
+                context.OverrideNext(args.TaskName, ["启动检测"]);
+            })) return true;
+        
         if (shouldRun)
         {
             context.OverrideNext(args.TaskName, ["开始探险"]);
@@ -51,7 +55,10 @@ public class InputParameterAction : IMaaCustomAction
             }
             return false;
         };
-        enter2.Until();
+        if (!enter2.Until(errorAction: () =>
+            {
+                context.OverrideNext(args.TaskName, ["启动检测"]);
+            })) return true;
         var enter3 = () =>
         {
             var image = context.GetImage();
@@ -62,7 +69,11 @@ public class InputParameterAction : IMaaCustomAction
             }
             return false;
         };
-        enter3.Until();
+        if (!enter3.Until(errorAction: () =>
+            {
+                context.OverrideNext(args.TaskName, ["启动检测"]);
+            })) return true;
+        
 
         Thread.Sleep(150);
         var confirm = () =>
@@ -79,7 +90,10 @@ public class InputParameterAction : IMaaCustomAction
             }
             return false;
         };
-        confirm.Until();
+        if (!confirm.Until(errorAction: () =>
+            {
+                context.OverrideNext(args.TaskName, ["启动检测"]);
+            })) return true;
         var leaving = () =>
         {
             var image = context.GetImage();
@@ -92,7 +106,10 @@ public class InputParameterAction : IMaaCustomAction
             }
             return false;
         };
-        leaving.Until();
+        if (!leaving.Until(errorAction: () =>
+            {
+                context.OverrideNext(args.TaskName, ["启动检测"]);
+            })) return true;
         context.OverrideNext(args.TaskName, ["开始探险"]);
         return true;
     }

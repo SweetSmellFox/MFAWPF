@@ -38,7 +38,10 @@ public class ChooseOperatorAciton : IMaaCustomAction
                     context.Click(1142, 369);
                     return false;
                 };
-                enterMap.Until();
+                if (!enterMap.Until(errorAction: () =>
+                    {
+                        context.OverrideNext(args.TaskName, ["启动检测"]);
+                    })) return true;
                 return true;
             }
             bool catchO = false;
@@ -82,12 +85,21 @@ public class ChooseOperatorAciton : IMaaCustomAction
 
             if (catchO)
             {
-                abandonOp.Until();
-                confirmAbandon.Until();
+                if (!abandonOp.Until(errorAction: () =>
+                    {
+                        context.OverrideNext(args.TaskName, ["启动检测"]);
+                    })) return true;
+                if (!confirmAbandon.Until(errorAction: () =>
+                    {
+                        context.OverrideNext(args.TaskName, ["启动检测"]);
+                    })) return true;
             }
             return false;
         };
-        choosing.Until();
+        if (!choosing.Until(errorAction: () =>
+            {
+                context.OverrideNext(args.TaskName, ["启动检测"]);
+            })) return true;
         context.OverrideNext(args.TaskName, ["关卡检测"]);
         return true;
     }
