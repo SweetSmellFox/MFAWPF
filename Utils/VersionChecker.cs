@@ -407,6 +407,11 @@ public class VersionChecker
         {
             SetText($"{"FailToGetDownloadUrl".GetLocalizationString()}: {ex.Message}", dialog, noDialog);
             MainWindow.Instance.SetUpdating(false);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            MainWindow.Data.ClearDownloadProgress();
             LoggerService.LogError(ex);
             return;
         }
@@ -417,6 +422,10 @@ public class VersionChecker
         {
             Growls.ErrorGlobal("FailToGetDownloadUrl".GetLocalizationString());
             MainWindow.Instance.SetUpdating(false);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
             MainWindow.Data.ClearDownloadProgress();
             return;
         }
@@ -436,6 +445,7 @@ public class VersionChecker
             {
                 dialog?.Close();
             });
+            MainWindow.Data.ClearDownloadProgress();
             return;
         }
         var tempExtractDir = Path.Combine(tempPath, $"mfa_{latestVersion}_extracted");
@@ -450,6 +460,7 @@ public class VersionChecker
             {
                 dialog?.Close();
             });
+            MainWindow.Data.ClearDownloadProgress();
             return;
         }
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);

@@ -10,7 +10,9 @@ public class ReplaceConverter : JsonConverter
         return objectType == typeof(List<string[]>);
     }
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+    public override object? ReadJson(JsonReader reader,
+        Type objectType,
+        object? existingValue,
         JsonSerializer serializer)
     {
         var token = JToken.Load(reader);
@@ -21,7 +23,10 @@ public class ReplaceConverter : JsonConverter
                 return token.ToObject<List<string[]>>();
             }
 
-            var list = new List<string[]> { token.ToObject<string[]>() ?? [] };
+            var list = new List<string[]>
+            {
+                token.ToObject<string[]>() ?? []
+            };
             return list;
         }
 
@@ -41,6 +46,10 @@ public class ReplaceConverter : JsonConverter
                 serializer.Serialize(writer, list);
             }
         }
-        writer.WriteValue(value?.ToString() ?? string.Empty);
+        else
+        {
+            writer.WriteValue(value?.ToString() ?? string.Empty);
+        }
+
     }
 }
