@@ -680,4 +680,13 @@
   <data name="DownloadFailed" xml:space="preserve">
     <value>新版本下載失敗</value>
   </data>
+  <data name="StartupSettings" xml:space="preserve">
+    <value>啟動設置</value>
+  </data>
+  <data name="AutomaticHide" xml:space="preserve">
+    <value>啟動 MFA 後直接隱藏</value>
+  </data>
+  <data name="AutomaticMinimize" xml:space="preserve">
+    <value>啟動 MFA 後直接最小化</value>
+  </data>
 </root>

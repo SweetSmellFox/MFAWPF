@@ -25,6 +25,9 @@ public partial class NotifyIcon
         {
             _menuItemNum = notifyIcon.ContextMenu.Items.Count;
         }
+
+
+
     }
 
     private void InitIcon()

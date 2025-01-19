@@ -21,6 +21,7 @@ public class ChooseOperatorAciton : IMaaCustomAction
         var context = icontext;
         var args = iargs;
         int i = 0;
+        context.OverrideNext(args.TaskName, []);
         var choosing = () =>
         {
             var image = context.GetImage();

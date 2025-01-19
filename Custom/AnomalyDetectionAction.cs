@@ -15,9 +15,11 @@ public class AnomalyDetectionAction : IMaaCustomAction
 
     public bool Run(in IMaaContext icontext, in RunArgs iargs)
     {
+
         var context = icontext;
         var args = iargs;
         var shouldWaiting = false;
+        context.OverrideNext(args.TaskName, ["启动检测"]);
         context.StartApp(DataSet.GetData("ResourceIndex", 0) == 0 ? "com.hypergryph.arknights" : "com.hypergryph.arknights.bilibili");
         var handle = () =>
         {

@@ -62,7 +62,10 @@ public partial class MainWindow
         _maaToolkit = new MaaToolkit(init: true);
         MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
         SetIconFromExeDirectory();
+
+
     }
+
 
     private void SetIconFromExeDirectory()
     {
@@ -1108,7 +1111,6 @@ public partial class MainWindow
             DataSet.SetData("EmulatorConfig", text);
         };
 
-        textBox.PreviewDragOver += File_Drop;
 
         // var comboBox = new ComboBox
         // {
@@ -1812,6 +1814,24 @@ public partial class MainWindow
                 Growl.Info(MaaInterface.Instance.Message);
             }
             VersionChecker.Check();
+
+
+        });
+        TaskManager.RunTaskAsync(async () =>
+        {
+            await Task.Delay(1000);
+            Growls.Process(() =>
+            {
+                if (DataSet.GetData("AutoMinimize", false))
+                {
+                    Collapse();
+                }
+
+                if (DataSet.GetData("AutoHide", false))
+                {
+                    Hide();
+                }
+            });
         });
     }
 
@@ -2028,6 +2048,51 @@ public partial class MainWindow
         settingsView.afterTaskSettings.BindLocalization("Post-script");
         settingsView.afterTaskSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
         settingsView.afterTaskSettings.TextChanged += (_, _) => { DataSet.SetData("Post-script", settingsView.afterTaskSettings.Text); };
+
+        //启动设置
+        settingsView.AutoMinimizeCheckBox.IsChecked = DataSet.GetData("AutoMinimize", false);
+        settingsView.AutoMinimizeCheckBox.Checked += (_, _) => { DataSet.SetData("AutoMinimize", true); };
+        settingsView.AutoMinimizeCheckBox.Unchecked += (_, _) => { DataSet.SetData("AutoMinimize", false); };
+
+        settingsView.AutoHideCheckBox.IsChecked = DataSet.GetData("AutoHide", false);
+        settingsView.AutoHideCheckBox.Checked += (_, _) => { DataSet.SetData("AutoHide", true); };
+        settingsView.AutoHideCheckBox.Unchecked += (_, _) => { DataSet.SetData("AutoHide", false); };
+
+        settingsView.SoftwarePathTextBox.Text = DataSet.GetData("SoftwarePath", string.Empty);
+        settingsView.SoftwarePathTextBox.TextChanged += (sender, _) =>
+        {
+            var text = (sender as TextBox)?.Text ?? string.Empty;
+            DataSet.SetData("SoftwarePath", text);
+        };
+        settingsView.SoftwarePathTextBox.PreviewDrop += File_Drop;
+
+        settingsView.SoftwarePathSelectButton.Click += (_, _) =>
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Title = "SelectExecutableFile".GetLocalizationString(),
+                Filter = "ExeFilter".GetLocalizationString()
+            };
+
+            if (openFileDialog.ShowDialog().IsTrue())
+            {
+                settingsView.SoftwarePathTextBox.Text = openFileDialog.FileName;
+            }
+        };
+
+        settingsView.ExtrasTextBox.Text = DataSet.GetData("EmulatorConfig", string.Empty);
+        settingsView.ExtrasTextBox.TextChanged += (sender, _) =>
+        {
+            var text = (sender as TextBox)?.Text ?? string.Empty;
+            DataSet.SetData("EmulatorConfig", text);
+        };
+
+        settingsView.WaitSoftwareTimeTextBox.Value = DataSet.GetData("WaitSoftwareTime", 60.0);
+        settingsView.ExtrasTextBox.TextChanged += (sender, _) =>
+        {
+            var text = (sender as TextBox)?.Text ?? string.Empty;
+            DataSet.SetData("EmulatorConfig", text);
+        };
         //切换配置
         string configPath = Path.Combine(Environment.CurrentDirectory, "config");
         foreach (string file in Directory.GetFiles(configPath))
@@ -2114,8 +2179,8 @@ public partial class MainWindow
         AddAutoStartOption(s2);
         AddAfterTaskOption(s2);
 
-        AddStartSettingOption(s2);
-        AddStartEmulatorOption(s2);
+        // AddStartSettingOption(s2);
+        // AddStartEmulatorOption(s2);
 
 
         ScrollViewer sv2 = new()

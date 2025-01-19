@@ -680,4 +680,13 @@
   <data name="DownloadFailed" xml:space="preserve">
     <value>Download of Update Package Failed</value>
   </data>
+  <data name="StartupSettings" xml:space="preserve">
+    <value>Startup Settings</value>
+  </data>
+  <data name="AutomaticHide" xml:space="preserve">
+    <value>Auto Hide after launched</value>
+  </data>
+  <data name="AutomaticMinimize" xml:space="preserve">
+    <value>Auto Minimize after launched</value>
+  </data>
 </root>

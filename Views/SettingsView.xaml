@@ -81,6 +81,50 @@
                           HorizontalAlignment="Center">
                 </CheckBox>
                 <hc:Divider Content="{Binding ListTitle[5].Name}" />
+                   <Grid Margin="30 10 30 10" HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
+                        <CheckBox  Margin="10"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Center" x:Name="AutoMinimizeCheckBox"
+                                   Content="{lex:Loc AutomaticMinimize}" IsEnabled="{calcBinding:Binding 'Idle'}">
+                        </CheckBox>
+                        <CheckBox  Margin="10"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Center" x:Name="AutoHideCheckBox"
+                                   Content="{lex:Loc AutomaticHide}" IsEnabled="{calcBinding:Binding 'Idle'}">
+                        </CheckBox>
+
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10 0 0 0">
+
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+                            <hc:TextBox hc:TitleElement.TitlePlacement="Top" hc:TitleElement.Title="{lex:Loc SoftwarePath}" hc:InfoElement.ShowClearButton="True" x:Name="SoftwarePathTextBox"  HorizontalAlignment="Stretch" >
+ 
+                            </hc:TextBox>
+                            <Button Grid.Column="1" VerticalAlignment="Bottom" x:Name="SoftwarePathSelectButton" ToolTip="{lex:Loc Select}">
+                                <Button.Content>
+                                    <Path Width="15" MaxWidth="15" Stretch="Uniform" Fill="{StaticResource GrayColor4}" Data="{StaticResource LoadGeometry}"/>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                        <hc:TextBox Margin="5" hc:TitleElement.TitlePlacement="Top" hc:TitleElement.Title="{lex:Loc StartupParameter}" x:Name="ExtrasTextBox" ToolTip = "mumu是-v 多开号(从0开始),雷电是index=多开号(也是0)" HorizontalAlignment="Stretch"></hc:TextBox>
+                        <hc:NumericUpDown Margin="5"  hc:TitleElement.TitlePlacement="Top" hc:TitleElement.Title="{lex:Loc WaitSoftware}" x:Name="WaitSoftwareTimeTextBox"  Style="{StaticResource NumericUpDownExtend}" >
+
+
+                        </hc:NumericUpDown>
+                    </StackPanel>
+
+                </Grid>
+                <hc:Divider Content="{Binding ListTitle[6].Name}" />
                 <hc:TextBox Margin="30 10 30 10" x:Name="beforeTaskSettings" hc:TitleElement.TitleWidth="110"
                             IsEnabled="{calcBinding:Binding 'Idle'}"
                             hc:TitleElement.HorizontalAlignment="Right"
@@ -102,7 +146,7 @@
                           IsEnabled="{calcBinding:Binding 'Idle'}"
                           HorizontalAlignment="Center">
                 </CheckBox>
-                <hc:Divider Content="{Binding ListTitle[6].Name}" />
+                <hc:Divider Content="{Binding ListTitle[7].Name}" />
 
                 <Grid Margin="30 10 30 10" HorizontalAlignment="Center">
                     <Grid.ColumnDefinitions>
@@ -156,7 +200,7 @@
                     </StackPanel>
 
                 </Grid>
-                <hc:Divider Content="{Binding ListTitle[7].Name}" />
+                <hc:Divider Content="{Binding ListTitle[8].Name}" />
             </StackPanel>
         </hc:ScrollViewer>
     </Grid>

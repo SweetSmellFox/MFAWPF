@@ -318,6 +318,7 @@ public class MainViewModel : ObservableObject
         new("ThemeSettings"),
         new("ConnectionSettings"),
         new("PerformanceSettings"),
+        new("StartupSettings"),
         new("RunningSettings"),
         new("SoftwareUpdate"),
         new("About"),
