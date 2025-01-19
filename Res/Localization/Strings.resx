@@ -477,8 +477,8 @@
     <data name="ResourceLink" xml:space="preserve">
     <value>资源链接: </value>
   </data>
-    <data name="StartupParameter" xml:space="preserve">
-    <value>启动参数</value>
+  <data name="StartupParameter" xml:space="preserve">
+    <value>附加命令</value>
   </data>
     <data name="AfterTaskOption" xml:space="preserve">
     <value>结束后操作</value>
@@ -686,5 +686,14 @@
   </data>
   <data name="DownloadFailed" xml:space="preserve">
     <value>新版本下载失败</value>
+  </data>
+  <data name="StartupSettings" xml:space="preserve">
+    <value>启动设置</value>
+  </data>
+  <data name="AutomaticHide" xml:space="preserve">
+    <value>启动 MFA 后直接隐藏</value>
+  </data>
+  <data name="AutomaticMinimize" xml:space="preserve">
+    <value>启动 MFA 后直接最小化</value>
   </data>
 </root>

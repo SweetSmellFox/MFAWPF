@@ -119,7 +119,7 @@
         </ContextMenu>
     </hc:Window.Resources>
     <DockPanel>
-        <views:NotifyIcon x:Name="NotifyIcon" Visibility="Hidden" />
+        <views:NotifyIcon x:Name="NotifyIcon" Visibility="Visible" />
         <TabControl
             BorderThickness="0,1,0,0"
             Style="{StaticResource TabControlInLine}">
