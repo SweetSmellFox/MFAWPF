@@ -10,15 +10,18 @@ using System.Linq;
 
 namespace MFAWPF.Custom;
 
-public class FinshAction : IMaaCustomAction
+public class FinshAction : MaaCustomAction
 {
-    public string Name { get; set; } = nameof(FinshAction);
+    public override string Name { get; set; } = nameof(FinshAction);
 
 
-    public bool Run(in IMaaContext icontext, in RunArgs iargs)
+    protected override void ErrorHandle(IMaaContext context, RunArgs args)
     {
-        var context = icontext;
-        var args = iargs;
+        context.OverrideNext(args.NodeName, ["启动检测"]);
+    }
+
+    protected override bool Execute(IMaaContext context, RunArgs args)
+    {
         Thread.Sleep(1000);
         var confirm = () =>
         {
@@ -30,12 +33,8 @@ public class FinshAction : IMaaCustomAction
             context.Click(631, 610);
             return false;
         };
-        if (!confirm.Until(150, errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            }))
-            return true;
-        context.OverrideNext(args.TaskName, ["启动检测"]);
+        confirm.Until(150);
+        context.OverrideNext(args.NodeName, ["启动检测"]);
         return true;
     }
 }

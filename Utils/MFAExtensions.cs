@@ -3,6 +3,7 @@ using System.Windows;
 using HandyControl.Controls;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
+using MFAWPF.Utils.Exceptions;
 using MFAWPF.ViewModels;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Extensions;
@@ -95,13 +96,13 @@ public static class MFAExtensions
     {
         return hitBox is null or { X: 0, Y: 0, Width: 0, Height: 0 };
     }
-    public static MaaTaskJob AppendPipeline(this IMaaTasker maaTasker, TaskItemViewModel task)
+    public static MaaTaskJob AppendTask(this IMaaTasker maaTasker, TaskItemViewModel task)
     {
-        return maaTasker.AppendPipeline(task.Name, task.ToString());
+        return maaTasker.AppendTask(task.Name, task.ToString());
     }
-    public static MaaTaskJob AppendPipeline(this IMaaTasker maaTasker, TaskModel taskModel)
+    public static MaaTaskJob AppendTask(this IMaaTasker maaTasker, TaskModel taskModel)
     {
-        return maaTasker.AppendPipeline(new TaskItemViewModel
+        return maaTasker.AppendTask(new TaskItemViewModel
         {
             Name = taskModel.Name,
             Task = taskModel,
@@ -256,7 +257,7 @@ public static class MFAExtensions
 
     public static bool TemplateMatch(this IMaaTasker maaTasker, string template, double threshold = 0.8D, int x = 0, int y = 0, int w = 0, int h = 0)
     {
-        var job = maaTasker.AppendPipeline(new TaskModel
+        var job = maaTasker.AppendTask(new TaskModel
         {
             Template = [template],
             Recognition = "TemplateMatch",
@@ -276,7 +277,7 @@ public static class MFAExtensions
 
     public static bool OCR(this IMaaTasker maaTasker, string text, int x = 0, int y = 0, int w = 0, int h = 0)
     {
-        var job = maaTasker.AppendPipeline(new TaskModel
+        var job = maaTasker.AppendTask(new TaskModel
         {
             Expected = [text],
             Recognition = "OCR",
@@ -357,35 +358,28 @@ public static class MFAExtensions
         Action? errorAction = null
     )
     {
-        errorAction = null;
-        try
+
+        int count = 0;
+        while (true)
         {
-            int count = 0;
-            while (true)
+            if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
             {
-                if (MaaProcessor.Instance.CancellationTokenSource.IsCancellationRequested)
-                {
-                    LoggerService.LogInfo("Operation was cancelled.");
-                    return false;
-                }
-
-                if (action() == condition)
-                    break;
-
-                if (++count >= maxCount)
-                {
-                    errorAction?.Invoke();
-                    return false;
-                }
-
-                if (sleepMilliseconds >= 0)
-                    Thread.Sleep(sleepMilliseconds);
+                throw new MaaStopException();
             }
+
+            if (action() == condition)
+                break;
+
+            if (++count >= maxCount)
+            {
+                errorAction?.Invoke();
+                throw new MaaErrorHandleException();
+            }
+
+            if (sleepMilliseconds >= 0)
+                Thread.Sleep(sleepMilliseconds);
         }
-        catch (Exception)
-        {
-            return false;
-        }
+
         return true;
     }
 

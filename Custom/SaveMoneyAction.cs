@@ -10,17 +10,20 @@ using System.Linq;
 
 namespace MFAWPF.Custom;
 
-public class SaveMoneyAction : IMaaCustomAction
+public class SaveMoneyAction : MaaCustomAction
 {
-    public string Name { get; set; } = nameof(SaveMoneyAction);
+    public override string Name { get; set; } = nameof(SaveMoneyAction);
 
 
-    public bool Run(in IMaaContext icontext, in RunArgs iargs)
+    protected override void ErrorHandle(IMaaContext context, RunArgs args)
     {
-        var context = icontext;
-        var args = iargs;
+        context.OverrideNext(args.NodeName, ["启动检测"]);
+    }
+
+    protected override bool Execute(IMaaContext context, RunArgs args)
+    {
         RecognitionDetail detail;
-        context.OverrideNext(args.TaskName, []);
+        context.OverrideNext(args.NodeName, []);
         var enter1 = () =>
         {
             var image = context.GetImage();
@@ -31,11 +34,7 @@ public class SaveMoneyAction : IMaaCustomAction
             }
             return false;
         };
-        if (!enter1.Until(150, errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            }))
-            return true;
+        enter1.Until(150);
         Thread.Sleep(300);
         var enter2 = () =>
         {
@@ -48,10 +47,7 @@ public class SaveMoneyAction : IMaaCustomAction
             }
             return false;
         };
-        if (!enter2.Until(200, errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
+       enter2.Until(200);
         Thread.Sleep(1000);
         var imageBuffer = context.GetImage();
 
@@ -95,10 +91,7 @@ public class SaveMoneyAction : IMaaCustomAction
             context.Click(980, 495);
             return false;
         };
-        if (!saving.Until(150, maxCount: 100, errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
+        saving.Until(150, maxCount: 100);
         int after = 0;
         switch (result)
         {
@@ -118,7 +111,7 @@ public class SaveMoneyAction : IMaaCustomAction
                 // };
                 // leave1.Until(150, errorAction: () =>
                 // {
-                //     context.OverrideNext(args.TaskName, ["启动检测"]);
+                //     context.OverrideNext(args.NodeName, ["启动检测"]);
                 // });
                 //
                 // var leave2 = () =>
@@ -133,7 +126,7 @@ public class SaveMoneyAction : IMaaCustomAction
                 // };
                 // leave2.Until(150, errorAction: () =>
                 // {
-                //     context.OverrideNext(args.TaskName, ["启动检测"]);
+                //     context.OverrideNext(args.NodeName, ["启动检测"]);
                 // });
                 Thread.Sleep(500);
                 context.GetImage(ref imageBuffer);
@@ -157,7 +150,7 @@ public class SaveMoneyAction : IMaaCustomAction
             $"已投资 {MaaProcessor.Money}(+{after - before}),存款: {after}",
             "LightSeaGreen");
         if (result != 0 && after != 999)
-            context.OverrideNext(args.TaskName, ["离开肉鸽"]);
+            context.OverrideNext(args.NodeName, ["离开肉鸽"]);
         return true;
     }
 }

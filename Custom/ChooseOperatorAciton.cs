@@ -11,17 +11,20 @@ using System.Runtime;
 
 namespace MFAWPF.Custom;
 
-public class ChooseOperatorAciton : IMaaCustomAction
+public class ChooseOperatorAciton : MaaCustomAction
 {
-    public string Name { get; set; } = nameof(ChooseOperatorAciton);
+    public override string Name { get; set; } = nameof(ChooseOperatorAciton);
 
 
-    public bool Run(in IMaaContext icontext, in RunArgs iargs)
+    protected override void ErrorHandle(IMaaContext context, RunArgs args)
     {
-        var context = icontext;
-        var args = iargs;
+        context.OverrideNext(args.NodeName, ["启动检测"]);
+    }
+
+    protected override bool Execute(IMaaContext context, RunArgs args)
+    {
         int i = 0;
-        context.OverrideNext(args.TaskName, []);
+        context.OverrideNext(args.NodeName, []);
         var choosing = () =>
         {
             var image = context.GetImage();
@@ -39,10 +42,7 @@ public class ChooseOperatorAciton : IMaaCustomAction
                     context.Click(1142, 369);
                     return false;
                 };
-                if (!enterMap.Until(errorAction: () =>
-                    {
-                        context.OverrideNext(args.TaskName, ["启动检测"]);
-                    })) return true;
+                enterMap.Until();
                 return true;
             }
             bool catchO = false;
@@ -86,22 +86,13 @@ public class ChooseOperatorAciton : IMaaCustomAction
 
             if (catchO)
             {
-                if (!abandonOp.Until(errorAction: () =>
-                    {
-                        context.OverrideNext(args.TaskName, ["启动检测"]);
-                    })) return true;
-                if (!confirmAbandon.Until(errorAction: () =>
-                    {
-                        context.OverrideNext(args.TaskName, ["启动检测"]);
-                    })) return true;
+                abandonOp.Until();
+                confirmAbandon.Until();
             }
             return false;
         };
-        if (!choosing.Until(errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
-        context.OverrideNext(args.TaskName, ["关卡检测"]);
+        choosing.Until();
+        context.OverrideNext(args.NodeName, ["关卡检测"]);
         return true;
     }
 }

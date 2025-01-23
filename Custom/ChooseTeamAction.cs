@@ -9,15 +9,17 @@ using System.Linq;
 
 namespace MFAWPF.Custom;
 
-public class ChooseTeamAction : IMaaCustomAction
+public class ChooseTeamAction : MaaCustomAction
 {
-    public string Name { get; set; } = nameof(ChooseTeamAction);
+    public override string Name { get; set; } = nameof(ChooseTeamAction);
 
-
-    public bool Run(in IMaaContext icontext, in RunArgs iargs)
+    protected override void ErrorHandle(IMaaContext context, RunArgs args)
     {
-        var context = icontext;
-        var args = iargs;
+        context.OverrideNext(args.NodeName, ["启动检测"]);
+    }
+
+    protected override bool Execute(IMaaContext context, RunArgs args)
+    {
         var choosing = () =>
         {
             var image = context.GetImage();
@@ -35,11 +37,7 @@ public class ChooseTeamAction : IMaaCustomAction
 
             return false;
         };
-        if (!choosing.Until(150, errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            }))
-            return true;
+        choosing.Until(150);
         var confirm = () =>
         {
             var image = context.GetImage();
@@ -53,10 +51,7 @@ public class ChooseTeamAction : IMaaCustomAction
             return false;
         };
 
-        if (!confirm.Until(150, errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
+        confirm.Until(150);
         int i = 0;
         var afterConfirm = () =>
         {
@@ -100,18 +95,12 @@ public class ChooseTeamAction : IMaaCustomAction
                     return false;
                 };
 
-                if (!after.Until(errorAction: () =>
-                    {
-                        context.OverrideNext(args.TaskName, ["启动检测"]);
-                    })) return true;
+                after.Until();
                 Thread.Sleep(700);
             }
             return false;
         };
-        if (!afterConfirm.Until(150, errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
+        afterConfirm.Until(150);
 
         var confirmZ = () =>
         {
@@ -125,11 +114,8 @@ public class ChooseTeamAction : IMaaCustomAction
 
             return false;
         };
-        if (!confirmZ.Until(errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
-        context.OverrideNext(args.TaskName, ["招募"]);
+        confirmZ.Until();
+        context.OverrideNext(args.NodeName, ["招募"]);
         return true;
     }
 }

@@ -16,25 +16,28 @@ using System.Text;
 
 namespace MFAWPF.Custom;
 
-public class LevelRecognitionAction : IMaaCustomAction
+public class LevelRecognitionAction : MaaCustomAction
 {
-    public string Name { get; set; } = nameof(LevelRecognitionAction);
+    public override string Name { get; set; } = nameof(LevelRecognitionAction);
 
 
-    public bool Run(in IMaaContext icontext, in RunArgs iargs)
+    protected override void ErrorHandle(IMaaContext context, RunArgs args)
     {
-        var context = icontext;
-        var args = iargs;
+        context.OverrideNext(args.NodeName, ["启动检测"]);
+    }
+
+    protected override bool Execute(IMaaContext context, RunArgs args)
+    {
         int i = 0, res;
         var level = () =>
         {
             if (i++ == 0)
             {
-                res = Find(context, 280, 120, 220, 460, args.TaskName);
+                res = Find(context, 280, 120, 220, 460, args.NodeName);
             }
             else
             {
-                res = Find(context, 480, 90, 485, 520, args.TaskName);
+                res = Find(context, 480, 90, 485, 520, args.NodeName);
             }
             IMaaImageBuffer image = new MaaImageBuffer();
             RecognitionDetail? detail;
@@ -55,14 +58,11 @@ public class LevelRecognitionAction : IMaaCustomAction
                         }
                         return false;
                     };
-                    if (!enteringEncouter.Until(errorAction: () =>
-                        {
-                            context.OverrideNext(args.TaskName, ["启动检测"]);
-                        })) return true;
-                    MeetByChance(context, args.TaskName);
+                    enteringEncouter.Until();
+                    MeetByChance(context, args.NodeName);
                     break;
                 case 1:
-                    if (!Combat(context, args.TaskName))
+                    if (!Combat(context, args.NodeName))
                         return true;
                     break;
                 case 2:
@@ -77,20 +77,17 @@ public class LevelRecognitionAction : IMaaCustomAction
                         }
                         return false;
                     };
-                    if (!enteringTrader.Until(errorAction: () =>
-                        {
-                            context.OverrideNext(args.TaskName, ["启动检测"]);
-                        })) return true;
-                    context.OverrideNext(args.TaskName, ["存钱插件"]);
+                    enteringTrader.Until();
+                    context.OverrideNext(args.NodeName, ["存钱插件"]);
                     return true;
             }
             return false;
         };
-        if (!level.Until()) return true;
+        level.Until();
         return true;
     }
 
-    public void MeetByChance(IMaaContext context, string taskName)
+    public void MeetByChance(IMaaContext context, string NodeName)
     {
         Thread.Sleep(1000);
         for (int i = 0; i < 3; i++)
@@ -142,11 +139,8 @@ public class LevelRecognitionAction : IMaaCustomAction
             }
             return false;
         };
-        if (!entering.Until(errorAction: () =>
-            {
-                context.OverrideNext(taskName, ["启动检测"]);
-            })) return;
-        HandleAllMeeting(context, taskName, ix);
+        entering.Until();
+        HandleAllMeeting(context, NodeName, ix);
         var leaving = () =>
         {
             context.GetImage(ref image);
@@ -157,12 +151,9 @@ public class LevelRecognitionAction : IMaaCustomAction
             context.Click(628, 621);
             return false;
         };
-        leaving.Until(errorAction: () =>
-        {
-            context.OverrideNext(taskName, ["启动检测"]);
-        });
+        leaving.Until();
     }
-    public void HandleAllMeeting(IMaaContext context, string taskName, int i)
+    public void HandleAllMeeting(IMaaContext context, string NodeName, int i)
     {
         switch (i)
         {
@@ -186,7 +177,7 @@ public class LevelRecognitionAction : IMaaCustomAction
                 break;
         }
     }
-    public bool Combat(IMaaContext context, string taskName)
+    public bool Combat(IMaaContext context, string NodeName)
     {
         IMaaImageBuffer image = new MaaImageBuffer();
         RecognitionDetail? detail;
@@ -201,18 +192,14 @@ public class LevelRecognitionAction : IMaaCustomAction
             }
             return false;
         };
-        if (!refresh.Until(errorAction: () =>
-            {
-                context.OverrideNext(taskName, ["启动检测"]);
-            }))
-            return false;
+        refresh.Until();
         var confirmRefresh = () =>
         {
             context.GetImage(ref image);
             if (context.TemplateMatch("unableRefresh.png", image, out detail, 0.8, 945, 70, 90, 90))
             {
                 shouldClose = true;
-                context.OverrideNext(taskName, ["启动检测"]);
+                context.OverrideNext(NodeName, ["启动检测"]);
                 return true;
             }
             if (context.TemplateMatch("refreshConfirm.png", image, out detail, 0.8, 690, 456, 580, 64))
@@ -222,10 +209,7 @@ public class LevelRecognitionAction : IMaaCustomAction
             }
             return false;
         };
-        if (!confirmRefresh.Until(errorAction: () =>
-            {
-                context.OverrideNext(taskName, ["启动检测"]);
-            })) return false;
+        confirmRefresh.Until();
 
         return !shouldClose;
     }
@@ -262,10 +246,10 @@ public class LevelRecognitionAction : IMaaCustomAction
             context.Click(clickX, (int)clickY);
             return false;
         };
-        if (!select.Until()) return;
+        select.Until();
     }
 
-    public int Find(IMaaContext context, int x, int y, int width, int height, string taskName)
+    public int Find(IMaaContext context, int x, int y, int width, int height, string NodeName)
     {
         int i = 0;
         var find = () =>
@@ -302,10 +286,7 @@ public class LevelRecognitionAction : IMaaCustomAction
 
             return false;
         };
-        if (!find.Until(700, errorAction: () =>
-            {
-                context.OverrideNext(taskName, ["启动检测"]);
-            })) return -1;
+        find.Until(700);
         return i;
     }
 }

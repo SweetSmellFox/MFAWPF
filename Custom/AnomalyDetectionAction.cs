@@ -8,18 +8,19 @@ using System.Threading;
 
 namespace MFAWPF.Custom;
 
-public class AnomalyDetectionAction : IMaaCustomAction
+public class AnomalyDetectionAction : MaaCustomAction
 {
-    public string Name { get; set; } = nameof(AnomalyDetectionAction);
+    public override string Name { get; set; } = nameof(AnomalyDetectionAction);
 
-
-    public bool Run(in IMaaContext icontext, in RunArgs iargs)
+    protected override void ErrorHandle(IMaaContext context, RunArgs args)
     {
+        context.OverrideNext(args.NodeName, ["启动检测"]);
+    }
 
-        var context = icontext;
-        var args = iargs;
+    protected override bool Execute(IMaaContext context, RunArgs args)
+    {
         var shouldWaiting = false;
-        context.OverrideNext(args.TaskName, ["启动检测"]);
+        context.OverrideNext(args.NodeName, ["启动检测"]);
         context.StartApp(DataSet.GetData("ResourceIndex", 0) == 0 ? "com.hypergryph.arknights" : "com.hypergryph.arknights.bilibili");
         var handle = () =>
         {
@@ -28,13 +29,13 @@ public class AnomalyDetectionAction : IMaaCustomAction
             if (context.TemplateMatch("Sarkaz@Roguelike@Abandon.png", image, out detail, 0.75, 1110, 302, 130, 130))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);
-                context.OverrideNext(args.TaskName, ["确认放弃本次探索"]);
+                context.OverrideNext(args.NodeName, ["确认放弃本次探索"]);
                 return true;
             }
 
             if (context.TemplateMatch("Sarkaz@Roguelike@StartExplore.png", image, out detail, 0.8, 958, 530, 322, 189))
             {
-                context.OverrideNext(args.TaskName, ["开始肉鸽"]);
+                context.OverrideNext(args.NodeName, ["开始肉鸽"]);
                 return true;
             }
 
@@ -63,15 +64,12 @@ public class AnomalyDetectionAction : IMaaCustomAction
 
             if (context.TemplateMatch("Roguelike@ExitThenAbandon.png", image, out detail, 0.75, 0, 0, 130, 60))
             {
-                context.OverrideNext(args.TaskName, ["离开肉鸽"]);
+                context.OverrideNext(args.NodeName, ["离开肉鸽"]);
                 return true;
             }
 
 
-            if (!tryReturn.Until(700, errorAction: () =>
-                {
-                    context.OverrideNext(args.TaskName, ["启动检测"]);
-                })) return true;
+            tryReturn.Until(700);
 
             var inStartUI = context.TemplateMatch("startGame.png", image, out detail, 0.75, 568, 624, 149, 95);
             if (inStartUI)
@@ -86,7 +84,7 @@ public class AnomalyDetectionAction : IMaaCustomAction
             }
             if (context.OCR("开始唤醒", image, out detail, 580, 490, 140, 50))
             {
-                context.OverrideNext(args.TaskName, ["游戏外检测"]);
+                context.OverrideNext(args.NodeName, ["游戏外检测"]);
                 return true;
             }
 
@@ -99,17 +97,14 @@ public class AnomalyDetectionAction : IMaaCustomAction
             if (context.TemplateMatch("originiums.png", image, out detail, 0.75, 1033, 19, 86, 69, true))
             {
                 context.Click(935, 189);
-                context.OverrideNext(args.TaskName, ["进入长期探索"]);
+                context.OverrideNext(args.NodeName, ["进入长期探索"]);
                 return true;
             }
 
             context.Click(631, 610);
             return false;
         };
-        if (!handle.Until(errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
+        handle.Until();
         if (shouldWaiting)
         {
             var waiting = () =>
@@ -117,21 +112,14 @@ public class AnomalyDetectionAction : IMaaCustomAction
                 var image = context.GetImage();
                 if (context.TemplateMatch("Sarkaz@Roguelike@StartExplore.png", image, out _, 0.8, 958, 530, 322, 189))
                 {
-                    context.OverrideNext(args.TaskName, ["开始肉鸽"]);
+                    context.OverrideNext(args.NodeName, ["开始肉鸽"]);
                     return true;
                 }
                 return false;
             };
 
-            if (!waiting.Until(3000, errorAction: () =>
-                {
-                    context.OverrideNext(args.TaskName, ["启动检测"]);
-                }, maxCount: 200)) return true;
+            waiting.Until(3000);
         }
         return true;
-    }
-
-    public void Abort()
-    {
     }
 }

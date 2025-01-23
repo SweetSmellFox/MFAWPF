@@ -32,7 +32,7 @@ public class OCRHelper
         tasker ??= MaaProcessor.Instance.GetCurrentTasker();
         string result = string.Empty;
 
-        var job = tasker.AppendPipeline(new TaskModel
+        var job = tasker.AppendTask(new TaskModel
         {
             Recognition = "OCR",
             Roi = new []

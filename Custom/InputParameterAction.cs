@@ -9,15 +9,18 @@ using System.Linq;
 
 namespace MFAWPF.Custom;
 
-public class InputParameterAction : IMaaCustomAction
+public class InputParameterAction : MaaCustomAction
 {
-    public string Name { get; set; } = nameof(InputParameterAction);
+    public override string Name { get; set; } = nameof(InputParameterAction);
 
 
-    public bool Run(in IMaaContext icontext, in RunArgs iargs)
+    protected override void ErrorHandle(IMaaContext context, RunArgs args)
     {
-        var context = icontext;
-        var args = iargs;
+        context.OverrideNext(args.NodeName, ["启动检测"]);
+    }
+
+    protected override bool Execute(IMaaContext context, RunArgs args)
+    {
         var shouldRun = false;
         var enter1 = () =>
         {
@@ -35,14 +38,11 @@ public class InputParameterAction : IMaaCustomAction
             }
             return false;
         };
-        if (!enter1.Until(errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
-        
+        enter1.Until();
+
         if (shouldRun)
         {
-            context.OverrideNext(args.TaskName, ["开始探险"]);
+            context.OverrideNext(args.NodeName, ["开始探险"]);
             return true;
         }
         var enter2 = () =>
@@ -55,10 +55,7 @@ public class InputParameterAction : IMaaCustomAction
             }
             return false;
         };
-        if (!enter2.Until(errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
+       enter2.Until();
         var enter3 = () =>
         {
             var image = context.GetImage();
@@ -69,11 +66,8 @@ public class InputParameterAction : IMaaCustomAction
             }
             return false;
         };
-        if (!enter3.Until(errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
-        
+        enter3.Until();
+
 
         Thread.Sleep(150);
         var confirm = () =>
@@ -90,10 +84,7 @@ public class InputParameterAction : IMaaCustomAction
             }
             return false;
         };
-        if (!confirm.Until(errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
+        confirm.Until();
         var leaving = () =>
         {
             var image = context.GetImage();
@@ -106,11 +97,8 @@ public class InputParameterAction : IMaaCustomAction
             }
             return false;
         };
-        if (!leaving.Until(errorAction: () =>
-            {
-                context.OverrideNext(args.TaskName, ["启动检测"]);
-            })) return true;
-        context.OverrideNext(args.TaskName, ["开始探险"]);
+        leaving.Until();
+        context.OverrideNext(args.NodeName, ["开始探险"]);
         return true;
     }
 }
