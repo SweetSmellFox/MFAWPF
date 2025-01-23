@@ -122,13 +122,11 @@ public class MaaProcessor
                     instance.Wait();
                     if (instance.Result == null || !instance.Result.Initialized)
                     {
-                        Growls.Error("InitInstanceFailed".GetLocalizationString());
+                        // Growls.Error("InitInstanceFailed".GetLocalizationString());
                         LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
                         MainWindow.AddLogByKey("InstanceInitFailedLog");
                         MainWindow.Instance.SetConnected(false);
-                        MainWindow.Instance.deviceComboBox.ItemsSource = new List<string>
-                        {
-                        };
+                        MainWindow.Instance.deviceComboBox.ItemsSource = new List<string>();
                         Stop();
                         throw new Exception();
                     }
@@ -187,7 +185,7 @@ public class MaaProcessor
 
         _emulatorCancellationTokenSource?.Cancel();
 
-        if (_cancellationTokenSource != null)
+        if (_cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested)
         {
             IsStopped = setIsStopped;
             _cancellationTokenSource?.Cancel();
@@ -207,7 +205,6 @@ public class MaaProcessor
             }, null, "停止任务");
             TaskQueue.Clear();
             OnTaskQueueChanged();
-            _cancellationTokenSource = null;
         }
         else
         {
@@ -1034,7 +1031,7 @@ public class MaaProcessor
         {
             var jObject = JObject.Parse(args.Details);
             var name = jObject["name"]?.ToString() ?? string.Empty;
-            if (args.Message.StartsWith(MaaMsg.Task.Action.Prefix))
+            if (args.Message.StartsWith(MaaMsg.Node.Action.Prefix))
             {
                 if (MainWindow.Instance.TaskDictionary.TryGetValue(name, out var taskModel))
                 {
@@ -1049,7 +1046,7 @@ public class MaaProcessor
         var converter = new BrushConverter();
         switch (message)
         {
-            case MaaMsg.Task.Action.Succeeded:
+            case MaaMsg.Node.Action.Succeeded:
                 if (taskModel.FocusSucceeded != null)
                 {
                     for (int i = 0; i < taskModel.FocusSucceeded.Count; i++)
@@ -1071,7 +1068,7 @@ public class MaaProcessor
                     }
                 }
                 break;
-            case MaaMsg.Task.Action.Failed:
+            case MaaMsg.Node.Action.Failed:
                 if (taskModel.FocusFailed != null)
                 {
                     for (int i = 0; i < taskModel.FocusFailed.Count; i++)
@@ -1093,7 +1090,7 @@ public class MaaProcessor
                     }
                 }
                 break;
-            case MaaMsg.Task.Action.Starting:
+            case MaaMsg.Node.Action.Starting:
                 if (taskModel.FocusTip != null)
                 {
                     for (int i = 0; i < taskModel.FocusTip.Count; i++)
@@ -1175,7 +1172,7 @@ public class MaaProcessor
     {
         if (maa == null || task == null) throw new NullReferenceException();
         if (string.IsNullOrWhiteSpace(taskParams)) taskParams = "{}";
-        maa.AppendPipeline(task, taskParams).Wait().ThrowIfNot(MaaJobStatus.Succeeded);
+        maa.AppendTask(task, taskParams).Wait().ThrowIfNot(MaaJobStatus.Succeeded);
     }
 
     private static MaaImageBuffer GetImage(IMaaController? maaController)
