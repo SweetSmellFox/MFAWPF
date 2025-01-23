@@ -21,7 +21,7 @@ public class CustomPasswordBox : PasswordBox
     private const string ElementPasswordBox = "PART_PasswordBox";
 
     private const string ElementTextBox = "PART_TextBox";
-    
+
 
     private TextBox _textBox;
 
@@ -29,16 +29,17 @@ public class CustomPasswordBox : PasswordBox
     {
         Style = FindResource("PasswordBoxPlusBaseStyle") as Style;
     }
-    
+
     public override void OnApplyTemplate()
     {
         Type type = typeof(PasswordBox);
-        
+
 
         var textBoxField = type.GetField("_textBox", BindingFlags.NonPublic | BindingFlags.Instance);
         if (textBoxField != null)
         {
-            _textBox = (TextBox)textBoxField.GetValue(this);
+            if (textBoxField.GetValue(this) is TextBox textBox)
+                _textBox = textBox;
         }
         if (ActualPasswordBox != null)
             ActualPasswordBox.PasswordChanged -= PasswordBox_PasswordChanged;
