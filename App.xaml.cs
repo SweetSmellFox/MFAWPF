@@ -17,12 +17,11 @@ public partial class App
 {
     public App()
     {
-        Startup += App_Startup;
-        Exit += App_Exit;
     }
     
     [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
     private extern static IntPtr LoadLibrary(string lpFileName);
+    
     protected override void OnStartup(StartupEventArgs e)
     {
         var dllFolderPath = Path.Combine(AppContext.BaseDirectory, "DLL");
@@ -39,12 +38,6 @@ public partial class App
                 }
             }
         }
-        base.OnStartup(e);
-    }
-
-    void App_Startup(object sender, StartupEventArgs e)
-    {
-        //UI线程未捕获异常处理事件
         DispatcherUnhandledException +=
             App_DispatcherUnhandledException;
         //Task线程内未捕获异常处理事件
@@ -55,7 +48,9 @@ public partial class App
         SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
         LierdaCracker cracker = new LierdaCracker();
         cracker.Cracker();
+        base.OnStartup(e);
     }
+    
 
     private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
     {
@@ -63,11 +58,6 @@ public partial class App
         {
             Views.MainWindow.FollowSystemTheme();
         }
-    }
-
-    void App_Exit(object sender, ExitEventArgs e)
-    {
-        //程序退出时需要处理的业务
     }
 
     void App_DispatcherUnhandledException(object sender,

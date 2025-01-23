@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="clr-namespace:MFAWPF.Controls"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:constants="clr-namespace:MFAWPF.Utils"
     x:Name="ErrorViewWindow"
     Icon="../logo.ico"
     Title="{lex:Loc Error}"
@@ -78,7 +79,28 @@
                             Content="{lex:Loc  CopiedToClipboard}" />
                     </hc:Poptip.Instance>
                 </controls:CustomTextBlock>
+                <WrapPanel
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center">
+                    <WrapPanel.Resources>
+                        <Style TargetType="controls:CustomTextBlock">
+                            <Setter Property="Margin" Value="12,0,0,0" />
+                        </Style>
+                    </WrapPanel.Resources>
+            
+                    <controls:CustomTextBlock>
+                        <Hyperlink
+                            Name="LinkToCreateGitHubIssue"
+                            Click="Hyperlink_OnClick"
+                            NavigateUri="{Binding Source={x:Static constants:MFAUrls.NewIssueUri}}">
+                            <Run Text="{lex:Loc ErrorFeedbackLinkText}" /> 
+                        </Hyperlink>
+                    </controls:CustomTextBlock>
+            
+                </WrapPanel>
             </Grid>
         </Border>
+
     </Grid>
 </hc:Window>
