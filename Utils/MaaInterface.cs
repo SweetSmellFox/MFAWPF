@@ -122,6 +122,9 @@ public class MaaInterface
         public MaaResourceControllerWin32? Win32 { get; set; }
     }
 
+    [JsonProperty("mirrorchyan_rid")]
+    public string? RID { get; set; }
+    
     [JsonProperty("name")]
     public string? Name { get; set; }
 

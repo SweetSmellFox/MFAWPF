@@ -582,7 +582,7 @@
     <value>Getting the latest resources...</value>
   </data>
   <data name="FailToGetLatestVersionInfo" xml:space="preserve">
-    <value>Failed to get the latest version information and cannot update.</value>
+    <value>Failed to get the latest version information</value>
   </data>
   <data name="FailToGetDownloadUrl" xml:space="preserve">
     <value>Unable to get the resource download link, update failed.</value>
@@ -688,5 +688,20 @@
   </data>
   <data name="AutomaticMinimize" xml:space="preserve">
     <value>Auto Minimize after launched</value>
+  </data>
+  <data name="ResourceDownloadSource" xml:space="preserve">
+    <value>Resource Download Source</value>
+  </data>
+  <data name="MirrorAutoUpdatePrompt" xml:space="preserve">
+    <value>Please purchase the Mirror sauce service to enable automatic updates, or switch the download source to GitHub</value>
+  </data>
+  <data name="MirrorChyan" xml:space="preserve">
+    <value>Mirror Chyan</value>
+  </data>
+  <data name="PurchaseLink" xml:space="preserve">
+    <value>Purchase link</value>
+  </data>
+  <data name="ErrorFeedbackLinkText" xml:space="preserve">
+    <value>Create a GitHub issue</value>
   </data>
 </root>

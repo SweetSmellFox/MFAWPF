@@ -349,6 +349,24 @@ public class MainViewModel : ObservableObject
         }
     }
 
+    private int _downloadSourceIndex;
+
+    public int DownloadSourceIndex
+    {
+        set
+        {
+            DataSet.SetData("DownloadSourceIndex", value);
+            SetProperty(ref _downloadSourceIndex, value);
+        }
+        get
+        {
+            if (_downloadSourceIndex != DataSet.GetData("DownloadSourceIndex", 0))
+                _downloadSourceIndex = DataSet.GetData("DownloadSourceIndex", 0);
+            return _downloadSourceIndex;
+        }
+    }
+    
+    
     private string _beforeTask = "None".GetLocalizationString();
 
     public string BeforeTask
@@ -524,4 +542,15 @@ public class MainViewModel : ObservableObject
             }
         });
     }
+    public List<SettingViewModel> DownloadSourceList
+    {
+        get => _downloadSourceList;
+        set => SetProperty(ref _downloadSourceList, value);
+    }
+    
+    private List<SettingViewModel> _downloadSourceList =
+    [
+        new("GitHub"),
+        new("MirrorChyan"),
+    ];
 }

@@ -10,9 +10,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.IO.Compression;
+using System.Management;
 using System.Net.Http;
 using System.Text;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Windows;
 
 namespace MFAWPF.Utils;
@@ -29,7 +31,7 @@ public class VersionChecker
         {
             Checker.Queue.Enqueue(new MFATask
             {
-                Action = () => Checker.UpdateResource(DataSet.GetData("EnableAutoUpdateMFA", false), true, action: () =>
+                Action = () => Checker.UpdateResourceBySelection(DataSet.GetData("EnableAutoUpdateMFA", false), true, action: () =>
                 {
                     if (DataSet.GetData("EnableAutoUpdateMFA", false))
                         Checker.UpdateMFA(true);
@@ -41,7 +43,7 @@ public class VersionChecker
         {
             Checker.Queue.Enqueue(new MFATask
             {
-                Action = () => Checker.CheckForResourceUpdates(),
+                Action = () => Checker.CheckResourceBySelection(),
                 Name = "检测资源版本"
             });
         }
@@ -89,12 +91,12 @@ public class VersionChecker
 
     public static void CheckResourceVersionAsync()
     {
-        TaskManager.RunTaskAsync(() => Checker.CheckForResourceUpdates());
+        TaskManager.RunTaskAsync(() => Checker.CheckResourceBySelection());
     }
 
     public static void UpdateResourceAsync()
     {
-        TaskManager.RunTaskAsync(() => Checker.UpdateResource());
+        TaskManager.RunTaskAsync(() => Checker.UpdateResourceBySelection());
 
     }
 
@@ -111,6 +113,305 @@ public class VersionChecker
             dialog?.SetText(text.GetLocalizationString());
 
     }
+    public async void CheckResourceBySelection()
+    {
+        switch (MainWindow.Data.DownloadSourceIndex)
+        {
+            case 0:
+                CheckForResourceUpdates();
+                break;
+            case 1:
+                CheckResourceVersionWithMirrorApi();
+                break;
+        }
+    }
+    public async void UpdateResourceBySelection(bool closeDialog = false, bool noDialog = false, Action? action = null)
+    {
+        switch (MainWindow.Data.DownloadSourceIndex)
+        {
+            case 0:
+                UpdateResource(closeDialog, noDialog, action);
+                break;
+            case 1:
+                UpdateResourceWithMirrorApi(closeDialog, noDialog, action);
+                break;
+        }
+    }
+
+    public async void UpdateResourceWithMirrorApi(bool closeDialog = false, bool noDialog = false, Action? action = null)
+    {
+        MainWindow.Instance.SetUpdating(true);
+        DownloadDialog? dialog = null;
+        Growls.Process(() =>
+        {
+            if (!noDialog)
+                dialog = new DownloadDialog("UpdateResource".GetLocalizationString());
+            dialog?.Show();
+        });
+        var resid = MaaInterface.Instance?.Name ?? string.Empty;
+        if (string.IsNullOrEmpty(resid))
+        {
+            MainWindow.Instance.SetUpdating(false);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            return;
+        }
+        SetText("GettingLatestResources", dialog, noDialog);
+
+
+        string resId = GetResourceID();
+        string currentVersion = GetResourceVersion();
+        string cdk = DataSet.GetData("DownloadCDK", string.Empty);
+        string spId = GetDeviceId().ToString();
+        dialog?.UpdateProgress(10);
+        if (string.IsNullOrWhiteSpace(currentVersion) || string.IsNullOrWhiteSpace(resId))
+        {
+            Growls.ErrorGlobal("FailToGetCurrentVersionInfo".GetLocalizationString());
+            MainWindow.Instance.SetUpdating(false);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            MainWindow.Data.ClearDownloadProgress();
+            return;
+        }
+        string downloadUrl, latestVersion;
+
+        try
+        {
+            GetDownloadUrlFromMirror(currentVersion, resId, spId, cdk, out downloadUrl, out latestVersion);
+        }
+        catch (Exception ex)
+        {
+            SetText($"{ex.Message}", dialog, noDialog);
+            MainWindow.Instance.SetUpdating(false);
+            LoggerService.LogError(ex);
+            return;
+        }
+
+        dialog?.UpdateProgress(50);
+
+        if (string.IsNullOrWhiteSpace(latestVersion))
+        {
+            Growls.ErrorGlobal("FailToGetLatestVersionInfo".GetLocalizationString());
+
+            MainWindow.Instance.SetUpdating(false);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            MainWindow.Data.ClearDownloadProgress();
+            return;
+        }
+
+        var localVersion = MaaInterface.Instance?.Version ?? string.Empty;
+
+        if (!IsNewVersionAvailable(latestVersion, localVersion))
+        {
+            Growl.InfoGlobal("ResourcesAreLatestVersion".GetLocalizationString());
+            MainWindow.Instance.SetUpdating(false);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            MainWindow.Data.ClearDownloadProgress();
+            action?.Invoke();
+            return;
+        }
+
+        dialog?.UpdateProgress(100);
+
+        if (string.IsNullOrWhiteSpace(downloadUrl))
+        {
+            Growls.ErrorGlobal("FailToGetDownloadUrl".GetLocalizationString());
+            MainWindow.Instance.SetUpdating(false);
+            MainWindow.Data.ClearDownloadProgress();
+            return;
+        }
+        LoggerService.LogInfo(downloadUrl);
+        var tempPath = Path.Combine(AppContext.BaseDirectory, "temp");
+        if (!Directory.Exists(tempPath))
+        {
+            Directory.CreateDirectory(tempPath);
+        }
+
+        var tempZipFilePath = Path.Combine(tempPath, $"resource_{latestVersion}.zip");
+        dialog?.SetText("Downloading".GetLocalizationString());
+        dialog?.UpdateProgress(0);
+        if (!await DownloadFileAsync(downloadUrl, tempZipFilePath, dialog, "GameResourceUpdated"))
+        {
+            SetText("DownloadFailed", dialog, noDialog);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            return;
+        }
+        dialog?.SetText("ApplyingUpdate".GetLocalizationString());
+        dialog?.UpdateProgress(5);
+
+        var tempExtractDir = Path.Combine(tempPath, $"resource_{latestVersion}_extracted");
+        if (Directory.Exists(tempExtractDir))
+        {
+            Directory.Delete(tempExtractDir, true);
+        }
+        if (!File.Exists(tempZipFilePath))
+        {
+            SetText("DownloadFailed", dialog, noDialog);
+            Growls.Process(() =>
+            {
+                dialog?.Close();
+            });
+            return;
+        }
+
+        ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
+        dialog?.UpdateProgress(50);
+
+        var interfacePath = Path.Combine(tempExtractDir, "interface.json");
+        var resourceDirPath = Path.Combine(tempExtractDir, "resource");
+        if (!File.Exists(interfacePath))
+        {
+            interfacePath = Path.Combine(tempExtractDir, "assets", "interface.json");
+            resourceDirPath = Path.Combine(tempExtractDir, "assets", "resource");
+        }
+        string wpfDir = AppContext.BaseDirectory;
+        var file = new FileInfo(interfacePath);
+        if (file.Exists)
+        {
+            var targetPath = Path.Combine(wpfDir, "interface.json");
+            file.CopyTo(targetPath, true);
+        }
+        dialog?.UpdateProgress(60);
+
+        var di = new DirectoryInfo(resourceDirPath);
+        if (di.Exists)
+        {
+            CopyFolder(resourceDirPath, Path.Combine(wpfDir, "resource"));
+        }
+        dialog?.UpdateProgress(70);
+
+        File.Delete(tempZipFilePath);
+        Directory.Delete(tempExtractDir, true);
+        dialog?.UpdateProgress(80);
+
+        var newInterfacePath = Path.Combine(wpfDir, "interface.json");
+        if (File.Exists(newInterfacePath))
+        {
+            var jsonContent = await File.ReadAllTextAsync(newInterfacePath);
+            var settings = new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore,
+                DefaultValueHandling = DefaultValueHandling.Ignore
+            };
+
+            settings.Converters.Add(new MaaInterfaceSelectOptionConverter(true));
+
+            var @interface = JsonConvert.DeserializeObject<MaaInterface>(jsonContent, settings);
+            if (@interface != null)
+            {
+                @interface.Url = MaaInterface.Instance?.Url;
+                @interface.RID = GetResourceID();
+                @interface.Version = latestVersion;
+            }
+            var updatedJsonContent = JsonConvert.SerializeObject(@interface, settings);
+
+            await File.WriteAllTextAsync(newInterfacePath, updatedJsonContent);
+        }
+        dialog?.UpdateProgress(100);
+
+        dialog?.SetText("UpdateCompleted".GetLocalizationString());
+        dialog?.Dispatcher?.Invoke(() =>
+        {
+            if (dialog != null)
+                dialog.RestartButton.Visibility = Visibility.Visible;
+        });
+        MainWindow.Instance.SetUpdating(false);
+
+        Growls.Process(() =>
+        {
+            if (closeDialog)
+                dialog?.Close();
+            if (noDialog)
+            {
+                if (MessageBoxHelper.Show("GameResourceUpdated".GetLocalizationString(), buttons: MessageBoxButton.YesNo, icon: MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
+                    Growls.Process(Application.Current.Shutdown);
+                }
+            }
+        });
+        DataSet.SetData("TaskItems",
+            new List<DragItemViewModel>());
+        MainWindow.Instance.InitializeData();
+        action?.Invoke();
+    }
+
+    // 新的检测资源最新版本方法，使用Mirror酱API
+    public void CheckResourceVersionWithMirrorApi()
+    {
+        MainWindow.Instance.SetUpdating(true);
+
+        var resId = GetResourceID();
+        var currentVersion = GetResourceVersion();
+        var cdk = DataSet.GetData("DownloadCDK", string.Empty);
+        var spId = GetDeviceId().ToString();
+        var userAgent = "MFA";
+
+        var apiUrl = $"https://mirrorc.top/api/resources/{resId}/latest?current_version={currentVersion}&cdk={cdk}&sp_id={spId}&user_agent={userAgent}";
+
+        try
+        {
+            using var httpClient = new HttpClient();
+            var response = httpClient.GetAsync(apiUrl).Result;
+            response.EnsureSuccessStatusCode();
+
+            var jsonResponse = response.Content.ReadAsStringAsync().Result;
+            var responseData = JObject.Parse(jsonResponse);
+
+            if ((int)responseData["code"] == 0)
+            {
+                var data = responseData["data"];
+                string versionName = data["version_name"]?.ToString();
+
+                if (!string.IsNullOrEmpty(versionName))
+                {
+                    var localVersion = GetResourceVersion();
+                    if (IsNewVersionAvailable(versionName, localVersion))
+                    {
+                        Growl.Info("ResourceOption".GetLocalizationString() + "NewVersionAvailableLatestVersion".GetLocalizationString() + versionName);
+                    }
+                    else
+                    {
+                        Growl.Info("ResourcesAreLatestVersion".GetLocalizationString());
+                    }
+                }
+                else
+                {
+                    Growls.Error("FailToGetLatestVersionInfo".GetLocalizationString());
+                }
+            }
+            else
+            {
+                Growls.ErrorGlobal($"{"FailToGetLatestVersionInfo".GetLocalizationString()}: {responseData["msg"]}");
+            }
+        }
+        catch (Exception ex)
+        {
+            MainWindow.Instance.SetUpdating(false);
+            Growls.Error($"{"FailToGetLatestVersionInfo".GetLocalizationString()}: {ex.Message}");
+            LoggerService.LogError(ex);
+        }
+        finally
+        {
+            MainWindow.Instance.SetUpdating(false);
+        }
+    }
+
+
     public async void UpdateResource(bool closeDialog = false, bool noDialog = false, Action? action = null)
     {
         MainWindow.Instance.SetUpdating(true);
@@ -339,7 +640,7 @@ public class VersionChecker
 
         SetText("GettingLatestSoftware", dialog, noDialog);
 
-        var url = "https://github.com/SweetSmellFox/MFAWPF";
+        var url = MFAUrls.GitHub;
 
         dialog?.UpdateProgress(10);
 
@@ -520,7 +821,47 @@ public class VersionChecker
             CopyFolder(subDirectory, destinationSubDirectory);
         }
     }
+    private void GetDownloadUrlFromMirror(string version, string resId, string spId, string cdk, out string url, out string latest_version, string userAgent = "MFA")
+    {
+        var releaseUrl = $"https://mirrorc.top/api/resources/{resId}/latest?current_version={version}&cdk={cdk}&sp_id={spId}&user_agent={userAgent}";
 
+        var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
+        httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
+        try
+        {
+            var response = httpClient.GetAsync(releaseUrl).Result;
+            response.EnsureSuccessStatusCode();
+
+            var read = response.Content.ReadAsStringAsync();
+            read.Wait();
+            var jsonResponse = read.Result;
+            var responseData = JObject.Parse(jsonResponse);
+
+            if ((int)responseData["code"] == 0)
+            {
+                var data = responseData["data"];
+                var versionName = data["version_name"]?.ToString();
+                var downloadUrl = data["url"]?.ToString();
+                url = downloadUrl;
+                latest_version = versionName;
+            }
+            else
+            {
+                throw new Exception($"{"MirrorAutoUpdatePrompt".GetLocalizationString()}: {responseData["msg"]}");
+            }
+
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"{e.Message}");
+        }
+        finally
+        {
+            httpClient.Dispose();
+        }
+
+    }
     private string GetDownloadUrlFromGitHubRelease(string version, string owner, string repo)
     {
         var releaseUrl = $"https://api.github.com/repos/{owner}/{repo}/releases/tags/{version}";
@@ -601,61 +942,51 @@ public class VersionChecker
     //
     //     await client.DownloadFileTaskAsync(url, filePath);
     // }
-
     async private Task<bool> DownloadFileAsync(string url, string filePath, DownloadDialog? dialog, string key)
     {
         try
         {
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
-            client.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
-
-            var response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-
-            await using var contentStream = await response.Content.ReadAsStreamAsync();
-            await using var fileStream = File.Create(filePath);
-
-            var totalBytes = contentStream.CanSeek ? contentStream.Length : -1;
-            long currentBytes = 0;
-
-            var buffer = new byte[8192];
-            int bytesRead;
-            var startTime = DateTime.Now;
-            var lastOutputTime = startTime;
-            var bytesPerSecond = 0L;
-            var totalBytesReadSinceLastOutput = 0L;
-
-            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            using (var client = new WebClient())
             {
-                await fileStream.WriteAsync(buffer, 0, bytesRead);
-                currentBytes += bytesRead;
-                totalBytesReadSinceLastOutput += bytesRead;
+                client.Headers[HttpRequestHeader.UserAgent] = "request";
+                client.Headers[HttpRequestHeader.Accept] = "application/json";
 
-                var currentTime = DateTime.Now;
-                var timeSpan = currentTime - lastOutputTime;
-                if (timeSpan.TotalSeconds >= 1)
-                {
-                    bytesPerSecond = totalBytesReadSinceLastOutput;
-                    totalBytesReadSinceLastOutput = 0;
-                    lastOutputTime = currentTime;
-                }
+                var startTime = DateTime.Now;
+                long totalBytesRead = 0;
+                long bytesPerSecond = 0;
+                long totalBytes = 0;
 
-                var progressPercentage = totalBytes > 0 ? (double)currentBytes / totalBytes * 100 : 0;
-                dialog?.UpdateProgress(progressPercentage);
-                Growls.Process(() =>
-                    MainWindow.Data.OutputDownloadProgress(currentBytes, totalBytes, (int)bytesPerSecond, timeSpan.TotalSeconds));
-                if (progressPercentage >= 100)
+                client.DownloadProgressChanged += (_, e) =>
                 {
-                    Growls.Process(() => MainWindow.Data.OutputDownloadProgress(downloading: false, output: key.GetLocalizationString()));
-                }
+                    var currentTime = DateTime.Now;
+                    var timeSpan = currentTime - startTime;
+                    totalBytesRead = e.BytesReceived;
+                    totalBytes = e.TotalBytesToReceive;
+
+                    if (timeSpan.TotalSeconds >= 1)
+                    {
+                        bytesPerSecond = totalBytesRead - (totalBytesRead - e.BytesReceived);
+                        startTime = currentTime;
+                    }
+
+                    var progressPercentage = totalBytes > 0 ? (double)totalBytesRead / totalBytes * 100 : 0;
+                    dialog?.UpdateProgress(progressPercentage);
+                    Growls.Process(() =>
+                        MainWindow.Data.OutputDownloadProgress(totalBytesRead, totalBytes, (int)bytesPerSecond, timeSpan.TotalSeconds));
+
+                    if (progressPercentage >= 100)
+                    {
+                        Growls.Process(() => MainWindow.Data.OutputDownloadProgress(downloading: false, output: key.GetLocalizationString()));
+                    }
+                };
+
+                await client.DownloadFileTaskAsync(new Uri(url), filePath);
             }
-
-            fileStream.Close();
+            return true;
         }
-        catch (HttpRequestException httpEx)
+        catch (WebException webEx)
         {
-            LoggerService.LogError($"HTTP请求出现异常: {httpEx.Message}");
+            LoggerService.LogError($"HTTP请求出现异常: {webEx.Message}");
             return false;
         }
         catch (IOException ioEx)
@@ -668,7 +999,93 @@ public class VersionChecker
             LoggerService.LogError($"出现未知异常: {ex.Message}");
             return false;
         }
-        return true;
+    }
+    // async private Task<bool> DownloadFileAsync(string url, string filePath, DownloadDialog? dialog, string key)
+    // {
+    //     try
+    //     {
+    //         using var client = new HttpClient();
+    //         client.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
+    //         client.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
+    //
+    //         var response = await client.GetAsync(url);
+    //
+    //         await using var contentStream = await response.Content.ReadAsStreamAsync();
+    //         await using var fileStream = File.Create(filePath);
+    //
+    //         var totalBytes = contentStream.CanSeek ? contentStream.Length : -1;
+    //         long currentBytes = 0;
+    //
+    //         var buffer = new byte[8192];
+    //         int bytesRead;
+    //         var startTime = DateTime.Now;
+    //         var lastOutputTime = startTime;
+    //         var bytesPerSecond = 0L;
+    //         var totalBytesReadSinceLastOutput = 0L;
+    //
+    //         while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+    //         {
+    //             await fileStream.WriteAsync(buffer, 0, bytesRead);
+    //             currentBytes += bytesRead;
+    //             totalBytesReadSinceLastOutput += bytesRead;
+    //
+    //             var currentTime = DateTime.Now;
+    //             var timeSpan = currentTime - lastOutputTime;
+    //             if (timeSpan.TotalSeconds >= 1)
+    //             {
+    //                 bytesPerSecond = totalBytesReadSinceLastOutput;
+    //                 totalBytesReadSinceLastOutput = 0;
+    //                 lastOutputTime = currentTime;
+    //             }
+    //
+    //             var progressPercentage = totalBytes > 0 ? (double)currentBytes / totalBytes * 100 : 0;
+    //             dialog?.UpdateProgress(progressPercentage);
+    //             Growls.Process(() =>
+    //                 MainWindow.Data.OutputDownloadProgress(currentBytes, totalBytes, (int)bytesPerSecond, timeSpan.TotalSeconds));
+    //             if (progressPercentage >= 100)
+    //             {
+    //                 Growls.Process(() => MainWindow.Data.OutputDownloadProgress(downloading: false, output: key.GetLocalizationString()));
+    //             }
+    //         }
+    //
+    //         fileStream.Close();
+    //     }
+    //     catch (HttpRequestException httpEx)
+    //     {
+    //         LoggerService.LogError($"HTTP请求出现异常: {httpEx.Message}");
+    //         return false;
+    //     }
+    //     catch (IOException ioEx)
+    //     {
+    //         LoggerService.LogError($"文件操作出现异常: {ioEx.Message}");
+    //         return false;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         LoggerService.LogError($"出现未知异常: {ex.Message}");
+    //         return false;
+    //     }
+    //     return true;
+    // }
+
+    private bool IsPathWritable(string? path)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            return false;
+        }
+
+        try
+        {
+            string testFilePath = Path.Combine(path, Path.GetRandomFileName());
+            using (File.Create(testFilePath)) { }
+            File.Delete(testFilePath);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public void CheckForGUIUpdates()
@@ -903,7 +1320,10 @@ public class VersionChecker
     {
         return MaaInterface.Instance?.Version ?? "DEBUG";
     }
-
+    private string GetResourceID()
+    {
+        return MaaInterface.Instance?.RID ?? "Unknown";
+    }
     private bool IsNewVersionAvailable(string latestVersion, string localVersion)
     {
         try
@@ -950,5 +1370,104 @@ public class VersionChecker
         }
 
         throw new FormatException("无法解析版本号: " + versionString);
+    }
+
+    private static readonly Guid Namespace = new("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
+
+    public static Guid? GetDeviceId()
+    {
+        string cpuSerial = GetCpuSerial();
+        if (!string.IsNullOrEmpty(cpuSerial))
+        {
+            byte[] namespaceBytes = Namespace.ToByteArray();
+            byte[] nameBytes = Encoding.UTF8.GetBytes(cpuSerial);
+            byte[] hashBytes = new byte[namespaceBytes.Length + nameBytes.Length];
+
+            Buffer.BlockCopy(namespaceBytes, 0, hashBytes, 0, namespaceBytes.Length);
+            Buffer.BlockCopy(nameBytes, 0, hashBytes, namespaceBytes.Length, nameBytes.Length);
+
+            using (System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create())
+            {
+                byte[] digest = sha1.ComputeHash(hashBytes);
+                byte[] newGuidBytes = new byte[16];
+                Buffer.BlockCopy(digest, 0, newGuidBytes, 0, 16);
+                return new Guid(newGuidBytes);
+            }
+        }
+        return null;
+    }
+
+    private static string GetCpuSerial()
+    {
+        string system = Environment.OSVersion.Platform.ToString();
+        if (system.Contains("Win32"))
+        {
+            try
+            {
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT ProcessorId FROM Win32_Processor");
+                foreach (ManagementObject mo in searcher.Get())
+                {
+                    return mo["ProcessorId"].ToString();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error getting CPU serial on Windows: {e}");
+            }
+        }
+        else if (system.Contains("Unix"))
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                try
+                {
+                    Process process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "sh",
+                            Arguments = "-c \"cat /proc/cpuinfo | grep serial | cut -d ' ' -f 2\"",
+                            RedirectStandardOutput = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        }
+                    };
+                    process.Start();
+                    string result = process.StandardOutput.ReadToEnd().Trim();
+                    process.WaitForExit();
+                    return result;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error getting CPU serial on Linux: {e}");
+                }
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                try
+                {
+                    Process process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo
+                        {
+                            FileName = "sh",
+                            Arguments = "-c \"ioreg -l | grep IOPlatformSerialNumber\"",
+                            RedirectStandardOutput = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        }
+                    };
+                    process.Start();
+                    string result = process.StandardOutput.ReadToEnd().Trim();
+                    process.WaitForExit();
+                    return result.Split('"')[3];
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error getting CPU serial on macOS: {e}");
+                }
+            }
+        }
+        return "UNKNOWN";
     }
 }

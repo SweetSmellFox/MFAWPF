@@ -579,7 +579,7 @@
     <value>正在獲取最新資源.....</value>
   </data>
   <data name="FailToGetLatestVersionInfo" xml:space="preserve">
-    <value>获取最新版本信息失敗，無法更新。</value>
+    <value>获取最新版本信息失敗</value>
   </data>
   <data name="FailToGetDownloadUrl" xml:space="preserve">
     <value>無法獲取資源下載鏈接，更新失敗。</value>
@@ -688,5 +688,20 @@
   </data>
   <data name="AutomaticMinimize" xml:space="preserve">
     <value>啟動 MFA 後直接最小化</value>
+  </data>
+  <data name="ResourceDownloadSource" xml:space="preserve">
+    <value>資源下載源</value>
+  </data>
+  <data name="MirrorAutoUpdatePrompt" xml:space="preserve">
+    <value>請購買 Mirror 醬服務以實現自動更新，或將下載源切換至 GitHub</value>
+  </data>
+  <data name="MirrorChyan" xml:space="preserve">
+    <value>Mirror 醬</value>
+  </data>
+  <data name="PurchaseLink" xml:space="preserve">
+    <value>購買鏈接</value>
+  </data>
+  <data name="ErrorFeedbackLinkText" xml:space="preserve">
+    <value>建立 GitHub issue</value>
   </data>
 </root>

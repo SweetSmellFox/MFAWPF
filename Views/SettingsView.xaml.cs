@@ -1,6 +1,8 @@
 using MFAWPF.Utils;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace MFAWPF.Views;
 
@@ -53,5 +55,10 @@ public partial class SettingsView
     private void UpdateMFA(object sender, RoutedEventArgs e)
     {
         VersionChecker.UpdateMFAAsync();
+    }
+    
+    private void Hyperlink_OnClick(object sender, RoutedEventArgs e)
+    {
+        Process.Start(new ProcessStartInfo(((Hyperlink)sender).NavigateUri.AbsoluteUri) { UseShellExecute = true });
     }
 }

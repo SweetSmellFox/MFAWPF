@@ -7,6 +7,9 @@
              xmlns:lex="http://wpflocalizeextension.codeplex.com"
              xmlns:hc="https://handyorg.github.io/handycontrol"
              xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
+             xmlns:custom="clr-namespace:MFAWPF.Custom"
+             xmlns:utils="clr-namespace:MFAWPF.Utils"
+
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="800">
     <Grid Margin="20 5 20 20">
@@ -81,22 +84,22 @@
                           HorizontalAlignment="Center">
                 </CheckBox>
                 <hc:Divider Content="{Binding ListTitle[5].Name}" />
-                   <Grid Margin="30 10 30 10" HorizontalAlignment="Center">
+                <Grid Margin="30 10 30 10" HorizontalAlignment="Center">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="220" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
-                        <CheckBox  Margin="10"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Center" x:Name="AutoMinimizeCheckBox"
-                                   Content="{lex:Loc AutomaticMinimize}" IsEnabled="{calcBinding:Binding 'Idle'}">
+                        <CheckBox Margin="10"
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Center" x:Name="AutoMinimizeCheckBox"
+                                  Content="{lex:Loc AutomaticMinimize}" IsEnabled="{calcBinding:Binding 'Idle'}">
                         </CheckBox>
-                        <CheckBox  Margin="10"
-                                   HorizontalAlignment="Left"
-                                   VerticalAlignment="Center" x:Name="AutoHideCheckBox"
-                                   Content="{lex:Loc AutomaticHide}" IsEnabled="{calcBinding:Binding 'Idle'}">
+                        <CheckBox Margin="10"
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Center" x:Name="AutoHideCheckBox"
+                                  Content="{lex:Loc AutomaticHide}" IsEnabled="{calcBinding:Binding 'Idle'}">
                         </CheckBox>
 
                     </StackPanel>
@@ -104,20 +107,30 @@
 
                         <Grid Margin="5">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="40" />
                             </Grid.ColumnDefinitions>
-                            <hc:TextBox hc:TitleElement.TitlePlacement="Top" hc:TitleElement.Title="{lex:Loc SoftwarePath}" hc:InfoElement.ShowClearButton="True" x:Name="SoftwarePathTextBox"  HorizontalAlignment="Stretch" >
- 
+                            <hc:TextBox hc:TitleElement.TitlePlacement="Top"
+                                        hc:TitleElement.Title="{lex:Loc SoftwarePath}"
+                                        hc:InfoElement.ShowClearButton="True" x:Name="SoftwarePathTextBox"
+                                        HorizontalAlignment="Stretch">
+
                             </hc:TextBox>
-                            <Button Grid.Column="1" VerticalAlignment="Bottom" x:Name="SoftwarePathSelectButton" ToolTip="{lex:Loc Select}">
+                            <Button Grid.Column="1" VerticalAlignment="Bottom" x:Name="SoftwarePathSelectButton"
+                                    ToolTip="{lex:Loc Select}">
                                 <Button.Content>
-                                    <Path Width="15" MaxWidth="15" Stretch="Uniform" Fill="{StaticResource GrayColor4}" Data="{StaticResource LoadGeometry}"/>
+                                    <Path Width="15" MaxWidth="15" Stretch="Uniform" Fill="{StaticResource GrayColor4}"
+                                          Data="{StaticResource LoadGeometry}" />
                                 </Button.Content>
                             </Button>
                         </Grid>
-                        <hc:TextBox Margin="5" hc:TitleElement.TitlePlacement="Top" hc:TitleElement.Title="{lex:Loc StartupParameter}" x:Name="ExtrasTextBox" ToolTip = "mumu是-v 多开号(从0开始),雷电是index=多开号(也是0)" HorizontalAlignment="Stretch"></hc:TextBox>
-                        <hc:NumericUpDown Margin="5"  hc:TitleElement.TitlePlacement="Top" hc:TitleElement.Title="{lex:Loc WaitSoftware}" x:Name="WaitSoftwareTimeTextBox"  Style="{StaticResource NumericUpDownExtend}" >
+                        <hc:TextBox Margin="5" hc:TitleElement.TitlePlacement="Top"
+                                    hc:TitleElement.Title="{lex:Loc StartupParameter}" x:Name="ExtrasTextBox"
+                                    ToolTip="mumu是-v 多开号(从0开始),雷电是index=多开号(也是0)" HorizontalAlignment="Stretch">
+                        </hc:TextBox>
+                        <hc:NumericUpDown Margin="5" hc:TitleElement.TitlePlacement="Top"
+                                          hc:TitleElement.Title="{lex:Loc WaitSoftware}"
+                                          x:Name="WaitSoftwareTimeTextBox" Style="{StaticResource NumericUpDownExtend}">
 
 
                         </hc:NumericUpDown>
@@ -172,7 +185,32 @@
                         </CheckBox>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical" Margin="10 0 0 0">
-                        <hc:Shield x:Name="MFAShield" Color="#6969AA" Subject="{lex:Loc SoftwareVersion}" Margin="5" HorizontalAlignment="Center">
+                        <hc:ComboBox HorizontalAlignment="Left" IsEnabled="{calcBinding:Binding 'Idle'}"
+                                     Margin="53 5 5 5"
+                                     hc:TitleElement.TitlePlacement="Top" Width="200" x:Name="DownloadSourceCombox"
+                                     DisplayMemberPath="Name"
+                                     hc:TitleElement.HorizontalAlignment="Left"
+                                     ItemsSource="{Binding DownloadSourceList}"
+                                     hc:TitleElement.Title="{lex:Loc ResourceDownloadSource}"
+                                     SelectedIndex="{Binding DownloadSourceIndex}">
+                        </hc:ComboBox>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="33 2 5 5"
+                                    Visibility="{calcBinding:Binding 'DownloadSourceIndex==1'}">
+                            <custom:CustomPasswordBox Margin="20 2 5 10" x:Name="CdkPassword"
+                                                      IsEnabled="{calcBinding:Binding 'Idle'}" ShowEyeButton="True"
+                                                      hc:TitleElement.HorizontalAlignment="Left"
+                                                      hc:TitleElement.Title="CDK"
+                                                      Width="200">
+                            </custom:CustomPasswordBox>
+                            <TextBlock Margin="2 12 5 -2" VerticalAlignment="Center">
+                                <Hyperlink NavigateUri="{Binding  Source={x:Static utils:MFAUrls.PurchaseLink}}"
+                                           RequestNavigate="Hyperlink_OnClick">
+                                    <Run Text="{lex:Loc PurchaseLink}" />
+                                </Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
+                        <hc:Shield x:Name="MFAShield" Color="#6969AA" Subject="{lex:Loc SoftwareVersion}" Margin="5"
+                                   HorizontalAlignment="Center">
                             <TextBlock
                                 MaxWidth="150"
                                 Margin="0,3,0,3"
@@ -180,7 +218,8 @@
                                 Foreground="White" x:Name="MFAShieldTextBlock"
                                 TextWrapping="Wrap" />
                         </hc:Shield>
-                        <hc:Shield x:Name="ResourceShield" Color="#6969AA" Subject="{lex:Loc ResourceVersion}" Margin="5" HorizontalAlignment="Center"> 
+                        <hc:Shield x:Name="ResourceShield" Color="#6969AA" Subject="{lex:Loc ResourceVersion}"
+                                   Margin="5" HorizontalAlignment="Center">
                             <TextBlock
                                 MaxWidth="150"
                                 Margin="0,3,0,3"
@@ -189,7 +228,9 @@
                                 TextWrapping="Wrap" />
                         </hc:Shield>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Margin="5" Click="CheckResourceUpdate" Content="{lex:Loc CheckResource}"  IsEnabled="{calcBinding:Binding '!IsUpdating'}"></Button>
+                            <Button Margin="5" Click="CheckResourceUpdate" Content="{lex:Loc CheckResource}"
+                                    IsEnabled="{calcBinding:Binding '!IsUpdating'}">
+                            </Button>
                             <Button Margin="5" Click="UpdateResource" Content="{lex:Loc UpdateResource}"
                                     IsEnabled="{calcBinding:Binding '!IsUpdating'}">
                             </Button>
