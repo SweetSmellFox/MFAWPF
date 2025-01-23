@@ -1428,9 +1428,10 @@ public partial class MainWindow
                     AddOption(s1, option, dragItem);
             }
 
-            if (!string.IsNullOrWhiteSpace(dragItem.InterfaceItem.Document))
+            if (dragItem.InterfaceItem.Document != null && dragItem.InterfaceItem.Document.Count > 0)
             {
-                AddIntroduction(s1, Regex.Unescape(dragItem.InterfaceItem.Document));
+                string combinedString = string.Join("\\n", dragItem.InterfaceItem);
+                AddIntroduction(s1, Regex.Unescape(combinedString));
             }
 
             var sc1 = new ScrollViewer
@@ -1804,7 +1805,7 @@ public partial class MainWindow
             if (Data != null)
                 Data.NotLock = MaaInterface.Instance?.LockController != true;
             ConnectSettingButton.IsChecked = true;
-            var value = DataSet.GetData("EnableEdit", true);
+            var value = DataSet.GetData("EnableEdit", false);
             if (!value)
                 EditButton.Visibility = Visibility.Collapsed;
             DataSet.SetData("EnableEdit", value);
@@ -2033,11 +2034,13 @@ public partial class MainWindow
 
         //性能设置
         settingsView.performanceSettings.IsChecked = DataSet.GetData("EnableGPU", true);
-        settingsView.performanceSettings.Click += (_, _) => { DataSet.SetData("EnableGPU", settingsView.performanceSettings.IsChecked); };
+        settingsView.performanceSettings.Checked += (_, _) => { DataSet.SetData("EnableGPU", true); };
+        settingsView.performanceSettings.Unchecked += (_, _) => { DataSet.SetData("EnableGPU", false); };
 
         //运行设置
         settingsView.enableSaveDrawSettings.IsChecked = DataSet.GetData("EnableSaveDraw", false);
-        settingsView.enableSaveDrawSettings.Click += (_, _) => { DataSet.SetData("EnableSaveDraw", settingsView.enableSaveDrawSettings.IsChecked); };
+        settingsView.enableSaveDrawSettings.Checked += (_, _) => { DataSet.SetData("EnableSaveDraw", true); };
+        settingsView.enableSaveDrawSettings.Unchecked += (_, _) => { DataSet.SetData("EnableSaveDraw", false); };
 
         settingsView.beforeTaskSettings.Text = DataSet.GetData("Prescript", string.Empty);
         settingsView.beforeTaskSettings.BindLocalization("Prescript");
@@ -2156,14 +2159,20 @@ public partial class MainWindow
             }
         };
         //软件更新
+        settingsView.CdkPassword.Password = DataSet.GetData("DownloadCDK", string.Empty);
+        settingsView.CdkPassword.PasswordChanged += (_, _) => { DataSet.SetData("DownloadCDK", settingsView.CdkPassword.Password); };
+       
         settingsView.enableCheckVersionSettings.IsChecked = DataSet.GetData("EnableCheckVersion", true);
-        settingsView.enableCheckVersionSettings.Click += (_, _) => { DataSet.SetData("EnableCheckVersion", settingsView.enableCheckVersionSettings.IsChecked); };
+        settingsView.enableCheckVersionSettings.Checked += (_, _) => { DataSet.SetData("EnableCheckVersion", true); };
+        settingsView.enableCheckVersionSettings.Unchecked += (_, _) => { DataSet.SetData("EnableCheckVersion", false); };
 
         settingsView.enableAutoUpdateResourceSettings.IsChecked = DataSet.GetData("EnableAutoUpdateResource", false);
-        settingsView.enableAutoUpdateResourceSettings.Click += (_, _) => { DataSet.SetData("EnableAutoUpdateResource", settingsView.enableAutoUpdateResourceSettings.IsChecked); };
+        settingsView.enableAutoUpdateResourceSettings.Checked += (_, _) => { DataSet.SetData("EnableAutoUpdateResource", true); };
+        settingsView.enableAutoUpdateResourceSettings.Unchecked += (_, _) => { DataSet.SetData("EnableAutoUpdateResource", false); };
 
         settingsView.enableAutoUpdateMFASettings.IsChecked = DataSet.GetData("EnableAutoUpdateMFA", false);
-        settingsView.enableAutoUpdateMFASettings.Click += (_, _) => { DataSet.SetData("EnableAutoUpdateMFA", settingsView.enableAutoUpdateMFASettings.IsChecked); };
+        settingsView.enableAutoUpdateMFASettings.Checked += (_, _) => { DataSet.SetData("EnableAutoUpdateMFA", true); };
+        settingsView.enableAutoUpdateMFASettings.Unchecked += (_, _) => { DataSet.SetData("EnableAutoUpdateMFA", false); };
         //关于我们
         AddAbout();
     }

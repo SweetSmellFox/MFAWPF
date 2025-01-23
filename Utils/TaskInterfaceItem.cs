@@ -7,7 +7,8 @@ public class TaskInterfaceItem
 {
     [JsonProperty("name")] public string? Name;
     [JsonProperty("entry")] public string? Entry;
-    [JsonProperty("doc")] public string? Document;
+    [JsonConverter(typeof(SingleOrListConverter))]
+    [JsonProperty("doc")] public List<string>? Document;
     [JsonProperty("check")] public bool? Check;
     [JsonProperty("repeatable")] public bool? Repeatable;
     [JsonProperty("repeat_count")] public int? RepeatCount;
