@@ -96,7 +96,7 @@ public class DragItemViewModel : ObservableObject
             {
                 if (value.Name != null)
                     Name = value.Name;
-                SettingVisibility = value is { Option.Count: > 0 } || value.Repeatable.IsTrue() || !string.IsNullOrWhiteSpace(value.Document)
+                SettingVisibility = value is { Option.Count: > 0 } || value.Repeatable.IsTrue() || value.Document != null && value.Document.Count >0
                     ? Visibility.Visible
                     : Visibility.Hidden;
                 if (value.Check.HasValue)
