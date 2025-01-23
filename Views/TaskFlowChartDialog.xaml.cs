@@ -1,8 +1,10 @@
-﻿using System.Windows;
+﻿using MFAWPF.Utils;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using MFAWPF.ViewModels;
 using QuickGraph;
+using System.Windows.Data;
 using TextBlock = System.Windows.Controls.TextBlock;
 
 namespace MFAWPF.Views;
@@ -23,65 +25,194 @@ public partial class TaskFlowChartDialog
         UpdateGraph();
     }
 
-    private BidirectionalGraph<object, IEdge<object>> CreateGraph(List<TaskItemViewModel>? tasks)
+    private void Dialog_MouseWheel(object sender, MouseWheelEventArgs e)
     {
-        var graph = new BidirectionalGraph<object, IEdge<object>>();
+
+        var isCtrlKeyPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+        if (isCtrlKeyPressed)
+        {
+            Point mousePosition = e.GetPosition(GraphArea);
+            double scaleX = sfr.ScaleX;
+            double scaleY = sfr.ScaleY;
+
+            double factor = e.Delta > 0 ? 1.1 : 1 / 1.1;
+            scaleX *= factor;
+            scaleY *= factor;
+
+            // 更新缩放比例
+            sfr.ScaleX = scaleX;
+            sfr.ScaleY = scaleY;
+            // 检查边界
+            CheckZoomBounds(mousePosition, scaleX, scaleY);
+        }
+    }
+
+    private void CheckZoomBounds(Point mousePosition, double scaleX, double scaleY)
+    {
+        double imageWidth = graphLayout.ActualWidth;
+        double imageHeight = graphLayout.ActualHeight;
+
+        if (mousePosition.X >= 0 && mousePosition.X <= imageWidth)
+        {
+            sfr.CenterX = mousePosition.X;
+        }
+        else
+        {
+            sfr.CenterX = imageWidth;
+        }
+
+        if (mousePosition.Y >= 0 && mousePosition.Y <= imageHeight)
+        {
+            sfr.CenterY = mousePosition.Y;
+        }
+        else
+        {
+            sfr.CenterY = imageHeight;
+        }
+    }
+    private void CancelButton_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+    private void GraphLayout_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Left)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                _startPoint = e.GetPosition(GraphArea);
+                _isDragging = true;
+                Mouse.Capture(GraphArea);
+            }
+            else
+            {
+                var hitTestResult = VisualTreeHelper.HitTest(graphLayout, e.GetPosition(graphLayout));
+                if (hitTestResult?.VisualHit is TextBlock textBlock && _editTaskDialog.Data is { DataList: not null })
+                {
+                    _editTaskDialog.Data.CurrentTask =
+                        _editTaskDialog.Data.DataList.FirstOrDefault(model =>
+                            !string.IsNullOrWhiteSpace(textBlock.Text) && model.Name.Equals(textBlock.Text))
+                        ?? _editTaskDialog.Data.CurrentTask;
+                }
+            }
+        }
+    }
+
+    private void GraphLayout_MouseMove(object sender, MouseEventArgs e)
+    {
+        var isCtrlKeyPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+        if (_isDragging && isCtrlKeyPressed && e.LeftButton == MouseButtonState.Pressed)
+        {
+            var Dposition = e.GetPosition(GraphArea);
+            Point previousPosition = _startPoint;
+            if (previousPosition == new Point(0, 0))
+            {
+                previousPosition = Dposition;
+            }
+
+            double offsetX = Dposition.X - previousPosition.X;
+            double offsetY = Dposition.Y - previousPosition.Y;
+
+            // 使用 Transform 类实现拖动
+            var translateTransform = ttf;
+            translateTransform.X += offsetX;
+            translateTransform.Y += offsetY;
+
+            _startPoint = Dposition;
+        }
+    }
+
+    private void GraphLayout_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (_isDragging)
+        {
+            _isDragging = false;
+        }
+        // 释放鼠标捕获
+        Mouse.Capture(null);
+    }
+
+
+    public BidirectionalGraph<Vertex, CustomEdge> InternalGraph { get; set; }
+    public BidirectionalGraph<object, IEdge<object>> Graph { get; set; }
+
+    public void UpdateGraph()
+    {
+        var tasks = _editTaskDialog.Data?.DataList;
+        if (tasks == null) return;
+
+        InternalGraph = new BidirectionalGraph<Vertex, CustomEdge>();
+
+        // 创建顶点字典
         var vertexDictionary = new Dictionary<string, Vertex>();
-        if (tasks == null || tasks.Count == 0)
-            return graph;
+
+        // 添加顶点
         foreach (var task in tasks)
         {
-            if (_vertexTaskMapping != null && !vertexDictionary.ContainsKey(task.Name))
+            if (!vertexDictionary.ContainsKey(task.Name))
             {
                 var vertex = new Vertex(task.Name);
                 vertexDictionary[task.Name] = vertex;
-                graph.AddVertex(vertex);
-                Console.WriteLine(vertex.Name);
-                _vertexTaskMapping[vertex.Name] = task;
+                InternalGraph.AddVertex(vertex);
             }
 
             if (task.Task is { Next: not null })
             {
-                AddEdges(graph, vertexDictionary, task.Task.Next, vertexDictionary[task.Name], "Normal");
-            }
-        }
-
-        return graph;
-    }
-
-    private void AddEdges(BidirectionalGraph<object, IEdge<object>> graph,
-        Dictionary<string, Vertex> vertexDictionary, List<string>? nextTasks, Vertex sourceVertex, string edgeType)
-    {
-        if (nextTasks is not null)
-        {
-            foreach (var nextTask in nextTasks)
-            {
-                if (!vertexDictionary.ContainsKey(nextTask))
+                foreach (var nextTask in task.Task.Next)
                 {
-                    var vertex = new Vertex(nextTask);
-                    vertexDictionary[nextTask] = vertex;
-                    graph.AddVertex(vertex);
+                    if (!vertexDictionary.ContainsKey(nextTask))
+                    {
+                        var vertex = new Vertex(nextTask);
+                        vertexDictionary[nextTask] = vertex;
+                        InternalGraph.AddVertex(vertex);
+                    }
+
+                    var source = vertexDictionary[task.Name];
+                    var target = vertexDictionary[nextTask];
+                    var edge = new CustomEdge(source, target, "Next");
+                    InternalGraph.AddEdge(edge);
                 }
-
-                var edge = new EdgeWithLabel(sourceVertex, vertexDictionary[nextTask], edgeType);
-                graph.AddEdge(edge);
             }
-        }
-    }
 
-    public class Vertex
-    {
-        public string Name { get; set; }
+            // if (task.Task is { OnError: not null })
+            // {
+            //     foreach (var errorTask in task.Task.OnError)
+            //     {
+            //         if (!vertexDictionary.ContainsKey(errorTask))
+            //         {
+            //             var vertex = new Vertex(errorTask);
+            //             vertexDictionary[errorTask] = vertex;
+            //             InternalGraph.AddVertex(vertex);
+            //         }
+            //
+            //         var source = vertexDictionary[task.Name];
+            //         var target = vertexDictionary[errorTask];
+            //         var edge = new CustomEdge(source, target, "OnError");
+            //         InternalGraph.AddEdge(edge);
+            //     }
+            // }
 
-        public Vertex(string name)
-        {
-            Name = name;
-        }
+            // 进行类型适配
+            var adaptedVertices = InternalGraph.Vertices.Cast<object>().ToList();
+            var adaptedEdges = new List<IEdge<object>>();
+            foreach (var edge in InternalGraph.Edges)
+            {
+                adaptedEdges.Add(new EdgeWithLabel(edge.Source, edge.Target, edge.EdgeType));
+            }
 
-        public override string ToString()
-        {
-            return Name;
+            Graph = new BidirectionalGraph<object, IEdge<object>>();
+            foreach (var vertex in adaptedVertices)
+            {
+                Graph.AddVertex(vertex);
+            }
+            foreach (var edge in adaptedEdges)
+            {
+                Graph.AddEdge(edge);
+            }
+
+
         }
+        graphLayout.Graph = Graph;
     }
 
     public class EdgeWithLabel : Edge<object>
@@ -100,108 +231,29 @@ public partial class TaskFlowChartDialog
         }
     }
 
-
-    private void GraphLayout_OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+    public class Vertex
     {
-        if (e.ChangedButton == MouseButton.Left)
+        public string Name { get; set; }
+
+        public Vertex(string name)
         {
-            if (Keyboard.Modifiers == ModifierKeys.Control)
-            {
-                _startPoint = e.GetPosition(scrollViewer);
-                _isDragging = true;
-                Mouse.Capture(graphLayout);
-            }
-            else
-            {
-                var hitTestResult = VisualTreeHelper.HitTest(graphLayout, e.GetPosition(graphLayout));
-                if (hitTestResult?.VisualHit is TextBlock textBlock && _editTaskDialog.Data is { DataList: not null })
-                {
-                    _editTaskDialog.Data.CurrentTask =
-                        _editTaskDialog.Data.DataList.FirstOrDefault(model =>
-                            !string.IsNullOrWhiteSpace(textBlock.Text) && model.Name.Equals(textBlock.Text))
-                        ?? _editTaskDialog.Data.CurrentTask;
-                }
-            }
+            Name = name;
         }
-        // if (e.ChangedButton == MouseButton.Right)
-        // {
-        //     // 右键删除节点或连线
-        //     var hitTestResult = VisualTreeHelper.HitTest(graphLayout, e.GetPosition(graphLayout));
-        //     if (hitTestResult != null && hitTestResult.VisualHit is CustomTextBlock textBlock)
-        //     {
-        //         var taskName = textBlock.Text;
-        //
-        //         // 改进后的部分：先检查键是否存在
-        //         if (_vertexTaskMapping.TryGetValue(taskName, out var taskToRemove))
-        //         {
-        //             _editTaskDialog.Data.DataList.Remove(taskToRemove);
-        //             UpdateGraph();
-        //         }
-        //         else
-        //         {
-        //             // 键不存在的情况，处理错误或警告
-        //             MessageBox.Show($"任务 '{taskName}' 未找到。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-        //         }
-        //     }
-        //     else if (hitTestResult.VisualHit is Path line)
-        //     {
-        //         var edge = line.DataContext as EdgeWithLabel;
-        //         if (edge != null)
-        //         {
-        //             var sourceTask = _vertexTaskMapping[edge.Source.ToString()];
-        //             sourceTask.Task.next.Remove(edge.Target.ToString());
-        //             UpdateGraph();
-        //         }
-        //     }
-        // }
-    }
 
-    private void GraphLayout_MouseMove(object sender, MouseEventArgs e)
-    {
-        if (_isDragging)
+        public override string ToString()
         {
-            var currentPoint = e.GetPosition(scrollViewer);
-            scrollViewer.ScrollToHorizontalOffset(scrollViewer.HorizontalOffset -
-                                                  (currentPoint.X - _startPoint.X));
-            scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - (currentPoint.Y - _startPoint.Y));
-            _startPoint = currentPoint;
+            return Name;
         }
     }
 
-    private void GraphLayout_MouseUp(object sender, MouseButtonEventArgs e)
+    public class CustomEdge : Edge<Vertex>
     {
-        if (e.ChangedButton == MouseButton.Left && _isDragging)
+        public string EdgeType { get; set; }
+
+        public CustomEdge(Vertex source, Vertex target, string edgeType) : base(source, target)
         {
-            _isDragging = false;
-            Mouse.Capture(null);
+            EdgeType = edgeType;
         }
     }
-
-    private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-    {
-        if (Keyboard.Modifiers == ModifierKeys.Control)
-        {
-            if (e.Delta > 0)
-            {
-                graphLayout.LayoutTransform = new ScaleTransform(graphLayout.LayoutTransform.Value.M11 * 1.1,
-                    graphLayout.LayoutTransform.Value.M22 * 1.1);
-            }
-            else
-            {
-                graphLayout.LayoutTransform = new ScaleTransform(graphLayout.LayoutTransform.Value.M11 / 1.1,
-                    graphLayout.LayoutTransform.Value.M22 / 1.1);
-            }
-
-            e.Handled = true;
-        }
-    }
-
-    public void UpdateGraph()
-    {
-        _vertexTaskMapping = new Dictionary<string, TaskItemViewModel>();
-        var graph = CreateGraph(_editTaskDialog.Data?.DataList?.ToList());
-        graphLayout.Graph = graph;
-        if (_editTaskDialog.Data is not null)
-            _editTaskDialog.Data.CurrentTask = null; // 更新完图形后，清空选择以防止不必要的误操作
-    }
+    // 边类型到画刷的转换器
 }
