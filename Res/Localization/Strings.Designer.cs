@@ -836,9 +836,9 @@ namespace MFAWPF.Res.Localization {
         /// <summary>
         ///   Looks up a localized string similar to 连接失败.
         /// </summary>
-        internal static string InstanceInitFailedLog {
+        internal static string ConnectFailed {
             get {
-                return ResourceManager.GetString("InstanceInitFailedLog", resourceCulture);
+                return ResourceManager.GetString("ConnectFailed", resourceCulture);
             }
         }
         

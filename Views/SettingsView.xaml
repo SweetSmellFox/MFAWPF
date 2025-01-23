@@ -78,11 +78,25 @@
                              Visibility="{calcBinding:Binding !IsAdb}" IsEnabled="{calcBinding:Binding 'Idle'}"
                              HorizontalAlignment="Center">
                 </hc:ComboBox>
+                <CheckBox Visibility="{calcBinding:Binding IsAdb}"
+                          Margin="20,10"  HorizontalAlignment="Center"
+                          Content="{lex:Loc RetryOnDisconnected}"
+                          IsChecked="{Binding RetryOnDisconnected}"
+                />
+                <CheckBox Visibility="{calcBinding:Binding IsAdb}"
+                          Margin="20,10"  HorizontalAlignment="Center"
+                          Content="{lex:Loc AllowAdbRestart}"
+                          IsChecked="{Binding AllowAdbRestart}" />
+                <CheckBox Visibility="{calcBinding:Binding IsAdb}"
+                          Margin="20,10" HorizontalAlignment="Center"
+                          Content="{lex:Loc AllowAdbHardRestart}"
+                          IsChecked="{Binding AllowAdbHardRestart}" />
                 <hc:Divider Content="{Binding ListTitle[4].Name}" />
                 <CheckBox Margin="30 10 30 10" x:Name="performanceSettings" Content="{lex:Loc EnableGPU}"
                           IsEnabled="{calcBinding:Binding 'Idle'}"
                           HorizontalAlignment="Center">
                 </CheckBox>
+                
                 <hc:Divider Content="{Binding ListTitle[5].Name}" />
                 <Grid Margin="30 10 30 10" HorizontalAlignment="Center">
                     <Grid.ColumnDefinitions>

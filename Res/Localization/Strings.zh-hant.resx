@@ -227,7 +227,7 @@
     <data name="InitInstanceFailed" xml:space="preserve">
     <value>初始化MAA實例失敗，發生連線錯誤或資源檔案損壞，請參閱日誌.</value>
   </data>
-    <data name="InstanceInitFailedLog" xml:space="preserve">
+    <data name="ConnectFailed" xml:space="preserve">
     <value>連線失敗</value>
   </data>
     <data name="TaskStart" xml:space="preserve">
@@ -703,5 +703,23 @@
   </data>
   <data name="ErrorFeedbackLinkText" xml:space="preserve">
     <value>建立 GitHub issue</value>
+  </data>
+  <data name="RetryOnDisconnected" xml:space="preserve">
+    <value>ADB 連線失敗時嘗試啟動模擬器</value>
+  </data>
+  <data name="AllowAdbRestart" xml:space="preserve">
+    <value>連接失敗後嘗試重開 ADB 伺服器</value>
+  </data>
+  <data name="AllowAdbHardRestart" xml:space="preserve">
+    <value>連接失敗後嘗試重開 ADB 程式</value>
+  </data>
+  <data name="TryToReconnectByAdb" xml:space="preserve">
+    <value>正在嘗試重连</value>
+  </data>
+  <data name="TryToStartEmulator" xml:space="preserve">
+    <value>正在嘗試啟動模擬器</value>
+  </data>
+  <data name="RestartAdb" xml:space="preserve">
+    <value>正在嘗試重開 ADB 伺服器</value>
   </data>
 </root>

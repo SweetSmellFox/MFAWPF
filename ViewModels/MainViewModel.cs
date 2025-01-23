@@ -365,8 +365,8 @@ public class MainViewModel : ObservableObject
             return _downloadSourceIndex;
         }
     }
-    
-    
+
+
     private string _beforeTask = "None".GetLocalizationString();
 
     public string BeforeTask
@@ -542,15 +542,61 @@ public class MainViewModel : ObservableObject
             }
         });
     }
+
     public List<SettingViewModel> DownloadSourceList
     {
         get => _downloadSourceList;
         set => SetProperty(ref _downloadSourceList, value);
     }
-    
+
     private List<SettingViewModel> _downloadSourceList =
     [
         new("GitHub"),
         new("MirrorChyan"),
     ];
+
+    private bool _retryOnDisconnected = DataSet.GetData("RetryOnDisconnected", false);
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to retry task after ADB disconnected.
+    /// </summary>
+    public bool RetryOnDisconnected
+    {
+        get => _retryOnDisconnected;
+        set
+        {
+            SetProperty(ref _retryOnDisconnected, value);
+            DataSet.SetData("RetryOnDisconnected", value);
+        }
+    }
+
+    private bool _allowAdbRestart = DataSet.GetData("AllowAdbRestart", true);
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to retry task after ADB disconnected.
+    /// </summary>
+    public bool AllowAdbRestart
+    {
+        get => _allowAdbRestart;
+        set
+        {
+            SetProperty(ref _allowAdbRestart, value);
+            DataSet.SetData("AllowAdbRestart", value);
+        }
+    }
+
+    private bool _allowAdbHardRestart = DataSet.GetData("AllowAdbHardRestart", true);
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to allow for killing ADB process.
+    /// </summary>
+    public bool AllowAdbHardRestart
+    {
+        get => _allowAdbHardRestart;
+        set
+        {
+            SetProperty(ref _allowAdbHardRestart, value);
+            DataSet.SetData("AllowAdbHardRestart", value);
+        }
+    }
 }

@@ -227,7 +227,7 @@
     <data name="InitInstanceFailed" xml:space="preserve">
     <value>Failed to initialize MAA instance, a connection error or resource file corruption occurred, please refer to the logs.</value>
   </data>
-    <data name="InstanceInitFailedLog" xml:space="preserve">
+    <data name="ConnectFailed" xml:space="preserve">
     <value>Connection failure</value>
   </data>
     <data name="TaskStart" xml:space="preserve">
@@ -703,5 +703,23 @@
   </data>
   <data name="ErrorFeedbackLinkText" xml:space="preserve">
     <value>Create a GitHub issue</value>
+  </data>
+  <data name="RetryOnDisconnected" xml:space="preserve">
+    <value>Retry launching the emulator when ADB connection fails</value>
+  </data>
+  <data name="AllowAdbRestart" xml:space="preserve">
+    <value>Attempt to restart ADB Server after connection failure</value>
+  </data>
+  <data name="AllowAdbHardRestart" xml:space="preserve">
+    <value>Attempt to kill and restart ADB process after connection failure</value>
+  </data>
+  <data name="TryToReconnectByAdb" xml:space="preserve">
+    <value>Attempting to reconnect</value>
+  </data>
+  <data name="TryToStartEmulator" xml:space="preserve">
+    <value>Trying to start the emulator</value>
+  </data>
+  <data name="RestartAdb" xml:space="preserve">
+    <value>Trying to restart the ADB Server</value>
   </data>
 </root>

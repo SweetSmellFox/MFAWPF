@@ -119,17 +119,79 @@ public class MaaProcessor
                         ? "Emulator"
                         : "Window");
                     var instance = Task.Run(GetCurrentTasker, token);
-                    instance.Wait();
-                    if (instance.Result == null || !instance.Result.Initialized)
+                    instance.Wait(token);
+                    bool connected = instance.Result is { Initialized: true };
+                    if (!connected && MainWindow.Data.IsAdb && DataSet.GetData("RetryOnDisconnected", false))
                     {
-                        // Growls.Error("InitInstanceFailed".GetLocalizationString());
-                        LoggerService.LogWarning("InitControllerFailed".GetLocalizationString());
-                        MainWindow.AddLogByKey("InstanceInitFailedLog");
+                        MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "TryToStartEmulator".GetLocalizationString());
+
+                        StartSoftware();
+
+                        if (token.IsCancellationRequested)
+                        {
+                            Stop();
+                            return;
+                        }
+                        instance = Task.Run(GetCurrentTasker, token);
+                        instance.Wait(token); connected = instance.Result is { Initialized: true };
+                    }
+                    if (!connected && MainWindow.Data.IsAdb)
+                    {
+                        MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "TryToReconnectByAdb".GetLocalizationString());
+                        ReconnectByAdb();
+
+                        if (token.IsCancellationRequested)
+                        {
+                            Stop();
+                            return;
+                        }
+
+                        MainWindow.Instance.SetConnected(false);
+                        instance = Task.Run(GetCurrentTasker, token);
+                        instance.Wait(token); connected = instance.Result is { Initialized: true };
+                    }
+                    if (!connected && MainWindow.Data.IsAdb && DataSet.GetData("AllowAdbRestart", true))
+                    {
+                        MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" +"RestartAdb".GetLocalizationString());
+
+                        RestartAdb();
+
+                        if (token.IsCancellationRequested)
+                        {
+                            Stop();
+                            return;
+                        }
+
+                        instance = Task.Run(GetCurrentTasker, token);
+                        instance.Wait(token); connected = instance.Result is { Initialized: true };
+                    }
+
+                    // 尝试杀掉 ADB 进程
+                    if (!connected  && MainWindow.Data.IsAdb && DataSet.GetData("AllowAdbHardRestart", true))
+                    {
+                        MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "HardRestartAdb".GetLocalizationString());
+
+                       HardRestartAdb();
+
+                        if (token.IsCancellationRequested)
+                        {
+                            Stop();
+                            return;
+                        }
+
+                        instance = Task.Run(GetCurrentTasker, token);
+                        instance.Wait(token); connected = instance.Result is { Initialized: true };
+                    }
+                    if (!connected)
+                    {
+                        LoggerService.LogWarning("ConnectFailed".GetLocalizationString());
+                        MainWindow.AddLogByKey("ConnectFailed");
                         MainWindow.Instance.SetConnected(false);
                         MainWindow.Instance.deviceComboBox.ItemsSource = new List<string>();
                         Stop();
                         throw new Exception();
                     }
+                    if (connected) MainWindow.Instance.SetConnected(true);
                     if (!MainWindow.Instance.IsConnected())
                     {
                         Growls.Warning("Warning_CannotConnect".GetLocalizationString()
@@ -1186,5 +1248,118 @@ public class MaaProcessor
             return buffer;
         maaController.GetCachedImage(buffer);
         return buffer;
+    }
+
+    public void RestartAdb()
+    {
+        if (!DataSet.GetData("AllowAdbRestart", false))
+        {
+            return;
+        }
+
+        var adbPath = Config.AdbDevice.AdbPath;
+
+        if (string.IsNullOrEmpty(adbPath))
+        {
+            return;
+        }
+
+        ProcessStartInfo processStartInfo = new ProcessStartInfo
+        {
+            FileName = "cmd.exe",
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            CreateNoWindow = true,
+            UseShellExecute = false,
+        };
+
+        Process process = new Process
+        {
+            StartInfo = processStartInfo,
+        };
+
+        process.Start();
+        process.StandardInput.WriteLine($"{adbPath} kill-server");
+        process.StandardInput.WriteLine($"{adbPath} start-server");
+        process.StandardInput.WriteLine("exit");
+        process.WaitForExit();
+    }
+
+    public void ReconnectByAdb()
+    {
+        var adbPath = Config.AdbDevice.AdbPath;
+        var address = Config.AdbDevice.AdbSerial;
+
+        if (string.IsNullOrEmpty(adbPath))
+        {
+            return;
+        }
+
+        ProcessStartInfo processStartInfo = new ProcessStartInfo
+        {
+            FileName = "cmd.exe",
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+            CreateNoWindow = true,
+            UseShellExecute = false,
+        };
+
+        var process = new Process
+        {
+            StartInfo = processStartInfo,
+        };
+
+        process.Start();
+        process.StandardInput.WriteLine($"{adbPath} disconnect {address}");
+        process.StandardInput.WriteLine("exit");
+        process.WaitForExit();
+    }
+
+    public void HardRestartAdb()
+    {
+        if (!DataSet.GetData("AllowAdbHardRestart", false))
+        {
+            return;
+        }
+
+        var adbPath = Config.AdbDevice.AdbPath;
+        if (string.IsNullOrEmpty(adbPath))
+        {
+            return;
+        }
+
+        // This allows for SQL injection, but since it is not on a real database nothing horrible would happen.
+        // The following query string does what I want, but WMI does not accept it.
+        // var wmiQueryString = string.Format("SELECT ProcessId, CommandLine FROM Win32_Process WHERE ExecutablePath='{0}'", adbPath);
+        const string WmiQueryString = "SELECT ProcessId, ExecutablePath, CommandLine FROM Win32_Process";
+        using var searcher = new ManagementObjectSearcher(WmiQueryString);
+        using var results = searcher.Get();
+        var query = from p in Process.GetProcesses()
+                    join mo in results.Cast<ManagementObject>()
+                        on p.Id equals (int)(uint)mo["ProcessId"]
+                    select new
+                    {
+                        Process = p,
+                        Path = (string)mo["ExecutablePath"],
+                    };
+        foreach (var item in query)
+        {
+            if (item.Path != adbPath)
+            {
+                continue;
+            }
+
+            // Some emulators start their ADB with administrator privilege.
+            // Not sure if this is necessary
+            try
+            {
+                item.Process.Kill();
+                item.Process.WaitForExit();
+            }
+            catch
+            {
+                // ignored
+            }
+        }
     }
 }
