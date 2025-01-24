@@ -1321,10 +1321,12 @@ public class VersionChecker
     {
         return MaaInterface.Instance?.Version ?? "DEBUG";
     }
+
     private string GetResourceID()
     {
-        return MaaInterface.Instance?.RID ?? "Unknown";
+        return MaaInterface.Instance?.RID ?? MaaInterface.Instance?.Name ?? string.Empty;
     }
+
     private bool IsNewVersionAvailable(string latestVersion, string localVersion)
     {
         try
@@ -1419,7 +1421,7 @@ public class VersionChecker
                         }
                     };
                     process.Start();
-                    string result = process.StandardOutput.ReadToEnd().Trim();
+                    var result = process.StandardOutput.ReadToEnd().Trim();
                     process.WaitForExit();
                     return result;
                 }
