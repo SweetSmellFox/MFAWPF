@@ -63,6 +63,7 @@
 {
   "name": "项目名称", //默认为null
   "version":  "项目版本", //默认为null
+  "mirrorchyan_rid":  "项目ID(从Mirror酱下载的必要字段)", //默认为null , 比如 M9A
   "url":  "项目链接(目前应该只支持Github)", //默认为null , 比如 https://github.com/{Github账户}/{Github项目}
   "custom_title": "自定义标题", //默认为null, 使用该字段后，标题栏将只显示custom_title和version
   "default_controller": "adb", //默认为adb, 启动后的默认控制器，可选项 adb , win32 

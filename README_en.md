@@ -58,10 +58,11 @@
 }
  ```
 Modify it as follows:
- ```json
+ ```
 {
   "name": "Project Name", // Default is null
   "version":  "Project Version", // Default is null
+  "mirrorchyan_rid":  "Project ID (necessary fields downloaded from MirrorChyan)", // Default is null, for example, M9A
   "url":  "Project URL (currently only supports Github)", // Default is null, for example, https://github.com/{GithubAccount}/{GithubRepo}
   "custom_title": "Custom Title", // Default is null, after using this field, the title bar will only show custom_title and version
   "default_controller": "adb", // Default is adb, the default controller after startup, options include adb or win32
