@@ -16,6 +16,7 @@ using System.Text;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
+using XNetEx.Guids.Generators;
 
 namespace MFAWPF.Utils;
 
@@ -1372,39 +1373,24 @@ public class VersionChecker
         throw new FormatException("无法解析版本号: " + versionString);
     }
 
-    private static readonly Guid Namespace = new("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
+    private static readonly Guid Namespace = Guid.Parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
 
-    public static Guid? GetDeviceId()
+    private static Guid? GetDeviceId()
     {
-        string cpuSerial = GetCpuSerial();
-        if (!string.IsNullOrEmpty(cpuSerial))
-        {
-            byte[] namespaceBytes = Namespace.ToByteArray();
-            byte[] nameBytes = Encoding.UTF8.GetBytes(cpuSerial);
-            byte[] hashBytes = new byte[namespaceBytes.Length + nameBytes.Length];
-
-            Buffer.BlockCopy(namespaceBytes, 0, hashBytes, 0, namespaceBytes.Length);
-            Buffer.BlockCopy(nameBytes, 0, hashBytes, namespaceBytes.Length, nameBytes.Length);
-
-            using (System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create())
-            {
-                byte[] digest = sha1.ComputeHash(hashBytes);
-                byte[] newGuidBytes = new byte[16];
-                Buffer.BlockCopy(digest, 0, newGuidBytes, 0, 16);
-                return new Guid(newGuidBytes);
-            }
-        }
-        return null;
+        var cpuSerial = GetCpuSerial();
+        LoggerService.LogInfo($"CPU: {cpuSerial}");
+        LoggerService.LogInfo($"SPID: {GuidGenerator.Version5.NewGuid(Namespace, cpuSerial)}");
+        return GuidGenerator.Version5.NewGuid(Namespace, cpuSerial);
     }
 
     private static string GetCpuSerial()
     {
-        string system = Environment.OSVersion.Platform.ToString();
+        var system = Environment.OSVersion.Platform.ToString();
         if (system.Contains("Win32"))
         {
             try
             {
-                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT ProcessorId FROM Win32_Processor");
+                var searcher = new ManagementObjectSearcher("SELECT ProcessorId FROM Win32_Processor");
                 foreach (ManagementObject mo in searcher.Get())
                 {
                     return mo["ProcessorId"].ToString();
@@ -1458,7 +1444,7 @@ public class VersionChecker
                         }
                     };
                     process.Start();
-                    string result = process.StandardOutput.ReadToEnd().Trim();
+                    var result = process.StandardOutput.ReadToEnd().Trim();
                     process.WaitForExit();
                     return result.Split('"')[3];
                 }
