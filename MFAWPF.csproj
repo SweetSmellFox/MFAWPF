@@ -46,8 +46,8 @@
         <ApplicationRevision>0</ApplicationRevision>
         <ApplicationVersion>1.1.0</ApplicationVersion>
         <Version>1.1</Version>
-        <FileVersion>0.0.1</FileVersion>
-        <AssemblyVersion>1.2.4.3</AssemblyVersion>
+        <FileVersion>1.2.4.4</FileVersion>
+        <AssemblyVersion>1.2.4.4</AssemblyVersion>
         <InformationalVersion>0.0.1</InformationalVersion>
     </PropertyGroup>
   
