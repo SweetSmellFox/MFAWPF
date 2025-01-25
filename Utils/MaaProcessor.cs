@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using HandyControl.Controls;
+using HandyControl.Tools.Extension;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Custom;
@@ -133,7 +134,8 @@ public class MaaProcessor
                             return;
                         }
                         instance = Task.Run(GetCurrentTasker, token);
-                        instance.Wait(token); connected = instance.Result is { Initialized: true };
+                        instance.Wait(token);
+                        connected = instance.Result is { Initialized: true };
                     }
                     if (!connected && MainWindow.Data.IsAdb)
                     {
@@ -148,11 +150,12 @@ public class MaaProcessor
 
                         MainWindow.Instance.SetConnected(false);
                         instance = Task.Run(GetCurrentTasker, token);
-                        instance.Wait(token); connected = instance.Result is { Initialized: true };
+                        instance.Wait(token);
+                        connected = instance.Result is { Initialized: true };
                     }
                     if (!connected && MainWindow.Data.IsAdb && DataSet.GetData("AllowAdbRestart", true))
                     {
-                        MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" +"RestartAdb".GetLocalizationString());
+                        MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "RestartAdb".GetLocalizationString());
 
                         RestartAdb();
 
@@ -163,15 +166,16 @@ public class MaaProcessor
                         }
 
                         instance = Task.Run(GetCurrentTasker, token);
-                        instance.Wait(token); connected = instance.Result is { Initialized: true };
+                        instance.Wait(token);
+                        connected = instance.Result is { Initialized: true };
                     }
 
                     // 尝试杀掉 ADB 进程
-                    if (!connected  && MainWindow.Data.IsAdb && DataSet.GetData("AllowAdbHardRestart", true))
+                    if (!connected && MainWindow.Data.IsAdb && DataSet.GetData("AllowAdbHardRestart", true))
                     {
                         MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "HardRestartAdb".GetLocalizationString());
 
-                       HardRestartAdb();
+                        HardRestartAdb();
 
                         if (token.IsCancellationRequested)
                         {
@@ -180,7 +184,8 @@ public class MaaProcessor
                         }
 
                         instance = Task.Run(GetCurrentTasker, token);
-                        instance.Wait(token); connected = instance.Result is { Initialized: true };
+                        instance.Wait(token);
+                        connected = instance.Result is { Initialized: true };
                     }
                     if (!connected)
                     {
@@ -278,6 +283,67 @@ public class MaaProcessor
             }
         }
     }
+    async private static Task<bool> DingTalkMessageAsync(string accessToken, string secret)
+    {
+        // 生成时间戳（Unix时间戳，单位为秒）
+        var timestamp = GetTimestamp();
+
+        var sign = CalculateSignature(timestamp, secret);
+
+        // 要发送的消息
+        var message = new
+        {
+            msgtype = "text",
+            text = new
+            {
+                content = "TaskAllCompleted".GetLocalizationString()
+            }
+        };
+
+        // 发送消息
+        try
+        {
+            var apiUrl =
+                $"https://oapi.dingtalk.com/robot/send?access_token={accessToken}&timestamp={timestamp}&sign={sign}";
+            using var client = new HttpClient();
+
+            var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8,
+                "application/json");
+            var response = await client.PostAsync(apiUrl, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                LoggerService.LogInfo("消息发送成功");
+                return true;
+            }
+
+            LoggerService.LogError($"消息发送失败：{response.StatusCode} {await response.Content.ReadAsStringAsync()}");
+            return false;
+
+
+        }
+        catch (Exception ex)
+        {
+            LoggerService.LogError($"发送消息出错：{ex.Message}");
+            return false;
+        }
+    }
+
+
+    public async  static Task ExternalNotificationAsync()
+    {
+        var enabledProviders = MainWindow.Data.EnabledExternalNotificationProviderList;
+
+        foreach (var enabledProvider in enabledProviders)
+        {
+            switch (enabledProvider)
+            {
+                case "DingTalk":
+                    await DingTalkMessageAsync(MainWindow.Data.DingTalkToken, MainWindow.Data.DingTalkSecret);
+                    break;
+            }
+        }
+    }
 
     public void HandleAfterTaskOperation()
     {
@@ -302,9 +368,6 @@ public class MaaProcessor
                 break;
             case 6:
                 Restart();
-                break;
-            case 7:
-                DingTalkMessageAsync();
                 break;
         }
     }
@@ -522,60 +585,6 @@ public class MaaProcessor
         Process.Start("shutdown", "/r /t 0");
     }
 
-    private static async Task DingTalkMessageAsync()
-    {
-        // 从文件中读取配置信息
-        string configFilePath = Path.Combine(Path.Combine(Environment.CurrentDirectory, "config"), "auth.txt");
-        var config = ReadConfigFile(configFilePath);
-        // 配置文件样例：
-        // accessToken=65ff4c133
-        // secret=SEC9eca40f06x
-
-        // 钉钉机器人配置信息
-        string accessToken = config["accessToken"];
-        string secret = config["secret"];
-
-        // 生成时间戳（Unix时间戳，单位为秒）
-        string timestamp = GetTimestamp();
-
-        string sign = CalculateSignature(timestamp, secret);
-
-        // 要发送的消息
-        var message = new
-        {
-            msgtype = "text",
-            text = new
-            {
-                content = "任务已全部完成"
-            }
-        };
-
-        // 发送消息
-        try
-        {
-            string apiUrl =
-                $"https://oapi.dingtalk.com/robot/send?access_token={accessToken}&timestamp={timestamp}&sign={sign}";
-            using (HttpClient client = new HttpClient())
-            {
-                var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8,
-                    "application/json");
-                HttpResponseMessage response = await client.PostAsync(apiUrl, content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine("消息发送成功");
-                }
-                else
-                {
-                    Console.WriteLine($"消息发送失败：{response.StatusCode} {await response.Content.ReadAsStringAsync()}");
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"发送消息出错：{ex.Message}");
-        }
-    }
 
     static string GetTimestamp()
     {
@@ -591,19 +600,15 @@ public class MaaProcessor
 
         byte[] hmacCode = ComputeHmacSha256(secretBytes, stringToSignBytes);
         string base64Encoded = Convert.ToBase64String(hmacCode);
-        //string sign = HttpUtility.UrlEncode(Convert.ToBase64String(hmacCode));
         string sign = WebUtility.UrlEncode(base64Encoded).Replace("+", "%20").Replace("/", "%2F").Replace("=", "%3D");
         return sign;
-        // Console.WriteLine(timestamp);
-        // Console.WriteLine(sign);
     }
 
     static byte[] ComputeHmacSha256(byte[] key, byte[] data)
     {
-        using (var hmacsha256 = new HMACSHA256(key))
-        {
-            return hmacsha256.ComputeHash(data);
-        }
+        using var hmacsha256 = new HMACSHA256(key);
+        return hmacsha256.ComputeHash(data);
+
     }
 
     static Dictionary<string, string> ReadConfigFile(string filePath)
@@ -780,7 +785,7 @@ public class MaaProcessor
             {
                 MainWindow.AddLogByKey("TaskAllCompleted");
             }
-
+            ExternalNotificationAsync();
             HandleAfterTaskOperation();
         }
 
@@ -878,6 +883,9 @@ public class MaaProcessor
         {
             LoggerService.LogInfo(string.Join(",", CurrentResources ?? Array.Empty<string>().ToList()));
             maaResource = new MaaResource(CurrentResources ?? Array.Empty<string>().ToList());
+
+            maaResource.SetOptionInferenceDevice(DataSet.GetData("EnableGPU", true) ? InferenceDevice.Auto : InferenceDevice.CPU);
+            LoggerService.LogInfo($"GPU acceleration: {DataSet.GetData("EnableGPU", true)}");
         }
         catch (Exception e)
         {
@@ -885,7 +893,7 @@ public class MaaProcessor
             return null;
         }
 
-        LoggerService.LogInfo("Resources initialized successfully".GetLocalizationString());
+        LoggerService.LogInfo("InitResourcesSuccess".GetLocalizationString());
         LoggerService.LogInfo("LoadingController".GetLocalizationString());
         MaaController controller;
         try
@@ -915,12 +923,9 @@ public class MaaProcessor
                 DisposeOptions = DisposeOptions.All,
             };
             RegisterCustomRecognitionsAndActions(tasker);
-            if (!DataSet.GetData("EnableGPU", true))
-            {
-                tasker.Resource.SetOptionInferenceDevice(InferenceDevice.CPU);
-                LoggerService.LogInfo("已禁用GPU加速！");
-            }
-            tasker.Utility.SetOptionSaveDraw(DataSet.GetData("EnableSaveDraw", false));
+            tasker.Utility.SetOptionRecording(DataSet.MaaConfig.GetConfig("recording", false));
+            tasker.Utility.SetOptionSaveDraw(DataSet.MaaConfig.GetConfig("save_draw", false));
+            tasker.Utility.SetOptionShowHitDraw(DataSet.MaaConfig.GetConfig("show_hit_draw", false));
             return tasker;
         }
         catch (Exception e)
@@ -966,9 +971,9 @@ public class MaaProcessor
                 Config.DesktopWindow.Check);
     }
 
-    static List<MetadataReference>? MetadataReferences;
+    private static List<MetadataReference>? MetadataReferences;
 
-    static List<MetadataReference> GetMetadataReferences()
+    private static List<MetadataReference> GetMetadataReferences()
     {
         if (MetadataReferences == null)
         {
@@ -999,11 +1004,29 @@ public class MaaProcessor
         return MetadataReferences;
     }
 
-    public static IEnumerable<CustomValue<object>> LoadAndInstantiateCustomClasses(string directory, string[] interfacesToImplement)
+
+    private static bool _shouldLoadCustomClasses = true;
+    private static FileSystemWatcher _watcher;
+    private static void onFileChanged(object sender, FileSystemEventArgs e)
+    {
+        _shouldLoadCustomClasses = true;
+    }
+    private static IEnumerable<CustomValue<object>> LoadAndInstantiateCustomClasses(string directory, string[] interfacesToImplement)
     {
         var customClasses = new List<CustomValue<object>>();
         if (Path.Exists(directory))
         {
+            if (_watcher == null)
+            {
+                _watcher = new FileSystemWatcher(directory);
+                _watcher.Filter = "*.cs";
+                _watcher.Changed += onFileChanged;
+                _watcher.Created += onFileChanged;
+                _watcher.Deleted += onFileChanged;
+                _watcher.Renamed += onFileChanged;
+                _watcher.EnableRaisingEvents = true;
+            }
+
             var csFiles = Directory.GetFiles(directory, "*.cs");
 
             var references = GetMetadataReferences();
@@ -1012,12 +1035,11 @@ public class MaaProcessor
             {
                 var name = Path.GetFileNameWithoutExtension(filePath);
                 LoggerService.LogInfo("Trying to parse " + name);
-                string code = File.ReadAllText(filePath);
-                // 将代码文件按行拆分，存储每行内容到列表中
-                var codeLines = code.Split(new[]
-                {
+                var code = File.ReadAllText(filePath);
+
+                var codeLines = code.Split([
                     '\n'
-                }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                ], StringSplitOptions.RemoveEmptyEntries).ToList();
 
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("DynamicAssembly")
@@ -1025,43 +1047,51 @@ public class MaaProcessor
                     .AddSyntaxTrees(syntaxTree)
                     .AddReferences(references);
 
-                using (var ms = new MemoryStream())
+                using var ms = new MemoryStream();
+
+                var result = compilation.Emit(ms);
+                if (!result.Success)
                 {
-                    EmitResult result = compilation.Emit(ms);
-                    if (!result.Success)
+                    var failures = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
+                    foreach (var diagnostic in failures)
                     {
-                        var failures = result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
-                        foreach (var diagnostic in failures)
-                        {
-                            // 尝试从错误诊断信息中提取行号相关内容，这里假设格式类似 "(行号, 列号)"，不同环境格式可能不同，需按需调整
-                            var lineInfo = diagnostic.Location.GetLineSpan().StartLinePosition;
-                            int lineNumber = lineInfo.Line + 1; // 通常行号从1开始计数，所以加1
-                            // 根据行号获取对应的代码行内容
-                            string errorLine = lineNumber <= codeLines.Count ? codeLines[lineNumber - 1].Trim() : "无法获取对应代码行（行号超出范围）";
-                            LoggerService.LogError($"{diagnostic.Id}: {diagnostic.GetMessage()}  [错误行号: {lineNumber}]  [错误代码行: {errorLine}]");
-                        }
-                        continue;
+                        // 尝试从错误诊断信息中提取行号相关内容，这里假设格式类似 "(行号, 列号)"，不同环境格式可能不同，需按需调整
+                        var lineInfo = diagnostic.Location.GetLineSpan().StartLinePosition;
+                        var lineNumber = lineInfo.Line + 1; // 通常行号从1开始计数，所以加1
+                        // 根据行号获取对应的代码行内容
+                        var errorLine = lineNumber <= codeLines.Count ? codeLines[lineNumber - 1].Trim() : "无法获取对应代码行（行号超出范围）";
+                        LoggerService.LogError($"{diagnostic.Id}: {diagnostic.GetMessage()}  [错误行号: {lineNumber}]  [错误代码行: {errorLine}]");
                     }
-
-                    ms.Seek(0, SeekOrigin.Begin);
-                    var assembly = Assembly.Load(ms.ToArray());
-
-                    foreach (var type in assembly.GetTypes())
-                    {
-                        foreach (var iface in interfacesToImplement)
-                        {
-                            if (type.GetInterfaces().Any(i => i.Name == iface))
-                            {
-                                var instance = Activator.CreateInstance(type);
-                                if (instance != null)
-                                    customClasses.Add(new CustomValue<object>(name, instance));
-                            }
-                        }
-                    }
+                    continue;
                 }
+
+                ms.Seek(0, SeekOrigin.Begin);
+                var assembly = Assembly.Load(ms.ToArray());
+
+                var instances =
+                    from type in assembly.GetTypes()
+                    from iface in interfacesToImplement
+                    where type.GetInterfaces().Any(i => i.Name == iface)
+                    let instance = Activator.CreateInstance(type)
+                    where instance != null
+                    select new CustomValue<object>(name, instance);
+
+                customClasses.AddRange(instances);
+
             }
         }
+        _shouldLoadCustomClasses = false;
         return customClasses;
+    }
+
+    private static IEnumerable<CustomValue<object>>? _customClasses;
+    private static IEnumerable<CustomValue<object>> GetCustomClasses(string directory, string[] interfacesToImplement)
+    {
+        if (_customClasses == null || _shouldLoadCustomClasses)
+            _customClasses = LoadAndInstantiateCustomClasses(directory, interfacesToImplement);
+        else
+            _customClasses.ForEach(value => LoggerService.LogInfo($"Trying to loading {value.Name}"));
+        return _customClasses;
     }
 
     private void RegisterCustomRecognitionsAndActions(MaaTasker instance)
@@ -1071,7 +1101,7 @@ public class MaaProcessor
         LoggerService.LogInfo("RegisteringCustomAction".GetLocalizationString());
         // instance.Resource.Register(new MoneyDetectRecognition());
         // instance.Resource.Register(new MoneyRecognition());
-        var customClasses = LoadAndInstantiateCustomClasses($"{Resource}/custom", [
+        var customClasses = GetCustomClasses($"{Resource}/custom", [
             "IMaaCustomRecognition",
             "IMaaCustomAction",
         ]);
