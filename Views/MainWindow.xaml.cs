@@ -1430,7 +1430,7 @@ public partial class MainWindow
 
             if (dragItem.InterfaceItem.Document != null && dragItem.InterfaceItem.Document.Count > 0)
             {
-                string combinedString = string.Join("\\n", dragItem.InterfaceItem);
+                string combinedString = string.Join("\\n", dragItem.InterfaceItem.Document);
                 AddIntroduction(s1, Regex.Unescape(combinedString));
             }
 
@@ -1815,7 +1815,7 @@ public partial class MainWindow
                 Growl.Info(MaaInterface.Instance.Message);
             }
             VersionChecker.Check();
-
+            
 
         });
         TaskManager.RunTaskAsync(async () =>
