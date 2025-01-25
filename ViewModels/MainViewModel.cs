@@ -7,6 +7,8 @@ using HandyControl.Data;
 using HandyControl.Tools.Command;
 using MFAWPF.Utils;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows.Threading;
 using DataSet = MFAWPF.Data.DataSet;
@@ -17,6 +19,13 @@ namespace MFAWPF.ViewModels;
 public class MainViewModel : ObservableObject
 {
     public ObservableCollection<LogItemViewModel> LogItemViewModels { get; } = new();
+    private bool SetCurrentProperty<T>([NotNullIfNotNull("newValue")] ref T field, T newValue, [CallerMemberName] string? propertyName = null)
+    {
+        OnPropertyChanging(propertyName);
+        field = newValue;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
 
     public void AddLog(string content,
         string? color = "",
@@ -314,11 +323,11 @@ public class MainViewModel : ObservableObject
     private List<SettingViewModel> _listTitle =
     [
         new("SwitchConfiguration"),
-        new("LanguageSettings"),
-        new("ThemeSettings"),
+        new("UiSettings"),
         new("ConnectionSettings"),
         new("PerformanceSettings"),
         new("StartupSettings"),
+        new("ExternalNotificationSettings"),
         new("RunningSettings"),
         new("SoftwareUpdate"),
         new("About"),
@@ -346,23 +355,6 @@ public class MainViewModel : ObservableObject
             if (_languageIndex != DataSet.GetData("LangIndex", 0))
                 _languageIndex = DataSet.GetData("LangIndex", 0);
             return _languageIndex;
-        }
-    }
-
-    private int _downloadSourceIndex;
-
-    public int DownloadSourceIndex
-    {
-        set
-        {
-            DataSet.SetData("DownloadSourceIndex", value);
-            SetProperty(ref _downloadSourceIndex, value);
-        }
-        get
-        {
-            if (_downloadSourceIndex != DataSet.GetData("DownloadSourceIndex", 0))
-                _downloadSourceIndex = DataSet.GetData("DownloadSourceIndex", 0);
-            return _downloadSourceIndex;
         }
     }
 
@@ -416,7 +408,6 @@ public class MainViewModel : ObservableObject
         new("ShutDown"),
         new("CloseEmulatorAndRestartMFA"),
         new("RestartPC"),
-        new("DingTalkMessageAsync"),
     ];
 
     public List<SettingViewModel> AfterTaskList
@@ -542,6 +533,25 @@ public class MainViewModel : ObservableObject
             }
         });
     }
+    private int _downloadSourceIndex;
+
+    public int DownloadSourceIndex
+    {
+        set
+        {
+            DataSet.SetData("DownloadSourceIndex", value);
+            SetCurrentProperty(ref _downloadSourceIndex, value);
+        }
+        get
+        {
+            if (_downloadSourceIndex != DataSet.GetData("DownloadSourceIndex", 0))
+                _downloadSourceIndex = DataSet.GetData("DownloadSourceIndex", 0);
+            if (string.IsNullOrWhiteSpace(MaaInterface.Instance.RID))
+                _downloadSourceIndex = 0;
+            return _downloadSourceIndex;
+        }
+    }
+
 
     public List<SettingViewModel> DownloadSourceList
     {
@@ -552,7 +562,6 @@ public class MainViewModel : ObservableObject
     private List<SettingViewModel> _downloadSourceList =
     [
         new("GitHub"),
-        new("MirrorChyan"),
     ];
 
     private bool _retryOnDisconnected = DataSet.GetData("RetryOnDisconnected", false);
@@ -598,5 +607,118 @@ public class MainViewModel : ObservableObject
             SetProperty(ref _allowAdbHardRestart, value);
             DataSet.SetData("AllowAdbHardRestart", value);
         }
+    }
+
+    private bool _shouldTip = true;
+    private bool _isDebugMode;
+
+    public bool IsDebugMode
+    {
+        set => SetProperty(ref _isDebugMode, value);
+
+        get
+        {
+            if (_isDebugMode != MFAExtensions.IsDebugMode())
+                _isDebugMode = MFAExtensions.IsDebugMode();
+            if (_isDebugMode && _shouldTip)
+            {
+                MessageBoxHelper.Show("DebugModeWarning".GetLocalizationString(), "Tip".GetLocalizationString(), MessageBoxButton.OK, MessageBoxImage.Warning);
+                _shouldTip = false;
+            }
+            return _isDebugMode;
+        }
+    }
+
+    public static readonly List<SettingViewModel> ExternalNotificationProviders =
+    [
+        new("DingTalk"),
+    ];
+
+    public static List<SettingViewModel> ExternalNotificationProvidersShow => ExternalNotificationProviders;
+
+    private static object[] _enabledExternalNotificationProviders =
+        ExternalNotificationProviders.Where(s => DataSet.GetData("ExternalNotificationEnabled", string.Empty).Split(',').Contains(s.ResourceKey))
+            .Distinct()
+            .ToArray();
+
+    public object[] EnabledExternalNotificationProviders
+    {
+        get
+        {
+            return _enabledExternalNotificationProviders;
+        }
+        set
+        {
+            try
+            {
+                var settingViewModels = value.Cast<SettingViewModel>();
+                SetProperty(ref _enabledExternalNotificationProviders, value);
+                var validProviders = settingViewModels
+                    .Where(provider => ExternalNotificationProviders.ContainsKey(provider.ToString() ?? string.Empty))
+                    .Select(provider => provider.ToString())
+                    .Distinct();
+
+                var config = string.Join(",", validProviders);
+                DataSet.SetData("ExternalNotificationEnabled", config);
+                UpdateExternalNotificationProvider();
+                EnabledExternalNotificationProviderCount = _enabledExternalNotificationProviders.Length;
+            }
+            catch (Exception e)
+            {
+                LoggerService.LogError(e);
+            }
+        }
+    }
+
+    private int _enabledExternalNotificationProviderCount = _enabledExternalNotificationProviders.Length;
+
+    public int EnabledExternalNotificationProviderCount
+    {
+        get => _enabledExternalNotificationProviderCount;
+        set => SetProperty(ref _enabledExternalNotificationProviderCount, value);
+    }
+
+    public string[] EnabledExternalNotificationProviderList => EnabledExternalNotificationProviders
+        .Select(s => s.ToString() ?? string.Empty)
+        .ToArray();
+
+
+    private bool _dingTalkEnabled = false;
+
+    public bool DingTalkEnabled
+    {
+        get => _dingTalkEnabled;
+        set => SetProperty(ref _dingTalkEnabled, value);
+    }
+
+    private string _dingTalkToken = SimpleEncryptionHelper.Decrypt(DataSet.GetData("ExternalNotificationDingTalkToken", string.Empty));
+
+    public string DingTalkToken
+    {
+        get => _dingTalkToken;
+        set
+        {
+            SetProperty(ref _dingTalkToken, value);
+            value = SimpleEncryptionHelper.Encrypt(value);
+            DataSet.SetData("ExternalNotificationDingTalkToken", value);
+        }
+    }
+
+    private string _dingTalkSecret = SimpleEncryptionHelper.Decrypt(DataSet.GetData("ExternalNotificationDingTalkSecret", string.Empty));
+
+    public string DingTalkSecret
+    {
+        get => _dingTalkSecret;
+        set
+        {
+            SetProperty(ref _dingTalkSecret, value);
+            value = SimpleEncryptionHelper.Encrypt(value);
+            DataSet.SetData("ExternalNotificationDingTalkSecret", value);
+        }
+    }
+
+    public void UpdateExternalNotificationProvider()
+    {
+        DingTalkEnabled = _enabledExternalNotificationProviders.Contains("DingTalk");
     }
 }

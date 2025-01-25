@@ -103,22 +103,21 @@ public partial class TaskFlowChartDialog
         var isCtrlKeyPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
         if (_isDragging && isCtrlKeyPressed && e.LeftButton == MouseButtonState.Pressed)
         {
-            var Dposition = e.GetPosition(GraphArea);
-            Point previousPosition = _startPoint;
+            var dposition = e.GetPosition(GraphArea);
+            var previousPosition = _startPoint;
             if (previousPosition == new Point(0, 0))
             {
-                previousPosition = Dposition;
+                previousPosition = dposition;
             }
 
-            double offsetX = Dposition.X - previousPosition.X;
-            double offsetY = Dposition.Y - previousPosition.Y;
-
-            // 使用 Transform 类实现拖动
+            double offsetX = dposition.X - previousPosition.X;
+            double offsetY = dposition.Y - previousPosition.Y;
+            
             var translateTransform = ttf;
             translateTransform.X += offsetX;
             translateTransform.Y += offsetY;
 
-            _startPoint = Dposition;
+            _startPoint = dposition;
         }
     }
 

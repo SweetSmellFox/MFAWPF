@@ -33,6 +33,10 @@
             </Grid.ColumnDefinitions>
             <StackPanel Grid.Column="0" IsHitTestVisible="False"
                         HorizontalAlignment="Left" Orientation="Horizontal">
+                <TextBlock VerticalAlignment="Center" Margin="5 0 -2 0" Text="{lex:Loc DebugMode}" FontSize="13" FontWeight="Bold"
+                           IsHitTestVisible="False" Visibility="{c:Binding 'IsDebugMode'}"
+                           Foreground="{DynamicResource TitleBrush}">
+                </TextBlock>
                 <TextBlock VerticalAlignment="Center" Margin="6 0 4 0" Text="{lex:Loc AppTitle}"
                            IsHitTestVisible="False" x:Name="title"
                            Foreground="{DynamicResource PrimaryTextBrush}">

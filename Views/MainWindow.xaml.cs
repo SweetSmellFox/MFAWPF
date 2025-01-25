@@ -23,6 +23,7 @@ using MFAWPF.ViewModels;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text;
 using WPFLocalizeExtension.Extensions;
@@ -50,6 +51,7 @@ public partial class MainWindow
     public MainWindow()
     {
         DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
+        DataSet.MaaConfig = JsonHelper.ReadFromConfigJsonFile("maa_option", new Dictionary<string, object>());
         LanguageManager.Initialize();
         InitializeComponent();
         Instance = this;
@@ -58,7 +60,13 @@ public partial class MainWindow
         Loaded += (_, _) => { LoadUI(); };
         InitializeData();
         OCRHelper.Initialize();
-
+        StateChanged += (_, _) =>
+        {
+            if (DataSet.GetData("ShouldMinimizeToTray", false))
+            {
+                ChangeVisibility(WindowState != WindowState.Minimized);
+            }
+        };
         _maaToolkit = new MaaToolkit(init: true);
         MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
         SetIconFromExeDirectory();
@@ -198,6 +206,11 @@ public partial class MainWindow
     private void OnTaskStackChanged(object? sender, EventArgs e)
     {
         ToggleTaskButtonsVisibility(isRunning: MaaProcessor.Instance.TaskQueue.Count > 0);
+    }
+
+    private void ChangeVisibility(bool visible)
+    {
+        Visibility = visible ? Visibility.Visible : Visibility.Hidden;
     }
 
     public void ToggleTaskButtonsVisibility(bool isRunning)
@@ -1809,13 +1822,13 @@ public partial class MainWindow
             if (!value)
                 EditButton.Visibility = Visibility.Collapsed;
             DataSet.SetData("EnableEdit", value);
-
+            Data.IsDebugMode = MFAExtensions.IsDebugMode();
             if (!string.IsNullOrWhiteSpace(MaaInterface.Instance?.Message))
             {
                 Growl.Info(MaaInterface.Instance.Message);
             }
             VersionChecker.Check();
-            
+
 
         });
         TaskManager.RunTaskAsync(async () =>
@@ -1976,12 +1989,16 @@ public partial class MainWindow
 
     private void InitializationSettings()
     {
+        settingsView.MinimizeToTrayCheckBox.IsChecked  = DataSet.GetData("ShouldMinimizeToTray", true);
+        settingsView.MinimizeToTrayCheckBox.Checked += (_, _) => { DataSet.SetData("ShouldMinimizeToTray", true); };
+        settingsView.MinimizeToTrayCheckBox.Unchecked += (_, _) => { DataSet.SetData("ShouldMinimizeToTray", false); };
+
         //语言设置
 
         settingsView.languageSettings.ItemsSource = LanguageManager.SupportedLanguages;
         settingsView.languageSettings.DisplayMemberPath = "Name";
         settingsView.languageSettings.BindLocalization("LanguageOption");
-        settingsView.languageSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
+        settingsView.languageSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
         settingsView.languageSettings.SelectionChanged += (sender, _) =>
         {
@@ -1997,18 +2014,15 @@ public partial class MainWindow
         settingsView.languageSettings.SetBinding(ComboBox.SelectedIndexProperty, binding2);
 
         //主题设置
-        var light = new ComboBoxItem();
-        light.BindLocalization("LightColor", ContentProperty);
-        var dark = new ComboBoxItem();
-        dark.BindLocalization("DarkColor", ContentProperty);
-        var followSystem = new ComboBoxItem();
-        followSystem.BindLocalization("FollowingSystem", ContentProperty);
-        settingsView.themeSettings.Items.Add(light);
-        settingsView.themeSettings.Items.Add(dark);
-        settingsView.themeSettings.Items.Add(followSystem);
-
+        settingsView.themeSettings.ItemsSource = new ObservableCollection<SettingViewModel>()
+        {
+            new("LightColor"),
+            new("DarkColor"),
+            new("LightColor"),
+        };
+        settingsView.themeSettings.DisplayMemberPath = "Name";
         settingsView.themeSettings.BindLocalization("ThemeOption");
-        settingsView.themeSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
+        settingsView.themeSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
         settingsView.themeSettings.SelectionChanged += (sender, _) =>
         {
@@ -2038,9 +2052,17 @@ public partial class MainWindow
         settingsView.performanceSettings.Unchecked += (_, _) => { DataSet.SetData("EnableGPU", false); };
 
         //运行设置
-        settingsView.enableSaveDrawSettings.IsChecked = DataSet.GetData("EnableSaveDraw", false);
-        settingsView.enableSaveDrawSettings.Checked += (_, _) => { DataSet.SetData("EnableSaveDraw", true); };
-        settingsView.enableSaveDrawSettings.Unchecked += (_, _) => { DataSet.SetData("EnableSaveDraw", false); };
+        settingsView.enableRecordingSettings.IsChecked = DataSet.MaaConfig.GetConfig("recording", false);
+        settingsView.enableRecordingSettings.Checked += (_, _) => { DataSet.MaaConfig.SetConfig("recording", true); };
+        settingsView.enableRecordingSettings.Unchecked += (_, _) => { DataSet.MaaConfig.SetConfig("recording", false); };
+
+        settingsView.enableSaveDrawSettings.IsChecked = DataSet.MaaConfig.GetConfig("save_draw", false);
+        settingsView.enableSaveDrawSettings.Checked += (_, _) => { DataSet.MaaConfig.SetConfig("save_draw", true); };
+        settingsView.enableSaveDrawSettings.Unchecked += (_, _) => { DataSet.MaaConfig.SetConfig("save_draw", false); };
+
+        settingsView.showHitDrawSettings.IsChecked = DataSet.MaaConfig.GetConfig("show_hit_draw", false);
+        settingsView.showHitDrawSettings.Checked += (_, _) => { DataSet.MaaConfig.SetConfig("show_hit_draw", true); };
+        settingsView.showHitDrawSettings.Unchecked += (_, _) => { DataSet.MaaConfig.SetConfig("show_hit_draw", false); };
 
         settingsView.beforeTaskSettings.Text = DataSet.GetData("Prescript", string.Empty);
         settingsView.beforeTaskSettings.BindLocalization("Prescript");
@@ -2159,9 +2181,9 @@ public partial class MainWindow
             }
         };
         //软件更新
-        settingsView.CdkPassword.Password = DataSet.GetData("DownloadCDK", string.Empty);
-        settingsView.CdkPassword.PasswordChanged += (_, _) => { DataSet.SetData("DownloadCDK", settingsView.CdkPassword.Password); };
-       
+        settingsView.CdkPassword.Password = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
+        settingsView.CdkPassword.PasswordChanged += (_, _) => { DataSet.SetData("DownloadCDK", SimpleEncryptionHelper.Encrypt(settingsView.CdkPassword.Password)); };
+
         settingsView.enableCheckVersionSettings.IsChecked = DataSet.GetData("EnableCheckVersion", true);
         settingsView.enableCheckVersionSettings.Checked += (_, _) => { DataSet.SetData("EnableCheckVersion", true); };
         settingsView.enableCheckVersionSettings.Unchecked += (_, _) => { DataSet.SetData("EnableCheckVersion", false); };
@@ -2173,6 +2195,12 @@ public partial class MainWindow
         settingsView.enableAutoUpdateMFASettings.IsChecked = DataSet.GetData("EnableAutoUpdateMFA", false);
         settingsView.enableAutoUpdateMFASettings.Checked += (_, _) => { DataSet.SetData("EnableAutoUpdateMFA", true); };
         settingsView.enableAutoUpdateMFASettings.Unchecked += (_, _) => { DataSet.SetData("EnableAutoUpdateMFA", false); };
+
+        if (!string.IsNullOrWhiteSpace(MaaInterface.Instance.RID))
+        {
+            Data.DownloadSourceList.Add(new("MirrorChyan"));
+            Data.DownloadSourceIndex = Data.DownloadSourceIndex;
+        }
         //关于我们
         AddAbout();
     }

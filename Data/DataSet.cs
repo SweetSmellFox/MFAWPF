@@ -7,19 +7,60 @@ namespace MFAWPF.Data
 
 ;
 
-public class DataSet
+public static class DataSet
 {
     public static Dictionary<string, object>? Data = new();
+    public static Dictionary<string, object>? MaaConfig = new();
+
+
+    public static void SetConfig(this Dictionary<string, object>? config, string key, object? value)
+    {
+        if (config == null || value == null) return;
+        config[key] = value;
+        if (key == "LangIndex" && MainWindow.Data is not null)
+            MainWindow.Data.LanguageIndex = Convert.ToInt32(value);
+        var fileName = config == Data ? "config" : "maa_option";
+        if (config == MaaConfig)
+            MainWindow.Data.IsDebugMode = MFAExtensions.IsDebugMode();
+        JsonHelper.WriteToConfigJsonFile(fileName, config, new MaaInterfaceSelectOptionConverter(false));
+    }
+
+    public static T? GetConfig<T>(this Dictionary<string, object>? Config, string key, T defaultValue)
+    {
+        if (Config?.TryGetValue(key, out var data) == true)
+        {
+            try
+            {
+                if (data is long longValue && typeof(T) == typeof(int))
+                {
+                    return (T)(object)Convert.ToInt32(longValue);
+                }
+
+                if (data is JArray jArray)
+                {
+                    // 将 JArray 转换为目标类型
+                    return jArray.ToObject<T>();
+                }
+
+                if (data is T t)
+                {
+                    return t;
+                }
+            }
+            catch (Exception e)
+            {
+                LoggerService.LogError("在进行类型转换时发生错误!");
+                LoggerService.LogError(e);
+            }
+        }
+
+        return defaultValue;
+    }
 
     public static void SetData(string key, object? value)
     {
-        if (Data == null || value == null) return;
-        Data[key] = value; // 如果 key 不存在，将自动添加条目；如果存在，将更新值
-        if (key == "LangIndex" && MainWindow.Data is not null)
-            MainWindow.Data.LanguageIndex = Convert.ToInt32(value);
-        JsonHelper.WriteToConfigJsonFile("config", Data, new MaaInterfaceSelectOptionConverter(false));
+        Data.SetConfig(key, value);
     }
-
 
     public static bool TryGetData<T>(string key, out T? value)
     {
@@ -60,33 +101,6 @@ public class DataSet
 
     public static T? GetData<T>(string key, T defaultValue)
     {
-        if (Data?.TryGetValue(key, out var data) == true)
-        {
-            try
-            {
-                if (data is long longValue && typeof(T) == typeof(int))
-                {
-                    return (T)(object)Convert.ToInt32(longValue);
-                }
-
-                if (data is JArray jArray)
-                {
-                    // 将 JArray 转换为目标类型
-                    return jArray.ToObject<T>();
-                }
-
-                if (data is T t)
-                {
-                    return t;
-                }
-            }
-            catch (Exception e)
-            {
-                LoggerService.LogError("在进行类型转换时发生错误!");
-                LoggerService.LogError(e);
-            }
-        }
-
-        return defaultValue;
+        return Data.GetConfig(key, defaultValue);
     }
 }
