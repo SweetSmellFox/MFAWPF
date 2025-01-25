@@ -164,7 +164,7 @@ public class VersionChecker
 
         var resId = GetResourceID();
         var currentVersion = GetResourceVersion();
-        var cdk = DataSet.GetData("DownloadCDK", string.Empty);
+        var cdk = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
         var spId = GetDeviceId().ToString();
         dialog?.UpdateProgress(10);
         if (string.IsNullOrWhiteSpace(currentVersion) || string.IsNullOrWhiteSpace(resId))
@@ -323,7 +323,7 @@ public class VersionChecker
             await File.WriteAllTextAsync(newInterfacePath, updatedJsonContent);
         }
         dialog?.UpdateProgress(100);
-
+        MainWindow.Instance.settingsView.ResourceShieldTextBlock.Text = latestVersion;
         dialog?.SetText("UpdateCompleted".GetLocalizationString());
         dialog?.Dispatcher?.Invoke(() =>
         {
@@ -358,7 +358,7 @@ public class VersionChecker
 
         var resId = GetResourceID();
         var currentVersion = GetResourceVersion();
-        var cdk = DataSet.GetData("DownloadCDK", string.Empty);
+        var cdk = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
         var spId = GetDeviceId().ToString();
         var userAgent = "MFA";
 
@@ -599,7 +599,7 @@ public class VersionChecker
             File.WriteAllText(newInterfacePath, updatedJsonContent);
         }
         dialog?.UpdateProgress(100);
-
+        MainWindow.Instance.settingsView.ResourceShieldTextBlock.Text = latestVersion;
         dialog?.SetText("UpdateCompleted".GetLocalizationString());
         dialog?.Dispatcher?.Invoke(() =>
         {
