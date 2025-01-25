@@ -133,10 +133,14 @@ public class MaaProcessor
                             Stop();
                             return;
                         }
+                        MainWindow.Instance.AutoDetectDevice();
+                        
                         instance = Task.Run(GetCurrentTasker, token);
                         instance.Wait(token);
                         connected = instance.Result is { Initialized: true };
                     }
+
+
                     if (!connected && MainWindow.Data.IsAdb)
                     {
                         MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "TryToReconnectByAdb".GetLocalizationString());
@@ -187,16 +191,17 @@ public class MaaProcessor
                         instance.Wait(token);
                         connected = instance.Result is { Initialized: true };
                     }
+
                     if (!connected)
                     {
                         LoggerService.LogWarning("ConnectFailed".GetLocalizationString());
                         MainWindow.AddLogByKey("ConnectFailed");
                         MainWindow.Instance.SetConnected(false);
-                        MainWindow.Instance.deviceComboBox.ItemsSource = new List<string>();
                         Stop();
-                        throw new Exception();
                     }
+
                     if (connected) MainWindow.Instance.SetConnected(true);
+
                     if (!MainWindow.Instance.IsConnected())
                     {
                         Growls.Warning("Warning_CannotConnect".GetLocalizationString()
@@ -234,7 +239,7 @@ public class MaaProcessor
             {
                 Name = "结束",
                 Type = MFATask.MFATaskType.MFA,
-                Action = () => { MainWindow.Instance?.RunScript("Post-script"); }
+                Action = () => { MainWindow.Instance.RunScript("Post-script"); }
             });
 
         TaskManager.RunTaskAsync(async () =>
@@ -330,7 +335,7 @@ public class MaaProcessor
     }
 
 
-    public async  static Task ExternalNotificationAsync()
+    public async static Task ExternalNotificationAsync()
     {
         var enabledProviders = MainWindow.Data.EnabledExternalNotificationProviderList;
 
@@ -389,20 +394,32 @@ public class MaaProcessor
         if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
             return;
         var processName = Path.GetFileNameWithoutExtension(exePath);
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = exePath,
+            UseShellExecute = true,
+            CreateNoWindow = false
+        };
         if (Process.GetProcessesByName(processName).Length == 0)
         {
             if (!string.IsNullOrWhiteSpace(DataSet.GetData("EmulatorConfig", string.Empty)))
+            {
+                startInfo.Arguments = DataSet.GetData("EmulatorConfig", string.Empty);
                 _softwareProcess =
-                    Process.Start(exePath, DataSet.GetData("EmulatorConfig", string.Empty) ?? string.Empty);
+                    Process.Start(startInfo);
+            }
             else
-                _softwareProcess = Process.Start(exePath);
+                _softwareProcess = Process.Start(startInfo);
         }
         else
         {
             if (!string.IsNullOrWhiteSpace(DataSet.GetData("EmulatorConfig", string.Empty)))
-                Process.Start(exePath, DataSet.GetData("EmulatorConfig", string.Empty) ?? string.Empty);
+            {
+                startInfo.Arguments = DataSet.GetData("EmulatorConfig", string.Empty);
+                _softwareProcess = Process.Start(startInfo);
+            }
             else
-                Process.Start(exePath);
+                _softwareProcess = Process.Start(startInfo);
         }
 
         for (double remainingTime = waitTimeInSeconds + 1; remainingTime > 0; remainingTime -= 1)
@@ -1214,10 +1231,6 @@ public class MaaProcessor
         string waringMessage = "")
     {
         Console.WriteLine(e);
-        TaskQueue.Clear();
-        OnTaskQueueChanged();
-        if (MainWindow.Data != null)
-            MainWindow.Data.Idle = true;
         Growls.Error(message);
         if (hasWarning)
             LoggerService.LogWarning(waringMessage);

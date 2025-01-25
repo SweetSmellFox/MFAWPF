@@ -533,7 +533,7 @@ public partial class MainWindow
         return 0;
     }
 
-    public async void AutoDetectDevice()
+    public void AutoDetectDevice()
     {
         try
         {
@@ -543,8 +543,8 @@ public partial class MainWindow
             SetConnected(false);
             if ((Data?.IsAdb).IsTrue())
             {
-                var devices = await _maaToolkit.AdbDevice.FindAsync();
-                deviceComboBox.ItemsSource = devices;
+                var devices = _maaToolkit.AdbDevice.Find();
+                Growls.Process(() => deviceComboBox.ItemsSource = devices);
                 SetConnected(devices.Count > 0);
                 var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
                 var resultIndex = 0;
@@ -567,7 +567,7 @@ public partial class MainWindow
                 }
                 else
                     resultIndex = 0;
-                deviceComboBox.SelectedIndex = resultIndex;
+                Growls.Process(() => deviceComboBox.SelectedIndex = resultIndex);
                 if (MaaInterface.Instance?.Controller != null)
                 {
                     if (MaaInterface.Instance.Controller.Any(controller => controller.Type != null && controller.Type.ToLower().Equals("adb")))
@@ -628,7 +628,7 @@ public partial class MainWindow
             else
             {
                 var windows = _maaToolkit.Desktop.Window.Find().ToList();
-                deviceComboBox.ItemsSource = windows;
+                Growls.Process(() =>deviceComboBox.ItemsSource = windows);
                 SetConnected(windows.Count > 0);
                 var resultIndex = windows.Count > 0
                     ? windows.ToList().FindIndex(win => !string.IsNullOrWhiteSpace(win.Name))
@@ -694,7 +694,7 @@ public partial class MainWindow
                         }
                     }
                 }
-                deviceComboBox.SelectedIndex = resultIndex;
+                Growls.Process(() => deviceComboBox.SelectedIndex = resultIndex);
             }
 
             if (!IsConnected())
@@ -1989,7 +1989,7 @@ public partial class MainWindow
 
     private void InitializationSettings()
     {
-        settingsView.MinimizeToTrayCheckBox.IsChecked  = DataSet.GetData("ShouldMinimizeToTray", true);
+        settingsView.MinimizeToTrayCheckBox.IsChecked = DataSet.GetData("ShouldMinimizeToTray", true);
         settingsView.MinimizeToTrayCheckBox.Checked += (_, _) => { DataSet.SetData("ShouldMinimizeToTray", true); };
         settingsView.MinimizeToTrayCheckBox.Unchecked += (_, _) => { DataSet.SetData("ShouldMinimizeToTray", false); };
 

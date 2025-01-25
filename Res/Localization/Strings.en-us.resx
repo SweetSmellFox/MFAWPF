@@ -764,4 +764,7 @@
   <data name="MinimizeToTray" xml:space="preserve">
     <value>Hide to tray when minimized</value>
   </data>
+  <data name="HardRestartAdb" xml:space="preserve">
+    <value>Trying to kill and restart the ADB process</value>
+  </data>
 </root>

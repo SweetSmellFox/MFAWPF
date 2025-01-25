@@ -1,18 +1,9 @@
-using HandyControl.Interactivity;
-using MFAWPF.Utils;
-using System.ComponentModel;
-using System.Drawing;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Security;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Input;
 using PasswordBox = HandyControl.Controls.PasswordBox;
 
-namespace MFAWPF.Custom;
+namespace MFAWPF.Controls;
 
 [TemplatePart(Name = ElementPasswordBox, Type = typeof(System.Windows.Controls.PasswordBox))]
 [TemplatePart(Name = ElementTextBox, Type = typeof(TextBox))]
