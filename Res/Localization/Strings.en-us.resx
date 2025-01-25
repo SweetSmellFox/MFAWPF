@@ -65,8 +65,8 @@
     <data name="ResourceOption" xml:space="preserve">
     <value>Resources</value>
   </data>
-    <data name="ThemeOption" xml:space="preserve">
-    <value>Color Theme</value>
+  <data name="ThemeOption" xml:space="preserve">
+    <value>UI Theme</value>
   </data>
     <data name="LanguageOption" xml:space="preserve">
     <value>Language(语言)</value>
@@ -512,11 +512,11 @@
     <data name="SelectExistingImage" xml:space="preserve">
     <value>Select an existing image</value>
   </data>
-    <data name="EnableSaveDraw" xml:space="preserve">
-    <value>Enable Save Draw(for debugging)</value>
+  <data name="EnableSaveDraw" xml:space="preserve">
+    <value>Enable save draw (for debugging)</value>
   </data>
   <data name="SwitchLanguage" xml:space="preserve">
-    <value>Switch Language</value>
+    <value>Switch Language 🌐</value>
   </data>
   <data name="CannotStart" xml:space="preserve">
     <value>Unable to start task</value>
@@ -543,10 +543,10 @@
     <value>Theme Setting</value>
   </data>
   <data name="PerformanceSettings" xml:space="preserve">
-    <value>Performance Setting</value>
+    <value>Performance</value>
   </data>
   <data name="RunningSettings" xml:space="preserve">
-    <value>Running Setting</value>
+    <value>Running</value>
   </data>
   <data name="Prescript" xml:space="preserve">
     <value>Prescript</value>
@@ -558,10 +558,10 @@
     <value>Startup software and script</value>
   </data>
   <data name="ConnectionSettings" xml:space="preserve">
-    <value>Connection Settings</value>
+    <value>Connection</value>
   </data>
   <data name="SoftwareUpdate" xml:space="preserve">
-    <value>Software Update</value>
+    <value>Update</value>
   </data>
   <data name="AutomaticDetectionUpdate" xml:space="preserve">
     <value>Automatic Detection Update</value>
@@ -681,7 +681,7 @@
     <value>Download of Update Package Failed</value>
   </data>
   <data name="StartupSettings" xml:space="preserve">
-    <value>Startup Settings</value>
+    <value>Startup</value>
   </data>
   <data name="AutomaticHide" xml:space="preserve">
     <value>Auto Hide after launched</value>
@@ -721,5 +721,47 @@
   </data>
   <data name="RestartAdb" xml:space="preserve">
     <value>Trying to restart the ADB Server</value>
+  </data>
+  <data name="DebugMode" xml:space="preserve">
+    <value>[Debug mode]</value>
+  </data>
+  <data name="EnableRecording" xml:space="preserve">
+    <value>Enable video recording (for debugging)</value>
+  </data>
+  <data name="ShowHitDraw" xml:space="preserve">
+    <value>Show node hit information in pop-up window (for debugging)</value>
+  </data>
+  <data name="DebugModeWarning" xml:space="preserve">
+    <value>Debug mode has been enabled. This mode will save screenshots, operation data, and image recognition visualization results during operation, which may occupy a large amount of storage space!</value>
+  </data>
+  <data name="UiSettings" xml:space="preserve">
+    <value>GUI</value>
+  </data>
+  <data name="ExternalNotificationSettings" xml:space="preserve">
+    <value>External notifications</value>
+  </data>
+  <data name="ExternalNotificationTips" xml:space="preserve">
+    <value>Please note: The external notification feature currently only sends 「All tasks completed」 notifications.</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="ExternalNotificationEnabled" xml:space="preserve">
+    <value>Enabled configuration</value>
+  </data>
+  <data name="ExternalNotificationSendTest" xml:space="preserve">
+    <value>Send Test</value>
+  </data>
+  <data name="ExternalNotificationTelegramDingTalkToken" xml:space="preserve">
+    <value>DingTalk Token</value>
+  </data>
+  <data name="ExternalNotificationTelegramDingTalkSecret" xml:space="preserve">
+    <value>DingTalk Secret</value>
+  </data>
+  <data name="DingTalk" xml:space="preserve">
+    <value>DingTalk</value>
+  </data>
+  <data name="MinimizeToTray" xml:space="preserve">
+    <value>Hide to tray when minimized</value>
   </data>
 </root>

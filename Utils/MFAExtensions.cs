@@ -3,6 +3,7 @@ using System.Windows;
 using HandyControl.Controls;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
+using MFAWPF.Data;
 using MFAWPF.Utils.Exceptions;
 using MFAWPF.ViewModels;
 using WPFLocalizeExtension.Engine;
@@ -98,6 +99,10 @@ public static class MFAExtensions
     }
     public static MaaTaskJob AppendTask(this IMaaTasker maaTasker, TaskItemViewModel task)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         return maaTasker.AppendTask(task.Name, task.ToString());
     }
     public static MaaTaskJob AppendTask(this IMaaTasker maaTasker, TaskModel taskModel)
@@ -111,55 +116,99 @@ public static class MFAExtensions
 
     public static void Click(this IMaaTasker maaTasker, int x, int y)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         maaTasker.Controller.Click(x, y).Wait();
     }
 
     public static void Swipe(this IMaaTasker maaTasker, int x1, int y1, int x2, int y2, int duration)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         maaTasker.Controller.Swipe(x1, y1, x2, y2, duration).Wait();
     }
 
     public static void TouchDown(this IMaaTasker maaTasker, int contact, int x, int y, int pressure)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         maaTasker.Controller.TouchDown(contact, x, y, pressure).Wait();
     }
 
     public static void TouchMove(this IMaaTasker maaTasker, int contact, int x, int y, int pressure)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         maaTasker.Controller.TouchMove(contact, x, y, pressure).Wait();
 
     }
     public static void TouchUp(this IMaaTasker maaTasker, int contact)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         maaTasker.Controller.TouchUp(contact).Wait();
     }
 
     public static void PressKey(this IMaaTasker maaTasker, int key)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         maaTasker.Controller.PressKey(key).Wait();
     }
     public static void InputText(this IMaaTasker maaTasker, string text)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         maaTasker.Controller.InputText(text).Wait();
     }
 
     public static void Screencap(this IMaaTasker maaTasker)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         maaTasker.Controller.Screencap().Wait();
     }
 
     public static bool GetCachedImage(this IMaaTasker maaTasker, IMaaImageBuffer imageBuffer)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         return maaTasker.Controller.GetCachedImage(imageBuffer);
     }
 
     public static void StartApp(this IMaaTasker maaTasker, string intent)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         maaTasker.Controller.StartApp(intent).Wait();
     }
 
     public static void StopApp(this IMaaTasker maaTasker, string intent)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         maaTasker.Controller.StopApp(intent).Wait();
     }
     //
@@ -220,6 +269,7 @@ public static class MFAExtensions
     {
         maaContext.Tasker.InputText(text);
     }
+
     public static void Screencap(this IMaaContext maaContext)
     {
         maaContext.Tasker.Screencap();
@@ -231,17 +281,17 @@ public static class MFAExtensions
     }
     public static IMaaImageBuffer? GetImage(this IMaaContext maaContext)
     {
-        maaContext.Tasker.Screencap();
+        maaContext.Screencap();
         IMaaImageBuffer imageBuffer = new MaaImageBuffer();
-        if (!maaContext.Tasker.GetCachedImage(imageBuffer))
+        if (!maaContext.GetCachedImage(imageBuffer))
             return null;
         return imageBuffer;
     }
 
     public static IMaaImageBuffer? GetImage(this IMaaContext maaContext, ref IMaaImageBuffer buffer)
     {
-        maaContext.Tasker.Screencap();
-        if (!maaContext.Tasker.GetCachedImage(buffer))
+        maaContext.Screencap();
+        if (!maaContext.GetCachedImage(buffer))
             return null;
         return buffer;
     }
@@ -335,12 +385,20 @@ public static class MFAExtensions
 
     public static RecognitionDetail? RunRecognition(this IMaaContext maaContext, TaskModel taskModel, IMaaImageBuffer imageBuffer)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         return maaContext.RunRecognition(taskModel.Name, taskModel.ToJson(), imageBuffer);
     }
 
 
     public static string GetText(this IMaaContext maaContext, int x, int y, int w, int h, IMaaImageBuffer imageBuffer)
     {
+        if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+        {
+            throw new MaaStopException();
+        }
         return OCRHelper.ReadTextFromMAAContext(maaContext, imageBuffer, x, y, w, h);
     }
 
@@ -392,5 +450,27 @@ public static class MFAExtensions
             return result;
         }
         return 0;
+    }
+    public static bool ContainsKey(this IEnumerable<SettingViewModel> settingViewModels, string key)
+    {
+        return settingViewModels.Any(vm => vm.ResourceKey == key);
+    }
+    public static string[] ToStringArray(this IEnumerable<SettingViewModel> settingViewModels)
+    {
+        return settingViewModels
+            .Where(vm => vm.ResourceKey != null)
+            .Select(vm => vm.ResourceKey).ToArray();
+    }
+    public static string ToKeyString(this IEnumerable<SettingViewModel> settingViewModels)
+    {
+        return string.Join(",", settingViewModels
+            .Where(vm => vm.ResourceKey != null)
+            .Select(vm => vm.ResourceKey));
+    }
+
+    public static bool IsDebugMode()
+    {
+        if (DataSet.MaaConfig.GetConfig("recording", false) || DataSet.MaaConfig.GetConfig("save_draw", false) || DataSet.MaaConfig.GetConfig("show_hit_draw", false)) return true;
+        return false;
     }
 }

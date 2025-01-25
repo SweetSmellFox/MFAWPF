@@ -65,8 +65,8 @@
     <data name="ResourceOption" xml:space="preserve">
     <value>資源</value>
   </data>
-    <data name="ThemeOption" xml:space="preserve">
-    <value>顏色主題</value>
+  <data name="ThemeOption" xml:space="preserve">
+    <value>介面主題</value>
   </data>
     <data name="LanguageOption" xml:space="preserve">
     <value>語言(Language)</value>
@@ -512,11 +512,11 @@
     <data name="SelectExistingImage" xml:space="preserve">
     <value>選擇一張已有圖片</value>
   </data>
-    <data name="EnableSaveDraw" xml:space="preserve">
-    <value>啟用儲存截圖(用於調試)</value>
+  <data name="EnableSaveDraw" xml:space="preserve">
+    <value>啟用儲存截圖 (用於調試)</value>
   </data>
   <data name="SwitchLanguage" xml:space="preserve">
-    <value>切換語言</value>
+    <value>切換語言 🌐</value>
   </data>
   <data name="CannotStart" xml:space="preserve">
     <value>無法啓動任務</value>
@@ -540,13 +540,13 @@
     <value>設定</value>
   </data>
   <data name="ThemeSettings" xml:space="preserve">
-    <value>主題設置</value>
+    <value>主題設定</value>
   </data>
   <data name="PerformanceSettings" xml:space="preserve">
-    <value>性能設置</value>
+    <value>性能設定</value>
   </data>
   <data name="RunningSettings" xml:space="preserve">
-    <value>運行設置</value>
+    <value>運行設定</value>
   </data>
   <data name="Prescript" xml:space="preserve">
     <value>開始前腳本</value>
@@ -558,10 +558,10 @@
     <value>啟動軟件並啟動腳本</value>
   </data>
   <data name="ConnectionSettings" xml:space="preserve">
-    <value>連接設置</value>
+    <value>連接設定</value>
   </data>
   <data name="SoftwareUpdate" xml:space="preserve">
-    <value>軟件更新</value>
+    <value>軟體更新</value>
   </data>
   <data name="AutomaticDetectionUpdate" xml:space="preserve">
     <value>自動檢測更新</value>
@@ -681,7 +681,7 @@
     <value>新版本下載失敗</value>
   </data>
   <data name="StartupSettings" xml:space="preserve">
-    <value>啟動設置</value>
+    <value>啟動設定</value>
   </data>
   <data name="AutomaticHide" xml:space="preserve">
     <value>啟動 MFA 後直接隱藏</value>
@@ -721,5 +721,47 @@
   </data>
   <data name="RestartAdb" xml:space="preserve">
     <value>正在嘗試重開 ADB 伺服器</value>
+  </data>
+  <data name="DebugMode" xml:space="preserve">
+    <value>[調試模式]</value>
+  </data>
+  <data name="EnableRecording" xml:space="preserve">
+    <value>啟用保存錄像 (用於調試)</value>
+  </data>
+  <data name="ShowHitDraw" xml:space="preserve">
+    <value>顯示節點命中彈窗 (用於調試)</value>
+  </data>
+  <data name="DebugModeWarning" xml:space="preserve">
+    <value>調試模式已開啟。此模式會保存運行期間的截圖、操作數據及圖像識別可視化結果，可能會佔用大量的存儲空間！</value>
+  </data>
+  <data name="UiSettings" xml:space="preserve">
+    <value>介面設定</value>
+  </data>
+  <data name="ExternalNotificationSettings" xml:space="preserve">
+    <value>外部通知</value>
+  </data>
+  <data name="ExternalNotificationTips" xml:space="preserve">
+    <value>請注意：外部通知功能目前僅會發送「所有任務完成」 的通知。</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>關閉</value>
+  </data>
+  <data name="ExternalNotificationEnabled" xml:space="preserve">
+    <value>啟用的通知配置</value>
+  </data>
+  <data name="ExternalNotificationSendTest" xml:space="preserve">
+    <value>發送測試</value>
+  </data>
+  <data name="ExternalNotificationTelegramDingTalkToken" xml:space="preserve">
+    <value>釘釘 Token</value>
+  </data>
+  <data name="ExternalNotificationTelegramDingTalkSecret" xml:space="preserve">
+    <value>釘釘 Secret</value>
+  </data>
+  <data name="DingTalk" xml:space="preserve">
+    <value>釘釘</value>
+  </data>
+  <data name="MinimizeToTray" xml:space="preserve">
+    <value>最小化時隱藏至工作列</value>
   </data>
 </root>

@@ -46,19 +46,26 @@ public partial class SettingsView
     {
         VersionChecker.UpdateResourceAsync();
     }
-    
+
     private void CheckResourceUpdate(object sender, RoutedEventArgs e)
     {
         VersionChecker.CheckResourceVersionAsync();
     }
-    
+
     private void UpdateMFA(object sender, RoutedEventArgs e)
     {
         VersionChecker.UpdateMFAAsync();
     }
-    
+
     private void Hyperlink_OnClick(object sender, RoutedEventArgs e)
     {
-        Process.Start(new ProcessStartInfo(((Hyperlink)sender).NavigateUri.AbsoluteUri) { UseShellExecute = true });
+        Process.Start(new ProcessStartInfo(((Hyperlink)sender).NavigateUri.AbsoluteUri)
+        {
+            UseShellExecute = true
+        });
+    }
+    private void ExternalNotificationSendTest(object sender, RoutedEventArgs e)
+    {
+        MaaProcessor.ExternalNotificationAsync();
     }
 }
