@@ -682,13 +682,26 @@ public class MainViewModel : ObservableObject
         .Select(s => s.ToString() ?? string.Empty)
         .ToArray();
 
-
+    
     private bool _dingTalkEnabled = false;
 
     public bool DingTalkEnabled
     {
         get => _dingTalkEnabled;
         set => SetProperty(ref _dingTalkEnabled, value);
+    }
+
+    private string _cdkPassword = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
+
+    public string CdkPassword
+    {
+        get => _cdkPassword;
+        set
+        {
+            SetProperty(ref _cdkPassword, value);
+            value = SimpleEncryptionHelper.Encrypt(value);
+            DataSet.SetData("DownloadCDK", value);
+        }
     }
 
     private string _dingTalkToken = SimpleEncryptionHelper.Decrypt(DataSet.GetData("ExternalNotificationDingTalkToken", string.Empty));
@@ -703,7 +716,6 @@ public class MainViewModel : ObservableObject
             DataSet.SetData("ExternalNotificationDingTalkToken", value);
         }
     }
-
     private string _dingTalkSecret = SimpleEncryptionHelper.Decrypt(DataSet.GetData("ExternalNotificationDingTalkSecret", string.Empty));
 
     public string DingTalkSecret

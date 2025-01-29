@@ -295,12 +295,14 @@
                         </hc:ComboBox>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="33 2 5 5"
                                     Visibility="{calcBinding:Binding 'DownloadSourceIndex==1'}">
-                            <controls:CustomPasswordBox Margin="20 2 5 10" x:Name="CdkPassword"
-                                                      IsEnabled="{calcBinding:Binding 'Idle'}" ShowEyeButton="True"
-                                                      hc:TitleElement.HorizontalAlignment="Left"
-                                                      hc:TitleElement.Title="CDK"
-                                                      Width="200">
-                            </controls:CustomPasswordBox>
+                            <hc:PasswordBox Margin="20 2 5 10" x:Name="CdkPassword"
+                                            IsEnabled="{calcBinding:Binding 'Idle'}" ShowEyeButton="True"
+                                            IsSafeEnabled="False"
+                                            hc:TitleElement.HorizontalAlignment="Left"
+                                            UnsafePassword="{Binding CdkPassword}"
+                                            hc:TitleElement.Title="CDK"
+                                            Width="200">
+                            </hc:PasswordBox>
                             <TextBlock Margin="2 12 5 -2" VerticalAlignment="Center">
                                 <Hyperlink NavigateUri="{Binding  Source={x:Static utils:MFAUrls.PurchaseLink}}"
                                            RequestNavigate="Hyperlink_OnClick">
