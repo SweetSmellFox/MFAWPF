@@ -138,6 +138,8 @@ public class MaaProcessor
                         instance = Task.Run(GetCurrentTasker, token);
                         instance.Wait(token);
                         connected = instance.Result is { Initialized: true };
+
+                        MainWindow.Instance.AutoDetectDevice();
                     }
 
 
@@ -290,46 +292,29 @@ public class MaaProcessor
     }
     async private static Task<bool> DingTalkMessageAsync(string accessToken, string secret)
     {
-        // 生成时间戳（Unix时间戳，单位为秒）
         var timestamp = GetTimestamp();
-
         var sign = CalculateSignature(timestamp, secret);
+        var message = new { msgtype = "text", text = new { content = "TaskAllCompleted".GetLocalizationString() } };
 
-        // 要发送的消息
-        var message = new
-        {
-            msgtype = "text",
-            text = new
-            {
-                content = "TaskAllCompleted".GetLocalizationString()
-            }
-        };
-
-        // 发送消息
         try
         {
-            var apiUrl =
-                $"https://oapi.dingtalk.com/robot/send?access_token={accessToken}&timestamp={timestamp}&sign={sign}";
+            var apiUrl = $"https://oapi.dingtalk.com/robot/send?access_token={accessToken}&timestamp={timestamp}&sign={sign}";
             using var client = new HttpClient();
-
-            var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8,
-                "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8, "application/json");
             var response = await client.PostAsync(apiUrl, content);
 
             if (response.IsSuccessStatusCode)
             {
-                LoggerService.LogInfo("消息发送成功");
+                LoggerService.LogInfo("Message sent successfully");
                 return true;
             }
 
-            LoggerService.LogError($"消息发送失败：{response.StatusCode} {await response.Content.ReadAsStringAsync()}");
+            LoggerService.LogError($"Message sending failed: {response.StatusCode} {await response.Content.ReadAsStringAsync()}");
             return false;
-
-
         }
         catch (Exception ex)
         {
-            LoggerService.LogError($"发送消息出错：{ex.Message}");
+            LoggerService.LogError($"Error sending message: {ex.Message}");
             return false;
         }
     }
@@ -474,100 +459,42 @@ public class MaaProcessor
 
     private void CloseSoftware()
     {
-        if (_softwareProcess is { HasExited: false })
+        if (_softwareProcess != null)
         {
+            if (!_softwareProcess.HasExited)
+            {
+                _softwareProcess.Kill();
+            }
             _softwareProcess = null;
         }
-        if (_softwareProcess is { HasExited: true })
+        else if ((MainWindow.Data?.IsAdb).IsTrue())
         {
-            _softwareProcess.Kill();
-            _softwareProcess = null;
+            EmulatorHelper.KillEmulatorModeSwitcher();
         }
         else
         {
-            if ((MainWindow.Data?.IsAdb).IsTrue())
-                EmulatorHelper.KillEmulatorModeSwitcher();
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(Config.DesktopWindow.Name))
-                {
-                    var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
-                    var processes = Process.GetProcesses().Where(p =>
-                        p.ProcessName.StartsWith(Config.DesktopWindow.Name));
-                    foreach (var process in processes)
-                    {
-                        try
-                        {
-                            var commandLine = GetCommandLine(process);
+            CloseProcessesByName(Config.DesktopWindow.Name, DataSet.GetData("EmulatorConfig", string.Empty));
+        }
+    }
 
-                            if (string.IsNullOrEmpty(emulatorConfig) || commandLine.ToLower().Contains(emulatorConfig.ToLower()))
-                            {
-                                process.Kill();
-                                break;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"关闭进程时出错: {ex.Message}");
-                        }
-                    }
+    private void CloseProcessesByName(string processName, string emulatorConfig)
+    {
+        var processes = Process.GetProcesses().Where(p => p.ProcessName.StartsWith(processName));
+        foreach (var process in processes)
+        {
+            try
+            {
+                var commandLine = GetCommandLine(process);
+                if (string.IsNullOrEmpty(emulatorConfig) || commandLine.ToLower().Contains(emulatorConfig.ToLower()))
+                {
+                    process.Kill();
+                    break;
                 }
             }
-            // var softwarePath = DataSet.GetData("SoftwarePath", string.Empty);
-            //
-            // if (!string.IsNullOrEmpty(softwarePath) && (MainWindow.Data?.IsAdb).IsTrue())
-            // {
-            //     string processName = Path.GetFileNameWithoutExtension(softwarePath);
-            //     var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
-            //
-            //     var processes = Process.GetProcessesByName(processName);
-            //     foreach (var process in processes)
-            //     {
-            //         var commandLine = GetCommandLine(process);
-            //         if (string.IsNullOrEmpty(emulatorConfig) || MainWindow.ExtractNumberFromEmulatorConfig(emulatorConfig) == 0 && commandLine.Split(" ").Length == 1 || commandLine.ToLower().Contains(emulatorConfig.ToLower()))
-            //         {
-            //             process.Kill();
-            //             break;
-            //         }
-            //     }
-            // }
-            // else if (!string.IsNullOrEmpty(Config.AdbDevice.Name) && (MainWindow.Data?.IsAdb).IsTrue())
-            // {
-            //     var windowName = Config.AdbDevice.Name;
-            //     if (windowName.Contains("MuMu"))
-            //         windowName = "MuMuPlayer";
-            //     else if (windowName.Contains("Nox"))
-            //         windowName = "Nox";
-            //     else if (windowName.Contains("LDPlayer"))
-            //         windowName = "LDPlayer";
-            //     else if (windowName.Contains("XYAZ"))
-            //         windowName = "MEmu";
-            //     else if (windowName.Contains("BlueStacks"))
-            //         windowName = "HD-Player";
-            //
-            //     var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
-            //
-            //     var processes = Process.GetProcesses().Where(p =>
-            //         p.ProcessName.StartsWith(windowName));
-            //
-            //     foreach (var process in processes)
-            //     {
-            //         try
-            //         {
-            //             var commandLine = GetCommandLine(process);
-            //
-            //             if (string.IsNullOrEmpty(emulatorConfig) || commandLine.ToLower().Contains(emulatorConfig.ToLower()))
-            //             {
-            //                 process.Kill();
-            //                 break;
-            //             }
-            //         }
-            //         catch (Exception ex)
-            //         {
-            //             Console.WriteLine($"关闭进程时出错: {ex.Message}");
-            //         }
-            //     }
-            // }
+            catch (Exception ex)
+            {
+                LoggerService.LogInfo($"Error closing process: {ex.Message}");
+            }
         }
     }
 
