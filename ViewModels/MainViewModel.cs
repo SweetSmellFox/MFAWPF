@@ -643,10 +643,7 @@ public class MainViewModel : ObservableObject
 
     public object[] EnabledExternalNotificationProviders
     {
-        get
-        {
-            return _enabledExternalNotificationProviders;
-        }
+        get => _enabledExternalNotificationProviders;
         set
         {
             try
@@ -654,8 +651,8 @@ public class MainViewModel : ObservableObject
                 var settingViewModels = value.Cast<SettingViewModel>();
                 SetProperty(ref _enabledExternalNotificationProviders, value);
                 var validProviders = settingViewModels
-                    .Where(provider => ExternalNotificationProviders.ContainsKey(provider.ToString() ?? string.Empty))
-                    .Select(provider => provider.ToString())
+                    .Where(provider => ExternalNotificationProviders.ContainsKey(provider.ResourceKey ?? string.Empty))
+                    .Select(provider => provider.ResourceKey)
                     .Distinct();
 
                 var config = string.Join(",", validProviders);
@@ -683,7 +680,7 @@ public class MainViewModel : ObservableObject
         .ToArray();
 
     
-    private bool _dingTalkEnabled = false;
+    private bool _dingTalkEnabled;
 
     public bool DingTalkEnabled
     {
@@ -731,6 +728,6 @@ public class MainViewModel : ObservableObject
 
     public void UpdateExternalNotificationProvider()
     {
-        DingTalkEnabled = _enabledExternalNotificationProviders.Contains("DingTalk");
+        DingTalkEnabled = EnabledExternalNotificationProviderList.Contains("DingTalk");
     }
 }
