@@ -28,7 +28,14 @@ public partial class DownloadDialog
             TextBlock.Text = text;
         });
     }
-    
+    public void SetRestartButtonVisibility(bool value)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            RestartButton.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+        });
+    }
+
     private void Restart(object sender, RoutedEventArgs e)
     {
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
