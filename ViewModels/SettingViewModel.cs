@@ -45,4 +45,6 @@ public class SettingViewModel : ObservableObject
     {
         UpdateName();
     }
+    public override string ToString()
+        => ResourceKey;
 }

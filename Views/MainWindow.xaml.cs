@@ -2181,7 +2181,7 @@ public partial class MainWindow
             }
         };
         //软件更新
-        // settingsView.CdkPassword.Password = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
+        // settingsView.CdkPassword.UnsafePassword = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
         // settingsView.CdkPassword.PasswordChanged += (_, _) => { DataSet.SetData("DownloadCDK", SimpleEncryptionHelper.Encrypt(settingsView.CdkPassword.Password)); };
 
         settingsView.enableCheckVersionSettings.IsChecked = DataSet.GetData("EnableCheckVersion", true);

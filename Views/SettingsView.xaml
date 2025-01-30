@@ -195,8 +195,8 @@
                             hc:InfoElement.Placeholder="{lex:Loc Off}"
                             hc:InfoElement.Title="{lex:Loc ExternalNotificationEnabled}"
                             hc:InfoElement.TitlePlacement="Top" DisplayMemberPath="Name"
-                            hc:ListBoxAttach.SelectedItems="{Binding EnabledExternalNotificationProviders}"
-                            ItemsSource="{Binding ExternalNotificationProvidersShow}"
+                            hc:ListBoxAttach.SelectedItems="{calcBinding:Binding 'EnabledExternalNotificationProviders'}"
+                            ItemsSource="{calcBinding:Binding 'ExternalNotificationProvidersShow'}"
                             Style="{StaticResource CheckComboBoxExtend}" />
                         <Button
                             Margin="5"
@@ -208,22 +208,22 @@
                     <StackPanel
                         Grid.Row="2"
                         Orientation="Vertical"
-                        Visibility="{calcBinding:Binding DingTalkEnabled}">
+                        Visibility="{calcBinding:Binding 'DingTalkEnabled'}">
                         <hc:Divider Content="{lex:Loc DingTalk}" />
-                        <hc:TextBox
+                        <hc:PasswordBox
                             x:Name="DingTalkToken"
                             Width="400"
                             Height="30"
-                            Margin="10"
+                            Margin="10" IsSafeEnabled="False" ShowEyeButton="True"
                             hc:InfoElement.Title="{lex:Loc ExternalNotificationTelegramDingTalkToken}"
-                            Text="{calcBinding:Binding DingTalkToken}" />
-                        <hc:TextBox
+                            UnsafePassword="{calcBinding:Binding DingTalkToken}" />
+                        <hc:PasswordBox
                             x:Name="DingTalkSecret"
                             Width="400"
                             Height="30"
-                            Margin="10"
+                            Margin="10" IsSafeEnabled="False" ShowEyeButton="True"
                             hc:InfoElement.Title="{lex:Loc ExternalNotificationTelegramDingTalkSecret}"
-                            Text="{calcBinding:Binding DingTalkSecret}" />
+                            UnsafePassword="{calcBinding:Binding DingTalkSecret}" />
                     </StackPanel>
 
 
