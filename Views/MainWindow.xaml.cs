@@ -229,6 +229,7 @@ public partial class MainWindow
     protected override void OnClosing(CancelEventArgs e)
     {
         e.Cancel = !ConfirmExit();
+        DataSet.SetData("TaskItems", Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         base.OnClosed(e);
     }
 
