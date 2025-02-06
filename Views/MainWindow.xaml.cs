@@ -2116,6 +2116,11 @@ public partial class MainWindow
         };
 
         settingsView.WaitSoftwareTimeTextBox.Value = DataSet.GetData("WaitSoftwareTime", 60.0);
+        settingsView.WaitSoftwareTimeTextBox.ValueChanged += (sender, _) =>
+        {
+            var value = (sender as NumericUpDown)?.Value ?? 60;
+            DataSet.SetData("WaitSoftwareTime", value);
+        };
         settingsView.ExtrasTextBox.TextChanged += (sender, _) =>
         {
             var text = (sender as TextBox)?.Text ?? string.Empty;
