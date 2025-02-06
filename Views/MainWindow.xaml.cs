@@ -1503,14 +1503,7 @@ public partial class MainWindow
                 comboBox.SetBinding(IsEnabledProperty, multiBinding);
 
                 comboBox.ItemsSource = interfaceOption.Cases;
-                if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase) && interfaceOption.Cases != null)
-                {
-                    int index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
-                    if (index != -1)
-                    {
-                        comboBox.SelectedIndex = index;
-                    }
-                }
+        
                 comboBox.Tag = option.Name;
 
                 comboBox.SelectionChanged += (_, _) =>
@@ -1520,7 +1513,16 @@ public partial class MainWindow
                     DataSet.SetData("TaskItems",
                         Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                 };
-
+                
+                if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase) && interfaceOption.Cases != null)
+                {
+                    var index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
+                    if (index != -1)
+                    {
+                        comboBox.SelectedIndex = index;
+                    }
+                }
+                
                 comboBox.SetValue(ToolTipProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitleProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
