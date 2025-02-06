@@ -21,7 +21,7 @@
     <PackageReference Include="Lierda.WPFHelper" Version="1.0.3" />
 	<PackageReference Include="Maa.Framework" Version="3.0.1-preview.25073.7" />
 	<PackageReference Include="Maa.Framework.Native" Version="3.0.1-preview.25073.7" />
-	<PackageReference Include="Maa.Framework.Runtime.win-x64" Version="3.0.1" />
+	<PackageReference Include="Maa.Framework.Runtime.win-x64" Version="3.0.3" />
 	<PackageReference Include="XstarS.GuidGenerators" Version="2.5.0" />
   </ItemGroup>
 
@@ -46,8 +46,8 @@
         <ApplicationRevision>0</ApplicationRevision>
         <ApplicationVersion>1.1.0</ApplicationVersion>
         <Version>1.1</Version>
-        <FileVersion>1.2.4.4</FileVersion>
-        <AssemblyVersion>1.2.4.4</AssemblyVersion>
+        <FileVersion>1.2.4.5</FileVersion>
+        <AssemblyVersion>1.2.4.5</AssemblyVersion>
         <InformationalVersion>0.0.1</InformationalVersion>
     </PropertyGroup>
   
@@ -80,9 +80,9 @@
         <PackageReference Include="QuickGraph" Version="3.6.61119.7" />
         <PackageReference Include="Serilog" Version="4.2.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-        <PackageReference Include="System.CodeDom" Version="9.0.0" />
-        <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
-        <PackageReference Include="System.Management" Version="9.0.0" />
+        <PackageReference Include="System.CodeDom" Version="9.0.1" />
+        <PackageReference Include="System.Drawing.Common" Version="9.0.1" />
+        <PackageReference Include="System.Management" Version="9.0.1" />
         <PackageReference Include="WPFLocalizeExtension" Version="3.10.0" />
     </ItemGroup>
 	
@@ -91,6 +91,7 @@
         <None Remove="Assets\Icons\maa-logo_128x128.png" />
         <None Remove="obj\**" />
         <None Remove="C:\Users\Fox\.nuget\packages\nlog.config\4.7.15\contentFiles\any\any\NLog.config" />
+        <None Remove="obj\Debug\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -260,6 +261,7 @@
           <SubType>Designer</SubType>
         </Page>
         <Page Remove="obj\**" />
+        <Page Remove="obj\Debug\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -282,6 +284,7 @@
         <Generator>ResXFileCodeGenerator</Generator>
         <LastGenOutput>Strings.zh-cn.Designer.cs</LastGenOutput>
       </EmbeddedResource>
+      <EmbeddedResource Remove="obj\Debug\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -337,6 +340,7 @@
         <AutoGen>True</AutoGen>
         <DependentUpon>Strings.resx</DependentUpon>
       </Compile>
+      <Compile Remove="obj\Debug\**" />
     </ItemGroup>
 
     <ItemGroup>

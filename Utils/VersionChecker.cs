@@ -103,7 +103,7 @@ public class VersionChecker
         }
     }
 
-     public async void UpdateResourceBySelection(bool closeDialog = false, bool noDialog = false, Action? action = null)
+    public async void UpdateResourceBySelection(bool closeDialog = false, bool noDialog = false, Action? action = null)
     {
         switch (MainWindow.Data.DownloadSourceIndex)
         {
@@ -528,7 +528,7 @@ public class VersionChecker
             }
             var updatedJsonContent = JsonConvert.SerializeObject(@interface, settings);
 
-            File.WriteAllText(newInterfacePath, updatedJsonContent);
+            await File.WriteAllTextAsync(newInterfacePath, updatedJsonContent);
         }
 
         dialog?.UpdateProgress(100);
@@ -557,7 +557,7 @@ public class VersionChecker
         action?.Invoke();
     }
 
-    public async void UpdateMFA(bool noDialog = false)
+    async public void UpdateMFA(bool noDialog = false)
     {
         MainWindow.Instance.SetUpdating(true);
 
@@ -926,7 +926,11 @@ public class VersionChecker
             string owner = match.Groups["owner"].Value;
             string repo = match.Groups["repo"].Value;
 
-            return new[] { owner, repo };
+            return
+            [
+                owner,
+                repo
+            ];
         }
 
         throw new FormatException("输入的 GitHub URL 格式不正确: " + githubUrl);
