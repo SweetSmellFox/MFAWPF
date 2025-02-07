@@ -13,12 +13,12 @@ namespace MFAWPF.Views;
 public partial class CropImageDialog
 {
     private Point _startPoint;
-    private Rectangle? _selectionRectangle;
+    private Rectangle _selectionRectangle;
 
-    public string? Output { get; set; }
-    private List<int>? _outputRoi;
+    public string Output { get; set; }
+    private List<int> _outputRoi;
 
-    public List<int>? OutputRoi
+    public List<int> OutputRoi
     {
         get => _outputRoi;
         set => _outputRoi = value?.Select(i => i < 0 ? 0 : i).ToList();
@@ -35,7 +35,7 @@ public partial class CropImageDialog
         });
     }
 
-    public void UpdateImage(BitmapImage? imageSource)
+    public void UpdateImage(BitmapImage imageSource)
     {
         if (imageSource == null)
             return;

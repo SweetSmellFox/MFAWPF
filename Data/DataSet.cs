@@ -9,11 +9,11 @@ namespace MFAWPF.Data
 
 public static class DataSet
 {
-    public static Dictionary<string, object>? Data = new();
-    public static Dictionary<string, object>? MaaConfig = new();
+    public static Dictionary<string, object> Data = new();
+    public static Dictionary<string, object> MaaConfig = new();
 
 
-    public static void SetConfig(this Dictionary<string, object>? config, string key, object? value)
+    public static void SetConfig(this Dictionary<string, object> config, string key, object value)
     {
         if (config == null || value == null) return;
         config[key] = value;
@@ -25,7 +25,7 @@ public static class DataSet
         JsonHelper.WriteToConfigJsonFile(fileName, config, new MaaInterfaceSelectOptionConverter(false));
     }
 
-    public static T? GetConfig<T>(this Dictionary<string, object>? Config, string key, T defaultValue)
+    public static T GetConfig<T>(this Dictionary<string, object> Config, string key, T defaultValue)
     {
         if (Config?.TryGetValue(key, out var data) == true)
         {
@@ -57,12 +57,12 @@ public static class DataSet
         return defaultValue;
     }
 
-    public static void SetData(string key, object? value)
+    public static void SetData(string key, object value)
     {
         Data.SetConfig(key, value);
     }
 
-    public static bool TryGetData<T>(string key, out T? value)
+    public static bool TryGetData<T>(string key, out T value)
     {
         if (Data?.TryGetValue(key, out var data) == true)
         {
@@ -99,7 +99,7 @@ public static class DataSet
         return false;
     }
 
-    public static T? GetData<T>(string key, T defaultValue)
+    public static T GetData<T>(string key, T defaultValue)
     {
         return Data.GetConfig(key, defaultValue);
     }

@@ -14,34 +14,25 @@ using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Custom;
 using MaaFramework.Binding.Notification;
-using MFAWPF.Custom;
 using MFAWPF.Data;
-using MFAWPF.Utils.Converters;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Emit;
-using Microsoft.CSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
-using System.Security.Policy;
-using System;
-using System.CodeDom.Compiler;
-using System.Runtime.Intrinsics.Arm;
-using System.Collections;
 using System.Net;
 using System.Reflection;
 using System.Reflection.Metadata;
-using System.Web;
+
 
 namespace MFAWPF.Utils;
 
 public class MaaProcessor
 {
     private static MaaProcessor? _instance;
-    private CancellationTokenSource? _cancellationTokenSource;
+    private CancellationTokenSource _cancellationTokenSource;
     private bool _isStopped;
 
     public bool IsStopped
@@ -50,8 +41,8 @@ public class MaaProcessor
         set => _isStopped = value;
     }
 
-    public CancellationTokenSource? CancellationTokenSource => _cancellationTokenSource;
-    private MaaTasker? _currentTasker;
+    public CancellationTokenSource CancellationTokenSource => _cancellationTokenSource;
+    private MaaTasker _currentTasker;
 
     public static string Resource => AppContext.BaseDirectory + "Resource";
     public static string ModelResource => $"{Resource}/model/";
@@ -62,19 +53,15 @@ public class MaaProcessor
     public static int Money { get; set; } = 0;
     public static int AllMoney { get; set; }
     public static Config Config { get; } = new();
-    public static List<string>? CurrentResources { get; set; }
+    public static List<string> CurrentResources { get; set; }
     public static AutoInitDictionary AutoInitDictionary { get; } = new();
 
-    public event EventHandler? TaskStackChanged;
+    public event EventHandler TaskStackChanged;
 
     public static MaaProcessor Instance
     {
         get => _instance ??= new MaaProcessor();
         set => _instance = value;
-    }
-
-    public MaaProcessor()
-    {
     }
 
     public class TaskAndParam
@@ -88,7 +75,7 @@ public class MaaProcessor
     private DateTime? _startTime;
 
 
-    public void Start(List<DragItemViewModel>? tasks, bool onlyStart = false)
+    public void Start(List<DragItemViewModel> tasks, bool onlyStart = false)
     {
         SetCurrentTasker();
         MainWindow.ViewModel?.SetIdle(false);
@@ -134,7 +121,7 @@ public class MaaProcessor
                             return;
                         }
                         MainWindow.Instance.AutoDetectDevice();
-                        
+
                         instance = Task.Run(GetCurrentTasker, token);
                         instance.Wait(token);
                         connected = instance.Result is { Initialized: true };
@@ -294,7 +281,14 @@ public class MaaProcessor
     {
         var timestamp = GetTimestamp();
         var sign = CalculateSignature(timestamp, secret);
-        var message = new { msgtype = "text", text = new { content = "TaskAllCompleted".GetLocalizationString() } };
+        var message = new
+        {
+            msgtype = "text",
+            text = new
+            {
+                content = "TaskAllCompleted".GetLocalizationString()
+            }
+        };
 
         try
         {
@@ -363,14 +357,14 @@ public class MaaProcessor
     }
 
 
-    private CancellationTokenSource? _emulatorCancellationTokenSource;
+    private CancellationTokenSource _emulatorCancellationTokenSource;
 
     private Process? _softwareProcess;
 
     public void StartSoftware()
     {
         _emulatorCancellationTokenSource = new CancellationTokenSource();
-        StartRunnableFile(DataSet.GetData("SoftwarePath", string.Empty) ?? string.Empty,
+        StartRunnableFile(DataSet.GetData("SoftwarePath", string.Empty),
             DataSet.GetData("WaitSoftwareTime", 60.0), _emulatorCancellationTokenSource.Token);
     }
 
@@ -446,13 +440,13 @@ public class MaaProcessor
 
         // 使用 WMI 查询命令行参数
         var query = $"SELECT CommandLine FROM Win32_Process WHERE ProcessId = {processId}";
-        using (ManagementObjectSearcher searcher = new ManagementObjectSearcher(query))
+        using var searcher = new ManagementObjectSearcher(query);
+
+        foreach (var obj in searcher.Get())
         {
-            foreach (ManagementObject obj in searcher.Get())
-            {
-                commandLine = obj["CommandLine"]?.ToString() ?? string.Empty;
-            }
+            commandLine = obj["CommandLine"]?.ToString() ?? string.Empty;
         }
+
 
         return commandLine;
     }
@@ -590,7 +584,7 @@ public class MaaProcessor
     }
 
     private void UpdateTaskDictionary(ref Dictionary<string, TaskModel> taskModels,
-        List<MaaInterface.MaaInterfaceSelectOption>? options)
+        List<MaaInterface.MaaInterfaceSelectOption> options)
     {
         if (MainWindow.Instance?.TaskDictionary != null)
             MainWindow.Instance.TaskDictionary = MainWindow.Instance.TaskDictionary.MergeTaskModels(taskModels);
@@ -741,7 +735,7 @@ public class MaaProcessor
         TaskStackChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public MaaTasker? GetCurrentTasker()
+    public MaaTasker GetCurrentTasker()
     {
         return _currentTasker ??= InitializeMaaTasker();
     }
@@ -749,7 +743,7 @@ public class MaaProcessor
     {
         return _currentTasker != null;
     }
-    public void SetCurrentTasker(MaaTasker? tasker = null)
+    public void SetCurrentTasker(MaaTasker tasker = null)
     {
         _currentTasker = tasker;
     }
@@ -915,7 +909,7 @@ public class MaaProcessor
                 Config.DesktopWindow.Check);
     }
 
-    private static List<MetadataReference>? MetadataReferences;
+    private static List<MetadataReference> MetadataReferences;
 
     private static List<MetadataReference> GetMetadataReferences()
     {
@@ -1028,7 +1022,7 @@ public class MaaProcessor
         return customClasses;
     }
 
-    private static IEnumerable<CustomValue<object>>? _customClasses;
+    private static IEnumerable<CustomValue<object>> _customClasses;
     private static IEnumerable<CustomValue<object>> GetCustomClasses(string directory, string[] interfacesToImplement)
     {
         if (_customClasses == null || _shouldLoadCustomClasses)
@@ -1087,7 +1081,7 @@ public class MaaProcessor
                 {
                     for (int i = 0; i < taskModel.FocusSucceeded.Count; i++)
                     {
-                        Brush? brush = null;
+                        Brush brush = null;
                         var tip = taskModel.FocusSucceeded[i];
                         try
                         {
@@ -1109,7 +1103,7 @@ public class MaaProcessor
                 {
                     for (int i = 0; i < taskModel.FocusFailed.Count; i++)
                     {
-                        Brush? brush = null;
+                        Brush brush = null;
                         var tip = taskModel.FocusFailed[i];
                         try
                         {
@@ -1131,7 +1125,7 @@ public class MaaProcessor
                 {
                     for (int i = 0; i < taskModel.FocusTip.Count; i++)
                     {
-                        Brush? brush = null;
+                        Brush brush = null;
                         var tip = taskModel.FocusTip[i];
                         try
                         {
@@ -1164,7 +1158,7 @@ public class MaaProcessor
         LoggerService.LogError(e.ToString());
     }
 
-    public BitmapImage? GetBitmapImage()
+    public BitmapImage GetBitmapImage()
     {
         using var buffer = GetImage(GetCurrentTasker()?.Controller);
         if (buffer == null) return null;
@@ -1200,14 +1194,14 @@ public class MaaProcessor
         return bitmapImage;
     }
 
-    private void TryRunTasks(MaaTasker? maa, string? task, string? taskParams)
+    private void TryRunTasks(MaaTasker maa, string task, string taskParams)
     {
         if (maa == null || task == null) throw new NullReferenceException();
         if (string.IsNullOrWhiteSpace(taskParams)) taskParams = "{}";
         maa.AppendTask(task, taskParams).Wait().ThrowIfNot(MaaJobStatus.Succeeded);
     }
 
-    private static MaaImageBuffer GetImage(IMaaController? maaController)
+    private static MaaImageBuffer GetImage(IMaaController maaController)
     {
         var buffer = new MaaImageBuffer();
         if (maaController == null)

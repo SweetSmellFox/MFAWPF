@@ -12,20 +12,20 @@ public partial class SwipeDialog
 {
     private Point _startPoint;
     private Point _endPoint;
-    private Line? _arrowLine;
-    private Polygon? _arrowHead;
+    private Line _arrowLine;
+    private Polygon _arrowHead;
     private Point StartPoint { get; set; }
     private Point EndPoint { get; set; }
-    private List<int>? _outputBegin;
-    private List<int>? _outputEnd;
+    private List<int> _outputBegin;
+    private List<int> _outputEnd;
 
-    public List<int>? OutputBegin
+    public List<int> OutputBegin
     {
         get => _outputBegin;
         private set => _outputBegin = value?.Select(i => i < 0 ? 0 : i).ToList();
     }
 
-    public List<int>? OutputEnd
+    public List<int> OutputEnd
     {
         get => _outputEnd;
         private set => _outputEnd = value?.Select(i => i < 0 ? 0 : i).ToList();
@@ -41,7 +41,7 @@ public partial class SwipeDialog
         });
     }
 
-    public void UpdateImage(BitmapImage? imageSource)
+    public void UpdateImage(BitmapImage imageSource)
     {
         if (imageSource == null)
             return;

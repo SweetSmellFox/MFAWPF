@@ -8,7 +8,7 @@ namespace MFAWPF.Utils;
 public static class EmulatorHelper
 {
     [DllImport("User32.dll", EntryPoint = "FindWindow")]
-    private extern static IntPtr FindWindow(string? lpClassName, string lpWindowName);
+    private extern static IntPtr FindWindow(string lpClassName, string lpWindowName);
 
     [DllImport("User32.dll", CharSet = CharSet.Auto)]
     private extern static int GetWindowThreadProcessId(IntPtr hwnd, out int id);
@@ -71,7 +71,7 @@ public static class EmulatorHelper
             return false;
         }
 
-        ProcessModule? processModule;
+        ProcessModule processModule;
         try
         {
             processModule = processes[0].MainModule;
@@ -146,7 +146,7 @@ public static class EmulatorHelper
             return false;
         }
 
-        ProcessModule? processModule;
+        ProcessModule processModule;
         try
         {
             processModule = processes[0].MainModule;
@@ -220,7 +220,7 @@ public static class EmulatorHelper
             return false;
         }
 
-        ProcessModule? processModule;
+        ProcessModule processModule;
         try
         {
             processModule = processes[0].MainModule;
@@ -285,7 +285,7 @@ public static class EmulatorHelper
             return false;
         }
 
-        ProcessModule? processModule;
+        ProcessModule processModule;
         try
         {
             processModule = processes[0].MainModule;
@@ -345,7 +345,7 @@ public static class EmulatorHelper
             return false;
         }
 
-        ProcessModule? processModule;
+        ProcessModule processModule;
         try
         {
             processModule = processes[0].MainModule;

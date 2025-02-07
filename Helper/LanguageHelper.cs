@@ -8,7 +8,7 @@ namespace MFAWPF.Utils;
 
 public static class LanguageHelper
 {
-    public static event EventHandler? LanguageChanged;
+    public static event EventHandler LanguageChanged;
 
     public class SupportedLanguage
     {
@@ -93,7 +93,7 @@ public static class LanguageHelper
             : new Dictionary<string, string>();
     }
 
-    public static string GetLocalizedString(string? key)
+    public static string GetLocalizedString(string key)
     {
         if (key == null)
             return string.Empty;

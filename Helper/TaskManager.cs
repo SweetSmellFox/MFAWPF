@@ -45,7 +45,7 @@ public static class TaskManager
     /// <param name="prompt">日志提示</param>
     /// <param name="catchException">是否捕获异常</param>
     public async static Task RunTaskAsync(
-        Action action,
+        Action? action,
         Action? handleError = null,
         string name = nameof(Action),
         string prompt = ">>> ",

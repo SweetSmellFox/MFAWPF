@@ -23,8 +23,7 @@ public class ChooseTeamAction : MaaCustomAction
         var choosing = () =>
         {
             var image = context.GetImage();
-            RecognitionDetail? detail;
-            if (context.TemplateMatch("houqin.png", image, out detail, 0.81, 0, 244, 1279, 164))
+            if (context.TemplateMatch("houqin.png", image, out var  detail, 0.81, 0, 244, 1279, 164))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);
                 return true;
@@ -41,8 +40,8 @@ public class ChooseTeamAction : MaaCustomAction
         var confirm = () =>
         {
             var image = context.GetImage();
-            RecognitionDetail? detail;
-            if (context.TemplateMatch("confirm.png", image, out detail, 0.8, 60, 550, 1100, 110))
+
+            if (context.TemplateMatch("confirm.png", image, out var detail, 0.8, 60, 550, 1100, 110))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);
                 return true;
@@ -56,7 +55,7 @@ public class ChooseTeamAction : MaaCustomAction
         var afterConfirm = () =>
         {
             var image = context.GetImage();
-            RecognitionDetail? detail;
+            RecognitionDetail detail;
             if (context.TemplateMatch("sniper.png", image, out detail, 0.8, 339, 182, 307, 387))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);
@@ -86,8 +85,7 @@ public class ChooseTeamAction : MaaCustomAction
                 var after = () =>
                 {
                     var image = context.GetImage();
-                    RecognitionDetail? detail;
-                    if (context.TemplateMatch("Sarkaz@Roguelike@LastRewardConfirm.png", image, out detail, 0.7, 155, 340, 900, 510))
+                    if (context.TemplateMatch("Sarkaz@Roguelike@LastRewardConfirm.png", image, out var detail, 0.7, 155, 340, 900, 510))
                     {
                         context.Click(detail.HitBox.X, detail.HitBox.Y);
                         return true;
@@ -105,8 +103,7 @@ public class ChooseTeamAction : MaaCustomAction
         var confirmZ = () =>
         {
             var image = context.GetImage();
-            RecognitionDetail? detail;
-            if (context.TemplateMatch("confirm.png", image, out detail, 0.7, 60, 550, 1100, 110))
+            if (context.TemplateMatch("confirm.png", image, out var detail, 0.7, 60, 550, 1100, 110))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);
                 return true;

@@ -25,7 +25,7 @@ public class InputParameterAction : MaaCustomAction
         var enter1 = () =>
         {
             var image = context.GetImage();
-            RecognitionDetail? detail;
+            RecognitionDetail detail;
             if (context.OCR("启用参数", image, out detail, 847, 570, 98, 28))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);

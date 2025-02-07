@@ -66,7 +66,7 @@ public partial class ErrorView : INotifyPropertyChanged
         // ErrorQqGroupLink.Visibility = isZhCn ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler PropertyChanged;
 
     protected override void OnClosed(EventArgs e)
     {

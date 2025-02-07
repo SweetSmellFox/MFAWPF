@@ -10,7 +10,7 @@ public class SingleOrIntListConverter : JsonConverter
         return objectType == typeof(object);
     }
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
         if (token.Type == JTokenType.Integer)
@@ -26,7 +26,7 @@ public class SingleOrIntListConverter : JsonConverter
         return null;
     }
 
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         if (value is List<int> list)
         {

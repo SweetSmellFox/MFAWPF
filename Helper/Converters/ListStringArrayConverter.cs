@@ -7,7 +7,7 @@ namespace MFAWPF.Utils.Converters;
 
 public class ListStringArrayConverter : IValueConverter
 {
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is IEnumerable<string[]> ls)
         {
@@ -27,7 +27,7 @@ public class ListStringArrayConverter : IValueConverter
             var result = collection.Select(customValue =>
             {
                 var trimmed = customValue.Value?.Trim('[', ']');
-                var splitArray = trimmed?.Split(",") ?? null;
+                var splitArray = trimmed?.Split(",");
                 return splitArray?.Length == 2 ? splitArray : null;
             }).ToList();
 

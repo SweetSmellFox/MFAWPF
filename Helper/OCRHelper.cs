@@ -27,7 +27,7 @@ public class OCRHelper
     {
     }
 
-    public static string ReadTextFromMAATasker(int x, int y, int width, int height, IMaaTasker? tasker = null)
+    public static string ReadTextFromMAATasker(int x, int y, int width, int height, IMaaTasker tasker = null)
     {
         tasker ??= MaaProcessor.Instance.GetCurrentTasker();
         string result = string.Empty;
@@ -130,6 +130,6 @@ public class OCRHelper
     //     File.Delete(tempFilePath);
     //
     //     // 拼接结果文本
-    //     return Text ?? string.Empty;
+    //     return Text ? string.Empty;
     // }
 }

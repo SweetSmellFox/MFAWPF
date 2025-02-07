@@ -39,7 +39,7 @@ public class UIntOrObjectConverter : JsonConverter
         return objectType == typeof(uint) || objectType == typeof(object);
     }
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
         JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
@@ -57,7 +57,7 @@ public class UIntOrObjectConverter : JsonConverter
         throw new JsonSerializationException("Invalid JSON format for SingleOrNestedListConverter.");
     }
 
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         if (value is uint ui)
         {

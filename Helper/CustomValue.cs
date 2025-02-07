@@ -14,17 +14,17 @@ public class CustomValue<T> : ObservableObject
         Value = value;
     }
 
-    private T? _value;
+    private T _value;
 
-    public T? Value
+    public T Value
     {
         get => _value;
         set => SetProperty(ref _value, value);
     }
 
-    private string? _name;
+    private string _name;
 
-    public string? Name
+    public string Name
     {
         get => _name;
         set => SetProperty(ref _name, value);

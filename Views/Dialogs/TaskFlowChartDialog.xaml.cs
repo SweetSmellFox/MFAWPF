@@ -13,9 +13,9 @@ public partial class TaskFlowChartDialog
 {
     private bool _isDragging;
     private Point _startPoint;
-    private Dictionary<string, TaskItemViewModel>? _vertexTaskMapping;
+    private Dictionary<string, TaskItemViewModel> _vertexTaskMapping;
     private readonly EditTaskDialog _editTaskDialog;
-    private Vertex? _selectedVertex; // 用于连线的源节点
+    private Vertex _selectedVertex; // 用于连线的源节点
 
     public TaskFlowChartDialog(EditTaskDialog editTaskDialog)
     {

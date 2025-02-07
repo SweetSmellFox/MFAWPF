@@ -21,7 +21,7 @@ public partial class CustomListControl
                 CoerceItems
             ));
 
-    private static object? CoerceItems(DependencyObject d, object? value)
+    private static object CoerceItems(DependencyObject d, object value)
     {
         return value;
     }
@@ -67,7 +67,7 @@ public partial class CustomListControl
     {
     }
 
-    private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
         // 处理集合的增删改
         if (e is { Action: NotifyCollectionChangedAction.Add, NewItems: not null })
@@ -96,7 +96,7 @@ public partial class CustomListControl
         SetCurrentValue(ItemsProperty, Items);
     }
 
-    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(CustomValue<string>.Value))
         {
@@ -133,7 +133,7 @@ public partial class CustomListControl
     }
 
     // 查找父元素的方法
-    private static T? FindParent<T>(DependencyObject child) where T : DependencyObject
+    private static T FindParent<T>(DependencyObject child) where T : DependencyObject
     {
         for (var parent = VisualTreeHelper.GetParent(child);
              parent != null;

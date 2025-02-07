@@ -10,7 +10,7 @@ public class MaaResourceVersionConverter : JsonConverter
         return objectType == typeof(string) || objectType == typeof(MaaInterface.MaaResourceVersion);
     }
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
         JsonSerializer serializer)
     {
         var token = JToken.Load(reader);
@@ -24,7 +24,7 @@ public class MaaResourceVersionConverter : JsonConverter
         return res;
     }
 
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         if (value is string strValue)
         {

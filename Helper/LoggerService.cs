@@ -20,7 +20,7 @@ public static class LoggerService
         Logger.Information(message.ToString());
         Console.WriteLine("[INFO]" + message);
     }
-    public static void LogError(object? e)
+    public static void LogError(object e)
     {
         Logger.Error(e?.ToString() ?? string.Empty);
 

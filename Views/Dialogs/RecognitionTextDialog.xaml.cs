@@ -11,18 +11,18 @@ namespace MFAWPF.Views;
 public partial class RecognitionTextDialog
 {
     private Point _startPoint;
-    private Rectangle? _selectionRectangle;
-    private List<int>? _output;
+    private Rectangle _selectionRectangle;
+    private List<int> _output;
 
-    public List<int>? Output
+    public List<int> Output
     {
         get => _output;
         set => _output = value?.Select(i => i < 0 ? 0 : i).ToList();
     }
 
-    private List<int>? _outputRoi;
+    private List<int> _outputRoi;
 
-    public List<int>? OutputRoi
+    public List<int> OutputRoi
     {
         get => _outputRoi;
         set => _outputRoi = value?.Select(i => i < 0 ? 0 : i).ToList();
@@ -38,7 +38,7 @@ public partial class RecognitionTextDialog
         });
     }
 
-    public void UpdateImage(BitmapImage? imageSource)
+    public void UpdateImage(BitmapImage imageSource)
     {
         if (imageSource == null)
             return;

@@ -18,7 +18,7 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
     }
 
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
         JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
@@ -49,7 +49,7 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
 
                 break;
             case JTokenType.String:
-                string? oName = token.ToObject<string>(serializer);
+               var oName = token.ToObject<string>(serializer);
                 return new List<MaaInterface.MaaInterfaceSelectOption>
                 {
                     new()
@@ -65,7 +65,7 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
         return null;
     }
 
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         var array = new JArray();
 
@@ -85,7 +85,7 @@ public class MaaInterfaceSelectOptionConverter : JsonConverter
                     JObject obj = new JObject
                     {
                         ["name"] = option.Name,
-                        ["index"] = option.Index ?? 0
+                        ["index"] = option.Index
                     };
                     array.Add(obj);
                 }

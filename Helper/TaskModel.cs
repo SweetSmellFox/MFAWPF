@@ -12,7 +12,7 @@ namespace MFAWPF.Utils;
 
 public class TaskModel : ObservableObject
 {
-    private string _name = "未命名";
+    private string? _name = "未命名";
     private string? _recognition;
     private string? _action;
     private List<string>? _next;
@@ -21,13 +21,13 @@ public class TaskModel : ObservableObject
     private bool? _is_sub;
     private bool? _inverse;
     private bool? _enabled;
-    private uint? _timeout;
+    private uint _timeout;
     private List<string>? _timeout_next;
-    private uint? _times_limit;
+    private uint _times_limit;
     private List<string>? _runout_next;
-    private uint? _pre_delay;
-    private uint? _post_delay;
-    private uint? _rate_limit;
+    private uint _pre_delay;
+    private uint _post_delay;
+    private uint _rate_limit;
     private object? _pre_wait_freezes;
     private object? _post_wait_freezes;
     private bool? _focus;
@@ -48,8 +48,8 @@ public class TaskModel : ObservableObject
     private List<int>? _begin_offset;
     private object? _end;
     private List<int>? _end_offset;
-    private uint? _starting;
-    private uint? _duration;
+    private uint _starting;
+    private uint _duration;
     private List<int>? _key;
     private string? _input_text;
     private string? _package;
@@ -58,12 +58,12 @@ public class TaskModel : ObservableObject
     private string? _custom_action;
     private string? _custom_action_param;
     private string? _order_by;
-    private int? _index;
-    private int? _method;
-    private int? _count;
+    private int _index;
+    private int _method;
+    private int _count;
     private bool? _green_mask;
     private string? _detector;
-    private double? _ratio;
+    private double _ratio;
     private List<string>? _template;
     private object? _roi;
     private object? _roi_offset;
@@ -78,10 +78,10 @@ public class TaskModel : ObservableObject
     [Browsable(false)]
     [JsonIgnore]
     [JsonProperty("name")]
-    public string Name
+    public string? Name
     {
         get => _name;
-        set => SetNewProperty(ref _name, value);
+        set => SetNewProperty( ref _name, value);
     }
 
     [JsonProperty("recognition")]
@@ -93,7 +93,7 @@ public class TaskModel : ObservableObject
     public string? Recognition
     {
         get => _recognition;
-        set => SetNewProperty(ref _recognition, value);
+        set => SetNewProperty( ref _recognition, value);
     }
 
     [JsonProperty("action")]
@@ -104,7 +104,7 @@ public class TaskModel : ObservableObject
     public string? Action
     {
         get => _action;
-        set => SetNewProperty(ref _action, value);
+        set => SetNewProperty( ref _action, value);
     }
 
     [JsonProperty("next")]
@@ -115,7 +115,7 @@ public class TaskModel : ObservableObject
     public List<string>? Next
     {
         get => _next;
-        set => SetNewProperty(ref _next, value);
+        set => SetNewProperty( ref _next, value);
     }
 
     [JsonProperty("interrupt")]
@@ -127,7 +127,7 @@ public class TaskModel : ObservableObject
     public List<string>? Interrupt
     {
         get => _interrupt;
-        set => SetNewProperty(ref _interrupt, value);
+        set => SetNewProperty( ref _interrupt, value);
     }
 
     [JsonProperty("is_sub")]
@@ -139,7 +139,7 @@ public class TaskModel : ObservableObject
     public bool? IsSub
     {
         get => _is_sub;
-        set => SetNewProperty(ref _is_sub, value);
+        set => SetNewProperty( ref _is_sub, value);
     }
 
     [JsonProperty("timeout")]
@@ -148,10 +148,10 @@ public class TaskModel : ObservableObject
         "next + interrupt 识别超时时间，毫秒。默认 20 * 1000 。\n具体逻辑为 while(!timeout) { foreach(next + interrupt); sleep_until(rate_limit); } 。"
     )]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? Timeout
+    public uint Timeout
     {
         get => _timeout;
-        set => SetNewProperty(ref _timeout, value);
+        set => SetNewProperty( ref _timeout, value);
     }
 
     [JsonProperty("on_error")]
@@ -164,7 +164,7 @@ public class TaskModel : ObservableObject
     public List<string>? OnError
     {
         get => _on_error;
-        set => SetNewProperty(ref _on_error, value);
+        set => SetNewProperty( ref _on_error, value);
     }
 
     [JsonProperty("inverse")]
@@ -176,7 +176,7 @@ public class TaskModel : ObservableObject
     public bool? Inverse
     {
         get => _inverse;
-        set => SetNewProperty(ref _inverse, value);
+        set => SetNewProperty( ref _inverse, value);
     }
 
     [JsonProperty("enabled")]
@@ -188,7 +188,7 @@ public class TaskModel : ObservableObject
     public bool? Enabled
     {
         get => _enabled;
-        set => SetNewProperty(ref _enabled, value);
+        set => SetNewProperty( ref _enabled, value);
     }
 
     [JsonProperty("pre_delay")]
@@ -197,10 +197,10 @@ public class TaskModel : ObservableObject
         "识别到 到 执行动作前 的延迟，毫秒。可选，默认 200 。\n推荐尽可能增加中间过程任务，少用延迟，不然既慢还不稳定。"
     )]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? PreDelay
+    public uint PreDelay
     {
         get => _pre_delay;
-        set => SetNewProperty(ref _pre_delay, value);
+        set => SetNewProperty( ref _pre_delay, value);
     }
 
     [JsonProperty("post_delay")]
@@ -209,10 +209,10 @@ public class TaskModel : ObservableObject
         "执行动作后 到 识别 next 的延迟，毫秒。可选，默认 200 。\n推荐尽可能增加中间过程任务，少用延迟，不然既慢还不稳定。"
     )]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? PostDelay
+    public uint PostDelay
     {
         get => _post_delay;
-        set => SetNewProperty(ref _post_delay, value);
+        set => SetNewProperty( ref _post_delay, value);
     }
 
     [JsonProperty("pre_wait_freezes")]
@@ -225,7 +225,7 @@ public class TaskModel : ObservableObject
     public object? PreWaitFreezes
     {
         get => _pre_wait_freezes;
-        set => SetNewProperty(ref _pre_wait_freezes, value);
+        set => SetNewProperty( ref _pre_wait_freezes, value);
     }
 
     [JsonProperty("post_wait_freezes")]
@@ -238,7 +238,7 @@ public class TaskModel : ObservableObject
     public object? PostWaitFreezes
     {
         get => _post_wait_freezes;
-        set => SetNewProperty(ref _post_wait_freezes, value);
+        set => SetNewProperty( ref _post_wait_freezes, value);
     }
 
     [JsonProperty("focus")]
@@ -250,7 +250,7 @@ public class TaskModel : ObservableObject
     public bool? Focus
     {
         get => _focus;
-        set => SetNewProperty(ref _focus, value);
+        set => SetNewProperty( ref _focus, value);
     }
 
     [JsonProperty("focus_tip")]
@@ -263,7 +263,7 @@ public class TaskModel : ObservableObject
     public List<string>? FocusTip
     {
         get => _focus_tip;
-        set => SetNewProperty(ref _focus_tip, value);
+        set => SetNewProperty( ref _focus_tip, value);
     }
 
     [JsonProperty("focus_tip_color")]
@@ -276,7 +276,7 @@ public class TaskModel : ObservableObject
     public List<string>? FocusTipColor
     {
         get => _focus_tip_color;
-        set => SetNewProperty(ref _focus_tip_color, value);
+        set => SetNewProperty( ref _focus_tip_color, value);
     }
 
     [JsonProperty("focus_succeeded")]
@@ -289,7 +289,7 @@ public class TaskModel : ObservableObject
     public List<string>? FocusSucceeded
     {
         get => _focus_succeeded;
-        set => SetNewProperty(ref _focus_succeeded, value);
+        set => SetNewProperty( ref _focus_succeeded, value);
     }
 
     [JsonProperty("focus_succeeded_color")]
@@ -302,7 +302,7 @@ public class TaskModel : ObservableObject
     public List<string>? FocusSucceededColor
     {
         get => _focus_succeeded_color;
-        set => SetNewProperty(ref _focus_succeeded_color, value);
+        set => SetNewProperty( ref _focus_succeeded_color, value);
     }
 
 
@@ -316,7 +316,7 @@ public class TaskModel : ObservableObject
     public List<string>? FocusFailed
     {
         get => _focus_failed;
-        set => SetNewProperty(ref _focus_failed, value);
+        set => SetNewProperty( ref _focus_failed, value);
     }
 
     [JsonProperty("focus_failed_color")]
@@ -329,7 +329,7 @@ public class TaskModel : ObservableObject
     public List<string>? FocusFailedColor
     {
         get => _focus_failed_color;
-        set => SetNewProperty(ref _focus_failed_color, value);
+        set => SetNewProperty( ref _focus_failed_color, value);
     }
 
     [JsonProperty("roi")]
@@ -342,7 +342,7 @@ public class TaskModel : ObservableObject
     public object? Roi
     {
         get => _roi;
-        set => SetNewProperty(ref _roi, value);
+        set => SetNewProperty( ref _roi, value);
     }
 
     [JsonProperty("roi_offset")]
@@ -355,7 +355,7 @@ public class TaskModel : ObservableObject
     public object? RoiOffset
     {
         get => _roi_offset;
-        set => SetNewProperty(ref _roi_offset, value);
+        set => SetNewProperty( ref _roi_offset, value);
     }
 
     [JsonProperty("template")]
@@ -368,7 +368,7 @@ public class TaskModel : ObservableObject
     public List<string>? Template
     {
         get => _template;
-        set => SetNewProperty(ref _template, value);
+        set => SetNewProperty( ref _template, value);
     }
 
     [JsonProperty("threshold")]
@@ -381,7 +381,7 @@ public class TaskModel : ObservableObject
     public object? Threshold
     {
         get => _threshold;
-        set => SetNewProperty(ref _threshold, value);
+        set => SetNewProperty( ref _threshold, value);
     }
 
     [JsonProperty("order_by")]
@@ -393,7 +393,7 @@ public class TaskModel : ObservableObject
     public string? OrderBy
     {
         get => _order_by;
-        set => SetNewProperty(ref _order_by, value);
+        set => SetNewProperty( ref _order_by, value);
     }
 
     [JsonProperty("index")]
@@ -402,10 +402,10 @@ public class TaskModel : ObservableObject
         "命中第几个结果。可选，默认 0 。\n 假设共有 N 个结果，则 index 的取值范围为 [-N, N - 1] ，其中负数使用类 Python 的规则转换为 N - index 。若超出范围，则视为当前识别无结果。"
     )]
     [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
-    public int? Index
+    public int Index
     {
         get => _index;
-        set => SetNewProperty(ref _index, value);
+        set => SetNewProperty( ref _index, value);
     }
 
     [JsonProperty("method")]
@@ -414,10 +414,10 @@ public class TaskModel : ObservableObject
         "匹配算法。"
     )]
     [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
-    public int? Method
+    public int Method
     {
         get => _method;
-        set => SetNewProperty(ref _method, value);
+        set => SetNewProperty( ref _method, value);
     }
 
     [JsonProperty("green_mask")]
@@ -429,7 +429,7 @@ public class TaskModel : ObservableObject
     public bool? GreenMask
     {
         get => _green_mask;
-        set => SetNewProperty(ref _green_mask, value);
+        set => SetNewProperty( ref _green_mask, value);
     }
 
     [JsonProperty("count")]
@@ -438,10 +438,10 @@ public class TaskModel : ObservableObject
         "匹配的点的数量要求（阈值）。"
     )]
     [Editor(typeof(NullableIntEditor), typeof(NullableIntEditor))]
-    public int? Count
+    public int Count
     {
         get => _count;
-        set => SetNewProperty(ref _count, value);
+        set => SetNewProperty( ref _count, value);
     }
 
     [JsonProperty("detector")]
@@ -453,7 +453,7 @@ public class TaskModel : ObservableObject
     public string? Detector
     {
         get => _detector;
-        set => SetNewProperty(ref _detector, value);
+        set => SetNewProperty( ref _detector, value);
     }
 
     [JsonProperty("ratio")]
@@ -462,10 +462,10 @@ public class TaskModel : ObservableObject
         "KNN 匹配算法的距离比值，[0 - 1.0] , 越大则匹配越宽松（更容易连线）。可选，默认 0.6 。"
     )]
     [Editor(typeof(NullableDoubleEditor), typeof(NullableDoubleEditor))]
-    public double? Ratio
+    public double Ratio
     {
         get => _ratio;
-        set => SetNewProperty(ref _ratio, value);
+        set => SetNewProperty( ref _ratio, value);
     }
 
     [JsonProperty("lower")]
@@ -478,7 +478,7 @@ public class TaskModel : ObservableObject
     public object? Lower
     {
         get => _lower;
-        set => SetNewProperty(ref _lower, value);
+        set => SetNewProperty( ref _lower, value);
     }
 
     [JsonProperty("upper")]
@@ -491,7 +491,7 @@ public class TaskModel : ObservableObject
     public object? Upper
     {
         get => _upper;
-        set => SetNewProperty(ref _upper, value);
+        set => SetNewProperty( ref _upper, value);
     }
 
     [JsonProperty("connected")]
@@ -503,7 +503,7 @@ public class TaskModel : ObservableObject
     public bool? Connected
     {
         get => _connected;
-        set => SetNewProperty(ref _connected, value);
+        set => SetNewProperty( ref _connected, value);
     }
 
     [JsonProperty("expected")]
@@ -516,7 +516,7 @@ public class TaskModel : ObservableObject
     public List<string>? Expected
     {
         get => _expected;
-        set => SetNewProperty(ref _expected, value);
+        set => SetNewProperty( ref _expected, value);
     }
 
     [JsonProperty("replace")]
@@ -529,7 +529,7 @@ public class TaskModel : ObservableObject
     public List<string[]>? Replace
     {
         get => _replace;
-        set => SetNewProperty(ref _replace, value);
+        set => SetNewProperty( ref _replace, value);
     }
 
     [JsonProperty("only_rec")]
@@ -541,7 +541,7 @@ public class TaskModel : ObservableObject
     public bool? OnlyRec
     {
         get => _only_rec;
-        set => SetNewProperty(ref _only_rec, value);
+        set => SetNewProperty( ref _only_rec, value);
     }
 
     [JsonProperty("model")]
@@ -553,7 +553,7 @@ public class TaskModel : ObservableObject
     public string? Model
     {
         get => _model;
-        set => SetNewProperty(ref _model, value);
+        set => SetNewProperty( ref _model, value);
     }
 
     [JsonProperty("labels")]
@@ -565,7 +565,7 @@ public class TaskModel : ObservableObject
     public List<string>? Labels
     {
         get => _labels;
-        set => SetNewProperty(ref _labels, value);
+        set => SetNewProperty( ref _labels, value);
     }
 
     [JsonProperty("custom_recognition")]
@@ -577,7 +577,7 @@ public class TaskModel : ObservableObject
     public string? CustomRecognition
     {
         get => _custom_recognition;
-        set => SetNewProperty(ref _custom_recognition, value);
+        set => SetNewProperty( ref _custom_recognition, value);
     }
 
     [JsonProperty("custom_recognition_param")]
@@ -589,7 +589,7 @@ public class TaskModel : ObservableObject
     public string? CustomRecognitionParam
     {
         get => _custom_recognition_param;
-        set => SetNewProperty(ref _custom_recognition_param, value);
+        set => SetNewProperty( ref _custom_recognition_param, value);
     }
 
     [JsonProperty("custom_action")]
@@ -601,7 +601,7 @@ public class TaskModel : ObservableObject
     public string? CustomAction
     {
         get => _custom_action;
-        set => SetNewProperty(ref _custom_action, value);
+        set => SetNewProperty( ref _custom_action, value);
     }
 
     [JsonProperty("custom_action_param")]
@@ -613,7 +613,7 @@ public class TaskModel : ObservableObject
     public string? CustomActionParam
     {
         get => _custom_action_param;
-        set => SetNewProperty(ref _custom_action_param, value);
+        set => SetNewProperty( ref _custom_action_param, value);
     }
 
     [JsonProperty("target")]
@@ -626,7 +626,7 @@ public class TaskModel : ObservableObject
     public object? Target
     {
         get => _target;
-        set => SetNewProperty(ref _target, value);
+        set => SetNewProperty( ref _target, value);
     }
 
     [JsonProperty("target_offset")]
@@ -639,7 +639,7 @@ public class TaskModel : ObservableObject
     public List<int>? TargetOffset
     {
         get => _target_offset;
-        set => SetNewProperty(ref _target_offset, value);
+        set => SetNewProperty( ref _target_offset, value);
     }
 
     [JsonProperty("begin")]
@@ -652,7 +652,7 @@ public class TaskModel : ObservableObject
     public object? Begin
     {
         get => _begin;
-        set => SetNewProperty(ref _begin, value);
+        set => SetNewProperty( ref _begin, value);
     }
 
     [JsonProperty("begin_offset")]
@@ -665,7 +665,7 @@ public class TaskModel : ObservableObject
     public List<int>? BeginOffset
     {
         get => _begin_offset;
-        set => SetNewProperty(ref _begin_offset, value);
+        set => SetNewProperty( ref _begin_offset, value);
     }
 
     [JsonProperty("end")]
@@ -678,7 +678,7 @@ public class TaskModel : ObservableObject
     public object? End
     {
         get => _end;
-        set => SetNewProperty(ref _end, value);
+        set => SetNewProperty( ref _end, value);
     }
 
     [JsonProperty("end_offset")]
@@ -691,7 +691,7 @@ public class TaskModel : ObservableObject
     public List<int>? EndOffset
     {
         get => _end_offset;
-        set => SetNewProperty(ref _end_offset, value);
+        set => SetNewProperty( ref _end_offset, value);
     }
 
     [JsonProperty("duration")]
@@ -700,10 +700,10 @@ public class TaskModel : ObservableObject
         "滑动持续时间，单位毫秒。可选，默认 200 。"
     )]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? Duration
+    public uint Duration
     {
         get => _duration;
-        set => SetNewProperty(ref _duration, value);
+        set => SetNewProperty( ref _duration, value);
     }
 
     [JsonProperty("starting")]
@@ -712,10 +712,10 @@ public class TaskModel : ObservableObject
         "滑动起始时间，单位毫秒。可选，默认 0 。\nMultiSwipe 额外字段，该滑动会在本 action 中第 starting 毫秒才开始。"
     )]
     [Editor(typeof(NullableUIntEditor), typeof(NullableUIntEditor))]
-    public uint? Starting
+    public uint Starting
     {
         get => _starting;
-        set => SetNewProperty(ref _starting, value);
+        set => SetNewProperty( ref _starting, value);
     }
 
     [JsonProperty("key")]
@@ -728,7 +728,7 @@ public class TaskModel : ObservableObject
     public List<int>? Key
     {
         get => _key;
-        set => SetNewProperty(ref _key, value);
+        set => SetNewProperty( ref _key, value);
     }
 
     [JsonProperty("input_text")]
@@ -740,7 +740,7 @@ public class TaskModel : ObservableObject
     public string? InputText
     {
         get => _input_text;
-        set => SetNewProperty(ref _input_text, value);
+        set => SetNewProperty( ref _input_text, value);
     }
 
     [JsonProperty("package")]
@@ -752,7 +752,7 @@ public class TaskModel : ObservableObject
     public string? Package
     {
         get => _package;
-        set => SetNewProperty(ref _package, value);
+        set => SetNewProperty( ref _package, value);
     }
 
     [JsonProperty("exec")]
@@ -764,7 +764,7 @@ public class TaskModel : ObservableObject
     public string? Exec
     {
         get => _exec;
-        set => SetNewProperty(ref _exec, value);
+        set => SetNewProperty( ref _exec, value);
     }
 
     [JsonProperty("args")]
@@ -777,7 +777,7 @@ public class TaskModel : ObservableObject
     public List<string>? Args
     {
         get => _args;
-        set => SetNewProperty(ref _args, value);
+        set => SetNewProperty( ref _args, value);
     }
 
     [JsonProperty("detach")]
@@ -789,14 +789,14 @@ public class TaskModel : ObservableObject
     public bool? Detach
     {
         get => _detach;
-        set => SetNewProperty(ref _detach, value);
+        set => SetNewProperty( ref _detach, value);
     }
 
     [Browsable(false)]
     [JsonExtensionData]
-    public Dictionary<string, object> AdditionalData { get; set; } = new();
+    public Dictionary<string, object>? AdditionalData { get; set; } = new();
 
-    public override string ToString()
+    public override string? ToString()
     {
         var settings = new JsonSerializerSettings
         {
@@ -809,11 +809,11 @@ public class TaskModel : ObservableObject
         return json;
     }
 
-    public TaskModel Set(object properties)
+    public TaskModel Set(object? properties)
     {
         foreach (PropertyInfo prop in properties.GetType().GetProperties())
         {
-            PropertyInfo? propInfo = this.GetType().GetProperty(prop.Name, BindingFlags.Public | BindingFlags.Instance);
+            var propInfo = this.GetType().GetProperty(prop.Name, BindingFlags.Public | BindingFlags.Instance);
             if (propInfo != null && propInfo.CanWrite)
             {
                 propInfo.SetValue(this, prop.GetValue(properties));
@@ -823,11 +823,11 @@ public class TaskModel : ObservableObject
         return this;
     }
 
-    public TaskModel Set(Dictionary<string, object?> properties)
+    public TaskModel Set(Dictionary<string, object>? properties)
     {
         foreach (var property in properties)
         {
-            PropertyInfo? propInfo =
+            var propInfo =
                 GetType().GetProperty(property.Key, BindingFlags.Public | BindingFlags.Instance);
             if (propInfo != null && propInfo.CanWrite)
             {
@@ -844,7 +844,7 @@ public class TaskModel : ObservableObject
         {
             if (attribute.Key != null)
             {
-                PropertyInfo? propInfo =
+                var propInfo =
                     GetType().GetProperty(attribute.Key, BindingFlags.Public | BindingFlags.Instance);
                 if (propInfo != null && propInfo.CanWrite)
                     propInfo.SetValue(this, attribute.Value);
@@ -869,7 +869,7 @@ public class TaskModel : ObservableObject
     public TaskModel Reset()
     {
         var properties = this.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(prop => prop.CanWrite);
+            .Where(prop =>  prop.CanWrite);
 
         foreach (var prop in properties)
         {
@@ -883,7 +883,7 @@ public class TaskModel : ObservableObject
                 }
                 else
                 {
-                    object defaultValue = Activator.CreateInstance(propType)!;
+                    object? defaultValue = Activator.CreateInstance(propType)!;
                     prop.SetValue(this, defaultValue);
                 }
             }
@@ -903,7 +903,7 @@ public class TaskModel : ObservableObject
         return this;
     }
 
-    protected bool SetNewProperty<T>([NotNullIfNotNull(nameof(newValue))] ref T field,
+    protected bool? SetNewProperty<T>([NotNullIfNotNull(nameof(newValue))] ref T field,
         T newValue,
         [CallerMemberName] string? propertyName = null)
     {
@@ -916,7 +916,7 @@ public class TaskModel : ObservableObject
         return true;
     }
 
-    public List<Attribute> ToAttributeList()
+    public List<Attribute>? ToAttributeList()
     {
         var attributes = new List<Attribute>();
         foreach (PropertyInfo prop in GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance))
@@ -939,7 +939,7 @@ public class TaskModel : ObservableObject
         };
     }
 
-    public static TaskModel TemplateMatch(string template)
+    public static TaskModel TemplateMatch(string? template)
     {
         return new TaskModel
         {
@@ -948,7 +948,7 @@ public class TaskModel : ObservableObject
         };
     }
 
-    public static TaskModel OCR(string text)
+    public static TaskModel OCR(string? text)
     {
         return new TaskModel
         {
@@ -957,7 +957,7 @@ public class TaskModel : ObservableObject
         };
     }
 
-    public string ToJson()
+    public string? ToJson()
     {
         var settings = new JsonSerializerSettings
         {

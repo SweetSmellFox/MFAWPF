@@ -17,7 +17,7 @@ public class PinButton : Button
         set => SetValue(IsCheckedProperty, value);
     }
 
-    public event RoutedPropertyChangedEventHandler<bool>? CheckedChanged;
+    public event RoutedPropertyChangedEventHandler<bool> CheckedChanged;
 
     private static void OnIsCheckedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {

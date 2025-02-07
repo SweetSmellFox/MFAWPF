@@ -6,7 +6,7 @@ namespace MFAWPF.Services;
 
 public class ApplicationHostService(IServiceProvider serviceProvider) : IHostedService
 {
-    private Window? _window;
+    private Window _window;
 
     /// <summary>
     /// Triggered when the application host is ready to start the service.

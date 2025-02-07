@@ -15,9 +15,9 @@ namespace MFAWPF.ViewModels;
 public partial class EditTaskDialogViewModel : ViewModel
 {
     [ObservableProperty]
-    private ObservableCollection<TaskItemViewModel>? _dataList;
+    private ObservableCollection<TaskItemViewModel> _dataList;
 
-    private ObservableCollection<TaskItemViewModel>? _colors;
+    private ObservableCollection<TaskItemViewModel> _colors;
 
     public ObservableCollection<TaskItemViewModel> Colors
     {
@@ -45,7 +45,7 @@ public partial class EditTaskDialogViewModel : ViewModel
     private int _selectedIndex;
     
 
-    public EditTaskDialog? Dialog;
+    public EditTaskDialog Dialog;
     public readonly Stack<ICommand> UndoStack = new();
     public readonly Stack<ICommand> UndoTaskStack = new();
 
@@ -75,9 +75,9 @@ public partial class EditTaskDialogViewModel : ViewModel
         return operators;
     }
 
-    private TaskItemViewModel? _currentTask;
+    private TaskItemViewModel _currentTask;
 
-    public TaskItemViewModel? CurrentTask
+    public TaskItemViewModel CurrentTask
     {
         get => _currentTask;
         set
@@ -111,12 +111,12 @@ public partial class EditTaskDialogViewModel : ViewModel
         if (CurrentTask != null && Dialog != null)
         {
             int index = Dialog.ListBoxDemo.Items.IndexOf(CurrentTask);
-            IDataObject? iData = Clipboard.GetDataObject();
+            IDataObject iData = Clipboard.GetDataObject();
             if (iData?.GetDataPresent(DataFormats.Text) == true)
             {
                 try
                 {
-                    Dictionary<string, TaskModel>? taskModels =
+                   var taskModels =
                         JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(
                             iData.GetData(DataFormats.Text) as string ?? string.Empty);
                     if (taskModels == null || taskModels.Count == 0)
@@ -170,9 +170,9 @@ public partial class EditTaskDialogViewModel : ViewModel
         }
     }
 
-    private AttributeButton? _selectedAttribute;
+    private AttributeButton _selectedAttribute;
 
-    public AttributeButton? SelectedAttribute
+    public AttributeButton SelectedAttribute
     {
         get => _selectedAttribute;
         set => SetProperty(ref _selectedAttribute, value);
@@ -214,7 +214,7 @@ public partial class EditTaskDialogViewModel : ViewModel
     //             var attribute =
     //                 JsonConvert.DeserializeObject<Attribute>(
     //                     (string)iData.GetData(DataFormats.Text));
-    //             // AttributeButton? button = Dialog?.AddAttribute(attribute);
+    //             // AttributeButton button = Dialog?.AddAttribute(attribute);
     //             // if (button != null)
     //             //     UndoTaskStack.Push(new RelayCommand(_ => Dialog?.Parts.Children.Remove(button)));
     //         }

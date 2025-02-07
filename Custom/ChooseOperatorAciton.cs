@@ -28,7 +28,7 @@ public class ChooseOperatorAciton : MaaCustomAction
         var choosing = () =>
         {
             var image = context.GetImage();
-            RecognitionDetail? detail;
+            RecognitionDetail detail;
             if (context.TemplateMatch("Sarkaz@Roguelike@EnterAfterRecruit.png", image, out detail, 0.7, 1050, 226, 220, 250))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);

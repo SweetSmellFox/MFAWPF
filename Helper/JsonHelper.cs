@@ -15,7 +15,7 @@ public static class JsonHelper
     /// <param name="show"></param>
     /// <returns></returns>
     ///    //序列化到文件
-    public static T? ReadFromConfigJsonFile<T>(string file, T? defaultS = default, bool show = false, params JsonConverter[] converters)
+    public static T ReadFromConfigJsonFile<T>(string file, T defaultS = default, bool show = false, params JsonConverter[] converters)
     {
         // 从文件中读取 JSON 字符串
         string directory = $"{AppContext.BaseDirectory}/config/{file}.json";
@@ -31,7 +31,7 @@ public static class JsonHelper
                 settings.Converters.AddRange(converters);
             }
 
-            T? result = JsonConvert.DeserializeObject<T>(jsonString,settings) ?? defaultS;
+            T result = JsonConvert.DeserializeObject<T>(jsonString,settings) ?? defaultS;
             return result;
         }
         catch (Exception e)
@@ -43,7 +43,7 @@ public static class JsonHelper
     }
 
 
-    public static void WriteToConfigJsonFile(string file, object? content, params JsonConverter[] converters)
+    public static void WriteToConfigJsonFile(string file, object content, params JsonConverter[] converters)
     {
         if (content == null) return;
         var settings = new JsonSerializerSettings
@@ -66,7 +66,7 @@ public static class JsonHelper
         File.WriteAllText(directory, jsonString);
     }
 
-    public static T? ReadFromJsonFile<T>(string file, T? defaultS = default)
+    public static T ReadFromJsonFile<T>(string file, T defaultS = default)
     {
         string directory = $"{AppContext.BaseDirectory}/{file}.json";
         try
@@ -102,7 +102,7 @@ public static class JsonHelper
         File.WriteAllText(directory, jsonString);
     }
 
-    public static T? ReadFromJsonFilePath<T>(string path, string file, T? defaultS = default, Action? action = null,
+    public static T ReadFromJsonFilePath<T>(string path, string file, T defaultS = default, Action action = null,
         params JsonConverter[] converters)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -129,7 +129,7 @@ public static class JsonHelper
         }
     }
 
-    public static void WriteToJsonFilePath(string path, string file, object? content, params JsonConverter[] converters)
+    public static void WriteToJsonFilePath(string path, string file, object content, params JsonConverter[] converters)
     {
         if (string.IsNullOrWhiteSpace(path))
             path = AppContext.BaseDirectory;

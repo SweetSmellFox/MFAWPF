@@ -10,7 +10,7 @@ public class SingleOrDoubleListConverter : JsonConverter
         return objectType == typeof(object) || objectType == typeof(double);
     }
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
         JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
@@ -27,7 +27,7 @@ public class SingleOrDoubleListConverter : JsonConverter
         return null;
     }
 
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         if (value is null)
         {

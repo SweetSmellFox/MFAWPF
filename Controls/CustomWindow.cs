@@ -100,7 +100,7 @@ public class CustomWindow : Window
         return IntPtr.Zero;
     }
 
-    protected virtual void Close(object? sender = null, RoutedEventArgs? e = null)
+    protected virtual void Close(object sender = null, RoutedEventArgs e = null)
     {
         base.Close();
     }
@@ -162,7 +162,7 @@ public class CustomWindow : Window
         }
     }
 
-    private bool IsPointInElement(Point point, UIElement? element)
+    private bool IsPointInElement(Point point, UIElement element)
     {
         if (element == null) return false;
 

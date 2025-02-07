@@ -83,7 +83,7 @@ public class VersionChecker
     public static void UpdateResourceAsync() => TaskManager.RunTaskAsync(() => Checker.UpdateResourceBySelection());
     public static void UpdateMFAAsync() => TaskManager.RunTaskAsync(() => Checker.UpdateMFABySelection());
 
-    public void SetText(string text, DownloadDialog? dialog, bool noDialog = false)
+    public void SetText(string text, DownloadDialog dialog, bool noDialog = false)
     {
         if (noDialog)
             MainWindow.ViewModel.OutputDownloadProgress(text.GetLocalizationString(), false);
@@ -115,7 +115,7 @@ public class VersionChecker
                 break;
         }
     }
-    public async void UpdateResourceBySelection(bool closeDialog = false, bool noDialog = false, Action? action = null)
+    public async void UpdateResourceBySelection(bool closeDialog = false, bool noDialog = false, Action action = null)
     {
         switch (SettingsView.ViewModel.DownloadSourceIndex)
         {
@@ -131,10 +131,10 @@ public class VersionChecker
             case 1: UpdateMFAWithMirrorApi(noDialog); break;
         }
     }
-    public async void UpdateResourceWithMirrorApi(bool closeDialog = false, bool noDialog = false, Action? action = null)
+    public async void UpdateResourceWithMirrorApi(bool closeDialog = false, bool noDialog = false, Action action = null)
     {
         MainWindow.Instance.SetUpdating(true);
-        DownloadDialog? dialog = null;
+        DownloadDialog dialog = null;
         GrowlHelper.OnUIThread(() =>
         {
             if (!noDialog) dialog = new DownloadDialog("UpdateResource".GetLocalizationString());
@@ -390,10 +390,10 @@ public class VersionChecker
         }
     }
 
-    public async void UpdateResource(bool closeDialog = false, bool noDialog = false, Action? action = null)
+    public async void UpdateResource(bool closeDialog = false, bool noDialog = false, Action action = null)
     {
         MainWindow.Instance.SetUpdating(true);
-        DownloadDialog? dialog = null;
+        DownloadDialog dialog = null;
         GrowlHelper.OnUIThread(() =>
         {
             if (!noDialog) dialog = new DownloadDialog("UpdateResource".GetLocalizationString());
@@ -603,7 +603,7 @@ public class VersionChecker
     {
         MainWindow.Instance.SetUpdating(true);
 
-        DownloadDialog? dialog = null;
+        DownloadDialog dialog = null;
         GrowlHelper.OnUIThread(() =>
         {
             if (!noDialog) dialog = new DownloadDialog("SoftwareUpdate".GetLocalizationString());
@@ -740,7 +740,7 @@ public class VersionChecker
     {
         MainWindow.Instance.SetUpdating(true);
 
-        DownloadDialog? dialog = null;
+        DownloadDialog dialog = null;
         GrowlHelper.OnUIThread(() =>
         {
             if (!noDialog) dialog = new DownloadDialog("SoftwareUpdate".GetLocalizationString());
@@ -999,7 +999,7 @@ public class VersionChecker
         return string.Empty;
     }
 
-    private async Task<bool> DownloadFileAsync(string url, string filePath, DownloadDialog? dialog, string key)
+    private async Task<bool> DownloadFileAsync(string url, string filePath, DownloadDialog dialog, string key)
     {
         try
         {
@@ -1056,7 +1056,7 @@ public class VersionChecker
         }
     }
 
-    private bool IsPathWritable(string? path)
+    private bool IsPathWritable(string path)
     {
         if (string.IsNullOrEmpty(path)) return false;
 
@@ -1319,7 +1319,7 @@ public class VersionChecker
 
     private static readonly Guid Namespace = Guid.Parse("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
 
-    private static Guid? GetDeviceId()
+    private static Guid GetDeviceId()
     {
         var cpuSerial = GetCpuSerial();
         LoggerService.LogInfo($"CPU: {cpuSerial}");

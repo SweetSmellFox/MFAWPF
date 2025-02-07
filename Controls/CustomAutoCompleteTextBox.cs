@@ -15,9 +15,9 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
 {
     private const string SearchTextBox = "PART_SearchTextBox";
     private bool ignoreTextChanging;
-    private TextBox? _searchTextBox;
+    private TextBox _searchTextBox;
 
-    private object?
+    private object
         _selectedItem;
 
     private bool isApplyingTemplate;
@@ -27,7 +27,7 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
         .Register(nameof(DataList), typeof(IEnumerable), typeof(CustomAutoCompleteTextBox),
             new FrameworkPropertyMetadata(null, OnDataListChanged));
 
-    public IEnumerable? DataList
+    public IEnumerable DataList
     {
         get => GetValue(DataListProperty) as IEnumerable;
         set =>
@@ -50,7 +50,7 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
                 OnTextChanged));
     }
 
-    public TextBox? GetTextBox()
+    public TextBox GetTextBox()
     {
         return _searchTextBox;
     }
@@ -93,7 +93,7 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
             }
 
             // 调用 ComboBox 的 OnApplyTemplate 方法
-            MethodInfo? baseMethod =
+            MethodInfo baseMethod =
                 typeof(ComboBox).GetMethod("OnApplyTemplate", BindingFlags.Instance | BindingFlags.Public);
             if (baseMethod != null && baseMethod.DeclaringType == typeof(ComboBox))
             {
@@ -131,7 +131,7 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
             isSelectionChanging = true;
 
             // 调用 ComboBox 的 OnSelectionChanged 方法
-            MethodInfo? baseMethod =
+            MethodInfo baseMethod =
                 typeof(ComboBox).GetMethod("OnSelectionChanged", BindingFlags.Instance | BindingFlags.NonPublic);
             if (baseMethod != null && baseMethod.DeclaringType == typeof(ComboBox))
             {
@@ -252,7 +252,7 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
         }
     }
 
-    private void UpdateTextBoxBySelectedItem(object? selectedItem)
+    private void UpdateTextBoxBySelectedItem(object selectedItem)
     {
         try
         {

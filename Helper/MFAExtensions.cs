@@ -14,8 +14,8 @@ namespace MFAWPF.Utils;
 public static class MFAExtensions
 {
     public static Dictionary<TKey, TaskModel> MergeTaskModels<TKey>(
-        this IEnumerable<KeyValuePair<TKey, TaskModel>>? taskModels,
-        IEnumerable<KeyValuePair<TKey, TaskModel>>? additionalModels) where TKey : notnull
+        this IEnumerable<KeyValuePair<TKey, TaskModel>> taskModels,
+        IEnumerable<KeyValuePair<TKey, TaskModel>> additionalModels) where TKey : notnull
     {
         if (additionalModels == null)
             return taskModels?.ToDictionary() ?? new Dictionary<TKey, TaskModel>();
@@ -40,21 +40,21 @@ public static class MFAExtensions
 
     public static void BindLocalization(this FrameworkElement control,
         string resourceKey,
-        DependencyProperty? property = null)
+        DependencyProperty property = null)
     {
         property ??= TitleElement.TitleProperty;
         var locExtension = new LocExtension(resourceKey);
         locExtension.SetBinding(control, property);
     }
 
-    public static string GetLocalizationString(this string? key)
+    public static string GetLocalizationString(this string key)
     {
         if (string.IsNullOrWhiteSpace(key))
             return string.Empty;
         return LocalizeDictionary.Instance.GetLocalizedObject(key, null, null) as string ?? key;
     }
 
-    public static string GetLocalizedFormattedString(this string? key, params object[] args)
+    public static string GetLocalizedFormattedString(this string key, params object[] args)
     {
         if (string.IsNullOrWhiteSpace(key))
             return string.Empty;
@@ -62,12 +62,12 @@ public static class MFAExtensions
         return string.Format(localizedString, args);
     }
 
-    public static string FormatWith(this string format, params object?[] args)
+    public static string FormatWith(this string format, params object[] args)
     {
         return string.Format(format, args);
     }
 
-    public static void AddRange<T>(this ObservableCollection<T>? collection, IEnumerable<T>? items)
+    public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> items)
     {
         if (collection == null || items == null)
             return;
@@ -75,6 +75,7 @@ public static class MFAExtensions
             collection.Add(item);
     }
 
+#nullable enable
     public static bool IsTrue(this bool? value)
     {
         return value == true;
@@ -86,14 +87,14 @@ public static class MFAExtensions
     }
 
     public static bool IsHit(
-        this RecognitionDetail? detail)
+        this RecognitionDetail detail)
     {
         if (detail is null || detail.HitBox.IsDefaultHitBox())
             return false;
         return true;
     }
 
-    private static bool IsDefaultHitBox(this IMaaRectBuffer? hitBox)
+    private static bool IsDefaultHitBox(this IMaaRectBuffer hitBox)
     {
         return hitBox is null or { X: 0, Y: 0, Width: 0, Height: 0 };
     }
@@ -279,7 +280,7 @@ public static class MFAExtensions
     {
         return maaContext.Tasker.GetCachedImage(imageBuffer);
     }
-    public static IMaaImageBuffer? GetImage(this IMaaContext maaContext)
+    public static IMaaImageBuffer GetImage(this IMaaContext maaContext)
     {
         maaContext.Screencap();
         IMaaImageBuffer imageBuffer = new MaaImageBuffer();
@@ -288,7 +289,7 @@ public static class MFAExtensions
         return imageBuffer;
     }
 
-    public static IMaaImageBuffer? GetImage(this IMaaContext maaContext, ref IMaaImageBuffer buffer)
+    public static IMaaImageBuffer GetImage(this IMaaContext maaContext, ref IMaaImageBuffer buffer)
     {
         maaContext.Screencap();
         if (!maaContext.GetCachedImage(buffer))
@@ -383,7 +384,7 @@ public static class MFAExtensions
         return detail.IsHit();
     }
 
-    public static RecognitionDetail? RunRecognition(this IMaaContext maaContext, TaskModel taskModel, IMaaImageBuffer imageBuffer)
+    public static RecognitionDetail RunRecognition(this IMaaContext maaContext, TaskModel taskModel, IMaaImageBuffer imageBuffer)
     {
         if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
         {

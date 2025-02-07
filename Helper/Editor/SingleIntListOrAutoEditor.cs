@@ -30,7 +30,7 @@ public class SingleIntListOrAutoEditor : PropertyEditorBase
         return ["Roi", "Begin", "End", "Target"];
     }
 
-    private IEnumerable? GetItemsSource(PropertyItem propertyItem)
+    private IEnumerable GetItemsSource(PropertyItem propertyItem)
     {
         if (AutoProperty().Contains(propertyItem.PropertyName))
         {

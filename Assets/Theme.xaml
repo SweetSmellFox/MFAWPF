@@ -1,18 +1,18 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:hc="https://handyorg.github.io/handycontrol">
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
         <hc:ThemeResources>
             <hc:ThemeResources.ThemeDictionaries>
                 <ResourceDictionary
-                    x:Key="Light"
+                    Source="Theme/LightTheme.xaml"
                     hc:ThemeDictionary.Key="Light"
-                    Source="Theme/LightTheme.xaml" />
+                    x:Key="Light" />
                 <ResourceDictionary
-                    x:Key="Dark"
+                    Source="Theme/DarkTheme.xaml"
                     hc:ThemeDictionary.Key="Dark"
-                    Source="Theme/DarkTheme.xaml" />
+                    x:Key="Dark" />
             </hc:ThemeResources.ThemeDictionaries>
         </hc:ThemeResources>
         <hc:Theme />

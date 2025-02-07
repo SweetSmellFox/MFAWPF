@@ -20,12 +20,12 @@ public class TaskItemViewModel : ViewModel
         }
     }
 
-    private TaskModel? _task;
+    private TaskModel _task;
 
     /// <summary>
     /// Gets or sets the time.
     /// </summary>
-    public TaskModel? Task
+    public TaskModel Task
     {
         get => _task;
         set

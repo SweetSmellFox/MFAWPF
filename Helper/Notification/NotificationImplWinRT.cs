@@ -25,7 +25,7 @@ namespace MFAWPF.Helper.Notification;
 
 internal class NotificationImplWinRT : INotificationPoster, IDisposable
 {
-    public event EventHandler<string> ActionActivated;
+    public event EventHandler<string>? ActionActivated;
 
     public NotificationImplWinRT()
     {

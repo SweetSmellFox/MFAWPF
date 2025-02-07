@@ -15,7 +15,7 @@ public class MaaInterface
         [JsonProperty("pipeline_override")]
         public Dictionary<string, TaskModel>? PipelineOverride { get; set; }
 
-        public override string ToString()
+        public override string? ToString()
         {
             var settings = new JsonSerializerSettings
             {
@@ -30,7 +30,7 @@ public class MaaInterface
     public class MaaInterfaceOption
     {
         [JsonIgnore]
-        public string Name { get; set; } = string.Empty;
+        public string? Name { get; set; } = string.Empty;
         [JsonProperty("cases")]
         public List<MaaInterfaceOptionCase>? Cases { get; set; }
         [JsonProperty("default_case")]
@@ -44,7 +44,7 @@ public class MaaInterface
         [JsonProperty("index")]
         public int? Index { get; set; }
 
-        public override string ToString()
+        public override string? ToString()
         {
             return Name ?? string.Empty;
         }
@@ -59,7 +59,7 @@ public class MaaInterface
 
         [JsonConverter(typeof(SingleOrListConverter))]
         [JsonProperty("exec_param")]
-        public List<string>? ExecParam { get; set; }
+        public List<string> ExecParam { get; set; }
     }
 
     public class MaaCustomResource
@@ -82,7 +82,7 @@ public class MaaInterface
         public string? Url { get; set; }
 
 
-        public override string ToString()
+        public override string? ToString()
         {
             return Version ?? string.Empty;
         }
@@ -145,7 +145,7 @@ public class MaaInterface
     public string? DefaultController { get; set; }
 
     [JsonProperty("lock_controller")]
-    public bool? LockController { get; set; }
+    public bool LockController { get; set; }
 
     [JsonProperty("controller")]
     public List<MaaResourceController>? Controller { get; set; }
@@ -172,13 +172,13 @@ public class MaaInterface
     public Dictionary<string, List<string>> Resources { get; } = new();
 
     // 替换单个字符串中的 "{PROJECT_DIR}" 为指定的替换值
-    public static string ReplacePlaceholder(string? input, string replacement)
+    public static string? ReplacePlaceholder(string? input, string? replacement)
     {
         return string.IsNullOrEmpty(input) ? string.Empty : Path.GetFullPath(input.Replace("{PROJECT_DIR}", replacement));
     }
 
     // 替换字符串列表中的每个字符串中的 "{PROJECT_DIR}"
-    public static List<string> ReplacePlaceholder(List<string>? inputs, string replacement)
+    public static List<string> ReplacePlaceholder(List<string>? inputs, string? replacement)
     {
         if (inputs == null) return new List<string>();
 
@@ -244,7 +244,7 @@ public class MaaInterface
         }
     }
 
-    public override string ToString()
+    public override string? ToString()
     {
         var settings = new JsonSerializerSettings
         {

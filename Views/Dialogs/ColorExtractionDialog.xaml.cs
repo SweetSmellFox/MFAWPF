@@ -12,17 +12,17 @@ namespace MFAWPF.Views;
 public partial class ColorExtractionDialog
 {
     private Point _startPoint;
-    private Rectangle? _selectionRectangle;
-    private List<int>? _outputRoi;
+    private Rectangle _selectionRectangle;
+    private List<int> _outputRoi;
 
-    public List<int>? OutputRoi
+    public List<int> OutputRoi
     {
         get => _outputRoi;
         set => _outputRoi = value?.Select(i => i < 0 ? 0 : i).ToList();
     }
 
-    public List<int>? OutputUpper { get; set; }
-    public List<int>? OutputLower { get; set; }
+    public List<int> OutputUpper { get; set; }
+    public List<int> OutputLower { get; set; }
 
     public ColorExtractionDialog()
     {
@@ -34,7 +34,7 @@ public partial class ColorExtractionDialog
         });
     }
 
-    public void UpdateImage(BitmapImage? imageSource)
+    public void UpdateImage(BitmapImage imageSource)
     {
         if (imageSource == null)
             return;

@@ -10,9 +10,9 @@ public class ReplaceConverter : JsonConverter
         return objectType == typeof(List<string[]>);
     }
 
-    public override object? ReadJson(JsonReader reader,
+    public override object ReadJson(JsonReader reader,
         Type objectType,
-        object? existingValue,
+        object existingValue,
         JsonSerializer serializer)
     {
         var token = JToken.Load(reader);
@@ -33,7 +33,7 @@ public class ReplaceConverter : JsonConverter
         throw new JsonSerializationException("Unexpected token type: " + token.Type);
     }
 
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         if (value is List<string[]> list)
         {

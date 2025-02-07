@@ -21,7 +21,7 @@ public partial class MainViewModel : ViewModel
     public ObservableCollection<LogItemViewModel> LogItemViewModels { get; } = new();
 
     public void AddLog(string content,
-        string? color = "",
+        string color = "",
         string weight = "Regular",
         bool showTime = true)
     {
@@ -40,7 +40,7 @@ public partial class MainViewModel : ViewModel
     }
 
     public void AddLog(string content,
-        Brush? color = null,
+        Brush color = null,
         string weight = "Regular",
         bool showTime = true)
     {
@@ -56,7 +56,7 @@ public partial class MainViewModel : ViewModel
         });
     }
 
-    public void AddLogByKey(string key, Brush? color = null, params string[]? formatArgsKeys)
+    public void AddLogByKey(string key, Brush color = null, params string[] formatArgsKeys)
     {
         color ??= Brushes.Gray;
         Task.Run(() =>

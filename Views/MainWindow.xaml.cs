@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
@@ -13,7 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using HandyControl.Controls;
 using HandyControl.Data;
-using HandyControl.Interactivity;
 using HandyControl.Themes;
 using MaaFramework.Binding;
 using MFAWPF.Data;
@@ -21,19 +19,14 @@ using MFAWPF.Utils;
 using MFAWPF.Utils.Converters;
 using MFAWPF.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Text;
 using WPFLocalizeExtension.Extensions;
 using ComboBox = HandyControl.Controls.ComboBox;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using ScrollViewer = HandyControl.Controls.ScrollViewer;
-using TabControl = System.Windows.Controls.TabControl;
-using TabItem = System.Windows.Controls.TabItem;
 using TextBox = HandyControl.Controls.TextBox;
 
 namespace MFAWPF.Views;
@@ -92,7 +85,7 @@ public partial class MainWindow
     public bool InitializeData()
     {
         MaaInterface.Check();
-        
+
         if (MaaInterface.Instance != null)
         {
             AppendVersionLog(MaaInterface.Instance.Version);
@@ -146,7 +139,7 @@ public partial class MainWindow
         }
     }
 
-    private void OnTaskStackChanged(object? sender, EventArgs e)
+    private void OnTaskStackChanged(object sender, EventArgs e)
     {
         ToggleTaskButtonsVisibility(isRunning: MaaProcessor.Instance.TaskQueue.Count > 0);
     }
@@ -162,9 +155,9 @@ public partial class MainWindow
         {
             if (ViewModel is not null)
                 ViewModel.IsRunning = isRunning;
-            // startButton.Visibility = isRunning ? Visibility.Collapsed : Visibility.Visible;
+            // startButton.Visibility = isRunning ?? Visibility.Collapsed : Visibility.Visible;
             // startButton.IsEnabled = !isRunning;
-            // stopButton.Visibility = isRunning ? Visibility.Visible : Visibility.Collapsed;
+            // stopButton.Visibility = isRunning ?? Visibility.Visible : Visibility.Collapsed;
             // stopButton.IsEnabled = isRunning;
         });
     }
@@ -193,7 +186,7 @@ public partial class MainWindow
         }
     }
 
-    private T? FindVisualParent<T>(DependencyObject child) where T : DependencyObject
+    private T FindVisualParent<T>(DependencyObject child) where T : DependencyObject
     {
         var parentObject = VisualTreeHelper.GetParent(child);
         if (parentObject == null) return null;
@@ -354,7 +347,7 @@ public partial class MainWindow
         }
     }
 
-    public void Start(object? sender, RoutedEventArgs? e) => Start();
+    public void Start(object sender, RoutedEventArgs e) => Start();
 
     public void Start(bool onlyStart = false)
     {
@@ -372,7 +365,7 @@ public partial class MainWindow
         }
     }
 
-    public void Stop(object? sender, RoutedEventArgs? e) => Stop();
+    public void Stop(object sender, RoutedEventArgs e) => Stop();
 
     public void Stop()
     {
@@ -659,7 +652,7 @@ public partial class MainWindow
         }
     }
 
-    private void ConfigureSettingsPanel(object? sender = null, RoutedEventArgs? e = null)
+    private void ConfigureSettingsPanel(object sender = null, RoutedEventArgs e = null)
     {
         settingPanel.Children.Clear();
 
@@ -723,7 +716,7 @@ public partial class MainWindow
         settingPanel.Children.Add(sv1);
     }
 
-    // private void AddSwitchConfiguration(Panel? panel = null, int defaultValue = 0)
+    // private void AddSwitchConfiguration(Panel panel = null, int defaultValue = 0)
     // {
     //     panel ??= settingPanel;
     //     var comboBox = new ComboBox
@@ -784,7 +777,7 @@ public partial class MainWindow
         GrowlHelper.OnUIThread(Application.Current.Shutdown);
     }
 
-    private void AddResourcesOption(Panel? panel = null, int defaultValue = 0)
+    private void AddResourcesOption(Panel panel = null, int defaultValue = 0)
     {
         panel ??= settingPanel;
         var comboBox = new ComboBox
@@ -834,7 +827,7 @@ public partial class MainWindow
         panel.Children.Add(comboBox);
     }
 
-    private void AddThemeOption(Panel? panel = null, int defaultValue = 0)
+    private void AddThemeOption(Panel panel = null, int defaultValue = 0)
     {
         panel ??= settingPanel;
         var comboBox = new ComboBox
@@ -891,7 +884,7 @@ public partial class MainWindow
     }
 
 
-    private void AddStartEmulatorOption(Panel? panel = null)
+    private void AddStartEmulatorOption(Panel panel = null)
     {
         panel ??= settingPanel;
         var textBox = new TextBox
@@ -959,7 +952,7 @@ public partial class MainWindow
     }
 
 
-    private void AddIntroduction(Panel? panel = null, string input = "")
+    private void AddIntroduction(Panel panel = null, string input = "")
     {
         panel ??= settingPanel;
         input = LanguageHelper.GetLocalizedString(input);
@@ -1060,7 +1053,7 @@ public partial class MainWindow
     }
 
 
-    private void AddAutoStartOption(Panel? panel = null, int defaultValue = 0)
+    private void AddAutoStartOption(Panel panel = null, int defaultValue = 0)
     {
         panel ??= settingPanel;
         var comboBox = new ComboBox
@@ -1086,7 +1079,7 @@ public partial class MainWindow
         panel.Children.Add(comboBox);
     }
 
-    private void AddAfterTaskOption(Panel? panel = null, int defaultValue = 0)
+    private void AddAfterTaskOption(Panel panel = null, int defaultValue = 0)
     {
         panel ??= settingPanel;
         var comboBox = new ComboBox
@@ -1111,7 +1104,7 @@ public partial class MainWindow
     }
 
 
-    private void AddStartSettingOption(Panel? panel = null)
+    private void AddStartSettingOption(Panel panel = null)
     {
         panel ??= settingPanel;
         // var binding = new Binding("Idle")
@@ -1359,9 +1352,9 @@ public partial class MainWindow
         }
     }
 
-    private static EditTaskDialog? _taskDialog;
+    private static EditTaskDialog _taskDialog;
 
-    public static EditTaskDialog? TaskDialog
+    public static EditTaskDialog TaskDialog
     {
         get
         {
@@ -1511,8 +1504,8 @@ public partial class MainWindow
 
     private void Delete(object sender, RoutedEventArgs e)
     {
-        MenuItem? menuItem = sender as MenuItem;
-        ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
+        var menuItem = sender as MenuItem;
+        var contextMenu = menuItem?.Parent as ContextMenu;
         if (contextMenu?.PlacementTarget is Grid item)
         {
             if (item.DataContext is DragItemViewModel taskItemViewModel && ViewModel != null)
@@ -1636,6 +1629,10 @@ public partial class MainWindow
 
     public static void AppendVersionLog(string? resourceVersion)
     {
+        if (resourceVersion is null)
+        {
+            return;
+        }
         string debugFolderPath = Path.Combine(AppContext.BaseDirectory, "debug");
         if (!Directory.Exists(debugFolderPath))
         {
@@ -1668,7 +1665,7 @@ public partial class MainWindow
     }
 
     public static void AddLogByColor(string content,
-        string? color = "Gray",
+        string color = "Gray",
         string weight = "Regular",
         bool showTime = true)
     {
@@ -1676,14 +1673,14 @@ public partial class MainWindow
     }
 
     public static void AddLog(string content,
-        Brush? color = null,
+        Brush color = null,
         string weight = "Regular",
         bool showTime = true)
     {
         ViewModel?.AddLog(content, color, weight, showTime);
     }
 
-    public static void AddLogByKey(string key, Brush? color = null, params string[]? formatArgsKeys)
+    public static void AddLogByKey(string key, Brush color = null, params string[] formatArgsKeys)
     {
         ViewModel?.AddLogByKey(key, color, formatArgsKeys);
     }
@@ -1714,7 +1711,7 @@ public partial class MainWindow
         }
     }
 
-    private static bool ExecuteScript(string? scriptPath)
+    private static bool ExecuteScript(string scriptPath)
     {
         try
         {
@@ -1779,7 +1776,7 @@ public partial class MainWindow
         SettingViewBorder.Child = settingsView;
     }
 
-    private void ConfigureTaskSettingsPanel(object? sender = null, RoutedEventArgs? e = null)
+    private void ConfigureTaskSettingsPanel(object sender = null, RoutedEventArgs e = null)
     {
         settingPanel.Children.Clear();
         StackPanel s2 = new()

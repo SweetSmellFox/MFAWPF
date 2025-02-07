@@ -12,10 +12,10 @@ namespace MFAWPF.Views;
 public partial class SelectionRegionDialog
 {
     private Point _startPoint;
-    private Rectangle? _selectionRectangle;
-    private List<int>? _output;
+    private Rectangle _selectionRectangle;
+    private List<int> _output;
 
-    public List<int>? Output
+    public List<int> Output
     {
         get => _output;
         set => _output = value?.Select(i => i < 0 ? 0 : i).ToList();
@@ -33,7 +33,7 @@ public partial class SelectionRegionDialog
         });
     }
 
-    public void UpdateImage(BitmapImage? imageSource)
+    public void UpdateImage(BitmapImage imageSource)
     {
         if (imageSource == null)
             return;

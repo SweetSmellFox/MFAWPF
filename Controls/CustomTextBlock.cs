@@ -65,7 +65,7 @@ namespace MFAWPF.Controls
             text.UpdateText();
         }
 
-        private void OnLanguageChanged(object? sender, EventArgs e)
+        private void OnLanguageChanged(object sender, EventArgs e)
         {
             UpdateText();
         }

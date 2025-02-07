@@ -40,7 +40,7 @@ public class LevelRecognitionAction : MaaCustomAction
                 res = Find(context, 480, 90, 485, 520, args.NodeName);
             }
             IMaaImageBuffer image = new MaaImageBuffer();
-            RecognitionDetail? detail;
+            RecognitionDetail detail;
             switch (res)
             {
                 case -1:
@@ -96,7 +96,7 @@ public class LevelRecognitionAction : MaaCustomAction
             Thread.Sleep(150);
         }
         var image = context.GetImage();
-        RecognitionDetail? detail;
+        RecognitionDetail detail;
         int ix = 0;
         var entering = () =>
         {
@@ -180,7 +180,7 @@ public class LevelRecognitionAction : MaaCustomAction
     public bool Combat(IMaaContext context, string NodeName)
     {
         IMaaImageBuffer image = new MaaImageBuffer();
-        RecognitionDetail? detail;
+        RecognitionDetail detail;
         var shouldClose = false;
         var refresh = () =>
         {
@@ -254,7 +254,7 @@ public class LevelRecognitionAction : MaaCustomAction
         int i = 0;
         var find = () =>
         {
-            RecognitionDetail? detail;
+            RecognitionDetail detail;
             var image = context.GetImage();
             if (context.TemplateMatch("Sarkaz@Roguelike@StageTraderCR.png", image, out detail, 0.8, x, y, width, height))
             {

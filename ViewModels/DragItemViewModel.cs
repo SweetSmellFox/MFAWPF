@@ -9,7 +9,7 @@ namespace MFAWPF.ViewModels;
 
 public partial class DragItemViewModel : ViewModel
 {
-    public DragItemViewModel(TaskInterfaceItem? interfaceItem)
+    public DragItemViewModel(TaskInterfaceItem interfaceItem)
     {
         InterfaceItem = interfaceItem;
         Name = interfaceItem?.Name ?? "未命名";
@@ -76,9 +76,9 @@ public partial class DragItemViewModel : ViewModel
         }
     }
 
-    private TaskInterfaceItem? _interfaceItem;
+    private TaskInterfaceItem _interfaceItem;
 
-    public TaskInterfaceItem? InterfaceItem
+    public TaskInterfaceItem InterfaceItem
     {
         get => _interfaceItem;
         set
@@ -109,7 +109,7 @@ public partial class DragItemViewModel : ViewModel
         }
     }
 
-    private void OnLanguageChanged(object? sender, EventArgs e)
+    private void OnLanguageChanged(object sender, EventArgs e)
     {
         UpdateContent();
     }
@@ -121,7 +121,7 @@ public partial class DragItemViewModel : ViewModel
     public DragItemViewModel Clone()
     {
         // Clone the InterfaceItem if it's not null
-        TaskInterfaceItem? clonedInterfaceItem = InterfaceItem?.Clone();
+        TaskInterfaceItem clonedInterfaceItem = InterfaceItem?.Clone();
 
         // Create a new DragItemViewModel instance with the cloned InterfaceItem
         DragItemViewModel clone = new DragItemViewModel(clonedInterfaceItem);

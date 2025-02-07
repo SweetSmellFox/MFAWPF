@@ -16,7 +16,7 @@ public class ListAutoStringEditor : PropertyEditorBase
     {
         var autoListControl = new CustomAutoListControl
         {
-            MinHeight = 50, TaskDialogDataList = GetItemsSource(propertyItem) ?? new ObservableCollection<string>(),
+            MinHeight = 50, TaskDialogDataList = GetItemsSource(propertyItem),
             DisplayMemberPath = GetDisplayMemberPath(propertyItem)
         };
         
@@ -32,7 +32,7 @@ public class ListAutoStringEditor : PropertyEditorBase
         return ["Roi", "Next", "OnError", "Interrupt", "Begin", "End", "Target"];
     }
 
-    private IEnumerable? GetItemsSource(PropertyItem propertyItem)
+    private IEnumerable GetItemsSource(PropertyItem propertyItem)
     {
         if (propertyItem.PropertyName == "Roi" || propertyItem.PropertyName == "Next" ||
             propertyItem.PropertyName == "OnError" || propertyItem.PropertyName == "Interrupt")

@@ -5,14 +5,14 @@ namespace MFAWPF.Utils.Converters;
 
 public class NullableUIntConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
+    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {
         if (value == null)
             return string.Empty;
         return value.ToString();
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter,
+    public object ConvertBack(object value, Type targetType, object parameter,
         System.Globalization.CultureInfo culture)
     {
 

@@ -5,7 +5,7 @@ namespace MFAWPF.Utils.Converters;
 
 public class SingleIntListConverter : IValueConverter
 {
-    public object? Convert(object? value, Type targetType, object? parameter, System.Globalization.CultureInfo culture)
+    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {
         if (value == null)
             return string.Empty;
@@ -17,7 +17,7 @@ public class SingleIntListConverter : IValueConverter
         return value.ToString();
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter,
+    public object ConvertBack(object value, Type targetType, object parameter,
         System.Globalization.CultureInfo culture)
     {
         var strValue = value as string;

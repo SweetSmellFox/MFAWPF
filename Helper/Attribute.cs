@@ -5,8 +5,8 @@ namespace MFAWPF.Utils;
 
 public class Attribute
 {
-    public string? Key { get; set; }
-    [JsonConverter(typeof(AutoConverter))] public object? Value { get; set; }
+    public string Key { get; set; }
+    [JsonConverter(typeof(AutoConverter))] public object Value { get; set; }
 
     public Attribute(string key, object value)
     {
@@ -64,22 +64,22 @@ public class Attribute
         return $"{Value}";
     }
 
-    public static bool operator ==(Attribute? a1, object? a2)
+    public static bool operator ==(Attribute a1, object a2)
     {
         return a2 is Attribute attribute && a1?.Key?.Equals(attribute.Key) == true && a1.Value == attribute.Value;
     }
 
-    public static bool operator !=(Attribute? a1, object? a2)
+    public static bool operator !=(Attribute a1, object a2)
     {
         return a2 is not Attribute attribute || a1?.Key?.Equals(attribute.Key) != true || a1.Value != attribute.Value;
     }
 
-    public override bool Equals(object? obj)
+    public override bool Equals(object obj)
     {
         return this == obj;
     }
 
-    private int? _cachedHashCode;
+    private int _cachedHashCode;
 
     public override int GetHashCode()
     {

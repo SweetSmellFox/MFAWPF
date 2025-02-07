@@ -58,7 +58,7 @@ public partial class CustomAutoListControl
         set => SetValue(DisplayMemberPathProperty, value);
     }
 
-    private static object? CoerceItems(DependencyObject d, object? value)
+    private static object CoerceItems(DependencyObject d, object value)
     {
         return value;
     }
@@ -108,7 +108,7 @@ public partial class CustomAutoListControl
         // 可在此方法中执行对新集合的额外处理
     }
 
-    private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
         // 处理集合的增删改
         if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems != null)
@@ -137,7 +137,7 @@ public partial class CustomAutoListControl
         SetCurrentValue(ItemsProperty, Items);
     }
 
-    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(CustomValue<string>.Value))
         {
@@ -174,7 +174,7 @@ public partial class CustomAutoListControl
     }
 
     // 查找父元素的方法
-    private static T? FindParent<T>(DependencyObject child) where T : DependencyObject
+    private static T FindParent<T>(DependencyObject child) where T : DependencyObject
     {
         var parentObject = VisualTreeHelper.GetParent(child);
         if (parentObject == null) return null;

@@ -6,16 +6,16 @@ namespace MFAWPF.Utils;
 
 public class DeviceWindowTemplateSelector : DataTemplateSelector
 {
-    public DataTemplate? DeviceInfoTemplate { get; set; }
-    public DataTemplate? WindowInfoTemplate { get; set; }
+    public DataTemplate DeviceInfoTemplate { get; set; }
+    public DataTemplate WindowInfoTemplate { get; set; }
 
-    public override DataTemplate? SelectTemplate(object? item, DependencyObject container)
+    public override DataTemplate? SelectTemplate(object item, DependencyObject container)
     {
         if (item is AdbDeviceInfo)
-            return DeviceInfoTemplate ?? base.SelectTemplate(item, container);
+            return DeviceInfoTemplate ;
         
         if (item is DesktopWindowInfo)
-            return WindowInfoTemplate ?? base.SelectTemplate(item, container);
+            return WindowInfoTemplate;
         
 
         return base.SelectTemplate(item, container);

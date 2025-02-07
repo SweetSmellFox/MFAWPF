@@ -85,7 +85,7 @@ public partial class App
         AppDomain.CurrentDomain.UnhandledException +=
             CurrentDomain_UnhandledException;
         SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
-        LierdaCracker cracker = new LierdaCracker();
+        var cracker = new LierdaCracker();
         cracker.Cracker();
         await Host.StartAsync();
     }
@@ -157,7 +157,7 @@ public partial class App
         GrowlHelper.Error(sbEx.ToString());
     }
 
-    void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
     {
         //task线程内未处理捕获
         LoggerService.LogError(e.Exception);

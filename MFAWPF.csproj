@@ -5,7 +5,7 @@
         <RuntimeIdentifier Condition="$(Platform)=='x64'">win-x64</RuntimeIdentifier>
         <RuntimeIdentifier Condition="$(Platform)=='ARM64'">win-arm64</RuntimeIdentifier>
         <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
-        <Nullable>enable</Nullable>
+        <Nullable>annotations</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UseWPF>true</UseWPF>
         <Configurations>Debug;Release;RelWithDebInfo</Configurations>
@@ -52,7 +52,7 @@
 
     <!-- Ignore Warings -->
     <PropertyGroup>
-        <NoWarn>NU1602;NU1701;CS0169;CS0612;CS0618;CS1998;CS4014;CS8618;CS8601;CS8602;CS8603;CS8604;SYSLIB0014</NoWarn>
+        <NoWarn>NU1602;NU1701;NU1900;CS0169;CS0612;CS0618;CS1998;CS4014;CS8618;CS8601;CS8602;CS8603;CS8604;SYSLIB0014;SA1121;SA1404;Uno0001</NoWarn>
     </PropertyGroup>
 
     <!-- Version -->

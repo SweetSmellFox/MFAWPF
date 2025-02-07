@@ -5,7 +5,6 @@ using HandyControl.Themes;
 using MFAWPF.Data;
 using MFAWPF.Utils;
 using MFAWPF.ViewModels;
-using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -70,7 +69,7 @@ public partial class SettingsView
 
         themeSettings.SelectionChanged += (sender, _) =>
         {
-            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+            var index = (sender as ComboBox)?.SelectedIndex  ?? 0;
 
             switch (index)
             {
@@ -385,7 +384,7 @@ public partial class SettingsView
             textBox.Text = files?[0] ?? string.Empty;
     }
 
-    private void SetSettingOption(ComboBox? comboBox,
+    private void SetSettingOption(ComboBox comboBox,
         string titleKey,
         IEnumerable<string> options,
         string datatype,
@@ -403,7 +402,7 @@ public partial class SettingsView
         };
     }
 
-    private void SetBindSettingOption(ComboBox? comboBox,
+    private void SetBindSettingOption(ComboBox comboBox,
         string titleKey,
         IEnumerable<string> options,
         string datatype,
@@ -429,7 +428,7 @@ public partial class SettingsView
         };
     }
 
-    private void SetRememberAdbOption(CheckBox? checkBox)
+    private void SetRememberAdbOption(CheckBox checkBox)
     {
         checkBox.IsChecked = DataSet.GetData("RememberAdb", true);
         checkBox.BindLocalization("RememberAdb", ContentProperty);

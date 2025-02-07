@@ -51,7 +51,7 @@ public class ToastNotification : IDisposable
         return version > new Version(10, 0, 10240);
     }
 
-    public static event EventHandler<string> ActionActivated;
+    public static event EventHandler<string>? ActionActivated;
 
     private string _notificationTitle = string.Empty;
 

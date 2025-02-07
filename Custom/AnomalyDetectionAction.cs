@@ -25,7 +25,7 @@ public class AnomalyDetectionAction : MaaCustomAction
         var handle = () =>
         {
             var image = context.GetImage();
-            RecognitionDetail? detail;
+            RecognitionDetail detail;
             if (context.TemplateMatch("Sarkaz@Roguelike@Abandon.png", image, out detail, 0.75, 1110, 302, 130, 130))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);

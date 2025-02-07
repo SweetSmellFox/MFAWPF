@@ -7,7 +7,7 @@ namespace MFAWPF.Utils.Converters;
 
 public class ListDoubleStringConverter : IValueConverter
 {
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is double d)
         {
@@ -27,7 +27,7 @@ public class ListDoubleStringConverter : IValueConverter
     }
 
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is IEnumerable<CustomValue<string>> customValueList)
         {

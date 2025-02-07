@@ -10,7 +10,7 @@ public class AutoConverter : JsonConverter
         return objectType == typeof(object); // We are converting to object as it can be any type.
     }
 
-    public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue,
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
         JsonSerializer serializer)
     {
         JToken token = JToken.Load(reader);
@@ -48,7 +48,7 @@ public class AutoConverter : JsonConverter
         throw new JsonSerializationException($"Invalid JSON format for AutoConverter. Unexpected Type \"{objectType}\"");
     }
 
-    public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         switch (value)
         {

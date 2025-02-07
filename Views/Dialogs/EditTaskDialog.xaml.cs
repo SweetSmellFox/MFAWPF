@@ -15,7 +15,7 @@ namespace MFAWPF.Views;
 
 public partial class EditTaskDialog
 {
-    public EditTaskDialogViewModel? Data { get; set; }
+    public EditTaskDialogViewModel Data { get; set; }
 
     public EditTaskDialog()
     {
@@ -47,7 +47,7 @@ public partial class EditTaskDialog
         Data?.UndoStack.Push(new RelayCommand(_ => Data?.DataList?.Insert(index, itemToDelete)));
     }
 
-    public void Save(object? sender, RoutedEventArgs? e)
+    public void Save(object sender, RoutedEventArgs e)
     {
         if (Data?.DataList?.Count(t => !string.IsNullOrWhiteSpace(t.Name) && t.Name.Equals(TaskName.Text)) > 1)
         {
@@ -78,7 +78,7 @@ public partial class EditTaskDialog
         }
     }
 
-    private TaskFlowChartDialog? _chartDialog;
+    private TaskFlowChartDialog _chartDialog;
 
     private void ShowChart(object sender, RoutedEventArgs e)
     {
@@ -101,8 +101,8 @@ public partial class EditTaskDialog
             PipelineFileName.Text = fileName;
             try
             {
-                string jsonText = File.ReadAllText(filePath);
-                Dictionary<string, TaskModel>? taskDictionary =
+                var jsonText = File.ReadAllText(filePath);
+                var taskDictionary =
                     JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(jsonText);
                 Data?.DataList?.Clear();
                 if (taskDictionary == null || taskDictionary.Count == 0)
@@ -146,12 +146,12 @@ public partial class EditTaskDialog
 
     private void TaskSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        TaskItemViewModel? taskItemViewModel = ListBoxDemo.SelectedValue as TaskItemViewModel;
+        TaskItemViewModel taskItemViewModel = ListBoxDemo.SelectedValue as TaskItemViewModel;
         if (Data != null)
             Data.CurrentTask = taskItemViewModel;
     }
 
-    public void Save_Pipeline(object? sender, RoutedEventArgs? e)
+    public void Save_Pipeline(object sender, RoutedEventArgs e)
     {
         var settings = new JsonSerializerSettings
         {
@@ -192,7 +192,7 @@ public partial class EditTaskDialog
         }
     }
 
-    private void OnSearchTask(object? sender, FunctionEventArgs<string> e)
+    private void OnSearchTask(object sender, FunctionEventArgs<string> e)
     {
         var searchText = e.Info?.ToLower() ?? string.Empty;
         var filteredTasks = Data?.DataList?.Where(t =>
