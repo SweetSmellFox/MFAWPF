@@ -1,7 +1,7 @@
 using HandyControl.Data;
 using System.Windows;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public static class MessageBoxHelper
 {

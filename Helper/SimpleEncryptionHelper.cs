@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public  static class SimpleEncryptionHelper
 {

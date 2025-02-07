@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Data;
 
-namespace MFAWPF.Utils.Converters;
+namespace MFAWPF.Helper.Converters;
 
 public class NullableDoubleConverter : IValueConverter
 {

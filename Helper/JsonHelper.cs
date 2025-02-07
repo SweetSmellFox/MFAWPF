@@ -2,7 +2,7 @@
 using HandyControl.Tools.Extension;
 using Newtonsoft.Json;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public static class JsonHelper
 {

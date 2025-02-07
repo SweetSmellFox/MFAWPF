@@ -4,11 +4,11 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using HandyControl.Controls;
-using MFAWPF.Utils.Converters;
-using MFAWPF.Utils.Editor;
+using MFAWPF.Helper.Converters;
+using MFAWPF.Helper.Editor;
 using Newtonsoft.Json;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class TaskModel : ObservableObject
 {

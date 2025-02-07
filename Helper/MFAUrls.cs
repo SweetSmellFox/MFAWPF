@@ -1,4 +1,4 @@
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public static class MFAUrls
 {

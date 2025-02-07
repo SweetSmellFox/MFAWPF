@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace MFAWPF.Utils.Converters;
+namespace MFAWPF.Helper.Converters;
 
 public class NullStringConverter : IValueConverter
 {

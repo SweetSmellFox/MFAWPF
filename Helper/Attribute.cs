@@ -1,7 +1,7 @@
-﻿using MFAWPF.Utils.Converters;
+﻿using MFAWPF.Helper.Converters;
 using Newtonsoft.Json;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class Attribute
 {

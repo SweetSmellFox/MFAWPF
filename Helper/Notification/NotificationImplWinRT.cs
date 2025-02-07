@@ -11,14 +11,14 @@
 // but WITHOUT ANY WARRANTY
 // </copyright>
 
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 using System;
 using System.Windows;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Notification.Wpf;
 using Serilog;
 using Windows.UI.Notifications;
-using ToastNotification = MFAWPF.Utils.ToastNotification;
+using ToastNotification = MFAWPF.Helper.ToastNotification;
 
 
 namespace MFAWPF.Helper.Notification;

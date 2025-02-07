@@ -1,6 +1,6 @@
 using MaaFramework.Binding;
 using MaaFramework.Binding.Custom;
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
 using System.Threading;

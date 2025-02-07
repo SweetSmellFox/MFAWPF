@@ -2,7 +2,7 @@
 using HandyControl.Controls;
 using HandyControl.Data;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public static class GrowlHelper
 {

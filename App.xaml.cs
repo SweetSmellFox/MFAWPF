@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Threading;
 using Lierda.WPFHelper;
 using MFAWPF.Services;
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
 using Microsoft.Extensions.Configuration;

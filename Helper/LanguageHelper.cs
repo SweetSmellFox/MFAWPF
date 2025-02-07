@@ -4,7 +4,7 @@ using System.IO;
 using WPFLocalizeExtension.Engine;
 
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public static class LanguageHelper
 {

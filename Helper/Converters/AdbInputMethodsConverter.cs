@@ -1,7 +1,7 @@
 using MaaFramework.Binding;
 using Newtonsoft.Json;
 
-namespace MFAWPF.Utils.Converters;
+namespace MFAWPF.Helper.Converters;
 
 public class AdbInputMethodsConverter : JsonConverter<AdbInputMethods>
 {

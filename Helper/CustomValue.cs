@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class CustomValue<T> : ObservableObject
 {

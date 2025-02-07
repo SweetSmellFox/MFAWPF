@@ -4,18 +4,18 @@ using HandyControl.Controls;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MFAWPF.Data;
-using MFAWPF.Utils.Exceptions;
+using MFAWPF.Helper.Exceptions;
 using MFAWPF.ViewModels;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Extensions;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public static class MFAExtensions
 {
     public static Dictionary<TKey, TaskModel> MergeTaskModels<TKey>(
-        this IEnumerable<KeyValuePair<TKey, TaskModel>> taskModels,
-        IEnumerable<KeyValuePair<TKey, TaskModel>> additionalModels) where TKey : notnull
+        this IEnumerable<KeyValuePair<TKey, TaskModel>>? taskModels,
+        IEnumerable<KeyValuePair<TKey, TaskModel>>? additionalModels) where TKey : notnull
     {
         if (additionalModels == null)
             return taskModels?.ToDictionary() ?? new Dictionary<TKey, TaskModel>();
@@ -67,7 +67,7 @@ public static class MFAExtensions
         return string.Format(format, args);
     }
 
-    public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> items)
+    public static void AddRange<T>(this ObservableCollection<T>? collection, IEnumerable<T>? items)
     {
         if (collection == null || items == null)
             return;

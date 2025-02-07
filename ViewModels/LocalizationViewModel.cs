@@ -1,14 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 using System.Text.RegularExpressions;
 
 namespace MFAWPF.ViewModels;
 
 public partial class LocalizationViewModel : ViewModel
 {
-    private string _resourceKey;
+    private string? _resourceKey;
 
-    public string ResourceKey
+    public string? ResourceKey
     {
         get => _resourceKey;
         set
@@ -29,7 +29,7 @@ public partial class LocalizationViewModel : ViewModel
     }
     
     [ObservableProperty]
-    private string _name;
+    private string? _name;
     
     private void UpdateName()
     {

@@ -9,7 +9,7 @@ using System.Windows.Interop;
 using Windows.Foundation.Metadata;
 using Windows.UI.Notifications.Management;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class ToastNotification : IDisposable
 {

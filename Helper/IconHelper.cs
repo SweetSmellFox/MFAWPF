@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Media.Imaging;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class IconHelper
 {

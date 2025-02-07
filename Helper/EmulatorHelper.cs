@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public static class EmulatorHelper
 {

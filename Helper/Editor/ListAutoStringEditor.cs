@@ -4,11 +4,11 @@ using System.Windows;
 using System.Windows.Data;
 using HandyControl.Controls;
 using MFAWPF.Controls;
-using MFAWPF.Utils.Converters;
+using MFAWPF.Helper.Converters;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
 
-namespace MFAWPF.Utils.Editor;
+namespace MFAWPF.Helper.Editor;
 
 public class ListAutoStringEditor : PropertyEditorBase
 {

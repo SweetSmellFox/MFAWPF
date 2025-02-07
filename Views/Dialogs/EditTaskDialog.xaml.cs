@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using HandyControl.Controls;
 using HandyControl.Data;

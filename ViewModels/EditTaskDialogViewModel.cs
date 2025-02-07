@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 using MFAWPF.Controls;
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 using MFAWPF.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using HandyControl.Tools.Command;

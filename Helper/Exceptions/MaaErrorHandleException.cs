@@ -1,4 +1,4 @@
-namespace MFAWPF.Utils.Exceptions;
+namespace MFAWPF.Helper.Exceptions;
 
 public class MaaErrorHandleException : Exception
 {

@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Data;
 using Newtonsoft.Json;
 
-namespace MFAWPF.Utils.Converters;
+namespace MFAWPF.Helper.Converters;
 
 public class NullableUIntOrObjectConverter : IValueConverter
 {

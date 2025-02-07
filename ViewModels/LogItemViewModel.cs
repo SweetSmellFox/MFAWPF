@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 
 namespace MFAWPF.ViewModels
 {

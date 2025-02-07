@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using MaaFramework.Binding;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class DeviceWindowTemplateSelector : DataTemplateSelector
 {

@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using HandyControl.Data;
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 
 namespace MFAWPF.Views;
@@ -9,7 +9,8 @@ namespace MFAWPF.Views;
 public partial class AddTaskDialog
 {
     private DragItemViewModel _outputContent;
-    public AddTaskDialogViewModel Data;
+    public AddTaskDialogViewModel?
+        Data;
 
     public DragItemViewModel OutputContent
     {

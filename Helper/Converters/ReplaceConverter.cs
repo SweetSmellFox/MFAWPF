@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace MFAWPF.Utils.Converters;
+namespace MFAWPF.Helper.Converters;
 
 public class ReplaceConverter : JsonConverter
 {

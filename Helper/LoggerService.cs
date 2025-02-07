@@ -1,6 +1,6 @@
 ﻿using Serilog;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public static class LoggerService
 {

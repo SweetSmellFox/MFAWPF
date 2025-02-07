@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Views;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class MFATask : ObservableObject
 {

@@ -3,7 +3,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using HandyControl.Controls;
 using MFAWPF.Data;
-using MFAWPF.Utils.Converters;
+using MFAWPF.Helper.Converters;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using XNetEx.Guids.Generators;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class VersionChecker
 {

@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class ThemeHelper
 {

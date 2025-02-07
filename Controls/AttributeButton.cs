@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using Attribute = MFAWPF.Utils.Attribute;
+using Attribute = MFAWPF.Helper.Attribute;
 
 namespace MFAWPF.Controls;
 

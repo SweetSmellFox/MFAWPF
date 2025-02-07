@@ -1,6 +1,6 @@
 using HandyControl.Controls;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public static class TaskManager
 {

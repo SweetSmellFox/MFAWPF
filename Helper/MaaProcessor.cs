@@ -27,7 +27,7 @@ using System.Reflection;
 using System.Reflection.Metadata;
 
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class MaaProcessor
 {

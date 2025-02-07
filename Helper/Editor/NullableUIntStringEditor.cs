@@ -1,9 +1,9 @@
 
 using System.Windows.Data;
 using HandyControl.Controls;
-using MFAWPF.Utils.Converters;
+using MFAWPF.Helper.Converters;
 
-namespace MFAWPF.Utils.Editor;
+namespace MFAWPF.Helper.Editor;
 
 public class NullableUIntStringEditor : NullableStringEditor
 {

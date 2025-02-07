@@ -3,7 +3,7 @@ using HandyControl.Data;
 using HandyControl.Interactivity;
 using HandyControl.Themes;
 using MFAWPF.Data;
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;

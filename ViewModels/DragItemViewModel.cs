@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Data;
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 using MFAWPF.Views;
 using Newtonsoft.Json;
 

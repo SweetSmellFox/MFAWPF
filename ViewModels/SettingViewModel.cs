@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Data;
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 using System.Windows;
 
 namespace MFAWPF.ViewModels;

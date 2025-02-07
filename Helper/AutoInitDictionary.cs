@@ -1,4 +1,4 @@
-﻿namespace MFAWPF.Utils;
+﻿namespace MFAWPF.Helper;
 
 public class AutoInitDictionary : Dictionary<string, int>
 {

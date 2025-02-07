@@ -4,7 +4,7 @@ using System.Collections;
 using System.Text;
 using System.Windows.Documents;
 
-namespace MFAWPF.Utils.Converters;
+namespace MFAWPF.Helper.Converters;
 
 public class SingleOrNestedListConverter : JsonConverter
 {

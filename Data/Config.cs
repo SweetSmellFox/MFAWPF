@@ -1,5 +1,5 @@
 using MaaFramework.Binding;
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 
 namespace MFAWPF.Data;
 

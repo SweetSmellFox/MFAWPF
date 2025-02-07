@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 // using PaddleOCRSharp;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class OCRHelper
 {

@@ -11,7 +11,7 @@
 // but WITHOUT ANY WARRANTY
 // </copyright>
 
-using MFAWPF.Utils;
+using MFAWPF.Helper;
 using System.Windows;
 using System.Windows.Media;
 using MFAWPF.Views;

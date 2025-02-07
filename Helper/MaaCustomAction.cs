@@ -1,8 +1,8 @@
 using MaaFramework.Binding;
 using MaaFramework.Binding.Custom;
-using MFAWPF.Utils.Exceptions;
+using MFAWPF.Helper.Exceptions;
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public abstract class MaaCustomAction : IMaaCustomAction
 {

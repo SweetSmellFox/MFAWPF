@@ -6,7 +6,7 @@ using MFAWPF.ViewModels;
 using MFAWPF.Views;
 
 
-namespace MFAWPF.Utils;
+namespace MFAWPF.Helper;
 
 public class DragDropHandler : IDropTarget
 {
