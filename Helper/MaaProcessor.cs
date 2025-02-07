@@ -1123,6 +1123,10 @@ public class MaaProcessor
                 }
                 break;
             case MaaMsg.Node.Action.Starting:
+                if (!string.IsNullOrWhiteSpace(taskModel.FocusToast))
+                {
+                    ToastNotification.ShowDirect(taskModel.FocusToast);
+                }
                 if (taskModel.FocusTip != null)
                 {
                     for (int i = 0; i < taskModel.FocusTip.Count; i++)

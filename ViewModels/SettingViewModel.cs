@@ -25,7 +25,7 @@ public partial class SettingViewModel : ViewModel
 
     private NotifyType _notifySource = NotifyType.None;
 
-    private System.Timers.Timer _resetNotifyTimer;
+    private System.Timers.Timer? _resetNotifyTimer;
 
     public SettingViewModel()
     {
