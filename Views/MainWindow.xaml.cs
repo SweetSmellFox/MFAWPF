@@ -186,7 +186,7 @@ public partial class MainWindow
         }
     }
 
-    private T FindVisualParent<T>(DependencyObject child) where T : DependencyObject
+    private T? FindVisualParent<T>(DependencyObject child) where T : DependencyObject
     {
         var parentObject = VisualTreeHelper.GetParent(child);
         if (parentObject == null) return null;
@@ -1673,14 +1673,14 @@ public partial class MainWindow
     }
 
     public static void AddLog(string content,
-        Brush color = null,
+        Brush? color = null,
         string weight = "Regular",
         bool showTime = true)
     {
         ViewModel?.AddLog(content, color, weight, showTime);
     }
 
-    public static void AddLogByKey(string key, Brush color = null, params string[] formatArgsKeys)
+    public static void AddLogByKey(string key, Brush? color = null, params string[] formatArgsKeys)
     {
         ViewModel?.AddLogByKey(key, color, formatArgsKeys);
     }

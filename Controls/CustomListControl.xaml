@@ -1,17 +1,19 @@
-<UserControl x:Class="MFAWPF.Controls.CustomListControl"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:dd="urn:gong-wpf-dragdrop"
-             xmlns:lex="http://wpflocalizeextension.codeplex.com"
-             xmlns:hc="https://handyorg.github.io/handycontrol"
-             xmlns:converters="clr-namespace:MFAWPF.Utils.Converters"
-             mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="340"
-             x:Name="Control">
+<UserControl
+    d:DesignHeight="300"
+    d:DesignWidth="340"
+    mc:Ignorable="d"
+    x:Class="MFAWPF.Controls.CustomListControl"
+    x:Name="Control"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:converters="clr-namespace:MFAWPF.Helper.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dd="urn:gong-wpf-dragdrop"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- 声明 SubtractConverter 资源 -->
+    <!--  声明 SubtractConverter 资源  -->
     <UserControl.Resources>
         <converters:SubtractConverter x:Key="SubtractConverter" />
     </UserControl.Resources>
@@ -23,59 +25,88 @@
         </Grid.RowDefinitions>
 
         <Grid>
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                <Button ToolTip="{lex:Loc ButtonAdd}" Width="15" Height="15"
-                        Style="{StaticResource textBoxButton}"
-                        Foreground="{DynamicResource GrayColor4}"
-                        Click="Add"
-                        Padding="0" hc:IconElement.Width="12" Margin="2 0 5 0"
-                        hc:IconElement.Height="12"
-                        hc:IconElement.Geometry="{StaticResource AddGeometry}" />
-                <Button ToolTip="{lex:Loc ButtonClear}" Width="15" Height="15"
-                        Style="{StaticResource textBoxButton}"
-                        Foreground="{DynamicResource GrayColor4}"
-                        Click="Clear"
-                        Padding="0" hc:IconElement.Width="12" Margin="2 0 5 0"
-                        hc:IconElement.Height="12"
-                        hc:IconElement.Geometry="{StaticResource clear}" />
+            <StackPanel
+                HorizontalAlignment="Right"
+                Orientation="Horizontal"
+                VerticalAlignment="Center">
+                <Button
+                    Click="Add"
+                    Foreground="{DynamicResource GrayColor4}"
+                    Height="15"
+                    Margin="2,0,5,0"
+                    Padding="0"
+                    Style="{StaticResource textBoxButton}"
+                    ToolTip="{lex:Loc ButtonAdd}"
+                    Width="15"
+                    hc:IconElement.Geometry="{StaticResource AddGeometry}"
+                    hc:IconElement.Height="12"
+                    hc:IconElement.Width="12" />
+                <Button
+                    Click="Clear"
+                    Foreground="{DynamicResource GrayColor4}"
+                    Height="15"
+                    Margin="2,0,5,0"
+                    Padding="0"
+                    Style="{StaticResource textBoxButton}"
+                    ToolTip="{lex:Loc ButtonClear}"
+                    Width="15"
+                    hc:IconElement.Geometry="{StaticResource clear}"
+                    hc:IconElement.Height="12"
+                    hc:IconElement.Width="12" />
             </StackPanel>
         </Grid>
 
-        <ListBox Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl},Mode=TwoWay}"
-                 HorizontalAlignment="Stretch"
-                 VerticalAlignment="Stretch"
-                 dd:DragDrop.IsDragSource="True"
-                 dd:DragDrop.IsDropTarget="True">
+        <ListBox
+            Grid.Row="1"
+            HorizontalAlignment="Stretch"
+            ItemsSource="{Binding Items, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            VerticalAlignment="Stretch"
+            dd:DragDrop.IsDragSource="True"
+            dd:DragDrop.IsDropTarget="True">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid x:Name="ListGrid" HorizontalAlignment="Stretch" Margin="2"
-                          VerticalAlignment="Stretch">
+                    <Grid
+                        HorizontalAlignment="Stretch"
+                        Margin="2"
+                        VerticalAlignment="Stretch"
+                        x:Name="ListGrid">
                         <Grid.ColumnDefinitions>
-                            <!-- 第一列的宽度使用 SubtractConverter 动态计算 -->
+                            <!--  第一列的宽度使用 SubtractConverter 动态计算  -->
                             <ColumnDefinition Width="*" />
-                            <!-- 第二列按钮宽度保持固定 -->
+                            <!--  第二列按钮宽度保持固定  -->
                             <ColumnDefinition Width="18" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- TextBox 宽度通过绑定 Grid 的 ActualWidth 减去按钮宽度 -->
-                        <TextBox Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                                 Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
+                        <!--  TextBox 宽度通过绑定 Grid 的 ActualWidth 减去按钮宽度  -->
+                        <TextBox
+                            Grid.Column="0"
+                            HorizontalAlignment="Stretch"
+                            Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                            VerticalAlignment="Center">
                             <TextBox.Width>
-                                <Binding Path="ActualWidth"
-                                         RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}"
-                                         Converter="{StaticResource SubtractConverter}"
-                                         ConverterParameter="45" />
+                                <Binding
+                                    Converter="{StaticResource SubtractConverter}"
+                                    ConverterParameter="45"
+                                    Path="ActualWidth"
+                                    RelativeSource="{RelativeSource Mode=FindAncestor,
+                                                                    AncestorType={x:Type ListBoxItem}}" />
                             </TextBox.Width>
                         </TextBox>
 
-                        <Button Grid.Column="1" ToolTip="{lex:Loc Delete}" Width="15" Height="15"
-                                Style="{StaticResource textBoxButton}" Margin="8 0 0  0"
-                                Foreground="{DynamicResource GrayColor4}"
-                                Click="DeleteButton_Click"
-                                Padding="0"
-                                hc:IconElement.Width="12" hc:IconElement.Height="12"
-                                hc:IconElement.Geometry="{StaticResource CloseGeometry}" />
+                        <Button
+                            Click="DeleteButton_Click"
+                            Foreground="{DynamicResource GrayColor4}"
+                            Grid.Column="1"
+                            Height="15"
+                            Margin="8,0,0,0"
+                            Padding="0"
+                            Style="{StaticResource textBoxButton}"
+                            ToolTip="{lex:Loc Delete}"
+                            Width="15"
+                            hc:IconElement.Geometry="{StaticResource CloseGeometry}"
+                            hc:IconElement.Height="12"
+                            hc:IconElement.Width="12" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

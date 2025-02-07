@@ -12,7 +12,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:MFAWPF.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:utils="clr-namespace:MFAWPF.Utils"
+    xmlns:utils="clr-namespace:MFAWPF.Helper"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid Background="{DynamicResource SecundaryBackgroundColor}">
 

@@ -1,25 +1,35 @@
-﻿<hc:Window x:Class="MFAWPF.Views.TaskFlowChartDialog"
-           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-           xmlns:hc="https://handyorg.github.io/handycontrol"
-           xmlns:local="clr-namespace:MFAWPF.Views"
-           NonClientAreaBackground="{DynamicResource MainContentBackgroundBrush}" Icon="../logo.ico"
-           xmlns:controls="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
-           xmlns:controls1="clr-namespace:MFAWPF.Controls"
-           xmlns:lex="http://wpflocalizeextension.codeplex.com"
-           xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
-           xmlns:oxy="http://oxyplot.org/wpf"
-           xmlns:converters="clr-namespace:MFAWPF.Utils.Converters"
-           Title="{lex:Loc WorkflowDiagramTitle}" Width="900" Height="810">
+﻿<hc:Window
+    Height="810"
+    Icon="../logo.ico"
+    NonClientAreaBackground="{DynamicResource MainContentBackgroundBrush}"
+    Title="{lex:Loc WorkflowDiagramTitle}"
+    Width="900"
+    x:Class="MFAWPF.Views.TaskFlowChartDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
+    xmlns:controls="clr-namespace:GraphSharp.Controls;assembly=GraphSharp.Controls"
+    xmlns:controls1="clr-namespace:MFAWPF.Controls"
+    xmlns:converters="clr-namespace:MFAWPF.Helper"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:local="clr-namespace:MFAWPF.Views"
+    xmlns:oxy="http://oxyplot.org/wpf"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Border Background="{DynamicResource WhiteColor}">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition Height="60" />
             </Grid.RowDefinitions>
-            <Border Grid.Row="0" HorizontalAlignment="Stretch" MouseMove="GraphLayout_MouseMove" x:Name="GraphArea" Background="{DynamicResource WhiteColor}"
-                    PreviewMouseDown="GraphLayout_OnPreviewMouseDown"
-                    MouseUp="GraphLayout_MouseUp" PreviewMouseWheel="Dialog_MouseWheel">
+            <Border
+                Background="{DynamicResource WhiteColor}"
+                Grid.Row="0"
+                HorizontalAlignment="Stretch"
+                MouseMove="GraphLayout_MouseMove"
+                MouseUp="GraphLayout_MouseUp"
+                PreviewMouseDown="GraphLayout_OnPreviewMouseDown"
+                PreviewMouseWheel="Dialog_MouseWheel"
+                x:Name="GraphArea">
                 <Viewbox Stretch="Uniform">
                     <Viewbox.RenderTransform>
                         <TransformGroup>
@@ -28,22 +38,30 @@
                         </TransformGroup>
                     </Viewbox.RenderTransform>
 
-                    <controls:GraphLayout x:Name="graphLayout" HorizontalAlignment="Stretch"
-                                          OverlapRemovalAlgorithmType="FSA"
-                                          LayoutAlgorithmType="EfficientSugiyama"
-                                          HighlightAlgorithmType="Simple" />
+                    <controls:GraphLayout
+                        HighlightAlgorithmType="Simple"
+                        HorizontalAlignment="Stretch"
+                        LayoutAlgorithmType="EfficientSugiyama"
+                        OverlapRemovalAlgorithmType="FSA"
+                        x:Name="graphLayout" />
 
                 </Viewbox>
             </Border>
-            <StackPanel Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal" Margin=" 0 10 0 0">
-                <Button x:Name="SaveButton"
-                        BorderThickness="0"
-                        Content="{lex:Loc ButtonClose}" Click="CancelButton_Click"
-                        Foreground="White"
-                        FontSize="11"
-                        VerticalContentAlignment="Center"
-                        Width="90"
-                        Margin="0,0,0,10">
+            <StackPanel
+                Grid.Row="1"
+                HorizontalAlignment="Center"
+                Margin="0,10,0,0"
+                Orientation="Horizontal">
+                <Button
+                    BorderThickness="0"
+                    Click="CancelButton_Click"
+                    Content="{lex:Loc ButtonClose}"
+                    FontSize="11"
+                    Foreground="White"
+                    Margin="0,0,0,10"
+                    VerticalContentAlignment="Center"
+                    Width="90"
+                    x:Name="SaveButton">
 
                     <Button.Style>
                         <Style TargetType="Button">
@@ -52,8 +70,7 @@
                             <Style.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Setter Property="Cursor" Value="Hand" />
-                                    <Setter Property="Background"
-                                            Value="{DynamicResource PrimaryLightBlueColor}" />
+                                    <Setter Property="Background" Value="{DynamicResource PrimaryLightBlueColor}" />
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
@@ -61,11 +78,11 @@
 
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border Height="30"
-                                    CornerRadius="4"
-                                    Background="{TemplateBinding Background}">
-                                <ContentPresenter VerticalAlignment="Center"
-                                                  HorizontalAlignment="Center" />
+                            <Border
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4"
+                                Height="30">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                         </ControlTemplate>
                     </Button.Template>

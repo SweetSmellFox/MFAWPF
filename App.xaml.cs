@@ -3,6 +3,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Threading;
 using Lierda.WPFHelper;
+using MaaFramework.Binding.Interop.Native;
 using MFAWPF.Services;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Win32;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Controls;
 

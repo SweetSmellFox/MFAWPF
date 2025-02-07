@@ -1,12 +1,21 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using HandyControl.Tools.Extension;
 using MFAWPF.Data;
 using MFAWPF.Helper;
+using MFAWPF.Views;
 using System.Windows;
 
 namespace MFAWPF.ViewModels;
 
 public partial class SettingViewModel : ViewModel
 {
+    [ObservableProperty] private string _maaFwVersion = MaaProcessor.MaaUtility.Version;
+    [ObservableProperty] private string _mfaVersion = MainWindow.Version;
+
+    [ObservableProperty] private string _resourceVersion = MaaInterface.Instance?.Version ?? string.Empty;
+
+    public bool ShowResourceVersion => !string.IsNullOrWhiteSpace(ResourceVersion);
+
     private enum NotifyType
     {
         None,
@@ -18,6 +27,11 @@ public partial class SettingViewModel : ViewModel
 
     private System.Timers.Timer _resetNotifyTimer;
 
+    public SettingViewModel()
+    {
+        UpdateExternalNotificationProvider();
+    }
+    
     private void ResetNotifySource()
     {
         if (_resetNotifyTimer != null)
@@ -215,14 +229,14 @@ public partial class SettingViewModel : ViewModel
 
     public static List<LocalizationViewModel> ExternalNotificationProvidersShow => ExternalNotificationProviders;
 
-    private static object[] _enabledExternalNotificationProviders =
-        ExternalNotificationProviders.Where(s => DataSet.GetData("ExternalNotificationEnabled", string.Empty).Split(',').Contains(s.ResourceKey))
-            .Distinct()
-            .ToArray();
+    private static object[] _enabledExternalNotificationProviders = ExternalNotificationProviders.Where(s => DataSet.GetData("ExternalNotificationEnabled", string.Empty).Split(',').Contains(s.ResourceKey))
+        .Distinct()
+        .ToArray();
 
     public object[] EnabledExternalNotificationProviders
     {
-        get => _enabledExternalNotificationProviders;
+        get =>_enabledExternalNotificationProviders;
+        
         set
         {
             try

@@ -32,17 +32,18 @@ namespace MFAWPF.Helper;
 public class MaaProcessor
 {
     private static MaaProcessor? _instance;
-    private CancellationTokenSource _cancellationTokenSource;
-    private bool _isStopped;
+    private CancellationTokenSource? _cancellationTokenSource;
 
+    public static MaaUtility  MaaUtility { get; } = new();
+    
     public bool IsStopped
     {
-        get => _isStopped;
-        set => _isStopped = value;
+        get;
+        set;
     }
 
-    public CancellationTokenSource CancellationTokenSource => _cancellationTokenSource;
-    private MaaTasker _currentTasker;
+    public CancellationTokenSource? CancellationTokenSource => _cancellationTokenSource;
+    private MaaTasker? _currentTasker;
 
     public static string Resource => AppContext.BaseDirectory + "Resource";
     public static string ModelResource => $"{Resource}/model/";
@@ -53,10 +54,10 @@ public class MaaProcessor
     public static int Money { get; set; } = 0;
     public static int AllMoney { get; set; }
     public static Config Config { get; } = new();
-    public static List<string> CurrentResources { get; set; }
+    public static List<string>? CurrentResources { get; set; }
     public static AutoInitDictionary AutoInitDictionary { get; } = new();
 
-    public event EventHandler TaskStackChanged;
+    public event EventHandler? TaskStackChanged;
 
     public static MaaProcessor Instance
     {
@@ -357,7 +358,7 @@ public class MaaProcessor
     }
 
 
-    private CancellationTokenSource _emulatorCancellationTokenSource;
+    private CancellationTokenSource? _emulatorCancellationTokenSource;
 
     private Process? _softwareProcess;
 
@@ -858,6 +859,7 @@ public class MaaProcessor
             {
                 Controller = controller,
                 Resource = maaResource,
+                Utility = MaaUtility,
                 DisposeOptions = DisposeOptions.All,
             };
             RegisterCustomRecognitionsAndActions(tasker);
@@ -909,14 +911,14 @@ public class MaaProcessor
                 Config.DesktopWindow.Check);
     }
 
-    private static List<MetadataReference> MetadataReferences;
+    private static List<MetadataReference>? _metadataReferences;
 
     private static List<MetadataReference> GetMetadataReferences()
     {
-        if (MetadataReferences == null)
+        if (_metadataReferences == null)
         {
             var domainAssemblys = AppDomain.CurrentDomain.GetAssemblies();
-            MetadataReferences = new List<MetadataReference>();
+            _metadataReferences = new List<MetadataReference>();
 
             foreach (var assembly in domainAssemblys)
             {
@@ -928,7 +930,7 @@ public class MaaProcessor
                         var moduleMetadata = ModuleMetadata.CreateFromMetadata((IntPtr)blob, length);
                         var assemblyMetadata = AssemblyMetadata.Create(moduleMetadata);
                         var metadataReference = assemblyMetadata.GetReference();
-                        MetadataReferences.Add(metadataReference);
+                        _metadataReferences.Add(metadataReference);
                     }
                 }
             }
@@ -936,15 +938,15 @@ public class MaaProcessor
             unsafe
             {
                 typeof(System.Linq.Expressions.Expression).Assembly.TryGetRawMetadata(out byte* blob, out int length);
-                MetadataReferences.Add(AssemblyMetadata.Create(ModuleMetadata.CreateFromMetadata((IntPtr)blob, length)).GetReference());
+                _metadataReferences.Add(AssemblyMetadata.Create(ModuleMetadata.CreateFromMetadata((IntPtr)blob, length)).GetReference());
             }
         }
-        return MetadataReferences;
+        return _metadataReferences;
     }
 
 
     private static bool _shouldLoadCustomClasses = true;
-    private static FileSystemWatcher _watcher;
+    private static FileSystemWatcher? _watcher;
     private static void onFileChanged(object sender, FileSystemEventArgs e)
     {
         _shouldLoadCustomClasses = true;
@@ -1158,7 +1160,7 @@ public class MaaProcessor
         LoggerService.LogError(e.ToString());
     }
 
-    public BitmapImage GetBitmapImage()
+    public BitmapImage? GetBitmapImage()
     {
         using var buffer = GetImage(GetCurrentTasker()?.Controller);
         if (buffer == null) return null;
@@ -1194,14 +1196,14 @@ public class MaaProcessor
         return bitmapImage;
     }
 
-    private void TryRunTasks(MaaTasker maa, string task, string taskParams)
+    private void TryRunTasks(MaaTasker maa, string? task, string? taskParams)
     {
         if (maa == null || task == null) throw new NullReferenceException();
         if (string.IsNullOrWhiteSpace(taskParams)) taskParams = "{}";
         maa.AppendTask(task, taskParams).Wait().ThrowIfNot(MaaJobStatus.Succeeded);
     }
 
-    private static MaaImageBuffer GetImage(IMaaController maaController)
+    private static MaaImageBuffer? GetImage(IMaaController? maaController)
     {
         var buffer = new MaaImageBuffer();
         if (maaController == null)

@@ -13,6 +13,7 @@
   &lt;Assembly Path="C:\Users\Fox\.nuget\packages\calcbinding\2.5.2\lib\netcoreapp3.0\CalcBinding.dll" /&gt;&#xD;
   &lt;Assembly Path="C:\Program Files\dotnet\packs\Microsoft.WindowsDesktop.App.Ref\8.0.7\ref\net8.0\PresentationFramework.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
+	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=MFAWPF_002FAssets_002FLocalization_002FStrings/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=MFAWPF_002FFytawej/@EntryIndexedValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=MFAWPF_002FFytawej/@EntryIndexRemoved">True</s:Boolean>
 	<s:Boolean x:Key="/Default/ResxEditorPersonal/CheckedGroups/=MFAWPF_002FRes_002FLocalization_002FStrings/@EntryIndexedValue">True</s:Boolean>

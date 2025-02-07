@@ -6,11 +6,7 @@ using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools.Command;
 using MFAWPF.Helper;
-using System.Data;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Windows.Threading;
 using DataSet = MFAWPF.Data.DataSet;
 
 
@@ -25,8 +21,8 @@ public partial class MainViewModel : ViewModel
         string weight = "Regular",
         bool showTime = true)
     {
-
-        var brush = new BrushConverter().ConvertFromString(color ?? "Gray") as SolidColorBrush;
+        
+        var brush = new BrushConverter().ConvertFromString(color) as SolidColorBrush;
         brush ??= Brushes.Gray;
         Task.Run(() =>
         {
@@ -40,7 +36,7 @@ public partial class MainViewModel : ViewModel
     }
 
     public void AddLog(string content,
-        Brush color = null,
+        Brush? color = null,
         string weight = "Regular",
         bool showTime = true)
     {
@@ -56,7 +52,7 @@ public partial class MainViewModel : ViewModel
         });
     }
 
-    public void AddLogByKey(string key, Brush color = null, params string[] formatArgsKeys)
+    public void AddLogByKey(string key, Brush? color = null, params string[] formatArgsKeys)
     {
         color ??= Brushes.Gray;
         Task.Run(() =>
@@ -66,26 +62,26 @@ public partial class MainViewModel : ViewModel
                 LogItemViewModels.Add(new LogItemViewModel(key, color, "Regular", true, "HH':'mm':'ss",
                     true, formatArgsKeys));
 
-                string Content = string.Empty;
-                if (formatArgsKeys == null || formatArgsKeys.Length == 0)
-                    Content = key.GetLocalizationString();
+                var content = string.Empty;
+                if (formatArgsKeys.Length == 0)
+                    content = key.GetLocalizationString();
                 else
                 {
                     // 获取每个格式化参数的本地化字符串
-                    var formatArgs = formatArgsKeys.Select(key => key.GetLocalizedFormattedString()).ToArray();
+                    var formatArgs = formatArgsKeys.Select(k => k.GetLocalizedFormattedString()).ToArray();
 
                     // 使用本地化字符串更新内容
                     try
                     {
-                        Content = Regex.Unescape(
+                        content = Regex.Unescape(
                             key.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray()));
                     }
                     catch
                     {
-                        Content = key.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray());
+                        content = key.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray());
                     }
                 }
-                LoggerService.LogInfo(Content);
+                LoggerService.LogInfo(content);
             });
         });
     }
@@ -252,9 +248,9 @@ public partial class MainViewModel : ViewModel
         });
     }
 
-    private string _beforeTask = "None".GetLocalizationString();
+    private string? _beforeTask = "None".GetLocalizationString();
 
-    public string BeforeTask
+    public string? BeforeTask
     {
         get
         {
@@ -264,9 +260,9 @@ public partial class MainViewModel : ViewModel
         set => SetProperty(ref _beforeTask, value);
     }
 
-    private string _afterTask = "None".GetLocalizationString();
+    private string? _afterTask = "None".GetLocalizationString();
 
-    public string AfterTask
+    public string? AfterTask
     {
         get
         {

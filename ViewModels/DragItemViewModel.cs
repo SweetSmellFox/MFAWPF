@@ -9,7 +9,7 @@ namespace MFAWPF.ViewModels;
 
 public partial class DragItemViewModel : ViewModel
 {
-    public DragItemViewModel(TaskInterfaceItem interfaceItem)
+    public DragItemViewModel(TaskInterfaceItem? interfaceItem)
     {
         InterfaceItem = interfaceItem;
         Name = interfaceItem?.Name ?? "未命名";
@@ -76,9 +76,9 @@ public partial class DragItemViewModel : ViewModel
         }
     }
 
-    private TaskInterfaceItem _interfaceItem;
+    private TaskInterfaceItem? _interfaceItem;
 
-    public TaskInterfaceItem InterfaceItem
+    public TaskInterfaceItem? InterfaceItem
     {
         get => _interfaceItem;
         set

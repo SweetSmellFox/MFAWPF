@@ -17,9 +17,9 @@ public partial class EditTaskDialogViewModel : ViewModel
     [ObservableProperty]
     private ObservableCollection<TaskItemViewModel> _dataList;
 
-    private ObservableCollection<TaskItemViewModel> _colors;
+    private ObservableCollection<TaskItemViewModel>? _colors;
 
-    public ObservableCollection<TaskItemViewModel> Colors
+    public ObservableCollection<TaskItemViewModel>? Colors
     {
         get
         {

@@ -14,7 +14,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:properties="clr-namespace:MFAWPF.Styles.Properties"
-    xmlns:utils="clr-namespace:MFAWPF.Utils"
+    xmlns:utils="clr-namespace:MFAWPF.Helper"
     xmlns:views="clr-namespace:MFAWPF.Views"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid Margin="20,5,20,20">
@@ -421,8 +421,10 @@
                                 Foreground="White"
                                 Margin="0,3,0,3"
                                 MaxWidth="150"
+                                MinWidth="40"
+                                Text="{Binding ViewModel.MfaVersion}"
+                                TextAlignment="Center"
                                 TextWrapping="Wrap"
-                                d:MinWidth="50"
                                 x:Name="MFAShieldTextBlock" />
                         </hc:Shield>
                         <hc:Shield
@@ -430,14 +432,33 @@
                             HorizontalAlignment="Center"
                             Margin="5"
                             Subject="{lex:Loc ResourceVersion}"
+                            Visibility="{calcBinding:Binding 'ViewModel.ShowResourceVersion'}"
                             x:Name="ResourceShield">
                             <TextBlock
                                 Foreground="White"
                                 Margin="0,3,0,3"
                                 MaxWidth="150"
+                                MinWidth="40"
+                                Text="{Binding ViewModel.ResourceVersion}"
+                                TextAlignment="Center"
                                 TextWrapping="Wrap"
-                                d:MinWidth="50"
                                 x:Name="ResourceShieldTextBlock" />
+                        </hc:Shield>
+                        <hc:Shield
+                            Color="#6969AA"
+                            HorizontalAlignment="Center"
+                            Margin="5"
+                            Subject="{lex:Loc MaaFWVersion}"
+                            x:Name="MaafwShield">
+                            <TextBlock
+                                Foreground="White"
+                                Margin="0,3,0,3"
+                                MaxWidth="150"
+                                MinWidth="40"
+                                Text="{Binding ViewModel.MaaFwVersion}"
+                                TextAlignment="Center"
+                                TextWrapping="Wrap"
+                                x:Name="MaafwShieldTextBlock" />
                         </hc:Shield>
                         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                             <Button
@@ -451,11 +472,20 @@
                                 IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
                                 Margin="5" />
                         </StackPanel>
-                        <Button
-                            Click="UpdateMFA"
-                            Content="{lex:Loc SoftwareUpdate}"
-                            IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
-                            Margin="5" />
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                            <Button
+                                Click="UpdateMFA"
+                                Content="{lex:Loc SoftwareUpdate}"
+                                IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                                Margin="5" />
+                            <Button
+                                Click="UpdateMaaFW"
+                                Content="{lex:Loc UpdateMaaFW}"
+                                IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                                Margin="5"
+                                Visibility="{calcBinding:Binding 'ViewModel.DownloadSourceIndex==1'}" />
+                        </StackPanel>
+
                     </StackPanel>
                 </Grid>
                 <hc:Divider Content="{Binding ViewModel.ListTitle[8].Name}" />

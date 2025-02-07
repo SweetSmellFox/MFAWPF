@@ -20,6 +20,7 @@ namespace MFAWPF.Views;
 
 public partial class SettingsView
 {
+   
     public static ViewModels.SettingViewModel ViewModel { get; set; }
     public ViewModels.MainViewModel MainViewModel { get; set; }
     public SettingsView(ViewModels.SettingViewModel model, ViewModels.MainViewModel mainViewModel)
@@ -294,7 +295,10 @@ public partial class SettingsView
     {
         VersionChecker.UpdateMFAAsync();
     }
-
+    private void UpdateMaaFW(object sender, RoutedEventArgs e)
+    {
+        VersionChecker.UpdateMaaFwAsync();
+    }
     private void Hyperlink_OnClick(object sender, RoutedEventArgs e)
     {
         Process.Start(new ProcessStartInfo(((Hyperlink)sender).NavigateUri.AbsoluteUri)
@@ -357,16 +361,16 @@ public partial class SettingsView
                 CommandParameter = resourceLink
             });
         }
-        MFAShieldTextBlock.Text = MainWindow.Version;
-        var resourceVersion = MaaInterface.Instance?.Version;
-        if (!string.IsNullOrWhiteSpace(resourceVersion))
-        {
-            ResourceShieldTextBlock.Text = resourceVersion;
-        }
-        else
-        {
-            ResourceShield.Visibility = Visibility.Collapsed;
-        }
+       
+        // var resourceVersion = MaaInterface.Instance?.Version;
+        // if (!string.IsNullOrWhiteSpace(resourceVersion))
+        // {
+        //     ViewModel.ResourceVersion = resourceVersion;
+        // }
+        // else
+        // {
+        //     ResourceShield.Visibility = Visibility.Collapsed;
+        // }
         settingStackPanel.Children.Add(s1);
         settingStackPanel.Children.Add(s2);
     }

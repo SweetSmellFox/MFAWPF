@@ -767,4 +767,16 @@
   <data name="HardRestartAdb" xml:space="preserve">
     <value>Trying to kill and restart the ADB process</value>
   </data>
+  <data name="UpdateMaaFW" xml:space="preserve">
+    <value>Update MaaFW</value>
+  </data>
+  <data name="GettingLatestMaaFW" xml:space="preserve">
+    <value>Getting the latest maafw...</value>
+  </data>
+  <data name="MaaFwIsLatestVersion" xml:space="preserve">
+    <value>MaaFW is already in the latest version!</value>
+  </data>
+  <data name="MaaFWVersion" xml:space="preserve">
+    <value>MaaFW Version</value>
+  </data>
 </root>

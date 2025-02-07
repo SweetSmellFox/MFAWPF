@@ -83,6 +83,8 @@ public class VersionChecker
     public static void UpdateResourceAsync() => TaskManager.RunTaskAsync(() => Checker.UpdateResourceBySelection());
     public static void UpdateMFAAsync() => TaskManager.RunTaskAsync(() => Checker.UpdateMFABySelection());
 
+    public static void UpdateMaaFwAsync() => TaskManager.RunTaskAsync(() => Checker.UpdateMaaFw());
+
     public void SetText(string text, DownloadDialog dialog, bool noDialog = false)
     {
         if (noDialog)
@@ -130,6 +132,13 @@ public class VersionChecker
             case 0: UpdateMFA(noDialog); break;
             case 1: UpdateMFAWithMirrorApi(noDialog); break;
         }
+    }
+
+    public async void UpdateMaaFw(bool noDialog = false)
+    {
+
+        UpdateMaaFwWithMirrorApi(noDialog);
+
     }
     public async void UpdateResourceWithMirrorApi(bool closeDialog = false, bool noDialog = false, Action action = null)
     {
@@ -188,10 +197,9 @@ public class VersionChecker
             MainWindow.ViewModel.ClearDownloadProgress();
             return;
         }
+        
 
-        var localVersion = MaaInterface.Instance?.Version ?? string.Empty;
-
-        if (!IsNewVersionAvailable(latestVersion, localVersion))
+        if (!IsNewVersionAvailable(latestVersion, currentVersion))
         {
             ToastNotification.ShowDirect("ResourcesAreLatestVersion".GetLocalizationString());
             MainWindow.Instance.SetUpdating(false);
@@ -301,7 +309,7 @@ public class VersionChecker
         try
         {
             var settingsView = App.Services.GetRequiredService<SettingsView>();
-            settingsView.ResourceShieldTextBlock.Text = latestVersion;
+            SettingsView.ViewModel.ResourceVersion  = latestVersion;
         }
         catch (Exception e)
         {
@@ -562,7 +570,7 @@ public class VersionChecker
         try
         {
             var settingsView = App.Services.GetRequiredService<SettingsView>();
-            settingsView.ResourceShieldTextBlock.Text = latestVersion;
+            SettingsView.ViewModel.ResourceVersion = latestVersion;
         }
         catch (Exception e)
         {
@@ -590,7 +598,7 @@ public class VersionChecker
         try
         {
             var settingsView = App.Services.GetRequiredService<SettingsView>();
-            settingsView.ResourceShieldTextBlock.Text = latestVersion;
+            SettingsView.ViewModel.ResourceVersion  = latestVersion;
         }
         catch (Exception e)
         {
@@ -598,6 +606,138 @@ public class VersionChecker
         }
         MainWindow.Instance.InitializeData();
         action?.Invoke();
+    }
+    
+    async public void UpdateMaaFwWithMirrorApi(bool noDialog = false)
+    {
+        MainWindow.Instance.SetUpdating(true);
+
+        DownloadDialog dialog = null;
+        GrowlHelper.OnUIThread(() =>
+        {
+            if (!noDialog) dialog = new DownloadDialog("UpdateMaaFW".GetLocalizationString());
+            dialog?.Show();
+        });
+
+        SetText("GettingLatestMaaFW", dialog, noDialog);
+
+
+        dialog?.UpdateProgress(10);
+
+        var resId = "MaaFramework";
+        var currentVersion = MaaProcessor.MaaUtility.Version;
+        var cdk = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
+        MainWindow.Instance.SetUpdating(true);
+        string downloadUrl = string.Empty, latestVersion = string.Empty;
+        try
+        {
+            GetDownloadUrlFromMirror(currentVersion, resId, cdk, out downloadUrl, out latestVersion, "MFA", true);
+        }
+        catch (Exception ex)
+        {
+            SetText($"{"FailToGetLatestVersionInfo".GetLocalizationString()}: {ex.Message}", dialog, noDialog);
+            MainWindow.Instance.SetUpdating(false);
+            LoggerService.LogError(ex);
+            return;
+        }
+
+        dialog?.UpdateProgress(50);
+
+        if (string.IsNullOrWhiteSpace(latestVersion))
+        {
+            ToastNotification.ShowDirect("FailToGetLatestVersionInfo".GetLocalizationString());
+            MainWindow.Instance.SetUpdating(false);
+            GrowlHelper.OnUIThread(() => dialog?.Close());
+            MainWindow.ViewModel.ClearDownloadProgress();
+            return;
+        }
+        
+
+        if (string.IsNullOrWhiteSpace(currentVersion))
+        {
+            ToastNotification.ShowDirect("FailToGetCurrentVersionInfo".GetLocalizationString());
+            MainWindow.Instance.SetUpdating(false);
+            GrowlHelper.OnUIThread(() => dialog?.Close());
+            MainWindow.ViewModel.ClearDownloadProgress();
+            return;
+        }
+
+        LoggerService.LogInfo($"latestVersion, localVersion: {latestVersion}, {currentVersion}");
+        if (!IsNewVersionAvailable(latestVersion, currentVersion))
+        {
+            ToastNotification.ShowDirect("MaaFwIsLatestVersion".GetLocalizationString());
+            MainWindow.Instance.SetUpdating(false);
+            GrowlHelper.OnUIThread(() => dialog?.Close());
+            MainWindow.ViewModel.ClearDownloadProgress();
+            return;
+        }
+
+        dialog?.UpdateProgress(100);
+
+        if (string.IsNullOrWhiteSpace(downloadUrl))
+        {
+            ToastNotification.ShowDirect("FailToGetDownloadUrl".GetLocalizationString());
+            MainWindow.Instance.SetUpdating(false);
+            GrowlHelper.OnUIThread(() => dialog?.Close());
+            MainWindow.ViewModel.ClearDownloadProgress();
+            return;
+        }
+
+        var tempPath = Path.Combine(AppContext.BaseDirectory, "temp");
+        Directory.CreateDirectory(tempPath);
+
+        var tempZipFilePath = Path.Combine(tempPath, $"maafw_{latestVersion}.zip");
+        dialog?.SetText("Downloading".GetLocalizationString());
+        dialog?.UpdateProgress(0);
+
+        if (!await DownloadFileAsync(downloadUrl, tempZipFilePath, dialog, "GameResourceUpdated"))
+        {
+            SetText("DownloadFailed", dialog, noDialog);
+            GrowlHelper.OnUIThread(() => dialog?.Close());
+            MainWindow.ViewModel.ClearDownloadProgress();
+            return;
+        }
+
+        var tempExtractDir = Path.Combine(tempPath, $"maafw_{latestVersion}_extracted");
+        if (Directory.Exists(tempExtractDir)) Directory.Delete(tempExtractDir, true);
+        if (!File.Exists(tempZipFilePath))
+        {
+            SetText("DownloadFailed", dialog, noDialog);
+            GrowlHelper.OnUIThread(() => dialog?.Close());
+            MainWindow.ViewModel.ClearDownloadProgress();
+            return;
+        }
+
+        ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
+
+        var currentExeFileName = Process.GetCurrentProcess().MainModule.ModuleName;
+
+        var utf8Bytes = Encoding.UTF8.GetBytes(AppContext.BaseDirectory);
+        var utf8BaseDirectory = Encoding.UTF8.GetString(utf8Bytes);
+        var batFilePath = Path.Combine(utf8BaseDirectory, "temp", "update_maafw.bat");
+        await using (var sw = new StreamWriter(batFilePath))
+        {
+            await sw.WriteLineAsync("@echo off");
+            await sw.WriteLineAsync("chcp 65001");
+
+            await sw.WriteLineAsync("ping 127.0.0.1 -n 3 > nul");
+            var extractedPath = $"\"{utf8BaseDirectory}temp\\maafw_{latestVersion}_extracted\\bin\\*.*\"";
+            var targetPath = $"\"{utf8BaseDirectory}\"";
+            await sw.WriteLineAsync("ping 127.0.0.1 -n 1 > nul");
+            await sw.WriteLineAsync($"xcopy /E /Y {extractedPath} {targetPath}");
+            await sw.WriteLineAsync("ping 127.0.0.1 -n 1 > nul");
+            await sw.WriteLineAsync($"start /d \"{utf8BaseDirectory}\" {currentExeFileName}");
+            await sw.WriteLineAsync($"rd /S /Q \"{utf8BaseDirectory}temp\"");
+        }
+
+        var psi = new ProcessStartInfo(batFilePath)
+        {
+            CreateNoWindow = true,
+            WindowStyle = ProcessWindowStyle.Hidden
+        };
+        Process.Start(psi);
+        Thread.Sleep(50);
+        GrowlHelper.OnUIThread(Application.Current.Shutdown);
     }
     async public void UpdateMFAWithMirrorApi(bool noDialog = false)
     {
@@ -611,11 +751,11 @@ public class VersionChecker
         });
 
         SetText("GettingLatestSoftware", dialog, noDialog);
-        
+
 
         dialog?.UpdateProgress(10);
 
-        var resId = "MFA";
+        var resId = "MFAWPF";
         var currentVersion = GetLocalVersion();
         var cdk = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
         MainWindow.Instance.SetUpdating(true);
@@ -643,10 +783,9 @@ public class VersionChecker
             MainWindow.ViewModel.ClearDownloadProgress();
             return;
         }
+        
 
-        var localVersion = GetLocalVersion();
-
-        if (string.IsNullOrWhiteSpace(localVersion))
+        if (string.IsNullOrWhiteSpace(currentVersion))
         {
             ToastNotification.ShowDirect("FailToGetCurrentVersionInfo".GetLocalizationString());
             MainWindow.Instance.SetUpdating(false);
@@ -655,7 +794,7 @@ public class VersionChecker
             return;
         }
 
-        if (!IsNewVersionAvailable(latestVersion, localVersion))
+        if (!IsNewVersionAvailable(latestVersion, currentVersion))
         {
             ToastNotification.ShowDirect("MFAIsLatestVersion".GetLocalizationString());
             MainWindow.Instance.SetUpdating(false);
@@ -663,7 +802,7 @@ public class VersionChecker
             MainWindow.ViewModel.ClearDownloadProgress();
             return;
         }
-        
+
         dialog?.UpdateProgress(100);
 
         if (string.IsNullOrWhiteSpace(downloadUrl))
@@ -735,7 +874,7 @@ public class VersionChecker
         Thread.Sleep(50);
         GrowlHelper.OnUIThread(Application.Current.Shutdown);
     }
-    
+
     async public void UpdateMFA(bool noDialog = false)
     {
         MainWindow.Instance.SetUpdating(true);
@@ -909,7 +1048,10 @@ public class VersionChecker
 
     private void GetDownloadUrlFromMirror(string version, string resId, string cdk, out string url, out string latest_version, string userAgent = "MFA", bool isUI = false)
     {
-        var releaseUrl = isUI ? $"https://mirrorc.top/api/resources/MFAWPF/latest?current_version={version}&cdk={cdk}&os=win&arch=x86_64" : $"https://mirrorc.top/api/resources/{resId}/latest?current_version={version}&cdk={cdk}&user_agent={userAgent}";
+
+        var releaseUrl = isUI
+            ? $"https://mirrorc.top/api/resources/{resId}/latest?current_version={version}&cdk={cdk}&os=win&arch=x86_64"
+            : $"https://mirrorc.top/api/resources/{resId}/latest?current_version={version}&cdk={cdk}&user_agent={userAgent}";
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
         httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
@@ -1076,11 +1218,11 @@ public class VersionChecker
     {
         try
         {
-            var resId = "MFA";
+            var resId = "MFAWPF";
             var currentVersion = GetLocalVersion();
             var cdk = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
             MainWindow.Instance.SetUpdating(true);
-            GetDownloadUrlFromMirror(currentVersion, resId,cdk, out var downloadUrl, out var latestVersion, "MFA", true);
+            GetDownloadUrlFromMirror(currentVersion, resId, cdk, out var downloadUrl, out var latestVersion, "MFA", true);
 
             if (IsNewVersionAvailable(latestVersion, currentVersion))
             {

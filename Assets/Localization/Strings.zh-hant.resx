@@ -767,4 +767,16 @@
   <data name="HardRestartAdb" xml:space="preserve">
     <value>正在嘗試重開 ADB 程式</value>
   </data>
+  <data name="UpdateMaaFW" xml:space="preserve">
+    <value>框架更新</value>
+  </data>
+  <data name="GettingLatestMaaFW" xml:space="preserve">
+    <value>正在獲取最新框架.....</value>
+  </data>
+  <data name="MaaFwIsLatestVersion" xml:space="preserve">
+    <value>框架已為最新版本！</value>
+  </data>
+  <data name="MaaFWVersion" xml:space="preserve">
+    <value>框架版本</value>
+  </data>
 </root>
