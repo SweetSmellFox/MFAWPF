@@ -128,6 +128,8 @@
 
 - `focus` : *bool*  
   是否启用`focus_tip` 、`focus_succeeded`、 `focus_failed`。可选，默认false。
+- `focus_toast` : *string* 
+  当执行某任务前，Windows弹窗输出的内容。可选，默认空。
 - `focus_tip` : *string* | *list<string, >*  
   当执行某任务前，在MFA右侧日志输出的内容。可选，默认空。
 - `focus_tip_color` : *string* | *list<string, >*  

@@ -126,6 +126,8 @@ Modify it as follows:
 
 - `focus`: *bool*
   Whether to enable `focus_tip` `focus_succeeded` `focus_failed`. Optional, default is false.
+- `focus_toast` : *string*
+  The content that is displayed in the Windows popup window before executing a certain task. Optional, default is empty.
 - `focus_tip`: *string* | *list<string, >*
   The content output in the MFA right-side log before executing a certain task. Optional, default is empty.
 - `focus_tip_color`: *string* | *list<string, >*
