@@ -30,7 +30,7 @@ public partial class EditTaskDialog
     {
         base.OnClosed(e);
         MainWindow.TaskDialog = null;
-        MainWindow.Data?.SetIdle(true);
+        MainWindow.ViewModel?.SetIdle(true);
     }
 
     private void List_KeyDown(object sender, KeyEventArgs e)
@@ -51,20 +51,20 @@ public partial class EditTaskDialog
     {
         if (Data?.DataList?.Count(t => !string.IsNullOrWhiteSpace(t.Name) && t.Name.Equals(TaskName.Text)) > 1)
         {
-            Growls.Error(string.Format("DuplicateTaskNameError".GetLocalizationString(), TaskName.Text));
+            GrowlHelper.Error(string.Format("DuplicateTaskNameError".GetLocalizationString(), TaskName.Text));
             return;
         }
 
         if (Data?.CurrentTask?.Task is not null)
         {
-            // Data.CurrentTask.Task.Reset();
+            // ViewModel.CurrentTask.Task.Reset();
             Data.CurrentTask.Task.Name = TaskName.Text;
 
             // foreach (var button in Parts.Children.OfType<AttributeButton>())
             // {
             //     if (button.Attribute is not null)
             //     {
-            //         Data.CurrentTask.Task.Set(button.Attribute);
+            //         ViewModel.CurrentTask.Task.Set(button.Attribute);
             //     }
             // }
 
@@ -74,7 +74,7 @@ public partial class EditTaskDialog
         }
         else
         {
-            Growls.ErrorGlobal("SaveFailureMessage".GetLocalizationString());
+            GrowlHelper.ErrorGlobal("SaveFailureMessage".GetLocalizationString());
         }
     }
 
@@ -119,7 +119,7 @@ public partial class EditTaskDialog
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                Growls.ErrorGlobal(string.Format("LoadPipelineErrorMessage".GetLocalizationString(), ex.Message));
+                GrowlHelper.ErrorGlobal(string.Format("LoadPipelineErrorMessage".GetLocalizationString(), ex.Message));
             }
         }
     }
@@ -167,7 +167,7 @@ public partial class EditTaskDialog
                 if (taskItemViewModel.Task != null &&
                     !taskModels.TryAdd(taskItemViewModel.Name, taskItemViewModel.Task))
                 {
-                    Growls.WarningGlobal("SavePipelineWarning".GetLocalizationString());
+                    GrowlHelper.WarningGlobal("SavePipelineWarning".GetLocalizationString());
                     return;
                 }
             }
@@ -287,7 +287,7 @@ public partial class EditTaskDialog
             }
             else
             {
-                Growls.ErrorGlobal("ClipboardDataError".GetLocalizationString());
+                GrowlHelper.ErrorGlobal("ClipboardDataError".GetLocalizationString());
             }
         }
     }
@@ -334,7 +334,7 @@ public partial class EditTaskDialog
             }
             else
             {
-                Growls.ErrorGlobal("ClipboardDataError".GetLocalizationString());
+                GrowlHelper.ErrorGlobal("ClipboardDataError".GetLocalizationString());
             }
         }
     }

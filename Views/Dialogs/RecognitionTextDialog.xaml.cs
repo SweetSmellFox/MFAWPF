@@ -5,11 +5,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MFAWPF.Utils;
-using Microsoft.Win32;
 
 namespace MFAWPF.Views;
 
-public partial class SelectionRegionDialog
+public partial class RecognitionTextDialog
 {
     private Point _startPoint;
     private Rectangle? _selectionRectangle;
@@ -21,15 +20,21 @@ public partial class SelectionRegionDialog
         set => _output = value?.Select(i => i < 0 ? 0 : i).ToList();
     }
 
-    public bool IsRoi { get; set; }
+    private List<int>? _outputRoi;
 
-    public SelectionRegionDialog()
+    public List<int>? OutputRoi
+    {
+        get => _outputRoi;
+        set => _outputRoi = value?.Select(i => i < 0 ? 0 : i).ToList();
+    }
+
+    public RecognitionTextDialog()
     {
         InitializeComponent();
         Task.Run(() =>
         {
             var image = MaaProcessor.Instance.GetBitmapImage();
-            Growls.Process(() => { UpdateImage(image); });
+            GrowlHelper.OnUIThread(() => { UpdateImage(image); });
         });
     }
 
@@ -41,18 +46,18 @@ public partial class SelectionRegionDialog
         ImageArea.Visibility = Visibility.Visible;
         image.Source = imageSource;
 
-        _originWidth = imageSource.PixelWidth;
-        _originHeight = imageSource.PixelHeight;
+        double imageWidth = imageSource.PixelWidth;
+        double imageHeight = imageSource.PixelHeight;
 
         double maxWidth = image.MaxWidth;
         double maxHeight = image.MaxHeight;
 
-        double widthRatio = maxWidth / _originWidth;
-        double heightRatio = maxHeight / _originHeight;
+        double widthRatio = maxWidth / imageWidth;
+        double heightRatio = maxHeight / imageHeight;
         _scaleRatio = Math.Min(widthRatio, heightRatio);
 
-        image.Width = _originWidth * _scaleRatio;
-        image.Height = _originHeight * _scaleRatio;
+        image.Width = imageWidth * _scaleRatio;
+        image.Height = imageHeight * _scaleRatio;
 
         SelectionCanvas.Width = image.Width;
         SelectionCanvas.Height = image.Height;
@@ -62,9 +67,7 @@ public partial class SelectionRegionDialog
     }
 
     private double _scaleRatio;
-    private double _originWidth;
-    private double _originHeight;
-
+    
     private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
     {
         var position = e.GetPosition(image);
@@ -103,7 +106,6 @@ public partial class SelectionRegionDialog
             Mouse.Capture(SelectionCanvas);
         }
     }
-
 
     private void Canvas_MouseMove(object sender, MouseEventArgs e)
     {
@@ -155,7 +157,6 @@ public partial class SelectionRegionDialog
             $"[ {(int)(x / _scaleRatio)}, {(int)(y / _scaleRatio)}, {(int)(w / _scaleRatio)}, {(int)(h / _scaleRatio)} ]";
     }
 
-
     private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
     {
         if (_selectionRectangle == null)
@@ -169,41 +170,26 @@ public partial class SelectionRegionDialog
     {
         if (_selectionRectangle == null)
         {
-            Growls.WarningGlobal("请选择一个区域");
+            GrowlHelper.WarningGlobal("请选择一个区域");
             return;
         }
 
-        var x = Canvas.GetLeft(_selectionRectangle) / _scaleRatio;
-        var y = Canvas.GetTop(_selectionRectangle) / _scaleRatio;
-        var w = _selectionRectangle.Width / _scaleRatio;
-        var h = _selectionRectangle.Height / _scaleRatio;
+        var x = (int)(Canvas.GetLeft(_selectionRectangle) / _scaleRatio);
+        var y = (int)(Canvas.GetTop(_selectionRectangle) / _scaleRatio);
+        var w = (int)(_selectionRectangle.Width / _scaleRatio);
+        var h = (int)(_selectionRectangle.Height / _scaleRatio);
 
-        // 显示 x, y, w, h 值，可以替换为其他处理逻辑
-        // Growl.InfoGlobal($"Roi: {x}, {y}, {w}, {h}");
-        Output = [(int)x, (int)y, (int)w, (int)h];
-        DialogResult = true;
-        IsRoi = SelectType.SelectedIndex == 0;
-        Close();
-    }
-
-    private void Load(object sender, RoutedEventArgs e)
-    {
-        OpenFileDialog openFileDialog = new OpenFileDialog
+        Output = [x, y, w, h];
+        if (image.Source is BitmapImage bitmapImage)
         {
-            Title = "LoadImageTitle".GetLocalizationString(), Filter = "ImageFilter".GetLocalizationString()
-        };
-
-        if (openFileDialog.ShowDialog().IsTrue())
-        {
-            try
-            {
-                BitmapImage bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
-                UpdateImage(bitmapImage);
-            }
-            catch (Exception ex)
-            {
-                ErrorView.ShowException(ex);
-            }
+            var roiX = Math.Max(x - 5, 0);
+            var roiY = Math.Max(y - 5, 0);
+            var roiW = Math.Min(w + 10, bitmapImage.PixelWidth - roiX);
+            var roiH = Math.Min(h + 10, bitmapImage.PixelHeight - roiY);
+            OutputRoi = [roiX, roiY, roiW, roiH];
         }
+
+        DialogResult = true;
+        Close();
     }
 }

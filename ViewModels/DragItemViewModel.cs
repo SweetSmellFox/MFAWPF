@@ -7,26 +7,17 @@ using Newtonsoft.Json;
 
 namespace MFAWPF.ViewModels;
 
-public class DragItemViewModel : ObservableObject
+public partial class DragItemViewModel : ViewModel
 {
     public DragItemViewModel(TaskInterfaceItem? interfaceItem)
     {
         InterfaceItem = interfaceItem;
         Name = interfaceItem?.Name ?? "未命名";
-        LanguageManager.LanguageChanged += OnLanguageChanged;
+        LanguageHelper.LanguageChanged += OnLanguageChanged;
     }
 
+    [ObservableProperty] private string _name = string.Empty;
 
-    private string _name = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the name.
-    /// </summary>
-    public string Name
-    {
-        get => _name;
-        set => SetProperty(ref _name, value);
-    }
 
     private bool? _isCheckedWithNull = false;
     private bool _isInitialized;
@@ -54,7 +45,7 @@ public class DragItemViewModel : ObservableObject
                 if (InterfaceItem != null)
                     InterfaceItem.Check = IsChecked;
                 DataSet.SetData("TaskItems",
-                    MainWindow.Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                    MainWindow.ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }
     }
@@ -96,7 +87,7 @@ public class DragItemViewModel : ObservableObject
             {
                 if (value.Name != null)
                     Name = value.Name;
-                SettingVisibility = value is { Option.Count: > 0 } || value.Repeatable.IsTrue() || value.Document != null && value.Document.Count >0
+                SettingVisibility = value is { Option.Count: > 0 } || value.Repeatable.IsTrue() || value.Document != null && value.Document.Count > 0
                     ? Visibility.Visible
                     : Visibility.Hidden;
                 if (value.Check.HasValue)
@@ -107,19 +98,14 @@ public class DragItemViewModel : ObservableObject
         }
     }
 
-    private Visibility _visibility = Visibility.Visible;
+    [ObservableProperty] private Visibility _settingVisibility = Visibility.Visible;
 
-    public Visibility SettingVisibility
-    {
-        get => _visibility;
-        set => SetProperty(ref _visibility, value);
-    }
 
     private void UpdateContent()
     {
         if (!string.IsNullOrEmpty(InterfaceItem?.Name))
         {
-            Name = LanguageManager.GetLocalizedString(Name);
+            Name = LanguageHelper.GetLocalizedString(Name);
         }
     }
 

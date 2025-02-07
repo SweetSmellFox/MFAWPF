@@ -44,7 +44,7 @@ namespace MFAWPF.Controls
         public CustomTextBlock()
         {
             UpdateText();
-            LanguageManager.LanguageChanged += OnLanguageChanged;
+            LanguageHelper.LanguageChanged += OnLanguageChanged;
         }
 
         private void UpdateText()

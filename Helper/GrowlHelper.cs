@@ -4,11 +4,11 @@ using HandyControl.Data;
 
 namespace MFAWPF.Utils;
 
-public static class Growls
+public static class GrowlHelper
 {
     public static void Warning(string message, string token = "")
     {
-        Process(() =>
+        OnUIThread(() =>
         {
             Growl.Warning(new GrowlInfo
             {
@@ -24,7 +24,7 @@ public static class Growls
 
     public static void WarningGlobal(string message, string token = "")
     {
-        Process(() =>
+        OnUIThread(() =>
         {
             Growl.InfoGlobal(new GrowlInfo
             {
@@ -40,7 +40,7 @@ public static class Growls
 
     public static void Error(string message, string token = "")
     {
-        Process(() =>
+        OnUIThread(() =>
         {
             Growl.Info(new GrowlInfo
             {
@@ -58,7 +58,7 @@ public static class Growls
 
     public static void ErrorGlobal(string message, string token = "")
     {
-        Process(() =>
+        OnUIThread(() =>
         {
             Growl.InfoGlobal(new GrowlInfo
             {
@@ -74,7 +74,7 @@ public static class Growls
     }
     public static void InfoGlobal(string message, string token = "")
     {
-        Process(() =>
+        OnUIThread(() =>
         {
             Growl.InfoGlobal(message);
         });
@@ -82,13 +82,13 @@ public static class Growls
 
     public static void Info(string message, string token = "")
     {
-        Process(() =>
+        OnUIThread(() =>
         {
             Growl.Info(message);
         });
     }
 
-    public static void Process(Action action)
+    public static void OnUIThread(Action action)
     {
         if (Application.Current.Dispatcher.CheckAccess())
             action();

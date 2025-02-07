@@ -11,7 +11,7 @@ public class MaaInterface
     {
         [JsonProperty("name")]
         public string? Name { get; set; }
-        
+
         [JsonProperty("pipeline_override")]
         public Dictionary<string, TaskModel>? PipelineOverride { get; set; }
 
@@ -124,14 +124,14 @@ public class MaaInterface
 
     [JsonProperty("mirrorchyan_rid")]
     public string? RID { get; set; }
-    
+
     [JsonProperty("name")]
     public string? Name { get; set; }
 
     [JsonProperty("version")]
     [JsonConverter(typeof(MaaResourceVersionConverter))]
     public string? Version { get; set; }
-    
+
     [JsonProperty("message")]
     public string? Message { get; set; }
 
@@ -146,7 +146,7 @@ public class MaaInterface
 
     [JsonProperty("lock_controller")]
     public bool? LockController { get; set; }
-    
+
     [JsonProperty("controller")]
     public List<MaaResourceController>? Controller { get; set; }
     [JsonProperty("resource")]
@@ -254,5 +254,70 @@ public class MaaInterface
         };
 
         return JsonConvert.SerializeObject(this, settings);
+    }
+
+    public static void Check()
+    {
+        if (!File.Exists($"{AppContext.BaseDirectory}/interface.json"))
+        {
+            LoggerService.LogInfo("未找到interface文件，生成interface.json...");
+            Instance = new MaaInterface
+                {
+                    Version = "1.0",
+                    Name = "Debug",
+                    Task = [],
+                    Resource =
+                    [
+                        new MaaInterface.MaaCustomResource
+                        {
+                            Name = "默认",
+                            Path =
+                            [
+                                "{PROJECT_DIR}/resource/base",
+                            ],
+                        },
+                    ],
+                    Controller =
+                    [
+                        new MaaInterface.MaaResourceController()
+                        {
+                            Name = "adb 默认方式",
+                            Type = "adb"
+                        },
+                    ],
+                    Option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
+                    {
+                        {
+                            "测试", new MaaInterface.MaaInterfaceOption()
+                            {
+                                Cases =
+                                [
+
+                                    new MaaInterface.MaaInterfaceOptionCase
+                                    {
+                                        Name = "测试1",
+                                        PipelineOverride = new Dictionary<string, TaskModel>()
+                                    },
+                                    new MaaInterface.MaaInterfaceOptionCase
+                                    {
+                                        Name = "测试2",
+                                        PipelineOverride = new Dictionary<string, TaskModel>()
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+                ;
+            JsonHelper.WriteToJsonFilePath(AppContext.BaseDirectory, "interface",
+                Instance, new MaaInterfaceSelectOptionConverter(true));
+        }
+        else
+        {
+            Instance =
+                JsonHelper.ReadFromJsonFilePath(AppContext.BaseDirectory, "interface",
+                    new MaaInterface(),
+                    () => { }, new MaaInterfaceSelectOptionConverter(false));
+        }
     }
 }

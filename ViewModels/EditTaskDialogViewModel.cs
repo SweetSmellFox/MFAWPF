@@ -12,15 +12,10 @@ using Newtonsoft.Json;
 
 namespace MFAWPF.ViewModels;
 
-public class EditTaskDialogViewModel : ObservableObject
+public partial class EditTaskDialogViewModel : ViewModel
 {
+    [ObservableProperty]
     private ObservableCollection<TaskItemViewModel>? _dataList;
-
-    public ObservableCollection<TaskItemViewModel>? DataList
-    {
-        get => _dataList;
-        set => SetProperty(ref _dataList, value);
-    }
 
     private ObservableCollection<TaskItemViewModel>? _colors;
 
@@ -46,15 +41,9 @@ public class EditTaskDialogViewModel : ObservableObject
         }
         set => SetProperty(ref _colors, value);
     }
-
+    [ObservableProperty]
     private int _selectedIndex;
-
-    public int SelectedIndex
-    {
-        get => _selectedIndex;
-        set =>
-            SetProperty(ref _selectedIndex, value);
-    }
+    
 
     public EditTaskDialog? Dialog;
     public readonly Stack<ICommand> UndoStack = new();
@@ -151,7 +140,7 @@ public class EditTaskDialogViewModel : ObservableObject
             }
             else
             {
-                Growls.ErrorGlobal("目前剪贴板中数据不可转换为文本");
+                GrowlHelper.ErrorGlobal("目前剪贴板中数据不可转换为文本");
             }
         }
     }

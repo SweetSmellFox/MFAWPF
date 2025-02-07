@@ -17,11 +17,11 @@ public static class DataSet
     {
         if (config == null || value == null) return;
         config[key] = value;
-        if (key == "LangIndex" && MainWindow.Data is not null)
-            MainWindow.Data.LanguageIndex = Convert.ToInt32(value);
+        if (key == "LangIndex" && MainWindow.ViewModel is not null)
+            SettingsView.ViewModel.LanguageIndex = Convert.ToInt32(value);
         var fileName = config == Data ? "config" : "maa_option";
         if (config == MaaConfig)
-            MainWindow.Data.IsDebugMode = MFAExtensions.IsDebugMode();
+            MainWindow.ViewModel.IsDebugMode = MFAExtensions.IsDebugMode();
         JsonHelper.WriteToConfigJsonFile(fileName, config, new MaaInterfaceSelectOptionConverter(false));
     }
 

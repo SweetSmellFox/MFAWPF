@@ -6,7 +6,7 @@ using WPFLocalizeExtension.Engine;
 
 namespace MFAWPF.Utils;
 
-public static class LanguageManager
+public static class LanguageHelper
 {
     public static event EventHandler? LanguageChanged;
 

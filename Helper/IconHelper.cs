@@ -3,7 +3,7 @@ using System.Windows.Media.Imaging;
 
 namespace MFAWPF.Utils;
 
-public class AppIcon
+public class IconHelper
 {
     private static readonly Lazy<BitmapSource> lazyIcon = new(ExtractIcon);
 
@@ -30,5 +30,5 @@ public class AppIcon
         }
     }
 
-    public static BitmapSource GetIcon() => lazyIcon.Value;
+    public static BitmapSource ICON => lazyIcon.Value;
 }

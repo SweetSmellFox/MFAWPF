@@ -37,7 +37,7 @@ public partial class SwipeDialog
         Task.Run(() =>
         {
             var image = MaaProcessor.Instance.GetBitmapImage();
-            Growls.Process(() => { UpdateImage(image); });
+            GrowlHelper.OnUIThread(() => { UpdateImage(image); });
         });
     }
 
@@ -155,7 +155,7 @@ public partial class SwipeDialog
     {
         if (_arrowLine == null)
         {
-            Growls.WarningGlobal("请选择一个区域");
+            GrowlHelper.WarningGlobal("请选择一个区域");
             return;
         }
 

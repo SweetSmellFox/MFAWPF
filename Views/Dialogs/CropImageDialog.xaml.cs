@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -9,10 +10,12 @@ using Microsoft.Win32;
 
 namespace MFAWPF.Views;
 
-public partial class ColorExtractionDialog
+public partial class CropImageDialog
 {
     private Point _startPoint;
     private Rectangle? _selectionRectangle;
+
+    public string? Output { get; set; }
     private List<int>? _outputRoi;
 
     public List<int>? OutputRoi
@@ -21,16 +24,14 @@ public partial class ColorExtractionDialog
         set => _outputRoi = value?.Select(i => i < 0 ? 0 : i).ToList();
     }
 
-    public List<int>? OutputUpper { get; set; }
-    public List<int>? OutputLower { get; set; }
 
-    public ColorExtractionDialog()
+    public CropImageDialog()
     {
         InitializeComponent();
         Task.Run(() =>
         {
             var image = MaaProcessor.Instance.GetBitmapImage();
-            Growls.Process(() => { UpdateImage(image); });
+            GrowlHelper.OnUIThread(() => { UpdateImage(image); });
         });
     }
 
@@ -42,18 +43,18 @@ public partial class ColorExtractionDialog
         ImageArea.Visibility = Visibility.Visible;
         image.Source = imageSource;
 
-        double imageWidth = imageSource.PixelWidth;
-        double imageHeight = imageSource.PixelHeight;
+        _originWidth = imageSource.PixelWidth;
+        _originHeight = imageSource.PixelHeight;
 
         double maxWidth = image.MaxWidth;
         double maxHeight = image.MaxHeight;
 
-        double widthRatio = maxWidth / imageWidth;
-        double heightRatio = maxHeight / imageHeight;
+        double widthRatio = maxWidth / _originWidth;
+        double heightRatio = maxHeight / _originHeight;
         _scaleRatio = Math.Min(widthRatio, heightRatio);
 
-        image.Width = imageWidth * _scaleRatio;
-        image.Height = imageHeight * _scaleRatio;
+        image.Width = _originWidth * _scaleRatio;
+        image.Height = _originHeight * _scaleRatio;
 
         SelectionCanvas.Width = image.Width;
         SelectionCanvas.Height = image.Height;
@@ -63,7 +64,8 @@ public partial class ColorExtractionDialog
     }
 
     private double _scaleRatio;
-    
+    private double _originWidth;
+    private double _originHeight;
 
     private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
     {
@@ -71,8 +73,7 @@ public partial class ColorExtractionDialog
         var canvasPosition = e.GetPosition(SelectionCanvas);
 
         // 判断点击是否在Image边缘5个像素内
-        if (canvasPosition.X < image.ActualWidth + 5 && canvasPosition.Y < image.ActualHeight + 5 &&
-            canvasPosition is { X: >= -5, Y: >= -5 })
+        if (canvasPosition.X < image.ActualWidth + 5 && canvasPosition.Y < image.ActualHeight + 5 && canvasPosition is { X: > -5, Y: > -5 })
         {
             if (_selectionRectangle != null)
             {
@@ -91,7 +92,10 @@ public partial class ColorExtractionDialog
             {
                 Stroke = Brushes.Red,
                 StrokeThickness = 2.5,
-                StrokeDashArray = { 2 }
+                StrokeDashArray =
+                {
+                    2
+                }
             };
 
             Canvas.SetLeft(_selectionRectangle, _startPoint.X);
@@ -103,6 +107,7 @@ public partial class ColorExtractionDialog
             Mouse.Capture(SelectionCanvas);
         }
     }
+
 
     private void Canvas_MouseMove(object sender, MouseEventArgs e)
     {
@@ -133,6 +138,7 @@ public partial class ColorExtractionDialog
             h = _startPoint.Y;
         }
 
+        // 确保矩形不会超出右边和下边
         if (x + w > SelectionCanvas.ActualWidth)
         {
             w = SelectionCanvas.ActualWidth - x;
@@ -153,6 +159,7 @@ public partial class ColorExtractionDialog
             $"[ {(int)(x / _scaleRatio)}, {(int)(y / _scaleRatio)}, {(int)(w / _scaleRatio)}, {(int)(h / _scaleRatio)} ]";
     }
 
+
     private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
     {
         if (_selectionRectangle == null)
@@ -166,24 +173,20 @@ public partial class ColorExtractionDialog
     {
         if (_selectionRectangle == null)
         {
-            Growls.WarningGlobal("请选择一个区域");
+            GrowlHelper.WarningGlobal("请选择一个区域");
             return;
         }
 
-        var x = Canvas.GetLeft(_selectionRectangle);
-        var y = Canvas.GetTop(_selectionRectangle);
-        var w = _selectionRectangle.Width;
-        var h = _selectionRectangle.Height;
+        var x = Canvas.GetLeft(_selectionRectangle) / _scaleRatio;
+        var y = Canvas.GetTop(_selectionRectangle) / _scaleRatio;
+        var w = _selectionRectangle.Width / _scaleRatio;
+        var h = _selectionRectangle.Height / _scaleRatio;
 
-        GetColorRange(Math.Round(x), Math.Round(y), Math.Round(w), Math.Round(h));
-        DialogResult = true;
-        Close();
+        SaveCroppedImage((int)x, (int)y, (int)w, (int)h);
     }
 
-    private void GetColorRange(double x, double y, double width, double height)
+    private void SaveCroppedImage(double x, double y, double width, double height)
     {
-        if (width < 1 || !double.IsNormal(width)) width = 1;
-        if (height < 1|| !double.IsNormal(height)) height = 1;
         // 创建BitmapImage对象
         if (image.Source is BitmapImage bitmapImage)
         {
@@ -191,39 +194,65 @@ public partial class ColorExtractionDialog
             var roiY = Math.Max(y - 5, 0);
             var roiW = Math.Min(width + 10, bitmapImage.PixelWidth - roiX);
             var roiH = Math.Min(height + 10, bitmapImage.PixelHeight - roiY);
+            OutputRoi = new List<int>
+            {
+                (int)roiX,
+                (int)roiY,
+                (int)roiW,
+                (int)roiH
+            };
+            // 创建WriteableBitmap对象并加载BitmapImage
             var writeableBitmap = new WriteableBitmap(bitmapImage);
 
-            OutputRoi = [(int)roiX, (int)roiY, (int)roiW, (int)roiH];
+            // 创建一个用于存储裁剪区域的矩形
+            var cropRect = new Int32Rect((int)x, (int)y, (int)width, (int)height);
 
-            var croppedBitmap =
-                new CroppedBitmap(writeableBitmap, new Int32Rect((int)x, (int)y, (int)width, (int)height));
+            // 创建一个字节数组来保存裁剪区域的像素数据
+            var croppedPixels = new byte[cropRect.Width * cropRect.Height * 4];
+            writeableBitmap.CopyPixels(cropRect, croppedPixels, cropRect.Width * 4, 0);
 
-            var pixels = new byte[(int)width * (int)height * 4];
-            croppedBitmap.CopyPixels(pixels, (int)width * 4, 0);
+            // 创建一个新的WriteableBitmap来保存裁剪后的图像
+            var croppedBitmap = new WriteableBitmap(cropRect.Width, cropRect.Height, 96, 96, PixelFormats.Bgra32, null);
+            croppedBitmap.WritePixels(new Int32Rect(0, 0, cropRect.Width, cropRect.Height), croppedPixels,
+                cropRect.Width * 4, 0);
 
-            int minR = 255, minG = 255, minB = 255;
-            int maxR = 0, maxG = 0, maxB = 0;
-
-            for (int i = 0; i < pixels.Length; i += 4)
+            var saveFileDialog = new SaveFileDialog
             {
-                int r = pixels[i + 2];
-                int g = pixels[i + 1];
-                int b = pixels[i];
+                Filter = "ImageFilter".GetLocalizationString(),
+                DefaultExt = "png"
+            };
 
-                if (r < minR) minR = r;
-                if (g < minG) minG = g;
-                if (b < minB) minB = b;
+            if (saveFileDialog.ShowDialog().IsTrue())
+            {
+                var encoder = GetEncoderByExtension(saveFileDialog.FileName);
+                encoder.Frames.Add(BitmapFrame.Create(croppedBitmap));
 
-                if (r > maxR) maxR = r;
-                if (g > maxG) maxG = g;
-                if (b > maxB) maxB = b;
+                using (var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
+                {
+                    encoder.Save(fileStream);
+                }
+
+                // 设置 Output 属性为保存的文件名和路径
+                Output = System.IO.Path.GetFileName(saveFileDialog.FileName);
+                DialogResult = true;
+                Close();
             }
+        }
+    }
 
-            var lower = new List<int> { minR, minG, minB };
-            var upper = new List<int> { maxR, maxG, maxB };
-            OutputUpper = upper;
-            OutputLower = lower;
-            // 输出颜色上下限值
+    private BitmapEncoder GetEncoderByExtension(string fileName)
+    {
+        var extension = System.IO.Path.GetExtension(fileName).ToLower();
+
+        switch (extension)
+        {
+            case ".jpg":
+            case ".jpeg":
+                return new JpegBitmapEncoder();
+            case ".bmp":
+                return new BmpBitmapEncoder();
+            default:
+                return new PngBitmapEncoder();
         }
     }
 
@@ -231,16 +260,36 @@ public partial class ColorExtractionDialog
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadImageTitle".GetLocalizationString(), Filter = "ImageFilter".GetLocalizationString()
+            Title = "LoadImageTitle".GetLocalizationString(),
+            Filter = "ImageFilter".GetLocalizationString()
         };
-
-
         if (openFileDialog.ShowDialog().IsTrue())
         {
             try
             {
                 BitmapImage bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
                 UpdateImage(bitmapImage);
+            }
+            catch (Exception ex)
+            {
+                ErrorView.ShowException(ex);
+            }
+        }
+    }
+    private void Select(object sender, RoutedEventArgs e)
+    {
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Title = "LoadImageTitle".GetLocalizationString(),
+            Filter = "ImageFilter".GetLocalizationString()
+        };
+        if (openFileDialog.ShowDialog().IsTrue())
+        {
+            try
+            {
+                Output = System.IO.Path.GetFileName(openFileDialog.FileName);
+                DialogResult = true;
+                Close();
             }
             catch (Exception ex)
             {

@@ -20,6 +20,8 @@ using MFAWPF.Data;
 using MFAWPF.Utils;
 using MFAWPF.Utils.Converters;
 using MFAWPF.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Toolkit.Uwp.Notifications;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -41,23 +43,24 @@ public partial class MainWindow
     public static MainWindow Instance { get; private set; }
     private readonly MaaToolkit _maaToolkit;
 
-    public static MainViewModel? Data { get; private set; }
+    public static ViewModels.MainViewModel ViewModel { get; set; }
 
     public static readonly string Version =
         $"v{Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "DEBUG"}";
 
     public Dictionary<string, TaskModel> TaskDictionary = new();
-
-    public MainWindow()
+    public MainWindow(ViewModels.MainViewModel viewModel)
     {
         DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
         DataSet.MaaConfig = JsonHelper.ReadFromConfigJsonFile("maa_option", new Dictionary<string, object>());
-        LanguageManager.Initialize();
+        LanguageHelper.Initialize();
         InitializeComponent();
+        ViewModel = viewModel;
         Instance = this;
+        DataContext = this;
         version.Text = Version;
-        Data = DataContext as MainViewModel;
         Loaded += (_, _) => { LoadUI(); };
+
         InitializeData();
         OCRHelper.Initialize();
         StateChanged += (_, _) =>
@@ -88,72 +91,12 @@ public partial class MainWindow
 
     public bool InitializeData()
     {
-        if (!File.Exists($"{AppContext.BaseDirectory}/interface.json"))
-        {
-            LoggerService.LogInfo("未找到interface文件，生成interface.json...");
-            MaaInterface.Instance = new MaaInterface
-                {
-                    Version = "1.0",
-                    Name = "Debug",
-                    Task = [],
-                    Resource =
-                    [
-                        new MaaInterface.MaaCustomResource
-                        {
-                            Name = "默认",
-                            Path =
-                            [
-                                "{PROJECT_DIR}/resource/base",
-                            ],
-                        },
-                    ],
-                    Controller =
-                    [
-                        new MaaInterface.MaaResourceController()
-                        {
-                            Name = "adb 默认方式",
-                            Type = "adb"
-                        },
-                    ],
-                    Option = new Dictionary<string, MaaInterface.MaaInterfaceOption>
-                    {
-                        {
-                            "测试", new MaaInterface.MaaInterfaceOption()
-                            {
-                                Cases =
-                                [
-
-                                    new MaaInterface.MaaInterfaceOptionCase
-                                    {
-                                        Name = "测试1",
-                                        PipelineOverride = new Dictionary<string, TaskModel>()
-                                    },
-                                    new MaaInterface.MaaInterfaceOptionCase
-                                    {
-                                        Name = "测试2",
-                                        PipelineOverride = new Dictionary<string, TaskModel>()
-                                    }
-                                ]
-                            }
-                        }
-                    }
-                }
-                ;
-            JsonHelper.WriteToJsonFilePath(AppContext.BaseDirectory, "interface",
-                MaaInterface.Instance, new MaaInterfaceSelectOptionConverter(true));
-        }
-        else
-        {
-            MaaInterface.Instance =
-                JsonHelper.ReadFromJsonFilePath(AppContext.BaseDirectory, "interface",
-                    new MaaInterface(),
-                    () => { }, new MaaInterfaceSelectOptionConverter(false));
-        }
-
+        MaaInterface.Check();
+        
         if (MaaInterface.Instance != null)
         {
             AppendVersionLog(MaaInterface.Instance.Version);
-            Data?.TasksSource.Clear();
+            ViewModel?.TasksSource.Clear();
             LoadTasks(MaaInterface.Instance.Task ?? new List<TaskInterfaceItem>());
         }
 
@@ -185,20 +128,20 @@ public partial class MainWindow
                 FirstTask = false;
             }
 
-            Data?.TasksSource.Add(dragItem);
+            ViewModel?.TasksSource.Add(dragItem);
         }
 
-        if (Data?.TaskItemViewModels.Count == 0)
+        if (ViewModel?.TaskItemViewModels.Count == 0)
         {
             var items = DataSet.GetData("TaskItems",
                     new List<TaskInterfaceItem>())
                 ?? new List<TaskInterfaceItem>();
             var dragItemViewModels = items.Select(interfaceItem => new DragItemViewModel(interfaceItem)).ToList();
-            Data.TaskItemViewModels.AddRange(dragItemViewModels);
-            if (Data.TaskItemViewModels.Count == 0 && Data.TasksSource.Count != 0)
+            ViewModel.TaskItemViewModels.AddRange(dragItemViewModels);
+            if (ViewModel.TaskItemViewModels.Count == 0 && ViewModel.TasksSource.Count != 0)
             {
-                foreach (var item in Data.TasksSource)
-                    Data.TaskItemViewModels.Add(item);
+                foreach (var item in ViewModel.TasksSource)
+                    ViewModel.TaskItemViewModels.Add(item);
             }
         }
     }
@@ -215,10 +158,10 @@ public partial class MainWindow
 
     public void ToggleTaskButtonsVisibility(bool isRunning)
     {
-        Growls.Process(() =>
+        GrowlHelper.OnUIThread(() =>
         {
-            if (Data is not null)
-                Data.IsRunning = isRunning;
+            if (ViewModel is not null)
+                ViewModel.IsRunning = isRunning;
             // startButton.Visibility = isRunning ? Visibility.Collapsed : Visibility.Visible;
             // startButton.IsEnabled = !isRunning;
             // stopButton.Visibility = isRunning ? Visibility.Visible : Visibility.Collapsed;
@@ -229,7 +172,7 @@ public partial class MainWindow
     protected override void OnClosing(CancelEventArgs e)
     {
         e.Cancel = !ConfirmExit();
-        DataSet.SetData("TaskItems", Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+        DataSet.SetData("TaskItems", ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         base.OnClosed(e);
     }
 
@@ -282,7 +225,7 @@ public partial class MainWindow
                         {
                             if (!taskDictionaryA.TryAdd(task.Key, task.Value))
                             {
-                                Growls.Error(string.Format(
+                                GrowlHelper.Error(string.Format(
                                     LocExtension.GetLocalizedValue<string>("DuplicateTaskError"), task.Key));
                                 return false;
                             }
@@ -343,7 +286,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            Growls.Error(string.Format(LocExtension.GetLocalizedValue<string>("PipelineLoadError"),
+            GrowlHelper.Error(string.Format(LocExtension.GetLocalizedValue<string>("PipelineLoadError"),
                 ex.Message));
             Console.WriteLine(ex);
             LoggerService.LogError(ex);
@@ -379,7 +322,7 @@ public partial class MainWindow
             {
                 if (!taskDictionary.ContainsKey(task))
                 {
-                    Growls.Error(string.Format(LocExtension.GetLocalizedValue<string>("TaskNotFoundError"),
+                    GrowlHelper.Error(string.Format(LocExtension.GetLocalizedValue<string>("TaskNotFoundError"),
                         name, task));
                 }
             }
@@ -415,15 +358,15 @@ public partial class MainWindow
 
     public void Start(bool onlyStart = false)
     {
-        if (Data?.Idle == false)
+        if (ViewModel?.Idle == false)
         {
-            Growls.Warning("CannotStart".GetLocalizationString());
+            GrowlHelper.Warning("CannotStart".GetLocalizationString());
             return;
         }
         if (InitializeData())
         {
             MaaProcessor.Money = 0;
-            var tasks = Data?.TaskItemViewModels.ToList().FindAll(task => task.IsChecked);
+            var tasks = ViewModel?.TaskItemViewModels.ToList().FindAll(task => task.IsChecked);
             ConnectToMAA();
             MaaProcessor.Instance.Start(tasks, onlyStart);
         }
@@ -438,9 +381,9 @@ public partial class MainWindow
 
     private async void ConnectionTabControlOnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (Data is not null)
+        if (ViewModel is not null)
         {
-            Data.IsAdb = adbTab.IsSelected;
+            ViewModel.IsAdb = adbTab.IsSelected;
             btnCustom.Visibility = adbTab.IsSelected ? Visibility.Visible : Visibility.Collapsed;
         }
 
@@ -538,14 +481,14 @@ public partial class MainWindow
     {
         try
         {
-            Growl.Info((Data?.IsAdb).IsTrue()
+            Growl.Info((ViewModel?.IsAdb).IsTrue()
                 ? LocExtension.GetLocalizedValue<string>("EmulatorDetectionStarted")
                 : LocExtension.GetLocalizedValue<string>("WindowDetectionStarted"));
             SetConnected(false);
-            if ((Data?.IsAdb).IsTrue())
+            if ((ViewModel?.IsAdb).IsTrue())
             {
                 var devices = _maaToolkit.AdbDevice.Find();
-                Growls.Process(() => deviceComboBox.ItemsSource = devices);
+                GrowlHelper.OnUIThread(() => deviceComboBox.ItemsSource = devices);
                 SetConnected(devices.Count > 0);
                 var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
                 var resultIndex = 0;
@@ -568,7 +511,7 @@ public partial class MainWindow
                 }
                 else
                     resultIndex = 0;
-                Growls.Process(() => deviceComboBox.SelectedIndex = resultIndex);
+                GrowlHelper.OnUIThread(() => deviceComboBox.SelectedIndex = resultIndex);
                 if (MaaInterface.Instance?.Controller != null)
                 {
                     if (MaaInterface.Instance.Controller.Any(controller => controller.Type != null && controller.Type.ToLower().Equals("adb")))
@@ -629,7 +572,7 @@ public partial class MainWindow
             else
             {
                 var windows = _maaToolkit.Desktop.Window.Find().ToList();
-                Growls.Process(() =>deviceComboBox.ItemsSource = windows);
+                GrowlHelper.OnUIThread(() => deviceComboBox.ItemsSource = windows);
                 SetConnected(windows.Count > 0);
                 var resultIndex = windows.Count > 0
                     ? windows.ToList().FindIndex(win => !string.IsNullOrWhiteSpace(win.Name))
@@ -695,20 +638,20 @@ public partial class MainWindow
                         }
                     }
                 }
-                Growls.Process(() => deviceComboBox.SelectedIndex = resultIndex);
+                GrowlHelper.OnUIThread(() => deviceComboBox.SelectedIndex = resultIndex);
             }
 
             if (!IsConnected())
             {
-                Growl.Info((Data?.IsAdb).IsTrue()
+                Growl.Info((ViewModel?.IsAdb).IsTrue()
                     ? LocExtension.GetLocalizedValue<string>("NoEmulatorFound")
                     : LocExtension.GetLocalizedValue<string>("NoWindowFound"));
             }
         }
         catch (Exception ex)
         {
-            Growls.Warning(string.Format(LocExtension.GetLocalizedValue<string>("TaskStackError"),
-                (Data?.IsAdb).IsTrue() ? "Emulator".GetLocalizationString() : "Window".GetLocalizationString(),
+            GrowlHelper.Warning(string.Format(LocExtension.GetLocalizedValue<string>("TaskStackError"),
+                (ViewModel?.IsAdb).IsTrue() ? "Emulator".GetLocalizationString() : "Window".GetLocalizationString(),
                 ex.Message));
             SetConnected(false);
             LoggerService.LogError(ex);
@@ -780,144 +723,65 @@ public partial class MainWindow
         settingPanel.Children.Add(sv1);
     }
 
-    private void AddSwitchConfiguration(Panel? panel = null, int defaultValue = 0)
-    {
-        panel ??= settingPanel;
-        var comboBox = new ComboBox
-        {
-            Style = FindResource("ComboBoxExtend") as Style,
-            Margin = new Thickness(5)
-        };
-        string configPath = Path.Combine(Environment.CurrentDirectory, "config");
-        foreach (string file in Directory.GetFiles(configPath))
-        {
-            string fileName = Path.GetFileName(file);
-            if (fileName.EndsWith(".json") && fileName != "maa_option.json")
-            {
-                comboBox.Items.Add(fileName);
-            }
-        }
+    // private void AddSwitchConfiguration(Panel? panel = null, int defaultValue = 0)
+    // {
+    //     panel ??= settingPanel;
+    //     var comboBox = new ComboBox
+    //     {
+    //         Style = FindResource("ComboBoxExtend") as Style,
+    //         Margin = new Thickness(5)
+    //     };
+    //     string configPath = Path.Combine(Environment.CurrentDirectory, "config");
+    //     foreach (string file in Directory.GetFiles(configPath))
+    //     {
+    //         string fileName = Path.GetFileName(file);
+    //         if (fileName.EndsWith(".json") && fileName != "maa_option.json")
+    //         {
+    //             comboBox.Items.Add(fileName);
+    //         }
+    //     }
+    //
+    //
+    //     comboBox.BindLocalization("SwitchConfiguration");
+    //     comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+    //
+    //     comboBox.SelectionChanged += (sender, _) =>
+    //     {
+    //         string selectedItem = (string)comboBox.SelectedItem;
+    //         if (selectedItem == "config.json")
+    //         {
+    //             //
+    //         }
+    //         // else if (selectedItem == "maa_option.json")
+    //         // {
+    //         //     // 什么都不做，等待后续添加逻辑
+    //         // }
+    //         else if (selectedItem == "config.json.bak")
+    //         {
+    //             string _currentFile = Path.Combine(configPath, "config.json");
+    //             string _selectedItem = Path.Combine(configPath, "config.json.bak");
+    //             string _bakContent = File.ReadAllText(_selectedItem);
+    //             File.WriteAllText(_currentFile, _bakContent);
+    //             RestartMFA();
+    //         }
+    //         else
+    //         {
+    //             // 恢复成绝对路径
+    //             string _currentFile = Path.Combine(configPath, "config.json");
+    //             string _selectedItem = Path.Combine(configPath, selectedItem);
+    //             SwapFiles(_currentFile, _selectedItem);
+    //             RestartMFA();
+    //         }
+    //     };
+    //     // comboBox.SelectedIndex = DataSet.GetData("SwitchConfigurationIndex", defaultValue);
+    //     panel.Children.Add(comboBox);
+    // }
 
 
-        comboBox.BindLocalization("SwitchConfiguration");
-        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-
-        comboBox.SelectionChanged += (sender, _) =>
-        {
-            string selectedItem = (string)comboBox.SelectedItem;
-            if (selectedItem == "config.json")
-            {
-                //
-            }
-            // else if (selectedItem == "maa_option.json")
-            // {
-            //     // 什么都不做，等待后续添加逻辑
-            // }
-            else if (selectedItem == "config.json.bak")
-            {
-                string _currentFile = Path.Combine(configPath, "config.json");
-                string _selectedItem = Path.Combine(configPath, "config.json.bak");
-                string _bakContent = File.ReadAllText(_selectedItem);
-                File.WriteAllText(_currentFile, _bakContent);
-                RestartMFA();
-            }
-            else
-            {
-                // 恢复成绝对路径
-                string _currentFile = Path.Combine(configPath, "config.json");
-                string _selectedItem = Path.Combine(configPath, selectedItem);
-                SwapFiles(_currentFile, _selectedItem);
-                RestartMFA();
-            }
-        };
-        // comboBox.SelectedIndex = DataSet.GetData("SwitchConfigurationIndex", defaultValue);
-        panel.Children.Add(comboBox);
-    }
-
-    private void SwapFiles(string file1Path, string file2Path)
-    {
-        // 备份文件
-        string backupFilePath = $"{file1Path}.bak";
-        File.Copy(file1Path, backupFilePath, true);
-
-        // 读取文件内容
-        string file1Content = File.ReadAllText(file1Path);
-        string file2Content = File.ReadAllText(file2Path);
-
-        // 只更换 config.json 的内容
-        File.WriteAllText(file1Path, file2Content);
-    }
-
-    private void RestartMFA()
+    public void RestartMFA()
     {
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
-        Growls.Process(Application.Current.Shutdown);
-    }
-
-
-    private void AddAbout()
-    {
-        StackPanel s1 = new()
-            {
-                Orientation = Orientation.Horizontal,
-                Margin = new Thickness(3),
-                HorizontalAlignment = HorizontalAlignment.Center
-            },
-            s2 = new()
-            {
-                Orientation = Orientation.Horizontal,
-                Margin = new Thickness(3),
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-        var t1 = new TextBlock
-        {
-            VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(2),
-            HorizontalAlignment = HorizontalAlignment.Center
-        };
-        t1.BindLocalization("ProjectLink", TextBlock.TextProperty);
-        s1.Children.Add(t1);
-        s1.Children.Add(new Shield
-        {
-            Status = "MFAWPF",
-            Subject = "Github",
-            Margin = new Thickness(2),
-            HorizontalAlignment = HorizontalAlignment.Center,
-            Command = ControlCommands.OpenLink,
-            CommandParameter = "https://github.com/SweetSmellFox/MFAWPF"
-        });
-        var resourceLink = MaaInterface.Instance?.Url;
-        if (!string.IsNullOrWhiteSpace(resourceLink))
-        {
-            var t2 = new TextBlock
-            {
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(2)
-            };
-            t2.BindLocalization("ResourceLink", TextBlock.TextProperty);
-            s2.Children.Add(t2);
-            s2.Children.Add(new Shield
-            {
-                Status = MaaInterface.Instance?.Name ?? "Resource",
-                Subject = "Github",
-                Margin = new Thickness(2),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                Command = ControlCommands.OpenLink,
-                CommandParameter = resourceLink
-            });
-        }
-        settingsView.MFAShieldTextBlock.Text = Version;
-        var resourceVersion = MaaInterface.Instance?.Version;
-        if (!string.IsNullOrWhiteSpace(resourceVersion))
-        {
-            settingsView.ResourceShieldTextBlock.Text = resourceVersion;
-        }
-        else
-        {
-            settingsView.ResourceShield.Visibility = Visibility.Collapsed;
-        }
-        settingsView.settingStackPanel.Children.Add(s1);
-        settingsView.settingStackPanel.Children.Add(s2);
+        GrowlHelper.OnUIThread(Application.Current.Shutdown);
     }
 
     private void AddResourcesOption(Panel? panel = null, int defaultValue = 0)
@@ -933,7 +797,7 @@ public partial class MainWindow
 
         var binding = new Binding("Idle")
         {
-            Source = Data,
+            Source = ViewModel,
             Mode = BindingMode.OneWay
         };
         comboBox.SetBinding(IsEnabledProperty, binding);
@@ -948,7 +812,7 @@ public partial class MainWindow
             {
                 var o = new MaaInterface.MaaCustomResource
                 {
-                    Name = LanguageManager.GetLocalizedString(VARIABLE.Name),
+                    Name = LanguageHelper.GetLocalizedString(VARIABLE.Name),
                     Path = VARIABLE.Path
                 };
                 a.Add(o);
@@ -989,7 +853,7 @@ public partial class MainWindow
         comboBox.Items.Add(followSystem);
         var binding = new Binding("Idle")
         {
-            Source = Data,
+            Source = ViewModel,
             Mode = BindingMode.OneWay
         };
         comboBox.SetBinding(IsEnabledProperty, binding);
@@ -1026,82 +890,6 @@ public partial class MainWindow
             ThemeHelper.IsLightTheme() ? ApplicationTheme.Light : ApplicationTheme.Dark;
     }
 
-    private void AddLanguageOption(Panel? panel = null, int defaultValue = 0)
-    {
-        panel ??= settingPanel;
-        var comboBox = new ComboBox
-        {
-            Style = FindResource("ComboBoxExtend") as Style,
-            Margin = new Thickness(5),
-            DisplayMemberPath = "Name",
-        };
-
-        comboBox.ItemsSource = LanguageManager.SupportedLanguages;
-
-        var binding = new Binding("Idle")
-        {
-            Source = Data,
-            Mode = BindingMode.OneWay
-        };
-
-        comboBox.SetBinding(IsEnabledProperty, binding);
-        comboBox.BindLocalization("LanguageOption");
-        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-
-        comboBox.SelectionChanged += (sender, _) =>
-        {
-            if ((sender as ComboBox)?.SelectedItem is LanguageManager.SupportedLanguage language)
-                LanguageManager.ChangeLanguage(language);
-            DataSet.SetData("LangIndex", (sender as ComboBox)?.SelectedIndex ?? 0);
-        };
-
-        comboBox.SelectedIndex = DataSet.GetData("LangIndex", defaultValue);
-        panel.Children.Add(comboBox);
-    }
-
-    private void SetSettingOption(ComboBox? comboBox,
-        string titleKey,
-        IEnumerable<string> options,
-        string datatype,
-        int defaultValue = 0)
-    {
-        comboBox.SelectedIndex = DataSet.GetData(datatype, defaultValue);
-        comboBox.ItemsSource = options;
-        comboBox.BindLocalization(titleKey);
-        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
-        comboBox.SelectionChanged += (sender, _) =>
-        {
-            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-            DataSet.SetData(datatype, index);
-            MaaProcessor.Instance.SetCurrentTasker();
-        };
-    }
-
-    private void SetBindSettingOption(ComboBox? comboBox,
-        string titleKey,
-        IEnumerable<string> options,
-        string datatype,
-        int defaultValue = 0)
-
-    {
-        comboBox.SelectedIndex = DataSet.GetData(datatype, defaultValue);
-
-        foreach (var s in options)
-        {
-            var comboBoxItem = new ComboBoxItem();
-            comboBoxItem.BindLocalization(s, ContentProperty);
-            comboBox.Items.Add(comboBoxItem);
-        }
-
-        comboBox.BindLocalization(titleKey);
-        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
-        comboBox.SelectionChanged += (sender, _) =>
-        {
-            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-            DataSet.SetData(datatype, index);
-            MaaProcessor.Instance.SetCurrentTasker();
-        };
-    }
 
     private void AddStartEmulatorOption(Panel? panel = null)
     {
@@ -1131,7 +919,7 @@ public partial class MainWindow
         //     Style = FindResource("ComboBoxExtend") as Style,
         //     Margin = new Thickness(5),
         //     DisplayMemberPath = "Name",
-        //     ItemsSource = new List<SettingViewModel>
+        //     ItemsSource = new List<LocalizationViewModel>
         //     {
         //         new("General"),
         //         new("BlueStacks"),
@@ -1144,13 +932,13 @@ public partial class MainWindow
         // var cBinding = new CalcBinding.Binding
         // {
         //     Path = "IsAdb",
-        //     Source = Data,
+        //     Source = ViewModel,
         // };
         // comboBox.ItemsSource = LanguageManager.SupportedLanguages;
         //
         // var binding = new Binding("Idle")
         // {
-        //     Source = Data,
+        //     Source = ViewModel,
         //     Mode = BindingMode.OneWay
         // };
         //
@@ -1174,7 +962,7 @@ public partial class MainWindow
     private void AddIntroduction(Panel? panel = null, string input = "")
     {
         panel ??= settingPanel;
-        input = LanguageManager.GetLocalizedString(input);
+        input = LanguageHelper.GetLocalizedString(input);
         RichTextBox richTextBox = new RichTextBox
         {
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
@@ -1282,7 +1070,7 @@ public partial class MainWindow
             DisplayMemberPath = "Name"
         };
 
-        comboBox.ItemsSource = Data.BeforeTaskList;
+        comboBox.ItemsSource = ViewModel.BeforeTaskList;
         comboBox.BindLocalization("AutoStartOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
         comboBox.SelectedIndex = DataSet.GetData("AutoStartIndex", defaultValue);
@@ -1291,7 +1079,7 @@ public partial class MainWindow
         {
             var index = (sender as ComboBox)?.SelectedIndex ?? 0;
             DataSet.SetData("AutoStartIndex", index);
-            Data.BeforeTask = Data.BeforeTaskList[index].Name;
+            ViewModel.BeforeTask = ViewModel.BeforeTaskList[index].Name;
         };
 
 
@@ -1307,7 +1095,7 @@ public partial class MainWindow
             Margin = new Thickness(5),
             DisplayMemberPath = "Name"
         };
-        comboBox.ItemsSource = Data.AfterTaskList;
+        comboBox.ItemsSource = ViewModel.AfterTaskList;
 
         comboBox.BindLocalization("AfterTaskOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
@@ -1316,25 +1104,19 @@ public partial class MainWindow
         {
             var index = (sender as ComboBox)?.SelectedIndex ?? 0;
             DataSet.SetData("AfterTaskIndex", index);
-            Data.AfterTask = Data.AfterTaskList[index].Name;
+            ViewModel.AfterTask = ViewModel.AfterTaskList[index].Name;
         };
 
         panel.Children.Add(comboBox);
     }
 
-    private void SetRememberAdbOption(CheckBox? checkBox)
-    {
-        checkBox.IsChecked = DataSet.GetData("RememberAdb", true);
-        checkBox.BindLocalization("RememberAdb", ContentProperty);
-        checkBox.Click += (_, _) => { DataSet.SetData("RememberAdb", checkBox.IsChecked); };
-    }
 
     private void AddStartSettingOption(Panel? panel = null)
     {
         panel ??= settingPanel;
         // var binding = new Binding("Idle")
         // {
-        //     Source = Data,
+        //     Source = ViewModel,
         //     Mode = BindingMode.OneWay
         // };
         // checkBox.SetBinding(IsEnabledProperty, binding);
@@ -1474,7 +1256,7 @@ public partial class MainWindow
                 {
                     foreach (var VARIABLE in interfaceOption.Cases)
                     {
-                        VARIABLE.Name = LanguageManager.GetLocalizedString(VARIABLE.Name);
+                        VARIABLE.Name = LanguageHelper.GetLocalizedString(VARIABLE.Name);
                     }
                 }
 
@@ -1498,13 +1280,13 @@ public partial class MainWindow
                 });
                 multiBinding.Bindings.Add(new Binding("Idle")
                 {
-                    Source = Data
+                    Source = ViewModel
                 });
 
                 comboBox.SetBinding(IsEnabledProperty, multiBinding);
 
                 comboBox.ItemsSource = interfaceOption.Cases;
-        
+
                 comboBox.Tag = option.Name;
 
                 comboBox.SelectionChanged += (_, _) =>
@@ -1512,9 +1294,9 @@ public partial class MainWindow
                     option.Index = comboBox.SelectedIndex;
 
                     DataSet.SetData("TaskItems",
-                        Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                        ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                 };
-                
+
                 if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase) && interfaceOption.Cases != null)
                 {
                     var index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
@@ -1523,7 +1305,7 @@ public partial class MainWindow
                         comboBox.SelectedIndex = index;
                     }
                 }
-                
+
                 comboBox.SetValue(ToolTipProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitleProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
@@ -1559,7 +1341,7 @@ public partial class MainWindow
             });
             multiBinding.Bindings.Add(new Binding("Idle")
             {
-                Source = Data
+                Source = ViewModel
             });
 
             numericUpDown.SetBinding(ComboBox.IsEnabledProperty, multiBinding);
@@ -1569,7 +1351,7 @@ public partial class MainWindow
             {
                 source.InterfaceItem.RepeatCount = Convert.ToInt16(numericUpDown.Value);
                 DataSet.SetData("TaskItems",
-                    Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                    ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             };
             numericUpDown.BindLocalization("RepeatOption");
             numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
@@ -1594,42 +1376,42 @@ public partial class MainWindow
     {
         if (!IsConnected())
         {
-            Growls.Warning(
-                "Warning_CannotConnect".GetLocalizedFormattedString((Data?.IsAdb).IsTrue()
+            GrowlHelper.Warning(
+                "Warning_CannotConnect".GetLocalizedFormattedString((ViewModel?.IsAdb).IsTrue()
                     ? "Emulator".GetLocalizationString()
                     : "Window".GetLocalizationString()));
             return;
         }
 
         TaskDialog?.Show();
-        if (Data != null)
-            Data.Idle = false;
+        if (ViewModel != null)
+            ViewModel.Idle = false;
     }
 
     private void SelectAll(object sender, RoutedEventArgs e)
     {
-        if (Data == null) return;
-        foreach (var task in Data.TaskItemViewModels)
+        if (ViewModel == null) return;
+        foreach (var task in ViewModel.TaskItemViewModels)
             task.IsChecked = true;
     }
 
     private void SelectNone(object sender, RoutedEventArgs e)
     {
-        if (Data == null) return;
-        foreach (var task in Data.TaskItemViewModels)
+        if (ViewModel == null) return;
+        foreach (var task in ViewModel.TaskItemViewModels)
             task.IsChecked = false;
     }
 
     private void Add(object sender, RoutedEventArgs e)
     {
-        if (Data != null)
-            Data.Idle = false;
-        var addTaskDialog = new AddTaskDialog(Data?.TasksSource);
+        if (ViewModel != null)
+            ViewModel.Idle = false;
+        var addTaskDialog = new AddTaskDialog(ViewModel?.TasksSource);
         addTaskDialog.ShowDialog();
         if (addTaskDialog.OutputContent != null)
         {
-            Data?.TaskItemViewModels.Add(addTaskDialog.OutputContent.Clone());
-            DataSet.SetData("TaskItems", Data?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+            ViewModel?.TaskItemViewModels.Add(addTaskDialog.OutputContent.Clone());
+            DataSet.SetData("TaskItems", ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         }
     }
 
@@ -1641,7 +1423,7 @@ public partial class MainWindow
 
     private void ConfigureMaaProcessorForADB()
     {
-        if ((Data?.IsAdb).IsTrue())
+        if ((ViewModel?.IsAdb).IsTrue())
         {
             var adbInputType = ConfigureAdbInputTypes();
             var adbScreenCapType = ConfigureAdbScreenCapTypes();
@@ -1656,7 +1438,7 @@ public partial class MainWindow
 
     public string ScreenshotType()
     {
-        if ((Data?.IsAdb).IsTrue())
+        if ((ViewModel?.IsAdb).IsTrue())
             return ConfigureAdbScreenCapTypes().ToString();
         return ConfigureWin32ScreenCapTypes().ToString();
     }
@@ -1691,7 +1473,7 @@ public partial class MainWindow
 
     private void ConfigureMaaProcessorForWin32()
     {
-        if (!(Data?.IsAdb).IsTrue())
+        if (!(ViewModel?.IsAdb).IsTrue())
         {
             var win32InputType = ConfigureWin32InputTypes();
             var winScreenCapType = ConfigureWin32ScreenCapTypes();
@@ -1733,19 +1515,19 @@ public partial class MainWindow
         ContextMenu? contextMenu = menuItem?.Parent as ContextMenu;
         if (contextMenu?.PlacementTarget is Grid item)
         {
-            if (item.DataContext is DragItemViewModel taskItemViewModel && Data != null)
+            if (item.DataContext is DragItemViewModel taskItemViewModel && ViewModel != null)
             {
                 // 获取选中项的索引
-                int index = Data.TaskItemViewModels.IndexOf(taskItemViewModel);
-                Data.TaskItemViewModels.RemoveAt(index);
-                DataSet.SetData("TaskItems", Data.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                int index = ViewModel.TaskItemViewModels.IndexOf(taskItemViewModel);
+                ViewModel.TaskItemViewModels.RemoveAt(index);
+                DataSet.SetData("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }
     }
 
     public void ShowResourceName(string name)
     {
-        Growls.Process(() =>
+        GrowlHelper.OnUIThread(() =>
         {
             resourceName.Visibility = Visibility.Visible;
             resourceNameText.Visibility = Visibility.Visible;
@@ -1755,7 +1537,7 @@ public partial class MainWindow
 
     public void ShowResourceVersion(string v)
     {
-        Growls.Process(() =>
+        GrowlHelper.OnUIThread(() =>
         {
             resourceVersion.Visibility = Visibility.Visible;
             resourceVersionText.Visibility = Visibility.Visible;
@@ -1765,7 +1547,7 @@ public partial class MainWindow
 
     public void ShowCustomTitle(string v)
     {
-        Growls.Process(() =>
+        GrowlHelper.OnUIThread(() =>
         {
             title.Visibility = Visibility.Collapsed;
             version.Visibility = Visibility.Collapsed;
@@ -1779,7 +1561,7 @@ public partial class MainWindow
 
     public void LoadUI()
     {
-        Growls.Process(() =>
+        GrowlHelper.OnUIThread(() =>
         {
             InitializationSettings();
             ConnectionTabControl.SelectedIndex = MaaInterface.Instance?.DefaultController == "win32" ? 1 : 0;
@@ -1796,7 +1578,7 @@ public partial class MainWindow
             }
             else
             {
-                if (Data?.IsAdb == true && DataSet.GetData("RememberAdb", true) && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) && DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
+                if (ViewModel?.IsAdb == true && DataSet.GetData("RememberAdb", true) && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) && DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
                 {
                     var settings = new JsonSerializerSettings();
                     settings.Converters.Add(new AdbInputMethodsConverter());
@@ -1805,7 +1587,7 @@ public partial class MainWindow
                     var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
                     if (device != null)
                     {
-                        Growls.Process(() =>
+                        GrowlHelper.OnUIThread(() =>
                         {
                             deviceComboBox.ItemsSource = new List<AdbDeviceInfo>
                             {
@@ -1818,14 +1600,14 @@ public partial class MainWindow
                 }
             }
             ConnectionTabControl.SelectionChanged += ConnectionTabControlOnSelectionChanged;
-            if (Data != null)
-                Data.NotLock = MaaInterface.Instance?.LockController != true;
+            if (ViewModel != null)
+                ViewModel.NotLock = MaaInterface.Instance?.LockController != true;
             ConnectSettingButton.IsChecked = true;
             var value = DataSet.GetData("EnableEdit", false);
             if (!value)
                 EditButton.Visibility = Visibility.Collapsed;
             DataSet.SetData("EnableEdit", value);
-            Data.IsDebugMode = MFAExtensions.IsDebugMode();
+            ViewModel.IsDebugMode = MFAExtensions.IsDebugMode();
             if (!string.IsNullOrWhiteSpace(MaaInterface.Instance?.Message))
             {
                 Growl.Info(MaaInterface.Instance.Message);
@@ -1837,7 +1619,7 @@ public partial class MainWindow
         TaskManager.RunTaskAsync(async () =>
         {
             await Task.Delay(1000);
-            Growls.Process(() =>
+            GrowlHelper.OnUIThread(() =>
             {
                 if (DataSet.GetData("AutoMinimize", false))
                 {
@@ -1890,7 +1672,7 @@ public partial class MainWindow
         string weight = "Regular",
         bool showTime = true)
     {
-        Data?.AddLog(content, color, weight, showTime);
+        ViewModel?.AddLog(content, color, weight, showTime);
     }
 
     public static void AddLog(string content,
@@ -1898,12 +1680,12 @@ public partial class MainWindow
         string weight = "Regular",
         bool showTime = true)
     {
-        Data?.AddLog(content, color, weight, showTime);
+        ViewModel?.AddLog(content, color, weight, showTime);
     }
 
     public static void AddLogByKey(string key, Brush? color = null, params string[]? formatArgsKeys)
     {
-        Data?.AddLogByKey(key, color, formatArgsKeys);
+        ViewModel?.AddLogByKey(key, color, formatArgsKeys);
     }
 
     public void RunScript(string str = "Prescript")
@@ -1992,225 +1774,9 @@ public partial class MainWindow
 
     private void InitializationSettings()
     {
-        settingsView.MinimizeToTrayCheckBox.IsChecked = DataSet.GetData("ShouldMinimizeToTray", true);
-        settingsView.MinimizeToTrayCheckBox.Checked += (_, _) => { DataSet.SetData("ShouldMinimizeToTray", true); };
-        settingsView.MinimizeToTrayCheckBox.Unchecked += (_, _) => { DataSet.SetData("ShouldMinimizeToTray", false); };
+        var settingsView = App.Services.GetRequiredService<SettingsView>();
 
-        //语言设置
-
-        settingsView.languageSettings.ItemsSource = LanguageManager.SupportedLanguages;
-        settingsView.languageSettings.DisplayMemberPath = "Name";
-        settingsView.languageSettings.BindLocalization("LanguageOption");
-        settingsView.languageSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-
-        settingsView.languageSettings.SelectionChanged += (sender, _) =>
-        {
-            if ((sender as ComboBox)?.SelectedItem is LanguageManager.SupportedLanguage language)
-                LanguageManager.ChangeLanguage(language);
-            DataSet.SetData("LangIndex", (sender as ComboBox)?.SelectedIndex ?? 0);
-        };
-        var binding2 = new Binding("LanguageIndex")
-        {
-            Source = Data,
-            Mode = BindingMode.OneWay
-        };
-        settingsView.languageSettings.SetBinding(ComboBox.SelectedIndexProperty, binding2);
-
-        //主题设置
-        settingsView.themeSettings.ItemsSource = new ObservableCollection<SettingViewModel>()
-        {
-            new("LightColor"),
-            new("DarkColor"),
-            new("LightColor"),
-        };
-        settingsView.themeSettings.DisplayMemberPath = "Name";
-        settingsView.themeSettings.BindLocalization("ThemeOption");
-        settingsView.themeSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-
-        settingsView.themeSettings.SelectionChanged += (sender, _) =>
-        {
-            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-
-            switch (index)
-            {
-                case 0:
-                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
-                    break;
-                case 1:
-                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
-                    break;
-                default:
-                    FollowSystemTheme();
-                    break;
-            }
-
-            ThemeManager.Current.ApplicationTheme = index == 0 ? ApplicationTheme.Light : ApplicationTheme.Dark;
-            DataSet.SetData("ThemeIndex", index);
-        };
-        settingsView.themeSettings.SelectedIndex = DataSet.GetData("ThemeIndex", 0);
-
-        //性能设置
-        settingsView.performanceSettings.IsChecked = DataSet.GetData("EnableGPU", true);
-        settingsView.performanceSettings.Checked += (_, _) => { DataSet.SetData("EnableGPU", true); };
-        settingsView.performanceSettings.Unchecked += (_, _) => { DataSet.SetData("EnableGPU", false); };
-
-        //运行设置
-        settingsView.enableRecordingSettings.IsChecked = DataSet.MaaConfig.GetConfig("recording", false);
-        settingsView.enableRecordingSettings.Checked += (_, _) => { DataSet.MaaConfig.SetConfig("recording", true); };
-        settingsView.enableRecordingSettings.Unchecked += (_, _) => { DataSet.MaaConfig.SetConfig("recording", false); };
-
-        settingsView.enableSaveDrawSettings.IsChecked = DataSet.MaaConfig.GetConfig("save_draw", false);
-        settingsView.enableSaveDrawSettings.Checked += (_, _) => { DataSet.MaaConfig.SetConfig("save_draw", true); };
-        settingsView.enableSaveDrawSettings.Unchecked += (_, _) => { DataSet.MaaConfig.SetConfig("save_draw", false); };
-
-        settingsView.showHitDrawSettings.IsChecked = DataSet.MaaConfig.GetConfig("show_hit_draw", false);
-        settingsView.showHitDrawSettings.Checked += (_, _) => { DataSet.MaaConfig.SetConfig("show_hit_draw", true); };
-        settingsView.showHitDrawSettings.Unchecked += (_, _) => { DataSet.MaaConfig.SetConfig("show_hit_draw", false); };
-
-        settingsView.beforeTaskSettings.Text = DataSet.GetData("Prescript", string.Empty);
-        settingsView.beforeTaskSettings.BindLocalization("Prescript");
-        settingsView.beforeTaskSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
-        settingsView.beforeTaskSettings.TextChanged += (_, _) => { DataSet.SetData("Prescript", settingsView.beforeTaskSettings.Text); };
-
-        settingsView.afterTaskSettings.Text = DataSet.GetData("Post-script", string.Empty);
-        settingsView.afterTaskSettings.BindLocalization("Post-script");
-        settingsView.afterTaskSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
-        settingsView.afterTaskSettings.TextChanged += (_, _) => { DataSet.SetData("Post-script", settingsView.afterTaskSettings.Text); };
-
-        //启动设置
-        settingsView.AutoMinimizeCheckBox.IsChecked = DataSet.GetData("AutoMinimize", false);
-        settingsView.AutoMinimizeCheckBox.Checked += (_, _) => { DataSet.SetData("AutoMinimize", true); };
-        settingsView.AutoMinimizeCheckBox.Unchecked += (_, _) => { DataSet.SetData("AutoMinimize", false); };
-
-        settingsView.AutoHideCheckBox.IsChecked = DataSet.GetData("AutoHide", false);
-        settingsView.AutoHideCheckBox.Checked += (_, _) => { DataSet.SetData("AutoHide", true); };
-        settingsView.AutoHideCheckBox.Unchecked += (_, _) => { DataSet.SetData("AutoHide", false); };
-
-        settingsView.SoftwarePathTextBox.Text = DataSet.GetData("SoftwarePath", string.Empty);
-        settingsView.SoftwarePathTextBox.TextChanged += (sender, _) =>
-        {
-            var text = (sender as TextBox)?.Text ?? string.Empty;
-            DataSet.SetData("SoftwarePath", text);
-        };
-        settingsView.SoftwarePathTextBox.PreviewDrop += File_Drop;
-
-        settingsView.SoftwarePathSelectButton.Click += (_, _) =>
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                Title = "SelectExecutableFile".GetLocalizationString(),
-                Filter = "ExeFilter".GetLocalizationString()
-            };
-
-            if (openFileDialog.ShowDialog().IsTrue())
-            {
-                settingsView.SoftwarePathTextBox.Text = openFileDialog.FileName;
-            }
-        };
-
-        settingsView.ExtrasTextBox.Text = DataSet.GetData("EmulatorConfig", string.Empty);
-        settingsView.ExtrasTextBox.TextChanged += (sender, _) =>
-        {
-            var text = (sender as TextBox)?.Text ?? string.Empty;
-            DataSet.SetData("EmulatorConfig", text);
-        };
-
-        settingsView.WaitSoftwareTimeTextBox.Value = DataSet.GetData("WaitSoftwareTime", 60.0);
-        settingsView.WaitSoftwareTimeTextBox.ValueChanged += (sender, _) =>
-        {
-            var value = (sender as NumericUpDown)?.Value ?? 60;
-            DataSet.SetData("WaitSoftwareTime", value);
-        };
-        settingsView.ExtrasTextBox.TextChanged += (sender, _) =>
-        {
-            var text = (sender as TextBox)?.Text ?? string.Empty;
-            DataSet.SetData("EmulatorConfig", text);
-        };
-        //切换配置
-        string configPath = Path.Combine(Environment.CurrentDirectory, "config");
-        foreach (string file in Directory.GetFiles(configPath))
-        {
-            string fileName = Path.GetFileName(file);
-            if (fileName.EndsWith(".json") && fileName != "maa_option.json")
-            {
-                settingsView.swtichConfigs.Items.Add(fileName);
-            }
-        }
-
-        //连接设置
-        SetSettingOption(settingsView.adbCaptureComboBox, "CaptureModeOption",
-            [
-                "Default", "RawWithGzip", "RawByNetcat",
-                "Encode", "EncodeToFileAndPull", "MinicapDirect", "MinicapStream",
-                "EmulatorExtras"
-            ],
-            "AdbControlScreenCapType");
-        SetBindSettingOption(settingsView.adbInputComboBox, "InputModeOption",
-            ["MiniTouch", "MaaTouch", "AdbInput", "AutoDetect"],
-            "AdbControlInputType");
-
-        SetRememberAdbOption(settingsView.rememberAdbButton);
-
-        SetSettingOption(settingsView.win32CaptureComboBox, "CaptureModeOption",
-            ["FramePool", "DXGIDesktopDup", "GDI"],
-            "Win32ControlScreenCapType");
-
-        SetSettingOption(settingsView.win32InputComboBox, "InputModeOption",
-            ["Seize", "SendMessage"],
-            "Win32ControlInputType");
-
-
-        settingsView.swtichConfigs.SelectionChanged += (sender, _) =>
-        {
-            string selectedItem = (string)settingsView.swtichConfigs.SelectedItem;
-            if (selectedItem == "config.json")
-            {
-                //
-            }
-            // else if (selectedItem == "maa_option.json")
-            // {
-            //     // 什么都不做，等待后续添加逻辑
-            // }
-            else if (selectedItem == "config.json.bak")
-            {
-                string _currentFile = Path.Combine(configPath, "config.json");
-                string _selectedItem = Path.Combine(configPath, "config.json.bak");
-                string _bakContent = File.ReadAllText(_selectedItem);
-                File.WriteAllText(_currentFile, _bakContent);
-                RestartMFA();
-            }
-            else
-            {
-                // 恢复成绝对路径
-                string _currentFile = Path.Combine(configPath, "config.json");
-                string _selectedItem = Path.Combine(configPath, selectedItem);
-                SwapFiles(_currentFile, _selectedItem);
-                RestartMFA();
-            }
-        };
-        //软件更新
-        // settingsView.CdkPassword.UnsafePassword = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
-        // settingsView.CdkPassword.PasswordChanged += (_, _) => { DataSet.SetData("DownloadCDK", SimpleEncryptionHelper.Encrypt(settingsView.CdkPassword.Password)); };
-
-        settingsView.enableCheckVersionSettings.IsChecked = DataSet.GetData("EnableCheckVersion", true);
-        settingsView.enableCheckVersionSettings.Checked += (_, _) => { DataSet.SetData("EnableCheckVersion", true); };
-        settingsView.enableCheckVersionSettings.Unchecked += (_, _) => { DataSet.SetData("EnableCheckVersion", false); };
-
-        settingsView.enableAutoUpdateResourceSettings.IsChecked = DataSet.GetData("EnableAutoUpdateResource", false);
-        settingsView.enableAutoUpdateResourceSettings.Checked += (_, _) => { DataSet.SetData("EnableAutoUpdateResource", true); };
-        settingsView.enableAutoUpdateResourceSettings.Unchecked += (_, _) => { DataSet.SetData("EnableAutoUpdateResource", false); };
-
-        settingsView.enableAutoUpdateMFASettings.IsChecked = DataSet.GetData("EnableAutoUpdateMFA", false);
-        settingsView.enableAutoUpdateMFASettings.Checked += (_, _) => { DataSet.SetData("EnableAutoUpdateMFA", true); };
-        settingsView.enableAutoUpdateMFASettings.Unchecked += (_, _) => { DataSet.SetData("EnableAutoUpdateMFA", false); };
-
-        if (!string.IsNullOrWhiteSpace(MaaInterface.Instance.RID))
-        {
-            Data.DownloadSourceList.Add(new("MirrorChyan"));
-            Data.DownloadSourceIndex = Data.DownloadSourceIndex;
-        }
-        //关于我们
-        AddAbout();
+        SettingViewBorder.Child = settingsView;
     }
 
     private void ConfigureTaskSettingsPanel(object? sender = null, RoutedEventArgs? e = null)
@@ -2245,7 +1811,7 @@ public partial class MainWindow
             MaaProcessor.Instance.StartSoftware();
         }
 
-        if ((Data?.IsAdb).IsTrue() && DataSet.GetData("RememberAdb", true) && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) && DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
+        if ((ViewModel?.IsAdb).IsTrue() && DataSet.GetData("RememberAdb", true) && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) && DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
         {
             var settings = new JsonSerializerSettings();
             settings.Converters.Add(new AdbInputMethodsConverter());
@@ -2254,7 +1820,7 @@ public partial class MainWindow
             var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
             if (device != null)
             {
-                Growls.Process(() =>
+                GrowlHelper.OnUIThread(() =>
                 {
                     deviceComboBox.ItemsSource = new List<AdbDeviceInfo>
                     {
@@ -2266,44 +1832,31 @@ public partial class MainWindow
             }
         }
         else
-            Growls.Process(AutoDetectDevice);
+            GrowlHelper.OnUIThread(AutoDetectDevice);
     }
     public bool IsConnected()
     {
-        return (Data?.IsConnected).IsTrue();
+        return (ViewModel?.IsConnected).IsTrue();
     }
 
     public void SetConnected(bool isConnected)
     {
-        if (Data == null) return;
-        Data.IsConnected = isConnected;
+        if (ViewModel == null) return;
+        ViewModel.IsConnected = isConnected;
     }
 
     public void SetUpdating(bool isUpdating)
     {
-        if (Data == null) return;
-        Data.IsUpdating = isUpdating;
+        if (ViewModel == null) return;
+        ViewModel.IsUpdating = isUpdating;
     }
 
     public bool ConfirmExit()
     {
-        if (!Data.IsRunning)
+        if (!ViewModel.IsRunning)
             return true;
         var result = MessageBoxHelper.Show("ConfirmExitText".GetLocalizationString(),
             "ConfirmExitTitle".GetLocalizationString(), buttons: MessageBoxButton.YesNo, icon: MessageBoxImage.Question);
         return result == MessageBoxResult.Yes;
-    }
-
-    private void File_Drop(object sender, DragEventArgs e)
-    {
-        if (!e.Data.GetDataPresent(DataFormats.FileDrop))
-        {
-            return;
-        }
-
-        // Note that you can have more than one file.
-        var files = (string[])e.Data.GetData(DataFormats.FileDrop);
-        if (sender is TextBox textBox)
-            textBox.Text = files?[0] ?? string.Empty;
     }
 }

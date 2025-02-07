@@ -40,7 +40,7 @@ public partial class AddTaskDialog
 
     protected override void OnClosed(EventArgs e)
     {
-        MainWindow.Data?.SetIdle(true);
+        MainWindow.ViewModel?.SetIdle(true);
         base.OnClosed(e);
     }
 

@@ -55,7 +55,7 @@ public class OCRHelper
         }
         else
         {
-            Growls.Error("识别失败！");
+            GrowlHelper.Error("识别失败！");
         }
 
         Console.WriteLine($"识别结果: {result}");
@@ -92,7 +92,7 @@ public class OCRHelper
         }
         else
         {
-            Growls.Error("识别失败！");
+            GrowlHelper.Error("识别失败！");
         }
 
         Console.WriteLine($"识别结果: {result}");

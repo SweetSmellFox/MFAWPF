@@ -27,7 +27,7 @@ public static class TaskManager
             }
             catch (Exception e)
             {
-                Growls.Error($"{prompt}任务 {name} 失败.");
+                GrowlHelper.Error($"{prompt}任务 {name} 失败.");
                 LoggerService.LogError(e.ToString());
             }
         }

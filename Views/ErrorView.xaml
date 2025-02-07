@@ -1,26 +1,27 @@
 ﻿<hc:Window
+    Background="{DynamicResource SecundaryBackgroundColor}"
+    Height="480"
+    Icon="{x:Static constants:IconHelper.ICON}"
+    MinHeight="200"
+    MinWidth="400"
+    NonClientAreaBackground="{DynamicResource MainContentBackgroundBrush}"
+    ResizeMode="CanResize"
+    Title="{lex:Loc Error}"
+    Topmost="True"
+    Width="600"
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="SingleBorderWindow"
+    mc:Ignorable="d"
     x:Class="MFAWPF.Views.ErrorView"
+    x:Name="ErrorViewWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:constants="clr-namespace:MFAWPF.Utils"
+    xmlns:controls="clr-namespace:MFAWPF.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="clr-namespace:MFAWPF.Controls"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
-    xmlns:constants="clr-namespace:MFAWPF.Utils"
-    x:Name="ErrorViewWindow"
-    Icon="../logo.ico"
-    Title="{lex:Loc Error}"
-    Width="600"
-    Height="480"
-    MinWidth="400"
-    MinHeight="200"
-    ResizeMode="CanResize"
-    Topmost="True"
-    WindowStartupLocation="CenterScreen"
-    WindowStyle="SingleBorderWindow" NonClientAreaBackground="{DynamicResource MainContentBackgroundBrush}"
-    Background="{DynamicResource SecundaryBackgroundColor}"
-    mc:Ignorable="d">
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -28,14 +29,14 @@
         </Grid.RowDefinitions>
 
         <RichTextBox
-            x:Name="RichTextBox"
-            Grid.Row="0"
-            Padding="12,16,4,8"
-            hc:BorderElement.CornerRadius="0"
             BorderThickness="0"
+            Grid.Row="0"
             HorizontalScrollBarVisibility="Auto"
             IsReadOnly="True"
-            VerticalScrollBarVisibility="Auto">
+            Padding="12,16,4,8"
+            VerticalScrollBarVisibility="Auto"
+            hc:BorderElement.CornerRadius="0"
+            x:Name="RichTextBox">
             <RichTextBox.Resources>
                 <!--  This will give us a LARGER scroll bar  -->
                 <Style TargetType="ScrollViewer">
@@ -48,35 +49,34 @@
                         <Run FontWeight="Bold" Text="{lex:Loc ErrorProlog}" />
                     </Paragraph>
                     <Paragraph Margin="8,0,0,0">
-                        <Run x:Name="Error" Text="{Binding ExceptionMessage, ElementName=ErrorViewWindow, Mode=OneWay}" />
+                        <Run Text="{Binding ExceptionMessage, ElementName=ErrorViewWindow, Mode=OneWay}" x:Name="Error" />
                     </Paragraph>
                 </Section>
                 <Section>
                     <Paragraph>
-                        <Run FontWeight="Bold" Text="{lex:Loc  ErrorDetails}" />
+                        <Run FontWeight="Bold" Text="{lex:Loc ErrorDetails}" />
                     </Paragraph>
                     <Paragraph Margin="8,0,0,0">
-                        <Run x:Name="ErrorDetails"
-                             Text="{Binding ExceptionDetails, ElementName=ErrorViewWindow, Mode=OneWay}" />
+                        <Run Text="{Binding ExceptionDetails, ElementName=ErrorViewWindow, Mode=OneWay}" x:Name="ErrorDetails" />
                     </Paragraph>
                 </Section>
             </FlowDocument>
         </RichTextBox>
 
         <Border
+            Background="{DynamicResource ErrorViewBackgroundBrush}"
             Grid.Row="1"
-            Padding="12,0"
-            Background="{DynamicResource ErrorViewBackgroundBrush}">
+            Padding="12,0">
             <Grid MinHeight="40" VerticalAlignment="Center">
                 <controls:CustomTextBlock VerticalAlignment="Center">
-                    <Hyperlink Name="CopyErrorMessage" Click="CopyErrorMessage_Click">
+                    <Hyperlink Click="CopyErrorMessage_Click" Name="CopyErrorMessage">
                         <Run Text="{lex:Loc CopyErrorMessage}" />
                     </Hyperlink>
                     <hc:Poptip.Instance>
                         <hc:Poptip
-                            x:Name="CopiedTip"
+                            Content="{lex:Loc CopiedToClipboard}"
                             hc:Poptip.HitMode="None"
-                            Content="{lex:Loc  CopiedToClipboard}" />
+                            x:Name="CopiedTip" />
                     </hc:Poptip.Instance>
                 </controls:CustomTextBlock>
                 <WrapPanel
@@ -88,16 +88,16 @@
                             <Setter Property="Margin" Value="12,0,0,0" />
                         </Style>
                     </WrapPanel.Resources>
-            
+
                     <controls:CustomTextBlock>
                         <Hyperlink
-                            Name="LinkToCreateGitHubIssue"
                             Click="Hyperlink_OnClick"
+                            Name="LinkToCreateGitHubIssue"
                             NavigateUri="{Binding Source={x:Static constants:MFAUrls.NewIssueUri}}">
-                            <Run Text="{lex:Loc ErrorFeedbackLinkText}" /> 
+                            <Run Text="{lex:Loc ErrorFeedbackLinkText}" />
                         </Hyperlink>
                     </controls:CustomTextBlock>
-            
+
                 </WrapPanel>
             </Grid>
         </Border>

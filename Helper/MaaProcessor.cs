@@ -91,7 +91,7 @@ public class MaaProcessor
     public void Start(List<DragItemViewModel>? tasks, bool onlyStart = false)
     {
         SetCurrentTasker();
-        MainWindow.Data?.SetIdle(false);
+        MainWindow.ViewModel?.SetIdle(false);
         if (!onlyStart)
             TaskQueue.Push(new MFATask
             {
@@ -116,13 +116,13 @@ public class MaaProcessor
                 Type = MFATask.MFATaskType.MFA,
                 Action = () =>
                 {
-                    MainWindow.AddLogByKey("ConnectingTo", null, (MainWindow.Data?.IsAdb).IsTrue()
+                    MainWindow.AddLogByKey("ConnectingTo", null, (MainWindow.ViewModel?.IsAdb).IsTrue()
                         ? "Emulator"
                         : "Window");
                     var instance = Task.Run(GetCurrentTasker, token);
                     instance.Wait(token);
                     bool connected = instance.Result is { Initialized: true };
-                    if (!connected && MainWindow.Data.IsAdb && DataSet.GetData("RetryOnDisconnected", false))
+                    if (!connected && MainWindow.ViewModel.IsAdb && DataSet.GetData("RetryOnDisconnected", false))
                     {
                         MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "TryToStartEmulator".GetLocalizationString());
 
@@ -143,7 +143,7 @@ public class MaaProcessor
                     }
 
 
-                    if (!connected && MainWindow.Data.IsAdb)
+                    if (!connected && MainWindow.ViewModel.IsAdb)
                     {
                         MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "TryToReconnectByAdb".GetLocalizationString());
                         ReconnectByAdb();
@@ -159,7 +159,7 @@ public class MaaProcessor
                         instance.Wait(token);
                         connected = instance.Result is { Initialized: true };
                     }
-                    if (!connected && MainWindow.Data.IsAdb && DataSet.GetData("AllowAdbRestart", true))
+                    if (!connected && MainWindow.ViewModel.IsAdb && DataSet.GetData("AllowAdbRestart", true))
                     {
                         MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "RestartAdb".GetLocalizationString());
 
@@ -177,7 +177,7 @@ public class MaaProcessor
                     }
 
                     // 尝试杀掉 ADB 进程
-                    if (!connected && MainWindow.Data.IsAdb && DataSet.GetData("AllowAdbHardRestart", true))
+                    if (!connected && MainWindow.ViewModel.IsAdb && DataSet.GetData("AllowAdbHardRestart", true))
                     {
                         MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "HardRestartAdb".GetLocalizationString());
 
@@ -206,8 +206,8 @@ public class MaaProcessor
 
                     if (!MainWindow.Instance.IsConnected())
                     {
-                        Growls.Warning("Warning_CannotConnect".GetLocalizationString()
-                            .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
+                        GrowlHelper.Warning("Warning_CannotConnect".GetLocalizationString()
+                            .FormatWith((MainWindow.ViewModel?.IsAdb).IsTrue()
                                 ? "Emulator".GetLocalizationString()
                                 : "Window".GetLocalizationString()));
                         throw new Exception();
@@ -270,11 +270,11 @@ public class MaaProcessor
                 if (_currentTasker == null || _currentTasker?.Abort().Wait() == MaaJobStatus.Succeeded)
                 {
                     DisplayTaskCompletionMessage();
-                    MainWindow.Data?.SetIdle(true);
+                    MainWindow.ViewModel?.SetIdle(true);
                 }
                 else
                 {
-                    Growls.Error("StoppingFailed".GetLocalizationString());
+                    GrowlHelper.Error("StoppingFailed".GetLocalizationString());
                 }
             }, null, "停止任务");
             TaskQueue.Clear();
@@ -284,7 +284,7 @@ public class MaaProcessor
         {
             if (setIsStopped)
             {
-                Growls.Warning("NoTaskToStop".GetLocalizationString());
+                GrowlHelper.Warning("NoTaskToStop".GetLocalizationString());
                 TaskQueue.Clear();
                 OnTaskQueueChanged();
             }
@@ -322,14 +322,14 @@ public class MaaProcessor
 
     public async static Task ExternalNotificationAsync()
     {
-        var enabledProviders = MainWindow.Data.EnabledExternalNotificationProviderList;
+        var enabledProviders = SettingsView.ViewModel.EnabledExternalNotificationProviderList;
 
         foreach (var enabledProvider in enabledProviders)
         {
             switch (enabledProvider)
             {
                 case "DingTalk":
-                    await DingTalkMessageAsync(MainWindow.Data.DingTalkToken, MainWindow.Data.DingTalkSecret);
+                    await DingTalkMessageAsync(SettingsView.ViewModel.DingTalkToken, SettingsView.ViewModel.DingTalkSecret);
                     break;
             }
         }
@@ -417,7 +417,7 @@ public class MaaProcessor
             if (remainingTime % 10 == 0)
             {
                 MainWindow.AddLogByKey("WaitSoftwareTime", null,
-                    (MainWindow.Data?.IsAdb).IsTrue()
+                    (MainWindow.ViewModel?.IsAdb).IsTrue()
                         ? "Emulator"
                         : "Window",
                     remainingTime.ToString()
@@ -467,7 +467,7 @@ public class MaaProcessor
             }
             _softwareProcess = null;
         }
-        else if ((MainWindow.Data?.IsAdb).IsTrue())
+        else if ((MainWindow.ViewModel?.IsAdb).IsTrue())
         {
             EmulatorHelper.KillEmulatorModeSwitcher();
         }
@@ -500,7 +500,7 @@ public class MaaProcessor
 
     private void CloseMFA()
     {
-        Growls.Process(Application.Current.Shutdown);
+        GrowlHelper.OnUIThread(Application.Current.Shutdown);
     }
 
 
@@ -520,7 +520,7 @@ public class MaaProcessor
     {
         CloseSoftware();
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
-        Growls.Process(Application.Current.Shutdown);
+        GrowlHelper.OnUIThread(Application.Current.Shutdown);
     }
 
     private void Restart()
@@ -718,7 +718,7 @@ public class MaaProcessor
         }
         else
         {
-            Growl.Info("TaskCompleted".GetLocalizationString());
+            ToastNotification.ShowDirect("TaskCompleted".GetLocalizationString());
             if (_startTime != null)
             {
                 var elapsedTime = DateTime.Now - (DateTime)_startTime;
@@ -848,7 +848,7 @@ public class MaaProcessor
         {
             HandleInitializationError(e,
                 "ConnectingEmulatorOrWindow".GetLocalizationString()
-                    .FormatWith((MainWindow.Data?.IsAdb).IsTrue()
+                    .FormatWith((MainWindow.ViewModel?.IsAdb).IsTrue()
                         ? "Emulator".GetLocalizationString()
                         : "Window".GetLocalizationString()), true,
                 "InitControllerFailed".GetLocalizationString());
@@ -881,7 +881,7 @@ public class MaaProcessor
 
     private MaaController InitializeController()
     {
-        if ((MainWindow.Data?.IsAdb).IsTrue())
+        if ((MainWindow.ViewModel?.IsAdb).IsTrue())
         {
             LoggerService.LogInfo($"AdbPath: {Config.AdbDevice.AdbPath}");
             LoggerService.LogInfo($"AdbSerial: {Config.AdbDevice.AdbSerial}");
@@ -897,7 +897,7 @@ public class MaaProcessor
             LoggerService.LogInfo($"Link: {Config.DesktopWindow.Link}");
             LoggerService.LogInfo($"Check: {Config.DesktopWindow.Check}");
         }
-        return (MainWindow.Data?.IsAdb).IsTrue()
+        return (MainWindow.ViewModel?.IsAdb).IsTrue()
             ? new MaaAdbController(
                 Config.AdbDevice.AdbPath,
                 Config.AdbDevice.AdbSerial,
@@ -1158,7 +1158,7 @@ public class MaaProcessor
         string waringMessage = "")
     {
         Console.WriteLine(e);
-        Growls.Error(message);
+        GrowlHelper.Error(message);
         if (hasWarning)
             LoggerService.LogWarning(waringMessage);
         LoggerService.LogError(e.ToString());
@@ -1172,7 +1172,7 @@ public class MaaProcessor
         var encodedDataHandle = buffer.GetEncodedData(out var size);
         if (encodedDataHandle == IntPtr.Zero)
         {
-            Growls.Error("Handle为空！");
+            GrowlHelper.Error("Handle为空！");
             return null;
         }
 

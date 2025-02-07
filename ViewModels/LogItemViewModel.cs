@@ -5,7 +5,7 @@ using MFAWPF.Utils;
 
 namespace MFAWPF.ViewModels
 {
-    public class LogItemViewModel : ObservableObject
+    public class LogItemViewModel : ViewModel
     {
         private readonly string[]? _formatArgsKeys;
 
@@ -29,7 +29,7 @@ namespace MFAWPF.ViewModels
                 UpdateContent();
 
                 // 订阅语言切换事件
-                LanguageManager.LanguageChanged += OnLanguageChanged;
+                LanguageHelper.LanguageChanged += OnLanguageChanged;
             }
             else
                 Content = resourceKey;

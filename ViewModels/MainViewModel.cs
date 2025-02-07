@@ -16,16 +16,9 @@ using DataSet = MFAWPF.Data.DataSet;
 
 namespace MFAWPF.ViewModels;
 
-public class MainViewModel : ObservableObject
+public partial class MainViewModel : ViewModel
 {
     public ObservableCollection<LogItemViewModel> LogItemViewModels { get; } = new();
-    private bool SetCurrentProperty<T>([NotNullIfNotNull("newValue")] ref T field, T newValue, [CallerMemberName] string? propertyName = null)
-    {
-        OnPropertyChanging(propertyName);
-        field = newValue;
-        OnPropertyChanged(propertyName);
-        return true;
-    }
 
     public void AddLog(string content,
         string? color = "",
@@ -103,32 +96,11 @@ public class MainViewModel : ObservableObject
     public ObservableCollection<DragItemViewModel> TasksSource { get; private set; } =
         new();
 
-    private bool _idle = true;
+    [ObservableProperty] private bool _idle = true;
 
-    /// <summary>
-    /// Gets or sets a value indicating whether it is idle.
-    /// </summary>
-    public bool Idle
-    {
-        get => _idle;
-        set => SetProperty(ref _idle, value);
-    }
+    [ObservableProperty] private bool _notLock = true;
 
-    private bool _notLock = true;
-
-    public bool NotLock
-    {
-        get => _notLock;
-        set => SetProperty(ref _notLock, value);
-    }
-
-    private bool _isRunning = false;
-
-    public bool IsRunning
-    {
-        get => _isRunning;
-        set => SetProperty(ref _isRunning, value);
-    }
+    [ObservableProperty] private bool _isRunning = false;
 
     public void SetIdle(bool value)
     {
@@ -137,47 +109,23 @@ public class MainViewModel : ObservableObject
 
     public GongSolutions.Wpf.DragDrop.IDropTarget DropHandler { get; } = new DragDropHandler();
 
+    [ObservableProperty] private bool _isAdb = true;
 
-    private bool _isAdb = true;
+    [ObservableProperty] private bool _isConnected;
+    
+    [ObservableProperty] private bool _isUpdating;
 
-    public bool IsAdb
+    [ObservableProperty] private bool _isVisible = true;
+
+    partial void OnIsVisibleChanged(bool value)
     {
-        get => _isAdb;
-        set => SetProperty(ref _isAdb, value);
-    }
-
-    private bool _isConnected;
-
-    public bool IsConnected
-    {
-        get => _isConnected;
-        set => SetProperty(ref _isConnected, value);
-    }
-
-    private bool _isUpdating;
-
-    public bool IsUpdating
-    {
-        get => _isUpdating;
-        set => SetProperty(ref _isUpdating, value);
-    }
-
-    private bool _isVisible = true;
-
-    public bool IsVisible
-    {
-        get => _isVisible;
-        set
+        if (value)
         {
-            if (value)
-            {
-                Application.Current.MainWindow.Show();
-            }
-            else
-            {
-                Application.Current.MainWindow.Hide();
-            }
-            SetProperty(ref _isVisible, value);
+            Application.Current.MainWindow?.Show();
+        }
+        else
+        {
+            Application.Current.MainWindow?.Hide();
         }
     }
 
@@ -188,232 +136,6 @@ public class MainViewModel : ObservableObject
     private void SwitchItem(FunctionEventArgs<object> info)
     {
         Growl.Info((info.Info as SideMenuItem)?.Header.ToString(), "InfoMessage");
-    }
-
-    private enum NotifyType
-    {
-        None,
-        SelectedIndex,
-        ScrollOffset,
-    }
-
-    private NotifyType _notifySource = NotifyType.None;
-
-    private System.Timers.Timer _resetNotifyTimer;
-
-    private void ResetNotifySource()
-    {
-        if (_resetNotifyTimer != null)
-        {
-            _resetNotifyTimer.Stop();
-            _resetNotifyTimer.Close();
-        }
-
-        _resetNotifyTimer = new(20);
-        _resetNotifyTimer.Elapsed += (_, _) =>
-        {
-            _notifySource = NotifyType.None;
-        };
-        _resetNotifyTimer.AutoReset = false;
-        _resetNotifyTimer.Enabled = true;
-        _resetNotifyTimer.Start();
-    }
-
-    /// <summary>
-    /// Gets or sets the height of scroll viewport.
-    /// </summary>
-    public double ScrollViewportHeight { get; set; }
-
-    /// <summary>
-    /// Gets or sets the extent height of scroll.
-    /// </summary>
-    public double ScrollExtentHeight { get; set; }
-
-    public List<double> DividerVerticalOffsetList { get; set; } = new();
-
-    private int _selectedIndex;
-
-    /// <summary>
-    /// Gets or sets the index selected.
-    /// </summary>
-    public int SelectedIndex
-    {
-        get => _selectedIndex;
-        set
-        {
-            switch (_notifySource)
-            {
-                case NotifyType.None:
-                    _notifySource = NotifyType.SelectedIndex;
-                    SetProperty(ref _selectedIndex, value);
-
-                    if (DividerVerticalOffsetList?.Count > 0 && value < DividerVerticalOffsetList.Count)
-                    {
-                        ScrollOffset = DividerVerticalOffsetList[value];
-                    }
-
-                    ResetNotifySource();
-                    break;
-
-                case NotifyType.ScrollOffset:
-                    SetProperty(ref _selectedIndex, value);
-                    break;
-
-                case NotifyType.SelectedIndex:
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-    }
-
-    private double _scrollOffset;
-
-    /// <summary>
-    /// Gets or sets the scroll offset.
-    /// </summary>
-    public double ScrollOffset
-    {
-        get => _scrollOffset;
-        set
-        {
-            switch (_notifySource)
-            {
-                case NotifyType.None:
-                    _notifySource = NotifyType.ScrollOffset;
-                    SetProperty(ref _scrollOffset, value);
-
-                    // 设置 ListBox SelectedIndex 为当前 ScrollOffset 索引
-                    if (DividerVerticalOffsetList?.Count > 0)
-                    {
-                        // 滚动条滚动到底部，返回最后一个 Divider 索引
-                        if (value + ScrollViewportHeight >= ScrollExtentHeight)
-                        {
-                            SelectedIndex = DividerVerticalOffsetList.Count - 1;
-                            ResetNotifySource();
-                            break;
-                        }
-
-                        // 根据出当前 ScrollOffset 选出最后一个在可视范围的 Divider 索引
-                        var dividerSelect = DividerVerticalOffsetList.Select((n, i) => (
-                            dividerAppeared: value >= n,
-                            index: i));
-
-                        var index = dividerSelect.LastOrDefault(n => n.dividerAppeared).index;
-                        SelectedIndex = index;
-                    }
-
-                    ResetNotifySource();
-                    break;
-
-                case NotifyType.SelectedIndex:
-                    SetProperty(ref _scrollOffset, value);
-                    break;
-
-                case NotifyType.ScrollOffset:
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-    }
-
-    private List<SettingViewModel> _listTitle =
-    [
-        new("SwitchConfiguration"),
-        new("UiSettings"),
-        new("ConnectionSettings"),
-        new("PerformanceSettings"),
-        new("StartupSettings"),
-        new("ExternalNotificationSettings"),
-        new("RunningSettings"),
-        new("SoftwareUpdate"),
-        new("About"),
-    ];
-
-    /// <summary>
-    /// Gets or sets the list title.
-    /// </summary>
-    public List<SettingViewModel> ListTitle
-    {
-        get => _listTitle;
-        set => SetProperty(ref _listTitle, value);
-    }
-
-    private int _languageIndex = 0;
-
-    public int LanguageIndex
-    {
-        set
-        {
-            SetProperty(ref _languageIndex, value);
-        }
-        get
-        {
-            if (_languageIndex != DataSet.GetData("LangIndex", 0))
-                _languageIndex = DataSet.GetData("LangIndex", 0);
-            return _languageIndex;
-        }
-    }
-
-
-    private string _beforeTask = "None".GetLocalizationString();
-
-    public string BeforeTask
-    {
-        get
-        {
-            if (_beforeTask != BeforeTaskList[DataSet.GetData("AutoStartIndex", 0)].ResourceKey)
-                _beforeTask = BeforeTaskList[DataSet.GetData("AutoStartIndex", 0)].ResourceKey;
-            return _beforeTask;
-        }
-        set => SetProperty(ref _beforeTask, value);
-    }
-
-    private string _afterTask = "None".GetLocalizationString();
-
-    public string AfterTask
-    {
-        get
-        {
-            if (_afterTask != AfterTaskList[DataSet.GetData("AfterTaskIndex", 0)].ResourceKey)
-                _afterTask = AfterTaskList[DataSet.GetData("AfterTaskIndex", 0)].ResourceKey;
-            return _afterTask;
-        }
-        set => SetProperty(ref _afterTask, value);
-    }
-
-    private List<SettingViewModel> _beforeTaskList =
-    [
-        new("None"),
-        new("StartupSoftware"),
-        new("StartupSoftwareAndScript"),
-    ];
-
-
-    public List<SettingViewModel> BeforeTaskList
-    {
-        get => _beforeTaskList;
-        set => SetProperty(ref _beforeTaskList, value);
-    }
-
-    private List<SettingViewModel> _afterTaskList =
-    [
-        new("None"),
-        new("CloseMFA"),
-        new("CloseEmulator"),
-        new("CloseEmulatorAndMFA"),
-        new("ShutDown"),
-        new("CloseEmulatorAndRestartMFA"),
-        new("RestartPC"),
-    ];
-
-    public List<SettingViewModel> AfterTaskList
-    {
-        get => _afterTaskList;
-        set => SetProperty(ref _listTitle, value);
     }
 
     public static string FormatFileSize(long size)
@@ -492,7 +214,7 @@ public class MainViewModel : ObservableObject
 
     public void ClearDownloadProgress()
     {
-        Growls.Process(() =>
+        GrowlHelper.OnUIThread(() =>
         {
 
             if (LogItemViewModels.Count > 0 && LogItemViewModels[0].IsDownloading)
@@ -504,12 +226,8 @@ public class MainViewModel : ObservableObject
 
     public void OutputDownloadProgress(string output, bool downloading = true)
     {
-        if (LogItemViewModels == null)
-        {
-            return;
-        }
 
-        Growls.Process(() =>
+        GrowlHelper.OnUIThread(() =>
         {
             var log = new LogItemViewModel(downloading ? "NewVersionFoundDescDownloading".GetLocalizationString() + "\n" + output : output, Application.Current.MainWindow.FindResource("DownloadLogBrush") as Brush,
                 dateFormat: "HH':'mm':'ss")
@@ -533,82 +251,50 @@ public class MainViewModel : ObservableObject
             }
         });
     }
-    private int _downloadSourceIndex;
 
-    public int DownloadSourceIndex
+    private string _beforeTask = "None".GetLocalizationString();
+
+    public string BeforeTask
     {
-        set
-        {
-            DataSet.SetData("DownloadSourceIndex", value);
-            SetCurrentProperty(ref _downloadSourceIndex, value);
-        }
         get
         {
-            if (_downloadSourceIndex != DataSet.GetData("DownloadSourceIndex", 0))
-                _downloadSourceIndex = DataSet.GetData("DownloadSourceIndex", 0);
-            if (string.IsNullOrWhiteSpace(MaaInterface.Instance.RID))
-                _downloadSourceIndex = 0;
-            return _downloadSourceIndex;
+            _beforeTask = BeforeTaskList[DataSet.GetData("AutoStartIndex", 0)].ResourceKey;
+            return _beforeTask;
         }
+        set => SetProperty(ref _beforeTask, value);
     }
 
+    private string _afterTask = "None".GetLocalizationString();
 
-    public List<SettingViewModel> DownloadSourceList
+    public string AfterTask
     {
-        get => _downloadSourceList;
-        set => SetProperty(ref _downloadSourceList, value);
+        get
+        {
+            _afterTask = AfterTaskList[DataSet.GetData("AfterTaskIndex", 0)].ResourceKey;
+            return _afterTask;
+        }
+        set => SetProperty(ref _afterTask, value);
     }
 
-    private List<SettingViewModel> _downloadSourceList =
+    [ObservableProperty] private List<LocalizationViewModel> _beforeTaskList =
     [
-        new("GitHub"),
+        new("None"),
+        new("StartupSoftware"),
+        new("StartupSoftwareAndScript"),
     ];
 
-    private bool _retryOnDisconnected = DataSet.GetData("RetryOnDisconnected", false);
 
-    /// <summary>
-    /// Gets or sets a value indicating whether to retry task after ADB disconnected.
-    /// </summary>
-    public bool RetryOnDisconnected
-    {
-        get => _retryOnDisconnected;
-        set
-        {
-            SetProperty(ref _retryOnDisconnected, value);
-            DataSet.SetData("RetryOnDisconnected", value);
-        }
-    }
-
-    private bool _allowAdbRestart = DataSet.GetData("AllowAdbRestart", true);
-
-    /// <summary>
-    /// Gets or sets a value indicating whether to retry task after ADB disconnected.
-    /// </summary>
-    public bool AllowAdbRestart
-    {
-        get => _allowAdbRestart;
-        set
-        {
-            SetProperty(ref _allowAdbRestart, value);
-            DataSet.SetData("AllowAdbRestart", value);
-        }
-    }
-
-    private bool _allowAdbHardRestart = DataSet.GetData("AllowAdbHardRestart", true);
-
-    /// <summary>
-    /// Gets or sets a value indicating whether to allow for killing ADB process.
-    /// </summary>
-    public bool AllowAdbHardRestart
-    {
-        get => _allowAdbHardRestart;
-        set
-        {
-            SetProperty(ref _allowAdbHardRestart, value);
-            DataSet.SetData("AllowAdbHardRestart", value);
-        }
-    }
-
+    [ObservableProperty] private List<LocalizationViewModel> _afterTaskList =
+    [
+        new("None"),
+        new("CloseMFA"),
+        new("CloseEmulator"),
+        new("CloseEmulatorAndMFA"),
+        new("ShutDown"),
+        new("CloseEmulatorAndRestartMFA"),
+        new("RestartPC"),
+    ];
+    
     private bool _shouldTip = true;
     private bool _isDebugMode;
 
@@ -618,8 +304,8 @@ public class MainViewModel : ObservableObject
 
         get
         {
-            if (_isDebugMode != MFAExtensions.IsDebugMode())
-                _isDebugMode = MFAExtensions.IsDebugMode();
+
+            _isDebugMode = MFAExtensions.IsDebugMode();
             if (_isDebugMode && _shouldTip)
             {
                 MessageBoxHelper.Show("DebugModeWarning".GetLocalizationString(), "Tip".GetLocalizationString(), MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -629,105 +315,4 @@ public class MainViewModel : ObservableObject
         }
     }
 
-    public static readonly List<SettingViewModel> ExternalNotificationProviders =
-    [
-        new("DingTalk"),
-    ];
-
-    public static List<SettingViewModel> ExternalNotificationProvidersShow => ExternalNotificationProviders;
-
-    private static object[] _enabledExternalNotificationProviders =
-        ExternalNotificationProviders.Where(s => DataSet.GetData("ExternalNotificationEnabled", string.Empty).Split(',').Contains(s.ResourceKey))
-            .Distinct()
-            .ToArray();
-
-    public object[] EnabledExternalNotificationProviders
-    {
-        get => _enabledExternalNotificationProviders;
-        set
-        {
-            try
-            {
-                var settingViewModels = value.Cast<SettingViewModel>();
-                SetProperty(ref _enabledExternalNotificationProviders, value);
-                var validProviders = settingViewModels
-                    .Where(provider => ExternalNotificationProviders.ContainsKey(provider.ResourceKey ?? string.Empty))
-                    .Select(provider => provider.ResourceKey)
-                    .Distinct();
-
-                var config = string.Join(",", validProviders);
-                DataSet.SetData("ExternalNotificationEnabled", config);
-                UpdateExternalNotificationProvider();
-                EnabledExternalNotificationProviderCount = _enabledExternalNotificationProviders.Length;
-            }
-            catch (Exception e)
-            {
-                LoggerService.LogError(e);
-            }
-        }
-    }
-
-    private int _enabledExternalNotificationProviderCount = _enabledExternalNotificationProviders.Length;
-
-    public int EnabledExternalNotificationProviderCount
-    {
-        get => _enabledExternalNotificationProviderCount;
-        set => SetProperty(ref _enabledExternalNotificationProviderCount, value);
-    }
-
-    public string[] EnabledExternalNotificationProviderList => EnabledExternalNotificationProviders
-        .Select(s => s.ToString() ?? string.Empty)
-        .ToArray();
-
-    
-    private bool _dingTalkEnabled;
-
-    public bool DingTalkEnabled
-    {
-        get => _dingTalkEnabled;
-        set => SetProperty(ref _dingTalkEnabled, value);
-    }
-
-    private string _cdkPassword = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
-
-    public string CdkPassword
-    {
-        get => _cdkPassword;
-        set
-        {
-            SetProperty(ref _cdkPassword, value);
-            value = SimpleEncryptionHelper.Encrypt(value);
-            DataSet.SetData("DownloadCDK", value);
-        }
-    }
-
-    private string _dingTalkToken = SimpleEncryptionHelper.Decrypt(DataSet.GetData("ExternalNotificationDingTalkToken", string.Empty));
-
-    public string DingTalkToken
-    {
-        get => _dingTalkToken;
-        set
-        {
-            SetProperty(ref _dingTalkToken, value);
-            value = SimpleEncryptionHelper.Encrypt(value);
-            DataSet.SetData("ExternalNotificationDingTalkToken", value);
-        }
-    }
-    private string _dingTalkSecret = SimpleEncryptionHelper.Decrypt(DataSet.GetData("ExternalNotificationDingTalkSecret", string.Empty));
-
-    public string DingTalkSecret
-    {
-        get => _dingTalkSecret;
-        set
-        {
-            SetProperty(ref _dingTalkSecret, value);
-            value = SimpleEncryptionHelper.Encrypt(value);
-            DataSet.SetData("ExternalNotificationDingTalkSecret", value);
-        }
-    }
-
-    public void UpdateExternalNotificationProvider()
-    {
-        DingTalkEnabled = EnabledExternalNotificationProviderList.Contains("DingTalk");
-    }
 }

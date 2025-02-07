@@ -451,17 +451,17 @@ public static class MFAExtensions
         }
         return 0;
     }
-    public static bool ContainsKey(this IEnumerable<SettingViewModel> settingViewModels, string key)
+    public static bool ContainsKey(this IEnumerable<LocalizationViewModel> settingViewModels, string key)
     {
         return settingViewModels.Any(vm => vm.ResourceKey == key);
     }
-    public static string[] ToStringArray(this IEnumerable<SettingViewModel> settingViewModels)
+    public static string?[] ToStringArray(this IEnumerable<LocalizationViewModel> settingViewModels)
     {
         return settingViewModels
             .Where(vm => vm.ResourceKey != null)
             .Select(vm => vm.ResourceKey).ToArray();
     }
-    public static string ToKeyString(this IEnumerable<SettingViewModel> settingViewModels)
+    public static string ToKeyString(this IEnumerable<LocalizationViewModel> settingViewModels)
     {
         return string.Join(",", settingViewModels
             .Where(vm => vm.ResourceKey != null)

@@ -32,7 +32,7 @@ public partial class NotifyIcon
 
     private void InitIcon()
     {
-        notifyIcon.Icon = AppIcon.GetIcon();
+        notifyIcon.Icon = IconHelper.ICON;
         notifyIcon.Visibility = DataSet.GetData("EnableShowIcon", true) ? Visibility.Visible : Visibility.Collapsed;
 
         notifyIcon.Click += NotifyIcon_MouseClick;
@@ -43,7 +43,7 @@ public partial class NotifyIcon
         exitMenu.Click += App_exit;
         hideMenu.Click += App_hide;
         showMenu.Click += App_show;
-        foreach (var lang in LanguageManager.SupportedLanguages)
+        foreach (var lang in LanguageHelper.SupportedLanguages)
         {
             var langMenu = new MenuItem
             {
@@ -51,8 +51,8 @@ public partial class NotifyIcon
             };
             langMenu.Click += (_, _) =>
             {
-                LanguageManager.ChangeLanguage(lang);
-                var index = LanguageManager.SupportedLanguages.FindIndex(language => language.Key == lang.Key);
+                LanguageHelper.ChangeLanguage(lang);
+                var index = LanguageHelper.SupportedLanguages.FindIndex(language => language.Key == lang.Key);
                 DataSet.SetData("LangIndex", index == -1 ? 0 : index);
             };
 

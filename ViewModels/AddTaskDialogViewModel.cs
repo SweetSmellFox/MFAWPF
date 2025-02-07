@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MFAWPF.ViewModels;
 
-public class AddTaskDialogViewModel: ObservableObject
+public class AddTaskDialogViewModel: ViewModel
 {
     private ObservableCollection<DragItemViewModel> _dataList = new ();
 

@@ -39,7 +39,7 @@ public partial class DownloadDialog
     private void Restart(object sender, RoutedEventArgs e)
     {
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
-        Growls.Process(Application.Current.Shutdown);
+        GrowlHelper.OnUIThread(Application.Current.Shutdown);
     }
 }
 

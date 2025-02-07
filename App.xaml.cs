@@ -1,12 +1,19 @@
-﻿using System.Text;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Text;
 using System.Windows;
 using System.Windows.Threading;
 using Lierda.WPFHelper;
+using MFAWPF.Services;
 using MFAWPF.Utils;
+using MFAWPF.ViewModels;
 using MFAWPF.Views;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Win32;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows.Controls;
 
 namespace MFAWPF;
 
@@ -15,20 +22,53 @@ namespace MFAWPF;
 /// </summary>
 public partial class App
 {
-    public App()
-    {
-    }
-    
-    [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-    private extern static IntPtr LoadLibrary(string lpFileName);
-    
-    protected override void OnStartup(StartupEventArgs e)
+    private static readonly IHost Host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
+        .ConfigureAppConfiguration(c =>
+        {
+            var basePath =
+                Path.GetDirectoryName(AppContext.BaseDirectory)
+                ?? throw new DirectoryNotFoundException(
+                    "Unable to find the base directory of the application."
+                );
+            _ = c.SetBasePath(basePath);
+        })
+        .ConfigureServices(
+            (context, services) =>
+            {
+                // App Host
+                _ = services.AddHostedService<ApplicationHostService>();
+
+                // Main window with navigation
+                _ = services.AddSingleton<Window, Views.MainWindow>();
+                _ = services.AddSingleton<MainViewModel>();
+
+                // Views and ViewModels
+                _ = services.AddSingleton<Views.SettingsView>();
+                _ = services.AddSingleton<ViewModels.SettingViewModel>();
+                // _ = services.AddSingleton<Views.Pages.DataPage>();
+                // _ = services.AddSingleton<ViewModels.DataPageViewModel>();
+                // _ = services.AddSingleton<Views.Pages.SettingsPage>();
+                // _ = services.AddSingleton<ViewModels.SettingsViewModel>();
+
+            }
+        )
+        .Build();
+
+    /// <summary>
+    /// Gets services.
+    /// </summary>
+    public static IServiceProvider Services => Host.Services;
+
+
+    /// <summary>
+    /// Occurs when the application is loading.
+    /// </summary>
+    async private void OnStartup(object sender, StartupEventArgs e)
     {
         var dllFolderPath = Path.Combine(AppContext.BaseDirectory, "DLL");
         if (Directory.Exists(dllFolderPath))
         {
             var dllFiles = Directory.GetFiles(dllFolderPath, "*.dll");
-            var allDllsLoaded = true;
             foreach (var dllName in dllFiles)
             {
                 var handle = LoadLibrary(dllName);
@@ -38,8 +78,7 @@ public partial class App
                 }
             }
         }
-        DispatcherUnhandledException +=
-            App_DispatcherUnhandledException;
+
         //Task线程内未捕获异常处理事件
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         //非UI线程未捕获异常处理事件
@@ -48,20 +87,23 @@ public partial class App
         SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
         LierdaCracker cracker = new LierdaCracker();
         cracker.Cracker();
-        base.OnStartup(e);
+        await Host.StartAsync();
     }
-    
 
-    private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
+    /// <summary>
+    /// Occurs when the application is closing.
+    /// </summary>
+    async private void OnExit(object sender, ExitEventArgs e)
     {
-        if (e.Category is UserPreferenceCategory.Color or UserPreferenceCategory.VisualStyle or UserPreferenceCategory.General)
-        {
-            Views.MainWindow.FollowSystemTheme();
-        }
+        await Host.StopAsync();
+
+        Host.Dispose();
     }
 
-    void App_DispatcherUnhandledException(object sender,
-        DispatcherUnhandledExceptionEventArgs e)
+    /// <summary>
+    /// Occurs when an exception is thrown by an application but not handled.
+    /// </summary>
+    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
         try
         {
@@ -74,6 +116,19 @@ public partial class App
             //此时程序出现严重异常，将强制结束退出
             LoggerService.LogError(ex.ToString());
             ErrorView.ShowException(ex, true);
+        }
+    }
+
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+    private extern static IntPtr LoadLibrary(string lpFileName);
+
+
+    private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
+    {
+        if (e.Category is UserPreferenceCategory.Color or UserPreferenceCategory.VisualStyle or UserPreferenceCategory.General)
+        {
+            Views.MainWindow.FollowSystemTheme();
         }
     }
 
@@ -99,7 +154,7 @@ public partial class App
             sbEx.Append(e.ExceptionObject);
         }
 
-        Growls.Error(sbEx.ToString());
+        GrowlHelper.Error(sbEx.ToString());
     }
 
     void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)

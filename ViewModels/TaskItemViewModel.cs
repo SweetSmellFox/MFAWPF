@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace MFAWPF.ViewModels;
 
-public class TaskItemViewModel : ObservableObject
+public class TaskItemViewModel : ViewModel
 {
     private string _name = "未命名";
 

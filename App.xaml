@@ -1,12 +1,16 @@
-﻿<Application xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" x:Class="MFAWPF.App"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="/Views/MainWindow.xaml">
+﻿<Application
+    DispatcherUnhandledException="OnDispatcherUnhandledException"
+    Exit="OnExit"
+    Startup="OnStartup"
+    x:Class="MFAWPF.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/themes/theme.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MFAWPF;component/Res/Theme.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MFAWPF;component/Res/Style.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/HandyControl;component/themes/theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MFAWPF;component/Assets/Theme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MFAWPF;component/Assets/Style.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
