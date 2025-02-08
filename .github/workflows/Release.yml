@@ -65,3 +65,9 @@ jobs:
           body: ${{ needs.changelog.outputs.release_body }}
           draft: false
           prerelease: false
+
+      - name: Trigger MirrorChyan
+        run: |
+          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
