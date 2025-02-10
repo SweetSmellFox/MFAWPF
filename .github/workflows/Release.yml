@@ -5,9 +5,6 @@ on:
     tags:
       - 'v*' # 匹配以'v'开头的tag
 
-permissions:
-  contents: write  # 给工作流写入仓库内容的权限
-
 jobs:
   changelog:
       name: Generate changelog
