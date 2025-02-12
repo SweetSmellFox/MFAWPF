@@ -87,10 +87,10 @@ public partial class MainViewModel : ViewModel
     }
 
     public ObservableCollection<DragItemViewModel> TaskItemViewModels { get; set; } =
-        new();
+        [];
 
     public ObservableCollection<DragItemViewModel> TasksSource { get; private set; } =
-        new();
+        [];
 
     [ObservableProperty] private bool _idle = true;
 

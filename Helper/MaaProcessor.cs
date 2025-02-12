@@ -34,8 +34,8 @@ public class MaaProcessor
     private static MaaProcessor? _instance;
     private CancellationTokenSource? _cancellationTokenSource;
 
-    public static MaaUtility  MaaUtility { get; } = new();
-    
+    public static MaaUtility MaaUtility { get; } = new();
+
     public bool IsStopped
     {
         get;
@@ -231,6 +231,13 @@ public class MaaProcessor
                 Type = MFATask.MFATaskType.MFA,
                 Action = () => { MainWindow.Instance.RunScript("Post-script"); }
             });
+        
+        TaskQueue.Push(new MFATask
+        {
+            Name = "检查更新",
+            Type = MFATask.MFATaskType.MFA,
+            Action = () => { VersionChecker.Check(); }
+        });
 
         TaskManager.RunTaskAsync(async () =>
         {

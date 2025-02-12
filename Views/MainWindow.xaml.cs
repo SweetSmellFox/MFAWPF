@@ -1591,6 +1591,7 @@ public partial class MainWindow
                         });
                     }
                 }
+                VersionChecker.Check();
             }
             ConnectionTabControl.SelectionChanged += ConnectionTabControlOnSelectionChanged;
             if (ViewModel != null)
@@ -1605,8 +1606,6 @@ public partial class MainWindow
             {
                 Growl.Info(MaaInterface.Instance.Message);
             }
-            VersionChecker.Check();
-
 
         });
         TaskManager.RunTaskAsync(async () =>
