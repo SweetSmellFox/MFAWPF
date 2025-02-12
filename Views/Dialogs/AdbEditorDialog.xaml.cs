@@ -23,8 +23,8 @@ public partial class AdbEditorDialog
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadFileTitle".GetLocalizationString(),
-            Filter = "AllFilter".GetLocalizationString()
+            Title = "LoadFileTitle".ToLocalization(),
+            Filter = "AllFilter".ToLocalization()
         };
 
         if (openFileDialog.ShowDialog().IsTrue())
@@ -50,7 +50,7 @@ public partial class AdbEditorDialog
             typeof(string),
             typeof(AdbEditorDialog),
             new FrameworkPropertyMetadata(
-                "Emulator".GetLocalizationString(), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+                "Emulator".ToLocalization(), FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
     public string AdbName
     {

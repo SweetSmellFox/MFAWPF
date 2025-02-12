@@ -51,7 +51,7 @@ namespace MFAWPF.Controls
         {
             if (string.IsNullOrEmpty(ResourceKey))
                 return;
-            Text = ResourceKey.GetLocalizationString();
+            Text = ResourceKey.ToLocalization();
         }
 
         private static void OnResourceKeyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

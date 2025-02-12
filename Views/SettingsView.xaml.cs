@@ -139,8 +139,8 @@ public partial class SettingsView
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Title = "SelectExecutableFile".GetLocalizationString(),
-                Filter = "ExeFilter".GetLocalizationString()
+                Title = "SelectExecutableFile".ToLocalization(),
+                Filter = "ExeFilter".ToLocalization()
             };
 
             if (openFileDialog.ShowDialog().IsTrue())

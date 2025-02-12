@@ -47,14 +47,14 @@ public static class MFAExtensions
         locExtension.SetBinding(control, property);
     }
 
-    public static string GetLocalizationString(this string key)
+    public static string ToLocalization(this string key)
     {
         if (string.IsNullOrWhiteSpace(key))
             return string.Empty;
         return LocalizeDictionary.Instance.GetLocalizedObject(key, null, null) as string ?? key;
     }
 
-    public static string GetLocalizedFormattedString(this string key, params object[] args)
+    public static string ToLocalizationFormatted(this string key, params object[] args)
     {
         if (string.IsNullOrWhiteSpace(key))
             return string.Empty;

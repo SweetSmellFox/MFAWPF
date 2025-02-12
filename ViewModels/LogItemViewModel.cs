@@ -105,21 +105,21 @@ namespace MFAWPF.ViewModels
         private void UpdateContent()
         {
             if (_formatArgsKeys == null || _formatArgsKeys.Length == 0)
-                Content = ResourceKey.GetLocalizationString();
+                Content = ResourceKey.ToLocalization();
             else
             {
                 // 获取每个格式化参数的本地化字符串
-                var formatArgs = _formatArgsKeys.Select(key => key.GetLocalizedFormattedString()).ToArray();
+                var formatArgs = _formatArgsKeys.Select(key => key.ToLocalizationFormatted()).ToArray();
 
                 // 使用本地化字符串更新内容
                 try
                 {
                     Content = Regex.Unescape(
-                        _resourceKey.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray()));
+                        _resourceKey.ToLocalizationFormatted(formatArgs.Cast<object>().ToArray()));
                 }
                 catch
                 {
-                    Content = _resourceKey.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray());
+                    Content = _resourceKey.ToLocalizationFormatted(formatArgs.Cast<object>().ToArray());
                 }
             }
         }

@@ -33,7 +33,7 @@ public partial class LocalizationViewModel : ViewModel
     
     private void UpdateName()
     {
-        Name = ResourceKey.GetLocalizationString();
+        Name = ResourceKey.ToLocalization();
     }
 
     private void OnLanguageChanged(object sender, EventArgs e)

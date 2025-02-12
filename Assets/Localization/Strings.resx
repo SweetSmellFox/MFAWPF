@@ -786,4 +786,7 @@
   <data name="MaaFWVersion" xml:space="preserve">
     <value>框架版本</value>
   </data>
+  <data name="CurrentResourcesNotSupportMirror" xml:space="preserve">
+    <value>当前资源不支持 Mirror 酱</value>
+  </data>
 </root>

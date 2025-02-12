@@ -231,7 +231,7 @@ public partial class ColorExtractionDialog
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadImageTitle".GetLocalizationString(), Filter = "ImageFilter".GetLocalizationString()
+            Title = "LoadImageTitle".ToLocalization(), Filter = "ImageFilter".ToLocalization()
         };
 
 

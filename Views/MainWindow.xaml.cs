@@ -353,7 +353,7 @@ public partial class MainWindow
     {
         if (ViewModel?.Idle == false)
         {
-            GrowlHelper.Warning("CannotStart".GetLocalizationString());
+            GrowlHelper.Warning("CannotStart".ToLocalization());
             return;
         }
         if (InitializeData())
@@ -644,7 +644,7 @@ public partial class MainWindow
         catch (Exception ex)
         {
             GrowlHelper.Warning(string.Format(LocExtension.GetLocalizedValue<string>("TaskStackError"),
-                (ViewModel?.IsAdb).IsTrue() ? "Emulator".GetLocalizationString() : "Window".GetLocalizationString(),
+                (ViewModel?.IsAdb).IsTrue() ? "Emulator".ToLocalization() : "Window".ToLocalization(),
                 ex.Message));
             SetConnected(false);
             LoggerService.LogError(ex);
@@ -1169,8 +1169,8 @@ public partial class MainWindow
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Title = "SelectExecutableFile".GetLocalizationString(),
-                Filter = "ExeFilter".GetLocalizationString()
+                Title = "SelectExecutableFile".ToLocalization(),
+                Filter = "ExeFilter".ToLocalization()
             };
 
             if (openFileDialog.ShowDialog().IsTrue())
@@ -1370,9 +1370,9 @@ public partial class MainWindow
         if (!IsConnected())
         {
             GrowlHelper.Warning(
-                "Warning_CannotConnect".GetLocalizedFormattedString((ViewModel?.IsAdb).IsTrue()
-                    ? "Emulator".GetLocalizationString()
-                    : "Window".GetLocalizationString()));
+                "Warning_CannotConnect".ToLocalizationFormatted((ViewModel?.IsAdb).IsTrue()
+                    ? "Emulator".ToLocalization()
+                    : "Window".ToLocalization()));
             return;
         }
 
@@ -1475,9 +1475,9 @@ public partial class MainWindow
             MaaProcessor.Config.DesktopWindow.ScreenCap = winScreenCapType;
 
             Console.WriteLine(
-                $"{"AdbInputMode".GetLocalizationString()}{win32InputType},{"AdbCaptureMode".GetLocalizationString()}{winScreenCapType}");
+                $"{"AdbInputMode".ToLocalization()}{win32InputType},{"AdbCaptureMode".ToLocalization()}{winScreenCapType}");
             LoggerService.LogInfo(
-                $"{"AdbInputMode".GetLocalizationString()}{win32InputType},{"AdbCaptureMode".GetLocalizationString()}{winScreenCapType}");
+                $"{"AdbInputMode".ToLocalization()}{win32InputType},{"AdbCaptureMode".ToLocalization()}{winScreenCapType}");
         }
     }
 
@@ -1851,8 +1851,8 @@ public partial class MainWindow
     {
         if (!ViewModel.IsRunning)
             return true;
-        var result = MessageBoxHelper.Show("ConfirmExitText".GetLocalizationString(),
-            "ConfirmExitTitle".GetLocalizationString(), buttons: MessageBoxButton.YesNo, icon: MessageBoxImage.Question);
+        var result = MessageBoxHelper.Show("ConfirmExitText".ToLocalization(),
+            "ConfirmExitTitle".ToLocalization(), buttons: MessageBoxButton.YesNo, icon: MessageBoxImage.Question);
         return result == MessageBoxResult.Yes;
     }
 }

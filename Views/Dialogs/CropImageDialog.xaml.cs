@@ -218,7 +218,7 @@ public partial class CropImageDialog
 
             var saveFileDialog = new SaveFileDialog
             {
-                Filter = "ImageFilter".GetLocalizationString(),
+                Filter = "ImageFilter".ToLocalization(),
                 DefaultExt = "png"
             };
 
@@ -260,8 +260,8 @@ public partial class CropImageDialog
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadImageTitle".GetLocalizationString(),
-            Filter = "ImageFilter".GetLocalizationString()
+            Title = "LoadImageTitle".ToLocalization(),
+            Filter = "ImageFilter".ToLocalization()
         };
         if (openFileDialog.ShowDialog().IsTrue())
         {
@@ -280,8 +280,8 @@ public partial class CropImageDialog
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadImageTitle".GetLocalizationString(),
-            Filter = "ImageFilter".GetLocalizationString()
+            Title = "LoadImageTitle".ToLocalization(),
+            Filter = "ImageFilter".ToLocalization()
         };
         if (openFileDialog.ShowDialog().IsTrue())
         {

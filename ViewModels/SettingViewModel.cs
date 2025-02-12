@@ -31,7 +31,7 @@ public partial class SettingViewModel : ViewModel
     {
         UpdateExternalNotificationProvider();
     }
-    
+
     private void ResetNotifySource()
     {
         if (_resetNotifyTimer != null)
@@ -190,8 +190,6 @@ public partial class SettingViewModel : ViewModel
         get
         {
             _downloadSourceIndex = DataSet.GetData("DownloadSourceIndex", 0);
-            if (string.IsNullOrWhiteSpace(MaaInterface.Instance.RID))
-                _downloadSourceIndex = 0;
             return _downloadSourceIndex;
         }
     }
@@ -199,7 +197,8 @@ public partial class SettingViewModel : ViewModel
 
     [ObservableProperty] private List<LocalizationViewModel> _downloadSourceList =
     [
-        new("GitHub"), new("MirrorChyan")
+        new("GitHub"), 
+        new("MirrorChyan"),
     ];
     [ObservableProperty] private bool _retryOnDisconnected = DataSet.GetData("RetryOnDisconnected", false);
 
@@ -235,8 +234,8 @@ public partial class SettingViewModel : ViewModel
 
     public object[] EnabledExternalNotificationProviders
     {
-        get =>_enabledExternalNotificationProviders;
-        
+        get => _enabledExternalNotificationProviders;
+
         set
         {
             try

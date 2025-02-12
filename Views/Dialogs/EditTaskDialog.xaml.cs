@@ -51,7 +51,7 @@ public partial class EditTaskDialog
     {
         if (Data?.DataList?.Count(t => !string.IsNullOrWhiteSpace(t.Name) && t.Name.Equals(TaskName.Text)) > 1)
         {
-            GrowlHelper.Error(string.Format("DuplicateTaskNameError".GetLocalizationString(), TaskName.Text));
+            GrowlHelper.Error(string.Format("DuplicateTaskNameError".ToLocalization(), TaskName.Text));
             return;
         }
 
@@ -70,11 +70,11 @@ public partial class EditTaskDialog
 
             Data.CurrentTask.Task = Data.CurrentTask.Task;
             _chartDialog?.UpdateGraph();
-            Growl.SuccessGlobal("SaveSuccessMessage".GetLocalizationString());
+            Growl.SuccessGlobal("SaveSuccessMessage".ToLocalization());
         }
         else
         {
-            GrowlHelper.ErrorGlobal("SaveFailureMessage".GetLocalizationString());
+            GrowlHelper.ErrorGlobal("SaveFailureMessage".ToLocalization());
         }
     }
 
@@ -90,8 +90,8 @@ public partial class EditTaskDialog
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadPipelineTitle".GetLocalizationString(),
-            Filter = "JSONFilter".GetLocalizationString()
+            Title = "LoadPipelineTitle".ToLocalization(),
+            Filter = "JSONFilter".ToLocalization()
         };
 
         if (openFileDialog.ShowDialog().IsTrue())
@@ -119,7 +119,7 @@ public partial class EditTaskDialog
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
-                GrowlHelper.ErrorGlobal(string.Format("LoadPipelineErrorMessage".GetLocalizationString(), ex.Message));
+                GrowlHelper.ErrorGlobal(string.Format("LoadPipelineErrorMessage".ToLocalization(), ex.Message));
             }
         }
     }
@@ -167,7 +167,7 @@ public partial class EditTaskDialog
                 if (taskItemViewModel.Task != null &&
                     !taskModels.TryAdd(taskItemViewModel.Name, taskItemViewModel.Task))
                 {
-                    GrowlHelper.WarningGlobal("SavePipelineWarning".GetLocalizationString());
+                    GrowlHelper.WarningGlobal("SavePipelineWarning".ToLocalization());
                     return;
                 }
             }
@@ -175,7 +175,7 @@ public partial class EditTaskDialog
 
         SaveFileDialog saveFileDialog = new SaveFileDialog
         {
-            Filter = "JSONFilter".GetLocalizationString(),
+            Filter = "JSONFilter".ToLocalization(),
             DefaultExt = ".json",
             AddExtension = true
         };
@@ -188,7 +188,7 @@ public partial class EditTaskDialog
             string jsonString = JsonConvert.SerializeObject(taskModels, settings);
 
             File.WriteAllText(filePath, jsonString);
-            Growl.SuccessGlobal("SavePipelineSuccess".GetLocalizationString());
+            Growl.SuccessGlobal("SavePipelineSuccess".ToLocalization());
         }
     }
 
@@ -287,7 +287,7 @@ public partial class EditTaskDialog
             }
             else
             {
-                GrowlHelper.ErrorGlobal("ClipboardDataError".GetLocalizationString());
+                GrowlHelper.ErrorGlobal("ClipboardDataError".ToLocalization());
             }
         }
     }
@@ -334,7 +334,7 @@ public partial class EditTaskDialog
             }
             else
             {
-                GrowlHelper.ErrorGlobal("ClipboardDataError".GetLocalizationString());
+                GrowlHelper.ErrorGlobal("ClipboardDataError".ToLocalization());
             }
         }
     }

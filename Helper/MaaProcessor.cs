@@ -112,7 +112,7 @@ public class MaaProcessor
                     bool connected = instance.Result is { Initialized: true };
                     if (!connected && MainWindow.ViewModel.IsAdb && DataSet.GetData("RetryOnDisconnected", false))
                     {
-                        MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "TryToStartEmulator".GetLocalizationString());
+                        MainWindow.AddLog("ConnectFailed".ToLocalization() + "\n" + "TryToStartEmulator".ToLocalization());
 
                         StartSoftware();
 
@@ -133,7 +133,7 @@ public class MaaProcessor
 
                     if (!connected && MainWindow.ViewModel.IsAdb)
                     {
-                        MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "TryToReconnectByAdb".GetLocalizationString());
+                        MainWindow.AddLog("ConnectFailed".ToLocalization() + "\n" + "TryToReconnectByAdb".ToLocalization());
                         ReconnectByAdb();
 
                         if (token.IsCancellationRequested)
@@ -149,7 +149,7 @@ public class MaaProcessor
                     }
                     if (!connected && MainWindow.ViewModel.IsAdb && DataSet.GetData("AllowAdbRestart", true))
                     {
-                        MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "RestartAdb".GetLocalizationString());
+                        MainWindow.AddLog("ConnectFailed".ToLocalization() + "\n" + "RestartAdb".ToLocalization());
 
                         RestartAdb();
 
@@ -167,7 +167,7 @@ public class MaaProcessor
                     // 尝试杀掉 ADB 进程
                     if (!connected && MainWindow.ViewModel.IsAdb && DataSet.GetData("AllowAdbHardRestart", true))
                     {
-                        MainWindow.AddLog("ConnectFailed".GetLocalizationString() + "\n" + "HardRestartAdb".GetLocalizationString());
+                        MainWindow.AddLog("ConnectFailed".ToLocalization() + "\n" + "HardRestartAdb".ToLocalization());
 
                         HardRestartAdb();
 
@@ -184,7 +184,7 @@ public class MaaProcessor
 
                     if (!connected)
                     {
-                        LoggerService.LogWarning("ConnectFailed".GetLocalizationString());
+                        LoggerService.LogWarning("ConnectFailed".ToLocalization());
                         MainWindow.AddLogByKey("ConnectFailed");
                         MainWindow.Instance.SetConnected(false);
                         Stop();
@@ -194,10 +194,10 @@ public class MaaProcessor
 
                     if (!MainWindow.Instance.IsConnected())
                     {
-                        GrowlHelper.Warning("Warning_CannotConnect".GetLocalizationString()
+                        GrowlHelper.Warning("Warning_CannotConnect".ToLocalization()
                             .FormatWith((MainWindow.ViewModel?.IsAdb).IsTrue()
-                                ? "Emulator".GetLocalizationString()
-                                : "Window".GetLocalizationString()));
+                                ? "Emulator".ToLocalization()
+                                : "Window".ToLocalization()));
                         throw new Exception();
                     }
                 }
@@ -269,7 +269,7 @@ public class MaaProcessor
                 }
                 else
                 {
-                    GrowlHelper.Error("StoppingFailed".GetLocalizationString());
+                    GrowlHelper.Error("StoppingFailed".ToLocalization());
                 }
             }, null, "停止任务");
             TaskQueue.Clear();
@@ -279,7 +279,7 @@ public class MaaProcessor
         {
             if (setIsStopped)
             {
-                GrowlHelper.Warning("NoTaskToStop".GetLocalizationString());
+                GrowlHelper.Warning("NoTaskToStop".ToLocalization());
                 TaskQueue.Clear();
                 OnTaskQueueChanged();
             }
@@ -294,7 +294,7 @@ public class MaaProcessor
             msgtype = "text",
             text = new
             {
-                content = "TaskAllCompleted".GetLocalizationString()
+                content = "TaskAllCompleted".ToLocalization()
             }
         };
 
@@ -714,13 +714,13 @@ public class MaaProcessor
     {
         if (IsStopped)
         {
-            Growl.Info("TaskStopped".GetLocalizationString());
+            Growl.Info("TaskStopped".ToLocalization());
             MainWindow.AddLogByKey("TaskAbandoned");
             IsStopped = false;
         }
         else
         {
-            ToastNotification.ShowDirect("TaskCompleted".GetLocalizationString());
+            ToastNotification.ShowDirect("TaskCompleted".ToLocalization());
             if (_startTime != null)
             {
                 var elapsedTime = DateTime.Now - (DateTime)_startTime;
@@ -823,7 +823,7 @@ public class MaaProcessor
     {
         AutoInitDictionary.Clear();
 
-        LoggerService.LogInfo("LoadingResources".GetLocalizationString());
+        LoggerService.LogInfo("LoadingResources".ToLocalization());
         MaaResource maaResource;
         try
         {
@@ -835,12 +835,12 @@ public class MaaProcessor
         }
         catch (Exception e)
         {
-            HandleInitializationError(e, "LoadResourcesFailed".GetLocalizationString());
+            HandleInitializationError(e, "LoadResourcesFailed".ToLocalization());
             return null;
         }
 
-        LoggerService.LogInfo("InitResourcesSuccess".GetLocalizationString());
-        LoggerService.LogInfo("LoadingController".GetLocalizationString());
+        LoggerService.LogInfo("InitResourcesSuccess".ToLocalization());
+        LoggerService.LogInfo("LoadingController".ToLocalization());
         MaaController controller;
         try
         {
@@ -849,15 +849,15 @@ public class MaaProcessor
         catch (Exception e)
         {
             HandleInitializationError(e,
-                "ConnectingEmulatorOrWindow".GetLocalizationString()
+                "ConnectingEmulatorOrWindow".ToLocalization()
                     .FormatWith((MainWindow.ViewModel?.IsAdb).IsTrue()
-                        ? "Emulator".GetLocalizationString()
-                        : "Window".GetLocalizationString()), true,
-                "InitControllerFailed".GetLocalizationString());
+                        ? "Emulator".ToLocalization()
+                        : "Window".ToLocalization()), true,
+                "InitControllerFailed".ToLocalization());
             return null;
         }
 
-        LoggerService.LogInfo("InitControllerSuccess".GetLocalizationString());
+        LoggerService.LogInfo("InitControllerSuccess".ToLocalization());
 
 
         try
@@ -1044,8 +1044,8 @@ public class MaaProcessor
     private void RegisterCustomRecognitionsAndActions(MaaTasker instance)
     {
         if (MaaInterface.Instance == null) return;
-        LoggerService.LogInfo("RegisteringCustomRecognizer".GetLocalizationString());
-        LoggerService.LogInfo("RegisteringCustomAction".GetLocalizationString());
+        LoggerService.LogInfo("RegisteringCustomRecognizer".ToLocalization());
+        LoggerService.LogInfo("RegisteringCustomAction".ToLocalization());
         // instance.Resource.Register(new MoneyDetectRecognition());
         // instance.Resource.Register(new MoneyRecognition());
         var customClasses = GetCustomClasses($"{Resource}/custom", [

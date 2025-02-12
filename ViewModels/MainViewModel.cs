@@ -64,21 +64,21 @@ public partial class MainViewModel : ViewModel
 
                 var content = string.Empty;
                 if (formatArgsKeys.Length == 0)
-                    content = key.GetLocalizationString();
+                    content = key.ToLocalization();
                 else
                 {
                     // 获取每个格式化参数的本地化字符串
-                    var formatArgs = formatArgsKeys.Select(k => k.GetLocalizedFormattedString()).ToArray();
+                    var formatArgs = formatArgsKeys.Select(k => k.ToLocalizationFormatted()).ToArray();
 
                     // 使用本地化字符串更新内容
                     try
                     {
                         content = Regex.Unescape(
-                            key.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray()));
+                            key.ToLocalizationFormatted(formatArgs.Cast<object>().ToArray()));
                     }
                     catch
                     {
-                        content = key.GetLocalizedFormattedString(formatArgs.Cast<object>().ToArray());
+                        content = key.ToLocalizationFormatted(formatArgs.Cast<object>().ToArray());
                     }
                 }
                 LoggerService.LogInfo(content);
@@ -225,7 +225,7 @@ public partial class MainViewModel : ViewModel
 
         GrowlHelper.OnUIThread(() =>
         {
-            var log = new LogItemViewModel(downloading ? "NewVersionFoundDescDownloading".GetLocalizationString() + "\n" + output : output, Application.Current.MainWindow.FindResource("DownloadLogBrush") as Brush,
+            var log = new LogItemViewModel(downloading ? "NewVersionFoundDescDownloading".ToLocalization() + "\n" + output : output, Application.Current.MainWindow.FindResource("DownloadLogBrush") as Brush,
                 dateFormat: "HH':'mm':'ss")
             {
                 IsDownloading = true,
@@ -248,7 +248,7 @@ public partial class MainViewModel : ViewModel
         });
     }
 
-    private string? _beforeTask = "None".GetLocalizationString();
+    private string? _beforeTask = "None".ToLocalization();
 
     public string? BeforeTask
     {
@@ -260,7 +260,7 @@ public partial class MainViewModel : ViewModel
         set => SetProperty(ref _beforeTask, value);
     }
 
-    private string? _afterTask = "None".GetLocalizationString();
+    private string? _afterTask = "None".ToLocalization();
 
     public string? AfterTask
     {
@@ -304,7 +304,7 @@ public partial class MainViewModel : ViewModel
             _isDebugMode = MFAExtensions.IsDebugMode();
             if (_isDebugMode && _shouldTip)
             {
-                MessageBoxHelper.Show("DebugModeWarning".GetLocalizationString(), "Tip".GetLocalizationString(), MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBoxHelper.Show("DebugModeWarning".ToLocalization(), "Tip".ToLocalization(), MessageBoxButton.OK, MessageBoxImage.Warning);
                 _shouldTip = false;
             }
             return _isDebugMode;

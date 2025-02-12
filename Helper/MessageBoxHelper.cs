@@ -87,11 +87,11 @@ public static class MessageBoxHelper
         string yes = "",
         string no = "")
     {
-        caption = string.IsNullOrEmpty(caption) ? "Tip".GetLocalizationString() : caption;
-        ok = string.IsNullOrEmpty(ok) ? OK.GetLocalizationString() : ok;
-        cancel = string.IsNullOrEmpty(cancel) ? Cancel.GetLocalizationString() : cancel;
-        yes = string.IsNullOrEmpty(yes) ? Yes.GetLocalizationString() : yes;
-        no = string.IsNullOrEmpty(no) ? No.GetLocalizationString() : no;
+        caption = string.IsNullOrEmpty(caption) ? "Tip".ToLocalization() : caption;
+        ok = string.IsNullOrEmpty(ok) ? OK.ToLocalization() : ok;
+        cancel = string.IsNullOrEmpty(cancel) ? Cancel.ToLocalization() : cancel;
+        yes = string.IsNullOrEmpty(yes) ? Yes.ToLocalization() : yes;
+        no = string.IsNullOrEmpty(no) ? No.ToLocalization() : no;
 
         SetImage(icon, ref iconKey, ref iconBrushKey);
         var info = new MessageBoxInfo
