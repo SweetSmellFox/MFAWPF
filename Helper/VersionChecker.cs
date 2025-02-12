@@ -348,7 +348,7 @@ public class VersionChecker
         var cdk = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
         var userAgent = "MFA";
 
-        var apiUrl = $"https://mirrorc.top/api/resources/{resId}/latest?current_version={currentVersion}&cdk={cdk}&user_agent={userAgent}";
+        var apiUrl = $"https://mirrorchyan.com/api/resources/{resId}/latest?current_version={currentVersion}&cdk={cdk}&user_agent={userAgent}";
 
         try
         {
@@ -1050,8 +1050,8 @@ public class VersionChecker
     {
 
         var releaseUrl = isUI
-            ? $"https://mirrorc.top/api/resources/{resId}/latest?current_version={version}&cdk={cdk}&os=win&arch=x86_64"
-            : $"https://mirrorc.top/api/resources/{resId}/latest?current_version={version}&cdk={cdk}&user_agent={userAgent}";
+            ? $"https://mirrorchyan.com/api/resources/{resId}/latest?current_version={version}&cdk={cdk}&os=win&arch=x86_64"
+            : $"https://mirrorchyan.com/api/resources/{resId}/latest?current_version={version}&cdk={cdk}&user_agent={userAgent}";
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
         httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
