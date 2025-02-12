@@ -1420,7 +1420,7 @@ public class VersionChecker
 
     private string GetResourceID()
     {
-        return MaaInterface.Instance?.RID ?? MaaInterface.Instance?.Name ?? string.Empty;
+        return MaaInterface.Instance?.RID ?? string.Empty;
     }
 
     private bool IsNewVersionAvailable(string latestVersion, string localVersion)
