@@ -204,7 +204,7 @@ public class VersionChecker
             MainWindow.ViewModel.ClearDownloadProgress();
             return;
         }
-        
+
 
         if (!IsNewVersionAvailable(latestVersion, currentVersion))
         {
@@ -263,7 +263,11 @@ public class VersionChecker
             interfacePath = Path.Combine(tempExtractDir, "assets", "interface.json");
             resourceDirPath = Path.Combine(tempExtractDir, "assets", "resource");
         }
+        Directory.Delete(tempExtractDir, true);
 
+        var resourcePath = Path.Combine(AppContext.BaseDirectory, "resource");
+        if (Directory.Exists(resourcePath))
+            Directory.Delete(resourcePath, true);
         string wpfDir = AppContext.BaseDirectory;
         var file = new FileInfo(interfacePath);
         if (file.Exists)
@@ -316,7 +320,7 @@ public class VersionChecker
         try
         {
             var settingsView = App.Services.GetRequiredService<SettingsView>();
-            SettingsView.ViewModel.ResourceVersion  = latestVersion;
+            SettingsView.ViewModel.ResourceVersion = latestVersion;
         }
         catch (Exception e)
         {
@@ -528,7 +532,11 @@ public class VersionChecker
 
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
         dialog?.UpdateProgress(50);
-
+        
+        var resourcePath = Path.Combine(AppContext.BaseDirectory, "resource");
+        if (Directory.Exists(resourcePath))
+            Directory.Delete(resourcePath, true);
+        
         var interfacePath = Path.Combine(tempExtractDir, "interface.json");
         var resourceDirPath = Path.Combine(tempExtractDir, "resource");
 
@@ -610,7 +618,7 @@ public class VersionChecker
         try
         {
             var settingsView = App.Services.GetRequiredService<SettingsView>();
-            SettingsView.ViewModel.ResourceVersion  = latestVersion;
+            SettingsView.ViewModel.ResourceVersion = latestVersion;
         }
         catch (Exception e)
         {
@@ -619,7 +627,7 @@ public class VersionChecker
         MainWindow.Instance.InitializeData();
         action?.Invoke();
     }
-    
+
     async public void UpdateMaaFwWithMirrorApi(bool noDialog = false)
     {
         MainWindow.Instance.SetUpdating(true);
@@ -663,7 +671,7 @@ public class VersionChecker
             MainWindow.ViewModel.ClearDownloadProgress();
             return;
         }
-        
+
 
         if (string.IsNullOrWhiteSpace(currentVersion))
         {
@@ -795,7 +803,7 @@ public class VersionChecker
             MainWindow.ViewModel.ClearDownloadProgress();
             return;
         }
-        
+
 
         if (string.IsNullOrWhiteSpace(currentVersion))
         {
@@ -1063,7 +1071,7 @@ public class VersionChecker
 
         var releaseUrl = isUI
             ? $"https://mirrorchyan.com/api/resources/{resId}/latest?current_version={version}&cdk={cdk}&os=win&arch=x86_64"
-            : $"https://mirrorchyan.com/api/resources/{resId}/latest?current_version={version}&cdk={cdk}&user_agent={userAgent}";
+            : $"https://mirrorchyan.com/api/resources/{resId}/latest?cdk={cdk}&user_agent={userAgent}";
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
         httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
