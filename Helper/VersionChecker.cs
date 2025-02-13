@@ -263,7 +263,7 @@ public class VersionChecker
             interfacePath = Path.Combine(tempExtractDir, "assets", "interface.json");
             resourceDirPath = Path.Combine(tempExtractDir, "assets", "resource");
         }
-        Directory.Delete(tempExtractDir, true);
+
 
         var resourcePath = Path.Combine(AppContext.BaseDirectory, "resource");
         if (Directory.Exists(resourcePath))
@@ -285,9 +285,10 @@ public class VersionChecker
         }
 
         dialog?.UpdateProgress(70);
-
-        File.Delete(tempZipFilePath);
-        Directory.Delete(tempExtractDir, true);
+        if (Directory.Exists(tempZipFilePath))
+            File.Delete(tempZipFilePath);
+        if (Directory.Exists(tempExtractDir))
+            Directory.Delete(tempExtractDir, true);
         dialog?.UpdateProgress(80);
 
         var newInterfacePath = Path.Combine(wpfDir, "interface.json");
