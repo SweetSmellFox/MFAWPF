@@ -459,7 +459,7 @@ public class MaaProcessor
         return commandLine;
     }
 
-    private void CloseSoftware()
+    private void CloseSoftware(Action? action = null)
     {
         if (_softwareProcess != null)
         {
@@ -477,6 +477,7 @@ public class MaaProcessor
         {
             CloseProcessesByName(Config.DesktopWindow.Name, DataSet.GetData("EmulatorConfig", string.Empty));
         }
+        action?.Invoke();
     }
 
     private void CloseProcessesByName(string processName, string emulatorConfig)
@@ -508,8 +509,7 @@ public class MaaProcessor
 
     private void CloseSoftwareAndMFA()
     {
-        CloseSoftware();
-        CloseMFA();
+        CloseSoftware(CloseMFA);
     }
 
     private void ShutDown()
