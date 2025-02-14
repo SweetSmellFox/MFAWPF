@@ -349,7 +349,7 @@ public partial class MainWindow
 
     public void Start(object sender, RoutedEventArgs e) => Start();
 
-    public void Start(bool onlyStart = false)
+    public void Start(bool onlyStart = false, bool checkUpdate = false)
     {
         if (ViewModel?.Idle == false)
         {
@@ -361,7 +361,7 @@ public partial class MainWindow
             MaaProcessor.Money = 0;
             var tasks = ViewModel?.TaskItemViewModels.ToList().FindAll(task => task.IsChecked);
             ConnectToMAA();
-            MaaProcessor.Instance.Start(tasks, onlyStart);
+            MaaProcessor.Instance.Start(tasks, onlyStart, checkUpdate);
         }
     }
 
@@ -1567,7 +1567,7 @@ public partial class MainWindow
                     Type = MFATask.MFATaskType.MFA,
                     Action = WaitSoftware,
                 });
-                Start(DataSet.GetData("AutoStartIndex", 0) == 1);
+                Start(DataSet.GetData("AutoStartIndex", 0) == 1, checkUpdate: true);
             }
             else
             {

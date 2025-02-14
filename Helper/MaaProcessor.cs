@@ -76,7 +76,7 @@ public class MaaProcessor
     private DateTime? _startTime;
 
 
-    public void Start(List<DragItemViewModel> tasks, bool onlyStart = false)
+    public void Start(List<DragItemViewModel> tasks, bool onlyStart = false, bool checkUpdate = false)
     {
         SetCurrentTasker();
         MainWindow.ViewModel?.SetIdle(false);
@@ -231,13 +231,14 @@ public class MaaProcessor
                 Type = MFATask.MFATaskType.MFA,
                 Action = () => { MainWindow.Instance.RunScript("Post-script"); }
             });
-        
-        TaskQueue.Push(new MFATask
-        {
-            Name = "检查更新",
-            Type = MFATask.MFATaskType.MFA,
-            Action = () => { VersionChecker.Check(); }
-        });
+        if (checkUpdate)
+            TaskQueue.Push(new MFATask
+            {
+                Name = "检查更新",
+                Type = MFATask.MFATaskType.MFA,
+                Action = () => { VersionChecker.Check(); }
+            });
+
 
         TaskManager.RunTaskAsync(async () =>
         {
