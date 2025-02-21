@@ -3,7 +3,7 @@ using MFAWPF.Views;
 
 namespace MFAWPF.Helper;
 
-public class MFATask : ObservableObject
+public partial class MFATask : ObservableObject
 {
     public enum MFATaskType
     {
@@ -11,34 +11,12 @@ public class MFATask : ObservableObject
         MAAFW
     }
 
-    private string _name = string.Empty;
-    private MFATaskType _type = MFATaskType.MFA;
-    private int _count = 1;
-    private Action _action;
+    [ObservableProperty] private string _name = string.Empty;
+    [ObservableProperty] private MFATaskType _type = MFATaskType.MFA;
+    [ObservableProperty] private int _count = 1;
+    [ObservableProperty] private Action _action;
+    [ObservableProperty] private Dictionary<string, TaskModel> _tasks = new();
 
-    public string Name
-    {
-        get => _name;
-        set => SetProperty(ref _name, value);
-    }
-
-    public MFATaskType Type
-    {
-        get => _type;
-        set => SetProperty(ref _type, value);
-    }
-
-    public Action Action
-    {
-        get => _action;
-        set => SetProperty(ref _action, value);
-    }
-
-    public int Count
-    {
-        get => _count;
-        set => SetProperty(ref _count, value);
-    }
 
     public bool Run()
     {

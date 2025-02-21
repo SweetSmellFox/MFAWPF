@@ -42,6 +42,8 @@ public partial class MainWindow
         $"v{Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "DEBUG"}";
 
     public Dictionary<string, TaskModel> TaskDictionary = new();
+    public Dictionary<string, TaskModel> BaseTasks = new();
+    
     public MainWindow(ViewModels.MainViewModel viewModel)
     {
         DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
@@ -94,8 +96,8 @@ public partial class MainWindow
         }
 
         ConnectToMAA();
+        
         return LoadTask();
-
     }
 
 
@@ -206,7 +208,7 @@ public partial class MainWindow
                 {
                     if (!Path.Exists($"{resourcePath}/pipeline/"))
                         break;
-                    var jsonFiles = Directory.GetFiles($"{resourcePath}/pipeline/", "*.json");
+                    var jsonFiles = Directory.GetFiles($"{resourcePath}/pipeline/", "*.json", SearchOption.AllDirectories);
                     var taskDictionaryA = new Dictionary<string, TaskModel>();
                     foreach (var file in jsonFiles)
                     {
@@ -289,7 +291,7 @@ public partial class MainWindow
 
     private void PopulateTasks(Dictionary<string, TaskModel> taskDictionary)
     {
-        TaskDictionary = taskDictionary;
+        BaseTasks = taskDictionary;
         foreach (var task in taskDictionary)
         {
             task.Value.Name = task.Key;

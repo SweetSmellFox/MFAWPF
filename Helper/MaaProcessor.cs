@@ -70,13 +70,19 @@ public class MaaProcessor
         public string? Name { get; set; }
         public string? Entry { get; set; }
         public int? Count { get; set; }
+
+        public Dictionary<string, TaskModel>? Tasks
+        {
+            get;
+            set;
+        }
         public string? Param { get; set; }
     }
 
     private DateTime? _startTime;
 
 
-    public void Start(List<DragItemViewModel> tasks, bool onlyStart = false, bool checkUpdate = false)
+    public void Start(List<DragItemViewModel>? tasks, bool onlyStart = false, bool checkUpdate = false)
     {
         SetCurrentTasker();
         MainWindow.ViewModel?.SetIdle(false);
@@ -93,7 +99,7 @@ public class MaaProcessor
 
         _startTime = DateTime.Now;
         IsStopped = false;
-        tasks ??= new List<DragItemViewModel>();
+        tasks ??= new();
         var taskAndParams = tasks.Select(CreateTaskAndParam).ToList();
         _cancellationTokenSource = new CancellationTokenSource();
         var token = _cancellationTokenSource.Token;
@@ -221,7 +227,11 @@ public class MaaProcessor
                     Name = task.Name,
                     Type = MFATask.MFATaskType.MAAFW,
                     Count = task.Count ?? 1,
-                    Action = () => { TryRunTasks(_currentTasker, task.Entry, task.Param); },
+                    Action = () =>
+                    {
+                        if (task.Tasks != null) MainWindow.Instance.TaskDictionary = task.Tasks;
+                        TryRunTasks(_currentTasker, task.Entry, task.Param);
+                    },
                 });
         }
         if (!onlyStart)
@@ -245,12 +255,12 @@ public class MaaProcessor
             var run = await ExecuteTasks(token);
             if (run)
             {
-                Stop(IsStopped);
+                Stop(IsStopped, onlyStart);
             }
         }, null, "启动任务");
     }
 
-    public void Stop(bool setIsStopped = true)
+    public void Stop(bool setIsStopped = true, bool onlyStart = false)
     {
 
         _emulatorCancellationTokenSource?.Cancel();
@@ -265,7 +275,7 @@ public class MaaProcessor
                     MainWindow.AddLogByKey("Stopping");
                 if (_currentTasker == null || _currentTasker?.Abort().Wait() == MaaJobStatus.Succeeded)
                 {
-                    DisplayTaskCompletionMessage();
+                    DisplayTaskCompletionMessage(onlyStart);
                     MainWindow.ViewModel?.SetIdle(true);
                 }
                 else
@@ -462,21 +472,23 @@ public class MaaProcessor
 
     private void CloseSoftware(Action? action = null)
     {
-        if (_softwareProcess != null)
-        {
-            if (!_softwareProcess.HasExited)
-            {
-                _softwareProcess.Kill();
-            }
-            _softwareProcess = null;
-        }
-        else if ((MainWindow.ViewModel?.IsAdb).IsTrue())
+
+        if ((MainWindow.ViewModel?.IsAdb).IsTrue())
         {
             EmulatorHelper.KillEmulatorModeSwitcher();
         }
         else
         {
-            CloseProcessesByName(Config.DesktopWindow.Name, DataSet.GetData("EmulatorConfig", string.Empty));
+            if (_softwareProcess != null && !_softwareProcess.HasExited)
+            {
+                _softwareProcess.Kill();
+            }
+            else
+            {
+                CloseProcessesByName(Config.DesktopWindow.Name, DataSet.GetData("EmulatorConfig", string.Empty));
+                _softwareProcess = null;
+            }
+
         }
         action?.Invoke();
     }
@@ -582,18 +594,28 @@ public class MaaProcessor
         UpdateTaskDictionary(ref taskModels, task.InterfaceItem?.Option);
 
         var taskParams = SerializeTaskParams(taskModels);
+        var settings = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        };
+        var json = JsonConvert.SerializeObject(MainWindow.Instance.BaseTasks, settings);
 
+        var tasks = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(json, settings);
+        tasks = tasks.MergeTaskModels(taskModels);
         return new TaskAndParam
         {
             Name = task.InterfaceItem?.Name,
             Entry = task.InterfaceItem?.Entry,
             Count = task.InterfaceItem?.Repeatable == true ? (task.InterfaceItem?.RepeatCount ?? 1) : 1,
+            Tasks = tasks,
             Param = taskParams
         };
     }
 
     private void UpdateTaskDictionary(ref Dictionary<string, TaskModel> taskModels,
-        List<MaaInterface.MaaInterfaceSelectOption> options)
+        List<MaaInterface.MaaInterfaceSelectOption>? options)
     {
         if (MainWindow.Instance?.TaskDictionary != null)
             MainWindow.Instance.TaskDictionary = MainWindow.Instance.TaskDictionary.MergeTaskModels(taskModels);
@@ -711,7 +733,7 @@ public class MaaProcessor
         return true;
     }
 
-    private void DisplayTaskCompletionMessage()
+    private void DisplayTaskCompletionMessage(bool onlyStart = false)
     {
         if (IsStopped)
         {
@@ -732,8 +754,11 @@ public class MaaProcessor
             {
                 MainWindow.AddLogByKey("TaskAllCompleted");
             }
-            ExternalNotificationAsync();
-            HandleAfterTaskOperation();
+            if (!onlyStart)
+            {
+                ExternalNotificationAsync();
+                HandleAfterTaskOperation();
+            }
         }
 
         _startTime = null;
