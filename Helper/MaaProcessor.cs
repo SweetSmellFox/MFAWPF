@@ -466,13 +466,11 @@ public class MaaProcessor
             commandLine = obj["CommandLine"]?.ToString() ?? string.Empty;
         }
 
-
         return commandLine;
     }
 
     private void CloseSoftware(Action? action = null)
     {
-
         if ((MainWindow.ViewModel?.IsAdb).IsTrue())
         {
             EmulatorHelper.KillEmulatorModeSwitcher();
@@ -516,7 +514,7 @@ public class MaaProcessor
 
     private void CloseMFA()
     {
-        GrowlHelper.OnUIThread(Application.Current.Shutdown);
+        DispatcherHelper.RunOnMainThread(Application.Current.Shutdown);
     }
 
 
@@ -535,7 +533,7 @@ public class MaaProcessor
     {
         CloseSoftware();
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
-        GrowlHelper.OnUIThread(Application.Current.Shutdown);
+        DispatcherHelper.RunOnMainThread(Application.Current.Shutdown);
     }
 
     private void Restart()
@@ -1121,7 +1119,7 @@ public class MaaProcessor
                         try
                         {
                             if (taskModel.FocusSucceededColor != null && taskModel.FocusSucceededColor.Count > i)
-                                brush = converter.ConvertFromString(taskModel.FocusSucceededColor[i]) as Brush;
+                                brush = BrushConverterHelper.ConvertToBrush(taskModel.FocusSucceededColor[i]) as Brush;
                         }
                         catch (Exception e)
                         {
@@ -1143,7 +1141,7 @@ public class MaaProcessor
                         try
                         {
                             if (taskModel.FocusFailedColor != null && taskModel.FocusFailedColor.Count > i)
-                                brush = converter.ConvertFromString(taskModel.FocusFailedColor[i]) as Brush;
+                                brush = BrushConverterHelper.ConvertToBrush(taskModel.FocusFailedColor[i]);
                         }
                         catch (Exception e)
                         {
@@ -1164,12 +1162,14 @@ public class MaaProcessor
                 {
                     for (int i = 0; i < taskModel.FocusTip.Count; i++)
                     {
-                        Brush brush = null;
+                        Brush? brush = null;
                         var tip = taskModel.FocusTip[i];
                         try
                         {
                             if (taskModel.FocusTipColor != null && taskModel.FocusTipColor.Count > i)
-                                brush = converter.ConvertFromString(taskModel.FocusTipColor[i]) as Brush;
+                            {
+                                brush = BrushConverterHelper.ConvertToBrush(taskModel.FocusTipColor[i]);
+                            }
                         }
                         catch (Exception e)
                         {
