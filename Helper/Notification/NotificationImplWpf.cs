@@ -147,7 +147,7 @@ internal class NotificationImplWpf : INotificationPoster
 
         try
         {
-            GrowlHelper.OnUIThread(() =>
+            DispatcherHelper.RunOnMainThread(() =>
             {
                 _notificationManager.Show(wpfcontent, expirationTime: expirationTime, ShowXbtn: false);
             });

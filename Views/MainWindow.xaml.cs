@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Themes;
+using HandyControl.Tools.Extension;
 using MaaFramework.Binding;
 using MFAWPF.Data;
 using MFAWPF.Helper;
@@ -22,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using WPFLocalizeExtension.Extensions;
 using ComboBox = HandyControl.Controls.ComboBox;
@@ -43,7 +45,7 @@ public partial class MainWindow
 
     public Dictionary<string, TaskModel> TaskDictionary = new();
     public Dictionary<string, TaskModel> BaseTasks = new();
-    
+
     public MainWindow(ViewModels.MainViewModel viewModel)
     {
         DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
@@ -69,7 +71,6 @@ public partial class MainWindow
         MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
         SetIconFromExeDirectory();
 
-
     }
 
 
@@ -84,7 +85,7 @@ public partial class MainWindow
         }
     }
 
-    public bool InitializeData()
+    public bool InitializeData(Collection<DragItemViewModel>? dragItem = null)
     {
         MaaInterface.Check();
 
@@ -92,18 +93,18 @@ public partial class MainWindow
         {
             AppendVersionLog(MaaInterface.Instance.Version);
             ViewModel?.TasksSource.Clear();
-            LoadTasks(MaaInterface.Instance.Task ?? new List<TaskInterfaceItem>());
+            LoadTasks(MaaInterface.Instance.Task ?? new List<TaskInterfaceItem>(), dragItem);
         }
 
         ConnectToMAA();
-        
+
         return LoadTask();
     }
 
 
     public bool FirstTask = true;
 
-    private void LoadTasks(IEnumerable<TaskInterfaceItem> tasks)
+    private void LoadTasks(IEnumerable<TaskInterfaceItem> tasks, Collection<DragItemViewModel>? drag = null)
     {
         foreach (var task in tasks)
         {
@@ -116,28 +117,93 @@ public partial class MainWindow
                         MaaInterface.Instance.Resources[
                             MaaInterface.Instance.Resources.Keys.ToList()[DataSet.GetData("ResourceIndex", 0)]];
                 else
-                    MaaProcessor.CurrentResources = new List<string>
-                    {
+                    MaaProcessor.CurrentResources =
+                    [
                         MaaProcessor.ResourceBase
-                    };
+                    ];
                 FirstTask = false;
+            }
+            if (drag != null)
+            {
+                var oldDict = drag
+                    .Where(vm => vm.InterfaceItem?.Name != null)
+                    .ToDictionary(vm => vm.InterfaceItem.Name);
+
+                foreach (var newItem in tasks)
+                {
+                    if (newItem?.Name == null) continue;
+
+                    if (oldDict.TryGetValue(newItem.Name, out var oldVm))
+                    {
+                        var oldItem = oldVm.InterfaceItem;
+                        if (oldItem == null) continue;
+
+                        if (oldItem.Check.HasValue)
+                        {
+                            newItem.Check = oldItem.Check;
+                        }
+
+                        if (oldItem.Option != null && newItem.Option != null)
+                        {
+                            foreach (var newOption in newItem.Option)
+                            {
+                                var oldOption = oldItem.Option.FirstOrDefault(o =>
+                                    o.Name == newOption.Name && o.Index.HasValue);
+
+                                if (oldOption != null)
+                                {
+
+                                    int maxValidIndex = newItem.Option.Count - 1;
+                                    int desiredIndex = oldOption.Index ?? 0;
+
+                                    newOption.Index = (desiredIndex >= 0 && desiredIndex <= maxValidIndex)
+                                        ? desiredIndex
+                                        : 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (dragItem.InterfaceItem?.Option != null)
+            {
+                foreach (var option in dragItem.InterfaceItem.Option)
+                {
+                    if (MaaInterface.Instance?.Option != null && MaaInterface.Instance.Option.TryGetValue(option.Name, out var interfaceOption))
+                    {
+                        if (interfaceOption.Cases != null)
+                        {
+                            if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase) && interfaceOption.Cases != null)
+                            {
+                                var index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
+                                if (index != -1)
+                                {
+                                    option.Index = index;
+                                }
+                            }
+                        }
+                    }
+
+                }
             }
 
             ViewModel?.TasksSource.Add(dragItem);
         }
 
-        if (ViewModel?.TaskItemViewModels.Count == 0)
+        if (ViewModel.TaskItemViewModels.Count == 0)
         {
             var items = DataSet.GetData("TaskItems",
                     new List<TaskInterfaceItem>())
                 ?? new List<TaskInterfaceItem>();
             var dragItemViewModels = items.Select(interfaceItem => new DragItemViewModel(interfaceItem)).ToList();
-            ViewModel.TaskItemViewModels.AddRange(dragItemViewModels);
-            if (ViewModel.TaskItemViewModels.Count == 0 && ViewModel.TasksSource.Count != 0)
+            var tempViewModel = new ObservableCollection<DragItemViewModel>();
+            tempViewModel.AddRange(dragItemViewModels);
+            if (tempViewModel.Count == 0 && ViewModel.TasksSource.Count != 0)
             {
                 foreach (var item in ViewModel.TasksSource)
-                    ViewModel.TaskItemViewModels.Add(item);
+                    tempViewModel.Add(item);
             }
+            ViewModel.TaskItemViewModels = tempViewModel;
         }
     }
 
@@ -153,21 +219,17 @@ public partial class MainWindow
 
     public void ToggleTaskButtonsVisibility(bool isRunning)
     {
-        GrowlHelper.OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
             if (ViewModel is not null)
                 ViewModel.IsRunning = isRunning;
-            // startButton.Visibility = isRunning ?? Visibility.Collapsed : Visibility.Visible;
-            // startButton.IsEnabled = !isRunning;
-            // stopButton.Visibility = isRunning ?? Visibility.Visible : Visibility.Collapsed;
-            // stopButton.IsEnabled = isRunning;
         });
     }
 
     protected override void OnClosing(CancelEventArgs e)
     {
         e.Cancel = !ConfirmExit();
-        DataSet.SetData("TaskItems", ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+        DataSet.SetData("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         base.OnClosed(e);
     }
 
@@ -483,7 +545,7 @@ public partial class MainWindow
             if ((ViewModel?.IsAdb).IsTrue())
             {
                 var devices = _maaToolkit.AdbDevice.Find();
-                GrowlHelper.OnUIThread(() => deviceComboBox.ItemsSource = devices);
+                DispatcherHelper.RunOnMainThread(() => deviceComboBox.ItemsSource = devices);
                 SetConnected(devices.Count > 0);
                 var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
                 var resultIndex = 0;
@@ -506,7 +568,7 @@ public partial class MainWindow
                 }
                 else
                     resultIndex = 0;
-                GrowlHelper.OnUIThread(() => deviceComboBox.SelectedIndex = resultIndex);
+                DispatcherHelper.RunOnMainThread(() => deviceComboBox.SelectedIndex = resultIndex);
                 if (MaaInterface.Instance?.Controller != null)
                 {
                     if (MaaInterface.Instance.Controller.Any(controller => controller.Type != null && controller.Type.ToLower().Equals("adb")))
@@ -567,7 +629,7 @@ public partial class MainWindow
             else
             {
                 var windows = _maaToolkit.Desktop.Window.Find().ToList();
-                GrowlHelper.OnUIThread(() => deviceComboBox.ItemsSource = windows);
+                DispatcherHelper.RunOnMainThread(() => deviceComboBox.ItemsSource = windows);
                 SetConnected(windows.Count > 0);
                 var resultIndex = windows.Count > 0
                     ? windows.ToList().FindIndex(win => !string.IsNullOrWhiteSpace(win.Name))
@@ -633,7 +695,7 @@ public partial class MainWindow
                         }
                     }
                 }
-                GrowlHelper.OnUIThread(() => deviceComboBox.SelectedIndex = resultIndex);
+                DispatcherHelper.RunOnMainThread(() => deviceComboBox.SelectedIndex = resultIndex);
             }
 
             if (!IsConnected())
@@ -776,7 +838,7 @@ public partial class MainWindow
     public void RestartMFA()
     {
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
-        GrowlHelper.OnUIThread(Application.Current.Shutdown);
+        DispatcherHelper.RunOnMainThread(Application.Current.Shutdown);
     }
 
     private void AddResourcesOption(Panel panel = null, int defaultValue = 0)
@@ -1263,7 +1325,7 @@ public partial class MainWindow
                     Margin = new Thickness(5),
                 };
 
-                var multiBinding = new MultiBinding()
+                var multiBinding = new MultiBinding
                 {
                     Converter = FindResource("CustomIsEnabledConverter") as IMultiValueConverter,
                     Mode = BindingMode.OneWay
@@ -1289,17 +1351,8 @@ public partial class MainWindow
                     option.Index = comboBox.SelectedIndex;
 
                     DataSet.SetData("TaskItems",
-                        ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                        ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                 };
-
-                if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase) && interfaceOption.Cases != null)
-                {
-                    var index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
-                    if (index != -1)
-                    {
-                        comboBox.SelectedIndex = index;
-                    }
-                }
 
                 comboBox.SetValue(ToolTipProperty, option.Name);
                 comboBox.SetValue(TitleElement.TitleProperty, option.Name);
@@ -1522,7 +1575,7 @@ public partial class MainWindow
 
     public void ShowResourceName(string name)
     {
-        GrowlHelper.OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
             resourceName.Visibility = Visibility.Visible;
             resourceNameText.Visibility = Visibility.Visible;
@@ -1532,7 +1585,7 @@ public partial class MainWindow
 
     public void ShowResourceVersion(string v)
     {
-        GrowlHelper.OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
             resourceVersion.Visibility = Visibility.Visible;
             resourceVersionText.Visibility = Visibility.Visible;
@@ -1542,7 +1595,7 @@ public partial class MainWindow
 
     public void ShowCustomTitle(string v)
     {
-        GrowlHelper.OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
             title.Visibility = Visibility.Collapsed;
             version.Visibility = Visibility.Collapsed;
@@ -1556,7 +1609,7 @@ public partial class MainWindow
 
     public void LoadUI()
     {
-        GrowlHelper.OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
             InitializationSettings();
             ConnectionTabControl.SelectedIndex = MaaInterface.Instance?.DefaultController == "win32" ? 1 : 0;
@@ -1582,7 +1635,7 @@ public partial class MainWindow
                     var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
                     if (device != null)
                     {
-                        GrowlHelper.OnUIThread(() =>
+                        DispatcherHelper.RunOnMainThread(() =>
                         {
                             deviceComboBox.ItemsSource = new List<AdbDeviceInfo>
                             {
@@ -1613,7 +1666,7 @@ public partial class MainWindow
         TaskManager.RunTaskAsync(async () =>
         {
             await Task.Delay(1000);
-            GrowlHelper.OnUIThread(() =>
+            DispatcherHelper.RunOnMainThread(() =>
             {
                 if (DataSet.GetData("AutoMinimize", false))
                 {
@@ -1818,7 +1871,7 @@ public partial class MainWindow
             var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
             if (device != null)
             {
-                GrowlHelper.OnUIThread(() =>
+                DispatcherHelper.RunOnMainThread(() =>
                 {
                     deviceComboBox.ItemsSource = new List<AdbDeviceInfo>
                     {
@@ -1830,7 +1883,7 @@ public partial class MainWindow
             }
         }
         else
-            GrowlHelper.OnUIThread(AutoDetectDevice);
+            DispatcherHelper.RunOnMainThread(AutoDetectDevice);
     }
     public bool IsConnected()
     {
@@ -1856,5 +1909,14 @@ public partial class MainWindow
         var result = MessageBoxHelper.Show("ConfirmExitText".ToLocalization(),
             "ConfirmExitTitle".ToLocalization(), buttons: MessageBoxButton.YesNo, icon: MessageBoxImage.Question);
         return result == MessageBoxResult.Yes;
+    }
+
+    public void ClearTasks(Action? action = null)
+    {
+        DispatcherHelper.RunOnMainThread(() =>
+        {
+            ViewModel.TaskItemViewModels = new();
+            action?.Invoke();
+        });
     }
 }

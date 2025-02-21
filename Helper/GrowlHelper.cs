@@ -2,13 +2,14 @@
 using HandyControl.Controls;
 using HandyControl.Data;
 
+
 namespace MFAWPF.Helper;
 
 public static class GrowlHelper
 {
     public static void Warning(string message, string token = "")
     {
-        OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
             Growl.Warning(new GrowlInfo
             {
@@ -24,7 +25,7 @@ public static class GrowlHelper
 
     public static void WarningGlobal(string message, string token = "")
     {
-        OnUIThread(() =>
+        HandyControl.Tools.DispatcherHelper.RunOnMainThread(() =>
         {
             Growl.InfoGlobal(new GrowlInfo
             {
@@ -40,7 +41,7 @@ public static class GrowlHelper
 
     public static void Error(string message, string token = "")
     {
-        OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
             Growl.Info(new GrowlInfo
             {
@@ -58,7 +59,7 @@ public static class GrowlHelper
 
     public static void ErrorGlobal(string message, string token = "")
     {
-        OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
             Growl.InfoGlobal(new GrowlInfo
             {
@@ -74,7 +75,7 @@ public static class GrowlHelper
     }
     public static void InfoGlobal(string message, string token = "")
     {
-        OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
             Growl.InfoGlobal(message);
         });
@@ -82,17 +83,10 @@ public static class GrowlHelper
 
     public static void Info(string message, string token = "")
     {
-        OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
             Growl.Info(message);
         });
     }
-
-    public static void OnUIThread(Action action)
-    {
-        if (Application.Current.Dispatcher.CheckAccess())
-            action();
-        else
-            Application.Current.Dispatcher.Invoke(action);
-    }
+    
 }

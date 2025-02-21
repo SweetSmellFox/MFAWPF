@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -30,7 +31,7 @@ public partial class ColorExtractionDialog
         Task.Run(() =>
         {
             var image = MaaProcessor.Instance.GetBitmapImage();
-            GrowlHelper.OnUIThread(() => { UpdateImage(image); });
+            DispatcherHelper.RunOnMainThread(() => { UpdateImage(image); });
         });
     }
 

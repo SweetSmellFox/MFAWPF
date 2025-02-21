@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -31,7 +32,7 @@ public partial class CropImageDialog
         Task.Run(() =>
         {
             var image = MaaProcessor.Instance.GetBitmapImage();
-            GrowlHelper.OnUIThread(() => { UpdateImage(image); });
+            DispatcherHelper.RunOnMainThread(() => { UpdateImage(image); });
         });
     }
 

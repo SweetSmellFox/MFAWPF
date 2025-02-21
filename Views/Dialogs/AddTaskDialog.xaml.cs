@@ -8,14 +8,14 @@ namespace MFAWPF.Views;
 
 public partial class AddTaskDialog
 {
-    private DragItemViewModel _outputContent;
+
     public AddTaskDialogViewModel?
         Data;
 
-    public DragItemViewModel OutputContent
+    public DragItemViewModel? OutputContent
     {
-        get => _outputContent;
-        set => _outputContent = value;
+        get;
+        set;
     }
 
     private readonly ObservableCollection<DragItemViewModel> _source = new();

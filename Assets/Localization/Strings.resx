@@ -789,4 +789,7 @@
   <data name="CurrentResourcesNotSupportMirror" xml:space="preserve">
     <value>当前资源不支持 Mirror 酱</value>
   </data>
+  <data name="MirrorUseLimitReached" xml:space="preserve">
+    <value>Mirror 酱的使用已达到上限</value>
+  </data>
 </root>

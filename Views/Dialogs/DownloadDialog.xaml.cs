@@ -1,3 +1,4 @@
+
 using MFAWPF.Helper;
 using System.Diagnostics;
 using System.Windows;
@@ -39,7 +40,7 @@ public partial class DownloadDialog
     private void Restart(object sender, RoutedEventArgs e)
     {
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
-        GrowlHelper.OnUIThread(Application.Current.Shutdown);
+        DispatcherHelper.RunOnMainThread(Application.Current.Shutdown);
     }
 }
 

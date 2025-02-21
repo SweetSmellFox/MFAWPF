@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using HandyControl.Tools;
+using System.Windows;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -25,13 +26,11 @@ public partial class ErrorView : INotifyPropertyChanged
 
     public static void ShowException(Exception e, bool shouldExit = false)
     {
-        if (Application.Current.Dispatcher.CheckAccess())
+        DispatcherHelper.RunOnMainThread(() =>
         {
             var errorView = new ErrorView(e, shouldExit);
             errorView.Show();
-        }
-        else
-            Application.Current.Dispatcher.Invoke(() => { ShowException(e, shouldExit); });
+        });
     }
 
     public ErrorView(Exception exc, bool shouldExit)

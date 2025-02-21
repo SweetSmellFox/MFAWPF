@@ -29,7 +29,7 @@ public partial class SelectionRegionDialog
         Task.Run(() =>
         {
             var image = MaaProcessor.Instance.GetBitmapImage();
-            GrowlHelper.OnUIThread(() => { UpdateImage(image); });
+            DispatcherHelper.RunOnMainThread(() => { UpdateImage(image); });
         });
     }
 

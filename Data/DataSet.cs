@@ -13,7 +13,7 @@ public static class DataSet
     public static Dictionary<string, object> MaaConfig = new();
 
 
-    public static void SetConfig(this Dictionary<string, object> config, string key, object value)
+    public static void SetConfig(this Dictionary<string, object>? config, string key, object? value)
     {
         if (config == null || value == null) return;
         config[key] = value;

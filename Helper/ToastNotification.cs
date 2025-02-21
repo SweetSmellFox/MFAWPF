@@ -189,7 +189,7 @@ public class ToastNotification : IDisposable
         NotificationSounds sound = NotificationSounds.Notification,
         params NotificationHint[] hints)
     {
-        GrowlHelper.OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
 
             var content = new NotificationContent

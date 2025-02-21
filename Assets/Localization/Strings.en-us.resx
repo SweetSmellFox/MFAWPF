@@ -782,4 +782,7 @@
   <data name="CurrentResourcesNotSupportMirror" xml:space="preserve">
     <value>The current resources do not support Mirror Chyan.</value>
   </data>
+  <data name="MirrorUseLimitReached" xml:space="preserve">
+    <value>The usage of Mirror Chyan has reached the limit.</value>
+  </data>
 </root>

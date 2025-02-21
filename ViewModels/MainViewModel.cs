@@ -6,6 +6,8 @@ using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools.Command;
 using MFAWPF.Helper;
+using Newtonsoft.Json;
+using System.ComponentModel;
 using System.Text.RegularExpressions;
 using DataSet = MFAWPF.Data.DataSet;
 
@@ -21,7 +23,7 @@ public partial class MainViewModel : ViewModel
         string weight = "Regular",
         bool showTime = true)
     {
-        
+
         var brush = new BrushConverter().ConvertFromString(color) as SolidColorBrush;
         brush ??= Brushes.Gray;
         Task.Run(() =>
@@ -86,8 +88,18 @@ public partial class MainViewModel : ViewModel
         });
     }
 
-    public ObservableCollection<DragItemViewModel> TaskItemViewModels { get; set; } =
-        [];
+    [ObservableProperty] private ObservableCollection<DragItemViewModel> _taskItemViewModels = new();
+    partial void OnTaskItemViewModelsChanged(ObservableCollection<DragItemViewModel>? oldValue, ObservableCollection<DragItemViewModel>? newValue)
+    {
+        if (newValue != null)
+        {
+            DataSet.SetData("TaskItems", newValue.ToList().Select(model => model.InterfaceItem));
+        }
+        else
+        {
+            DataSet.SetData("TaskItems", new ObservableCollection<DragItemViewModel>());
+        }
+    }
 
     public ObservableCollection<DragItemViewModel> TasksSource { get; private set; } =
         [];
@@ -108,7 +120,7 @@ public partial class MainViewModel : ViewModel
     [ObservableProperty] private bool _isAdb = true;
 
     [ObservableProperty] private bool _isConnected;
-    
+
     [ObservableProperty] private bool _isUpdating;
 
     [ObservableProperty] private bool _isVisible = true;
@@ -210,7 +222,7 @@ public partial class MainViewModel : ViewModel
 
     public void ClearDownloadProgress()
     {
-        GrowlHelper.OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
 
             if (LogItemViewModels.Count > 0 && LogItemViewModels[0].IsDownloading)
@@ -223,7 +235,7 @@ public partial class MainViewModel : ViewModel
     public void OutputDownloadProgress(string output, bool downloading = true)
     {
 
-        GrowlHelper.OnUIThread(() =>
+        DispatcherHelper.RunOnMainThread(() =>
         {
             var log = new LogItemViewModel(downloading ? "NewVersionFoundDescDownloading".ToLocalization() + "\n" + output : output, Application.Current.MainWindow.FindResource("DownloadLogBrush") as Brush,
                 dateFormat: "HH':'mm':'ss")
@@ -290,7 +302,7 @@ public partial class MainViewModel : ViewModel
         new("CloseEmulatorAndRestartMFA"),
         new("RestartPC"),
     ];
-    
+
     private bool _shouldTip = true;
     private bool _isDebugMode;
 
@@ -310,5 +322,4 @@ public partial class MainViewModel : ViewModel
             return _isDebugMode;
         }
     }
-
 }

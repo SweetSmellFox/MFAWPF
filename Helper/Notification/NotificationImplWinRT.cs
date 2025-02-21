@@ -48,7 +48,7 @@ internal class NotificationImplWinRT : INotificationPoster, IDisposable
     {
         try
         {
-            GrowlHelper.OnUIThread(() =>
+            DispatcherHelper.RunOnMainThread(() =>
             {
   
                 var builder = new ToastContentBuilder().AddText(content.Body).AddText(content.Summary);

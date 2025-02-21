@@ -37,7 +37,7 @@ public partial class SwipeDialog
         Task.Run(() =>
         {
             var image = MaaProcessor.Instance.GetBitmapImage();
-            GrowlHelper.OnUIThread(() => { UpdateImage(image); });
+            DispatcherHelper.RunOnMainThread(() => { UpdateImage(image); });
         });
     }
 
