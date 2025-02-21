@@ -127,8 +127,8 @@
 **注：在MFA中，于Pipeline中任务新增了俩个属性字段，分别为 `focus_tip` 和 `focus_tip_color`。**
 
 - `focus` : *bool*  
-  是否启用`focus_tip` 、`focus_succeeded`、 `focus_failed`。可选，默认false。
-- `focus_toast` : *string* 
+  是否启用`focus_tip` 、`focus_succeeded`、 `focus_failed`、 `focus_toast`。可选，默认false。
+- `focus_toast` : *string*  
   当执行某任务前，Windows弹窗输出的内容。可选，默认空。
 - `focus_tip` : *string* | *list<string, >*  
   当执行某任务前，在MFA右侧日志输出的内容。可选，默认空。

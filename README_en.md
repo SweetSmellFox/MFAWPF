@@ -125,7 +125,7 @@ Modify it as follows:
 **Note: In MFA, two new fields have been added to the task in the Pipeline, namely `focus_tip` and `focus_tip_color`.**
 
 - `focus`: *bool*
-  Whether to enable `focus_tip` `focus_succeeded` `focus_failed`. Optional, default is false.
+  Whether to enable `focus_tip` `focus_succeeded` `focus_failed` `focus_toast`. Optional, default is false.
 - `focus_toast` : *string*
   The content that is displayed in the Windows popup window before executing a certain task. Optional, default is empty.
 - `focus_tip`: *string* | *list<string, >*
