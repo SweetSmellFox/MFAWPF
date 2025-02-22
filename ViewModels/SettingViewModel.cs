@@ -1,8 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using HandyControl.Themes;
 using HandyControl.Tools.Extension;
 using MFAWPF.Data;
 using MFAWPF.Helper;
 using MFAWPF.Views;
+using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace MFAWPF.ViewModels;
@@ -30,6 +32,7 @@ public partial class SettingViewModel : ViewModel
     public SettingViewModel()
     {
         UpdateExternalNotificationProvider();
+        UpdateThemeIndexChanged(ThemeIndex);
     }
 
     private void ResetNotifySource()
@@ -197,7 +200,7 @@ public partial class SettingViewModel : ViewModel
 
     [ObservableProperty] private List<LocalizationViewModel> _downloadSourceList =
     [
-        new("GitHub"), 
+        new("GitHub"),
         new("MirrorChyan"),
     ];
     [ObservableProperty] private bool _retryOnDisconnected = DataSet.GetData("RetryOnDisconnected", false);
@@ -322,5 +325,36 @@ public partial class SettingViewModel : ViewModel
     public void UpdateExternalNotificationProvider()
     {
         DingTalkEnabled = EnabledExternalNotificationProviderList.Contains("DingTalk");
+    }
+
+    [ObservableProperty] private int _themeIndex = DataSet.GetData("ThemeIndex", 0);
+
+    [ObservableProperty] private ObservableCollection<LocalizationViewModel> _themes =
+    [
+        new("LightColor"),
+        new("DarkColor"),
+        new("FollowingSystem"),
+    ];
+
+    partial void OnThemeIndexChanged(int value)
+    {
+        UpdateThemeIndexChanged(value);
+        DataSet.SetData("ThemeIndex", value);
+    }
+
+    private void UpdateThemeIndexChanged(int value)
+    {
+        switch (value)
+        {
+            case 0:
+                ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
+                break;
+            case 1:
+                ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
+                break;
+            default:
+                MainWindow.FollowSystemTheme();
+                break;
+        }
     }
 }

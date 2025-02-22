@@ -58,37 +58,37 @@ public partial class SettingsView
         languageSettings.SetBinding(ComboBox.SelectedIndexProperty, binding2);
 
         //主题设置
-        themeSettings.ItemsSource = new ObservableCollection<LocalizationViewModel>()
-        {
-            new("LightColor"),
-            new("DarkColor"),
-            new("LightColor"),
-        };
+        themeSettings.ItemsSource = ViewModel.Themes;
         themeSettings.DisplayMemberPath = "Name";
         themeSettings.BindLocalization("ThemeOption");
         themeSettings.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
-        themeSettings.SelectionChanged += (sender, _) =>
+        var binding3 = new Binding("ThemeIndex")
         {
-            var index = (sender as ComboBox)?.SelectedIndex  ?? 0;
-
-            switch (index)
-            {
-                case 0:
-                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
-                    break;
-                case 1:
-                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
-                    break;
-                default:
-                    MainWindow.FollowSystemTheme();
-                    break;
-            }
-
-            ThemeManager.Current.ApplicationTheme = index == 0 ? ApplicationTheme.Light : ApplicationTheme.Dark;
-            DataSet.SetData("ThemeIndex", index);
+            Source = ViewModel,
+            Mode = BindingMode.TwoWay
         };
-        themeSettings.SelectedIndex = DataSet.GetData("ThemeIndex", 0);
+        themeSettings.SetBinding(ComboBox.SelectedIndexProperty, binding3);
+        
+        // themeSettings.SelectionChanged += (sender, _) =>
+        // {
+        //     var index = (sender as ComboBox)?.SelectedIndex  ?? 0;
+        //
+        //     switch (index)
+        //     {
+        //         case 0:
+        //             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
+        //             break;
+        //         case 1:
+        //             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
+        //             break;
+        //         default:
+        //             MainWindow.FollowSystemTheme();
+        //             break;
+        //     }
+        //     DataSet.SetData("ThemeIndex", index);
+        // };
+        // themeSettings.SelectedIndex = DataSet.GetData("ThemeIndex", 0);
 
         //性能设置
         performanceSettings.IsChecked = DataSet.GetData("EnableGPU", true);
