@@ -19,7 +19,7 @@ public class ThemeHelper
                 ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
                 break;
             default:
-                ThemeManager.Current.UsingSystemTheme = true;
+                ThemeManager.Current.UsingWindowsAppTheme = true;
                 break;
         }
     }
