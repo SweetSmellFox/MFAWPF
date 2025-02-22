@@ -10,6 +10,7 @@
     xmlns:controls="clr-namespace:MFAWPF.Controls"
     xmlns:custom="clr-namespace:MFAWPF.Custom"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:data="clr-namespace:MFAWPF.Data"
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -44,12 +45,41 @@
             <StackPanel x:Name="settingStackPanel">
                 <hc:Divider Content="{Binding ViewModel.ListTitle[0].Name}" />
                 <hc:ComboBox
+                    DisplayMemberPath="Name"
                     HorizontalAlignment="Center"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
                     Width="160"
-                    x:Name="swtichConfigs" />
+                    x:Name="SwitchConfigComboBox" />
+                <Grid Width="250">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <controls:CustomTextBlock
+                        Grid.Column="0"
+                        ResourceKey="ConfigurationName"
+                        VerticalAlignment="Center" />
+                    <TextBox
+                        Grid.Column="1"
+                        Margin="10"
+                        Text="{Binding ViewModel.NewConfigurationName, UpdateSourceTrigger=PropertyChanged}"
+                        Width="Auto">
+                        <TextBox.InputBindings>
+                            <KeyBinding Command="{Binding ViewModel.AddConfigurationCommand}" Key="Enter" />
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <Button
+                        Command="{Binding ViewModel.AddConfigurationCommand}"
+                        Content="{lex:Loc AddConfiguration}"
+                        Grid.Column="2"
+                        Width="60" />
+                </Grid>
                 <hc:Divider Content="{Binding ViewModel.ListTitle[1].Name}" />
+                <controls:TimerSettingsUserControl />
+                <hc:Divider Content="{Binding ViewModel.ListTitle[2].Name}" />
                 <Grid HorizontalAlignment="Center" Margin="30,10,30,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="180" />
@@ -63,7 +93,8 @@
                         <CheckBox
                             Content="{lex:Loc MinimizeToTray}"
                             HorizontalAlignment="Left"
-                            IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                            IsEnabled="{calcBinding:Binding Idle,
+                                                            Source={x:Static views:MainWindow.ViewModel}}"
                             Margin="10"
                             VerticalAlignment="Center"
                             x:Name="MinimizeToTrayCheckBox" />
@@ -74,57 +105,69 @@
                         Margin="10,0,0,0"
                         Orientation="Vertical">
                         <hc:ComboBox
-                            IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                            IsEnabled="{calcBinding:Binding Idle,
+                                                            Source={x:Static views:MainWindow.ViewModel}}"
                             Margin="5"
                             hc:TitleElement.TitleWidth="110"
                             x:Name="languageSettings" />
                         <hc:ComboBox
-                            IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                            IsEnabled="{calcBinding:Binding Idle,
+                                                            Source={x:Static views:MainWindow.ViewModel}}"
                             Margin="5"
                             hc:TitleElement.TitleWidth="110"
                             x:Name="themeSettings" />
                     </StackPanel>
                 </Grid>
 
-                <hc:Divider Content="{Binding ViewModel.ListTitle[2].Name}" />
+                <hc:Divider Content="{Binding ViewModel.ListTitle[3].Name}" />
                 <hc:ComboBox
                     HorizontalAlignment="Center"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
-                    Visibility="{calcBinding:Binding MainViewModel.IsAdb}"
+                    Visibility="{calcBinding:Binding IsAdb,
+                                                     Source={x:Static views:MainWindow.ViewModel}}"
                     Width="360"
                     hc:TitleElement.HorizontalAlignment="Right"
                     hc:TitleElement.TitleWidth="110"
                     x:Name="adbCaptureComboBox" />
                 <hc:ComboBox
                     HorizontalAlignment="Center"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
-                    Visibility="{calcBinding:Binding MainViewModel.IsAdb}"
+                    Visibility="{calcBinding:Binding IsAdb,
+                                                     Source={x:Static views:MainWindow.ViewModel}}"
                     Width="360"
                     hc:TitleElement.HorizontalAlignment="Right"
                     hc:TitleElement.TitleWidth="110"
                     x:Name="adbInputComboBox" />
                 <CheckBox
                     HorizontalAlignment="Center"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
-                    Visibility="{calcBinding:Binding MainViewModel.IsAdb}"
+                    Visibility="{calcBinding:Binding IsAdb,
+                                                     Source={x:Static views:MainWindow.ViewModel}}"
                     x:Name="rememberAdbButton" />
                 <hc:ComboBox
                     HorizontalAlignment="Center"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
-                    Visibility="{calcBinding:Binding !MainViewModel.IsAdb}"
+                    Visibility="{calcBinding:Binding !IsAdb,
+                                                     Source={x:Static views:MainWindow.ViewModel}}"
                     Width="360"
                     hc:TitleElement.HorizontalAlignment="Right"
                     hc:TitleElement.TitleWidth="110"
                     x:Name="win32CaptureComboBox" />
                 <hc:ComboBox
                     HorizontalAlignment="Center"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
-                    Visibility="{calcBinding:Binding !MainViewModel.IsAdb}"
+                    Visibility="{calcBinding:Binding !IsAdb,
+                                                     Source={x:Static views:MainWindow.ViewModel}}"
                     Width="360"
                     hc:TitleElement.HorizontalAlignment="Right"
                     hc:TitleElement.TitleWidth="110"
@@ -134,28 +177,32 @@
                     HorizontalAlignment="Center"
                     IsChecked="{Binding ViewModel.RetryOnDisconnected}"
                     Margin="20,10"
-                    Visibility="{calcBinding:Binding MainViewModel.IsAdb}" />
+                    Visibility="{calcBinding:Binding IsAdb,
+                                                     Source={x:Static views:MainWindow.ViewModel}}" />
                 <CheckBox
                     Content="{lex:Loc AllowAdbRestart}"
                     HorizontalAlignment="Center"
                     IsChecked="{Binding ViewModel.AllowAdbRestart}"
                     Margin="20,10"
-                    Visibility="{calcBinding:Binding MainViewModel.IsAdb}" />
+                    Visibility="{calcBinding:Binding IsAdb,
+                                                     Source={x:Static views:MainWindow.ViewModel}}" />
                 <CheckBox
                     Content="{lex:Loc AllowAdbHardRestart}"
                     HorizontalAlignment="Center"
                     IsChecked="{Binding ViewModel.AllowAdbHardRestart}"
                     Margin="20,10"
-                    Visibility="{calcBinding:Binding MainViewModel.IsAdb}" />
-                <hc:Divider Content="{Binding ViewModel.ListTitle[3].Name}" />
+                    Visibility="{calcBinding:Binding IsAdb,
+                                                     Source={x:Static views:MainWindow.ViewModel}}" />
+                <hc:Divider Content="{Binding ViewModel.ListTitle[4].Name}" />
                 <CheckBox
                     Content="{lex:Loc EnableGPU}"
                     HorizontalAlignment="Center"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
                     x:Name="performanceSettings" />
 
-                <hc:Divider Content="{Binding ViewModel.ListTitle[4].Name}" />
+                <hc:Divider Content="{Binding ViewModel.ListTitle[5].Name}" />
                 <Grid HorizontalAlignment="Center" Margin="30,10,30,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="220" />
@@ -169,14 +216,16 @@
                         <CheckBox
                             Content="{lex:Loc AutomaticMinimize}"
                             HorizontalAlignment="Left"
-                            IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                            IsEnabled="{calcBinding:Binding Idle,
+                                                            Source={x:Static views:MainWindow.ViewModel}}"
                             Margin="10"
                             VerticalAlignment="Center"
                             x:Name="AutoMinimizeCheckBox" />
                         <CheckBox
                             Content="{lex:Loc AutomaticHide}"
                             HorizontalAlignment="Left"
-                            IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                            IsEnabled="{calcBinding:Binding Idle,
+                                                            Source={x:Static views:MainWindow.ViewModel}}"
                             Margin="10"
                             VerticalAlignment="Center"
                             x:Name="AutoHideCheckBox" />
@@ -230,7 +279,7 @@
                     </StackPanel>
 
                 </Grid>
-                <hc:Divider Content="{Binding ViewModel.ListTitle[5].Name}" />
+                <hc:Divider Content="{Binding ViewModel.ListTitle[6].Name}" />
                 <Grid
                     hc:InfoElement.HorizontalAlignment="Center"
                     hc:InfoElement.TitlePlacement="Left"
@@ -299,11 +348,12 @@
 
 
                 </Grid>
-                <hc:Divider Content="{Binding ViewModel.ListTitle[6].Name}" />
+                <hc:Divider Content="{Binding ViewModel.ListTitle[7].Name}" />
                 <hc:TextBox
                     AllowDrop="True"
                     Drop="StartsWithScript_Drop"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
                     PreviewDragOver="TextBox_PreviewDragOver"
                     Width="360"
@@ -314,7 +364,8 @@
                 <hc:TextBox
                     AllowDrop="True"
                     Drop="EndsWithScript_Drop"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
                     PreviewDragOver="TextBox_PreviewDragOver"
                     Width="360"
@@ -325,22 +376,25 @@
                 <CheckBox
                     Content="{lex:Loc EnableRecording}"
                     HorizontalAlignment="Center"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
                     x:Name="enableRecordingSettings" />
                 <CheckBox
                     Content="{lex:Loc EnableSaveDraw}"
                     HorizontalAlignment="Center"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
                     x:Name="enableSaveDrawSettings" />
                 <CheckBox
                     Content="{lex:Loc ShowHitDraw}"
                     HorizontalAlignment="Center"
-                    IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static views:MainWindow.ViewModel}}"
                     Margin="30,10,30,10"
                     x:Name="showHitDrawSettings" />
-                <hc:Divider Content="{Binding ViewModel.ListTitle[7].Name}" />
+                <hc:Divider Content="{Binding ViewModel.ListTitle[8].Name}" />
 
                 <Grid HorizontalAlignment="Center" Margin="30,10,30,10">
                     <Grid.ColumnDefinitions>
@@ -355,21 +409,24 @@
                         <CheckBox
                             Content="{lex:Loc AutomaticDetectionUpdate}"
                             HorizontalAlignment="Left"
-                            IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                            IsEnabled="{calcBinding:Binding Idle,
+                                                            Source={x:Static views:MainWindow.ViewModel}}"
                             Margin="10"
                             VerticalAlignment="Center"
                             x:Name="enableCheckVersionSettings" />
                         <CheckBox
                             Content="{lex:Loc AutomaticUpdateResource}"
                             HorizontalAlignment="Left"
-                            IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                            IsEnabled="{calcBinding:Binding Idle,
+                                                            Source={x:Static views:MainWindow.ViewModel}}"
                             Margin="10"
                             VerticalAlignment="Center"
                             x:Name="enableAutoUpdateResourceSettings" />
                         <CheckBox
                             Content="{lex:Loc AutomaticUpdateMFA}"
                             HorizontalAlignment="Left"
-                            IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                            IsEnabled="{calcBinding:Binding Idle,
+                                                            Source={x:Static views:MainWindow.ViewModel}}"
                             Margin="10"
                             VerticalAlignment="Center"
                             x:Name="enableAutoUpdateMFASettings" />
@@ -381,7 +438,8 @@
                         <hc:ComboBox
                             DisplayMemberPath="Name"
                             HorizontalAlignment="Left"
-                            IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                            IsEnabled="{calcBinding:Binding Idle,
+                                                            Source={x:Static views:MainWindow.ViewModel}}"
                             ItemsSource="{Binding ViewModel.DownloadSourceList}"
                             Margin="53,5,5,5"
                             SelectedIndex="{Binding ViewModel.DownloadSourceIndex}"
@@ -396,7 +454,8 @@
                             Orientation="Horizontal"
                             Visibility="{calcBinding:Binding 'ViewModel.DownloadSourceIndex==1'}">
                             <hc:PasswordBox
-                                IsEnabled="{calcBinding:Binding 'MainViewModel.Idle'}"
+                                IsEnabled="{calcBinding:Binding Idle,
+                                                                Source={x:Static views:MainWindow.ViewModel}}"
                                 IsSafeEnabled="False"
                                 Margin="20,2,5,10"
                                 ShowEyeButton="True"
@@ -488,7 +547,7 @@
 
                     </StackPanel>
                 </Grid>
-                <hc:Divider Content="{Binding ViewModel.ListTitle[8].Name}" />
+                <hc:Divider Content="{Binding ViewModel.ListTitle[9].Name}" />
             </StackPanel>
         </hc:ScrollViewer>
     </Grid>

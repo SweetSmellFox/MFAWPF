@@ -1,11 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using HandyControl.Themes;
 using HandyControl.Tools.Extension;
 using MFAWPF.Data;
 using MFAWPF.Helper;
 using MFAWPF.Views;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace MFAWPF.ViewModels;
 
@@ -32,7 +35,6 @@ public partial class SettingViewModel : ViewModel
     public SettingViewModel()
     {
         UpdateExternalNotificationProvider();
-
     }
 
     private void ResetNotifySource()
@@ -157,6 +159,7 @@ public partial class SettingViewModel : ViewModel
     [ObservableProperty] private List<LocalizationViewModel> _listTitle =
     [
         new("SwitchConfiguration"),
+        new("ScheduleSettings"),
         new("UiSettings"),
         new("ConnectionSettings"),
         new("PerformanceSettings"),
@@ -342,5 +345,169 @@ public partial class SettingViewModel : ViewModel
         DataSet.SetData("ThemeIndex", value);
     }
 
+    public TimerModel TimerModels { get; set; } = new();
 
+    public partial class TimerModel
+    {
+        public partial class TimerProperties : ObservableObject
+        {
+            public TimerProperties(int timeId, bool isOn, int hour, int min)
+            {
+                TimerId = timeId;
+                _isOn = isOn;
+                _hour = hour;
+                _min = min;
+                // if (timerConfig == null || !DataSet.GetConfigurationList().Contains(timerConfig))
+                // {
+                //     _timerConfig = DataSet.GetCurrentConfiguration();
+                // }
+                // else
+                // {
+                //     _timerConfig = timerConfig;
+                // }
+                LanguageHelper.LanguageChanged += OnLanguageChanged;
+            }
+
+            public int TimerId { get; set; }
+
+            [ObservableProperty] private string _timerName;
+
+            private void OnLanguageChanged(object sender, EventArgs e)
+            {
+                TimerName = $"{"Timer".ToLocalization()} {TimerId + 1}";
+            }
+
+            private bool _isOn;
+
+            /// <summary>
+            /// Gets or sets a value indicating whether the timer is set.
+            /// </summary>
+            public bool IsOn
+            {
+                get => _isOn;
+                set
+                {
+                    SetProperty(ref _isOn, value);
+                    DataSet.SetTimer(TimerId, value);
+                }
+            }
+
+            private int _hour;
+
+            /// <summary>
+            /// Gets or sets the hour of the timer.
+            /// </summary>
+            public int Hour
+            {
+                get => _hour;
+                set
+                {
+                    value = Math.Clamp(value, 0, 23);
+                    SetProperty(ref _hour, value);
+                    DataSet.SetTimerHour(TimerId, _hour.ToString());
+                }
+            }
+
+            private int _min;
+
+            /// <summary>
+            /// Gets or sets the minute of the timer.
+            /// </summary>
+            public int Min
+            {
+                get => _min;
+                set
+                {
+                    value = Math.Clamp(value, 0, 59);
+                    SetProperty(ref _min, value);
+                    DataSet.SetTimerMin(TimerId, _min.ToString());
+                }
+            }
+
+            // private string? _timerConfig;
+            //
+            // /// <summary>
+            // /// Gets or sets the config of the timer.
+            // /// </summary>
+            // public string? TimerConfig
+            // {
+            //     get => _timerConfig;
+            //     set
+            //     {
+            //         SetProperty(ref _timerConfig, value ?? DataSet.GetCurrentConfiguration());
+            //         DataSet.SetTimerConfig(TimerId, _timerConfig);
+            //     }
+            // }
+        }
+
+        public TimerProperties[] Timers { get; set; } = new TimerProperties[8];
+        private readonly DispatcherTimer _dispatcherTimer;
+        public TimerModel()
+        {
+            for (var i = 0; i < 8; i++)
+            {
+                Timers[i] = new TimerProperties(
+                    i,
+                    DataSet.GetTimer(i, false),
+                    int.Parse(DataSet.GetTimerHour(i, $"{i * 3}")),
+                    int.Parse(DataSet.GetTimerMin(i, "0")));
+            }
+            _dispatcherTimer = new();
+            _dispatcherTimer.Interval = TimeSpan.FromMinutes(1);
+            _dispatcherTimer.Tick += CheckTimerElapsed;
+            _dispatcherTimer.Start();
+        }
+
+        private void CheckTimerElapsed(object sender, EventArgs e)
+        {
+            var currentTime = DateTime.Now;
+            foreach (var timer in Timers)
+            {
+                if (timer.IsOn && timer.Hour == currentTime.Hour && timer.Min == currentTime.Minute)
+                {
+                    ExecuteTimerTask(timer.TimerId);
+                }
+            }
+        }
+
+        private void ExecuteTimerTask(int timerId)
+        {
+            var timer = Timers.FirstOrDefault(t => t.TimerId == timerId, null);
+            if (timer != null)
+            {
+                MainWindow.Instance.Start();
+            }
+        }
+    }
+
+    [ObservableProperty] private string _newConfigurationName;
+
+    [RelayCommand]
+    private void AddConfiguration()
+    {
+        if (string.IsNullOrWhiteSpace(NewConfigurationName))
+        {
+            GrowlHelper.Error("ConfigNameCannotBeEmpty".ToLocalizationFormatted(NewConfigurationName));
+            return;
+        }
+        var configDPath = Path.Combine(AppContext.BaseDirectory, "config");
+        var configPath = Path.Combine(configDPath, $"{DataSet.ConfigName}.json");
+        var newConfigPath = Path.Combine(configDPath, $"{NewConfigurationName}.json");
+        bool configExists = Directory.GetFiles(configDPath, "*.json")
+            .Select(Path.GetFileNameWithoutExtension)
+            .Any(name => name.Equals(NewConfigurationName, StringComparison.OrdinalIgnoreCase));
+
+        if (configExists)
+        { 
+            GrowlHelper.Error("ConfigNameAlreadyExists".ToLocalizationFormatted(NewConfigurationName));
+            return;
+        }
+
+        if (File.Exists(configPath))
+        {
+            var content = File.ReadAllText(configPath);
+            File.WriteAllText(newConfigPath, content);
+        }
+        GrowlHelper.Success("ConfigAddedSuccessfully".ToLocalizationFormatted(NewConfigurationName));
+    }
 }

@@ -89,4 +89,19 @@ public static class GrowlHelper
         });
     }
     
+    public static void SuccessGlobal(string message, string token = "")
+    {
+        DispatcherHelper.RunOnMainThread(() =>
+        {
+            Growl.SuccessGlobal(message);
+        });
+    }
+
+    public static void Success(string message, string token = "")
+    {
+        DispatcherHelper.RunOnMainThread(() =>
+        {
+            Growl.Success(message);
+        });
+    }
 }

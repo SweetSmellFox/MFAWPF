@@ -785,4 +785,25 @@
   <data name="MirrorUseLimitReached" xml:space="preserve">
     <value>The usage of Mirror Chyan has reached the limit.</value>
   </data>
+  <data name="Timer" xml:space="preserve">
+    <value>Timer</value>
+  </data>
+  <data name="ScheduleSettings" xml:space="preserve">
+    <value>Schedule</value>
+  </data>
+  <data name="ConfigurationName" xml:space="preserve">
+    <value>Config</value>
+  </data>
+  <data name="AddConfiguration" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="ConfigNameCannotBeEmpty" xml:space="preserve">
+    <value>Configuration name cannot be empty!</value>
+  </data>
+  <data name="ConfigNameAlreadyExists" xml:space="preserve">
+    <value>Configuration name &lt;{0}&gt; already exists!</value>
+  </data>
+  <data name="ConfigAddedSuccessfully" xml:space="preserve">
+    <value>Configuration &lt;{0}&gt; added successfully!</value>
+  </data>
 </root>

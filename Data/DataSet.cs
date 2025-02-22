@@ -1,7 +1,11 @@
-﻿using MFAWPF.Helper;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MFAWPF.Helper;
 using MFAWPF.Helper.Converters;
 using MFAWPF.Views;
 using Newtonsoft.Json.Linq;
+using System.Collections.ObjectModel;
+using System.Configuration;
+using System.IO;
 
 namespace MFAWPF.Data
 
@@ -11,15 +15,56 @@ public static class DataSet
 {
     public static Dictionary<string, object> Data = new();
     public static Dictionary<string, object> MaaConfig = new();
+    public static ObservableCollection<MFAConfig> Configs = new();
+    public static Configuration Config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+    public static int ConfigIndex { get; set; } = 0;
+    public static string ConfigName = "config";
+    public static void LoadConfig()
+    {
+        LoggerService.LogInfo("Loading configuration file...");
+        ConfigName = ConfigurationManager.AppSettings["DefaultConfig"] ?? ConfigName;
 
+        var configPath = Path.Combine(AppContext.BaseDirectory, "config");
+        foreach (var file in Directory.GetFiles(configPath))
+        {
+            var fileName = Path.GetFileName(file);
+            if (fileName.EndsWith(".json") && !fileName.Contains("maa", StringComparison.OrdinalIgnoreCase))
+            {
+                var name = fileName.Replace(".json", "");
+                var config = JsonHelper.ReadFromConfigJsonFile(name, new Dictionary<string, object>());
+                Configs.Add(new MFAConfig
+                {
+                    Name = name.Equals("config", StringComparison.OrdinalIgnoreCase) ? "Default" : name,
+                    FileName = fileName,
+                    Config = config
+                });
+            }
+        }
+
+        Data = Configs.FirstOrDefault(c
+            => !string.IsNullOrWhiteSpace(c.Name)
+            && (ConfigName.Equals("config", StringComparison.OrdinalIgnoreCase) && c.Name.Equals("Default", StringComparison.OrdinalIgnoreCase)
+                || c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase)), null).Config;
+
+        ConfigIndex = Configs.ToList().FindIndex(c => !string.IsNullOrWhiteSpace(c.Name)
+            && (ConfigName.Equals("config", StringComparison.OrdinalIgnoreCase) && c.Name.Equals("Default", StringComparison.OrdinalIgnoreCase)
+                || c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase)));
+    }
+
+    public static void SetDefaultConfig(string name)
+    {
+        Config.AppSettings.Settings["DefaultConfig"].Value = name;
+        Config.Save(ConfigurationSaveMode.Modified);
+        ConfigurationManager.RefreshSection("appSettings");
+    }
 
     public static void SetConfig(this Dictionary<string, object>? config, string key, object? value)
     {
         if (config == null || value == null) return;
         config[key] = value;
-        if (key == "LangIndex" && MainWindow.ViewModel is not null)
+        if (key == "LangIndex")
             SettingsView.ViewModel.LanguageIndex = Convert.ToInt32(value);
-        var fileName = config == Data ? "config" : "maa_option";
+        var fileName = config == Data ? ConfigName : "maa_option";
         if (config == MaaConfig)
             MainWindow.ViewModel.IsDebugMode = MFAExtensions.IsDebugMode();
         JsonHelper.WriteToConfigJsonFile(fileName, config, new MaaInterfaceSelectOptionConverter(false));
@@ -102,5 +147,42 @@ public static class DataSet
     public static T GetData<T>(string key, T defaultValue)
     {
         return Data.GetConfig(key, defaultValue);
+    }
+
+    public static bool GetTimer(int i, bool defaultValue)
+    {
+        return GetData($"Timer.Timer{i + 1}", defaultValue);
+    }
+
+    public static void SetTimer(int i, bool value)
+    {
+        SetData($"Timer.Timer{i + 1}", value);
+    }
+
+    public static string GetTimerHour(int i, string defaultValue)
+    {
+        return GetData($"Timer.Timer{i + 1}Hour", defaultValue);
+    }
+
+    public static void SetTimerHour(int i, string value)
+    {
+        SetData($"Timer.Timer{i + 1}Hour", value);
+    }
+
+    public static string GetTimerMin(int i, string defaultValue)
+    {
+        return GetData($"Timer.Timer{i + 1}Min", defaultValue);
+    }
+
+    public static void SetTimerMin(int i, string value)
+    {
+        SetData($"Timer.Timer{i + 1}Min", value);
+    }
+
+    public partial class MFAConfig
+    {
+        public string Name { get; set; }
+        public string FileName { get; set; }
+        public Dictionary<string, object> Config { get; set; }
     }
 }

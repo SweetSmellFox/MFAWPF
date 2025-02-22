@@ -1082,7 +1082,7 @@ public class VersionChecker
             {
                 response.EnsureSuccessStatusCode();
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException)
             {
                 if ((int)response.StatusCode == 403)
                 {

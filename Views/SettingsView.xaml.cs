@@ -20,9 +20,7 @@ namespace MFAWPF.Views;
 
 public partial class SettingsView
 {
-   
     public static ViewModels.SettingViewModel ViewModel { get; set; }
-    public ViewModels.MainViewModel MainViewModel { get; set; }
     public SettingsView(ViewModels.SettingViewModel model, ViewModels.MainViewModel mainViewModel)
     {
         InitializeComponent();
@@ -69,7 +67,7 @@ public partial class SettingsView
             Mode = BindingMode.TwoWay
         };
         themeSettings.SetBinding(ComboBox.SelectedIndexProperty, binding3);
-        
+
         // themeSettings.SelectionChanged += (sender, _) =>
         // {
         //     var index = (sender as ComboBox)?.SelectedIndex  ?? 0;
@@ -168,16 +166,15 @@ public partial class SettingsView
             DataSet.SetData("EmulatorConfig", text);
         };
         //切换配置
-        var configPath = Path.Combine(Environment.CurrentDirectory, "config");
-        foreach (string file in Directory.GetFiles(configPath))
+        SwitchConfigComboBox.ItemsSource = DataSet.Configs;
+        SwitchConfigComboBox.SelectedIndex = DataSet.ConfigIndex;
+        SwitchConfigComboBox.SelectionChanged += (sender, _) =>
         {
-            string fileName = Path.GetFileName(file);
-            if (fileName.EndsWith(".json") && fileName != "maa_option.json")
-            {
-                swtichConfigs.Items.Add(fileName);
-            }
-        }
-
+            var config = (sender as ComboBox)?.SelectedItem as DataSet.MFAConfig;
+            if (config != null)
+                DataSet.SetDefaultConfig(config.FileName.Replace(".json", ""));
+            MaaProcessor.RestartMFA();
+        };
         //连接设置
         SetSettingOption(adbCaptureComboBox, "CaptureModeOption",
             [
@@ -201,34 +198,6 @@ public partial class SettingsView
             "Win32ControlInputType");
 
 
-        swtichConfigs.SelectionChanged += (sender, _) =>
-        {
-            string selectedItem = (string)swtichConfigs.SelectedItem;
-            if (selectedItem == "config.json")
-            {
-                //
-            }
-            // else if (selectedItem == "maa_option.json")
-            // {
-            //     // 什么都不做，等待后续添加逻辑
-            // }
-            else if (selectedItem == "config.json.bak")
-            {
-                string _currentFile = Path.Combine(configPath, "config.json");
-                string _selectedItem = Path.Combine(configPath, "config.json.bak");
-                string _bakContent = File.ReadAllText(_selectedItem);
-                File.WriteAllText(_currentFile, _bakContent);
-                MainWindow.Instance.RestartMFA();
-            }
-            else
-            {
-                // 恢复成绝对路径
-                string _currentFile = Path.Combine(configPath, "config.json");
-                string _selectedItem = Path.Combine(configPath, selectedItem);
-                SwapFiles(_currentFile, _selectedItem);
-                MainWindow.Instance.RestartMFA();
-            }
-        };
         //软件更新
         //  CdkPassword.UnsafePassword = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
         //  CdkPassword.PasswordChanged += (_, _) => { DataSet.SetData("DownloadCDK", SimpleEncryptionHelper.Encrypt( CdkPassword.Password)); };
@@ -244,7 +213,7 @@ public partial class SettingsView
         enableAutoUpdateMFASettings.IsChecked = DataSet.GetData("EnableAutoUpdateMFA", false);
         enableAutoUpdateMFASettings.Checked += (_, _) => { DataSet.SetData("EnableAutoUpdateMFA", true); };
         enableAutoUpdateMFASettings.Unchecked += (_, _) => { DataSet.SetData("EnableAutoUpdateMFA", false); };
-        
+
         if (!string.IsNullOrWhiteSpace(MaaInterface.Instance?.RID))
         {
         }
@@ -361,7 +330,7 @@ public partial class SettingsView
                 CommandParameter = resourceLink
             });
         }
-       
+
         // var resourceVersion = MaaInterface.Instance?.Version;
         // if (!string.IsNullOrWhiteSpace(resourceVersion))
         // {

@@ -378,7 +378,7 @@ public class MaaProcessor
 
     private CancellationTokenSource? _emulatorCancellationTokenSource;
 
-    private Process? _softwareProcess;
+    private static Process? _softwareProcess;
 
     public void StartSoftware()
     {
@@ -469,7 +469,7 @@ public class MaaProcessor
         return commandLine;
     }
 
-    private void CloseSoftware(Action? action = null)
+    public static void CloseSoftware(Action? action = null)
     {
         if ((MainWindow.ViewModel?.IsAdb).IsTrue())
         {
@@ -491,7 +491,7 @@ public class MaaProcessor
         action?.Invoke();
     }
 
-    private void CloseProcessesByName(string processName, string emulatorConfig)
+    private static void CloseProcessesByName(string processName, string emulatorConfig)
     {
         var processes = Process.GetProcesses().Where(p => p.ProcessName.StartsWith(processName));
         foreach (var process in processes)
@@ -512,36 +512,41 @@ public class MaaProcessor
         }
     }
 
-    private void CloseMFA()
+    public static void CloseMFA()
     {
         DispatcherHelper.RunOnMainThread(Application.Current.Shutdown);
     }
 
 
-    private void CloseSoftwareAndMFA()
+    public static void CloseSoftwareAndMFA()
     {
         CloseSoftware(CloseMFA);
     }
 
-    private void ShutDown()
+    public static void ShutDown()
     {
         CloseSoftware();
         Process.Start("shutdown", "/s /t 0");
     }
 
-    private void CloseSoftwareAndRestartMFA()
+
+    public static void RestartMFA()
     {
-        CloseSoftware();
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
         DispatcherHelper.RunOnMainThread(Application.Current.Shutdown);
     }
 
-    private void Restart()
+    public static void Restart()
     {
         CloseSoftware();
         Process.Start("shutdown", "/r /t 0");
     }
-
+    
+    public static void CloseSoftwareAndRestartMFA()
+    {
+        CloseSoftware();
+        RestartMFA();
+    }
 
     static string GetTimestamp()
     {

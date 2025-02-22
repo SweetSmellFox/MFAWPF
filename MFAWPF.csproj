@@ -185,6 +185,10 @@
         <Content Include="DLL\vcruntime140.dll">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
+        <None Remove="App.config" />
+        <Content Include="App.config">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>

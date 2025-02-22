@@ -25,6 +25,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.Windows.Controls.Primitives;
 using WPFLocalizeExtension.Extensions;
 using ComboBox = HandyControl.Controls.ComboBox;
@@ -49,7 +50,7 @@ public partial class MainWindow
 
     public MainWindow(ViewModels.MainViewModel viewModel)
     {
-        DataSet.Data = JsonHelper.ReadFromConfigJsonFile("config", new Dictionary<string, object>());
+        DataSet.LoadConfig();
         DataSet.MaaConfig = JsonHelper.ReadFromConfigJsonFile("maa_option", new Dictionary<string, object>());
         LanguageHelper.Initialize();
         InitializeComponent();
@@ -418,7 +419,7 @@ public partial class MainWindow
 
     public void Start(bool onlyStart = false, bool checkUpdate = false)
     {
-        if (ViewModel?.Idle == false)
+        if (ViewModel.Idle == false)
         {
             GrowlHelper.Warning("CannotStart".ToLocalization());
             return;

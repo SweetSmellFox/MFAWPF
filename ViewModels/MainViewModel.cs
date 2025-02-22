@@ -89,16 +89,9 @@ public partial class MainViewModel : ViewModel
     }
 
     [ObservableProperty] private ObservableCollection<DragItemViewModel> _taskItemViewModels = new();
-    partial void OnTaskItemViewModelsChanged(ObservableCollection<DragItemViewModel>? oldValue, ObservableCollection<DragItemViewModel>? newValue)
+    partial void OnTaskItemViewModelsChanged(ObservableCollection<DragItemViewModel>? oldValue, ObservableCollection<DragItemViewModel> newValue)
     {
-        if (newValue != null)
-        {
             DataSet.SetData("TaskItems", newValue.ToList().Select(model => model.InterfaceItem));
-        }
-        else
-        {
-            DataSet.SetData("TaskItems", new ObservableCollection<DragItemViewModel>());
-        }
     }
 
     public ObservableCollection<DragItemViewModel> TasksSource { get; private set; } =
