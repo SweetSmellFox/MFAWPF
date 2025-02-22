@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using HandyControl.Themes;
 using System.Text;
 using System.Windows;
 using System.Windows.Threading;
@@ -86,7 +87,6 @@ public partial class App
         //非UI线程未捕获异常处理事件
         AppDomain.CurrentDomain.UnhandledException +=
             CurrentDomain_UnhandledException;
-        SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
         var cracker = new LierdaCracker();
         cracker.Cracker();
         await Host.StartAsync();
@@ -125,14 +125,7 @@ public partial class App
     [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
     private extern static IntPtr LoadLibrary(string lpFileName);
 
-
-    private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
-    {
-        if (e.Category is UserPreferenceCategory.Color or UserPreferenceCategory.VisualStyle or UserPreferenceCategory.General)
-        {
-            Views.MainWindow.FollowSystemTheme();
-        }
-    }
+    
 
     void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {

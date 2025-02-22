@@ -1,3 +1,4 @@
+using HandyControl.Themes;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
@@ -5,21 +6,21 @@ namespace MFAWPF.Helper;
 
 public class ThemeHelper
 {
-    private const string RegistryKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
-    private const string RegistryValueName = "AppsUseLightTheme";
-
-    public static bool IsLightTheme()
+    public static void UpdateThemeIndexChanged(int value)
     {
-        return !IsDarkTheme();
-    }
-
-    public static bool IsDarkTheme()
-    {
-        var key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath);
-        using (key)
+        switch (value)
         {
-            var value = key?.GetValue(RegistryValueName);
-            return value != null && (int)value == 0;
+            case 0:
+                ThemeManager.Current.UsingWindowsAppTheme = false;
+                ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
+                break;
+            case 1:
+                ThemeManager.Current.UsingWindowsAppTheme = false;
+                ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
+                break;
+            default:
+                ThemeManager.Current.UsingSystemTheme = true;
+                break;
         }
     }
 }

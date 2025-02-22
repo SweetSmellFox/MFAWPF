@@ -32,7 +32,7 @@ public partial class SettingViewModel : ViewModel
     public SettingViewModel()
     {
         UpdateExternalNotificationProvider();
-        UpdateThemeIndexChanged(ThemeIndex);
+
     }
 
     private void ResetNotifySource()
@@ -338,23 +338,9 @@ public partial class SettingViewModel : ViewModel
 
     partial void OnThemeIndexChanged(int value)
     {
-        UpdateThemeIndexChanged(value);
+        ThemeHelper.UpdateThemeIndexChanged(value);
         DataSet.SetData("ThemeIndex", value);
     }
 
-    private void UpdateThemeIndexChanged(int value)
-    {
-        switch (value)
-        {
-            case 0:
-                ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
-                break;
-            case 1:
-                ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
-                break;
-            default:
-                MainWindow.FollowSystemTheme();
-                break;
-        }
-    }
+
 }

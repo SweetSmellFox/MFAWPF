@@ -58,9 +58,9 @@ public partial class MainWindow
         DataContext = this;
         version.Text = Version;
         Loaded += (_, _) => { LoadUI(); };
-
         InitializeData();
         OCRHelper.Initialize();
+        ThemeHelper.UpdateThemeIndexChanged(DataSet.GetData("ThemeIndex", 0));
         StateChanged += (_, _) =>
         {
             if (DataSet.GetData("ShouldMinimizeToTray", false))
@@ -894,14 +894,6 @@ public partial class MainWindow
         panel.Children.Add(comboBox);
     }
 
-
-    public static void FollowSystemTheme()
-    {
-        ThemeManager.Current.ApplicationTheme =
-            ThemeHelper.IsLightTheme() ? ApplicationTheme.Light : ApplicationTheme.Dark;
-    }
-
-
     private void AddStartEmulatorOption(Panel panel = null)
     {
         panel ??= settingPanel;
@@ -1293,6 +1285,7 @@ public partial class MainWindow
                     {
                         IsChecked = option.Index == yes,
                         Style = FindResource("ToggleButtonSwitch") as Style,
+                        Height = 20,
                         HorizontalAlignment = HorizontalAlignment.Right,
                         Tag = option.Name,
                         MinWidth = 60,
@@ -1317,7 +1310,8 @@ public partial class MainWindow
                     {
                         Text = option.Name,
                         Margin = new Thickness(0, 0, 5, 0),
-                        TextTrimming = TextTrimming.CharacterEllipsis,VerticalAlignment = VerticalAlignment.Center,
+                        TextTrimming = TextTrimming.CharacterEllipsis,
+                        VerticalAlignment = VerticalAlignment.Center,
                         TextWrapping = TextWrapping.NoWrap
                     };
                     Grid.SetColumn(textBlock, 0);
