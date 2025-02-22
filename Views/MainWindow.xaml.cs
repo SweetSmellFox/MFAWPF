@@ -25,6 +25,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows.Controls.Primitives;
 using WPFLocalizeExtension.Extensions;
 using ComboBox = HandyControl.Controls.ComboBox;
 using JsonSerializer = Newtonsoft.Json.JsonSerializer;
@@ -175,11 +176,13 @@ public partial class MainWindow
                         {
                             if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase) && interfaceOption.Cases != null)
                             {
+
                                 var index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
                                 if (index != -1)
                                 {
                                     option.Index = index;
                                 }
+
                             }
                         }
                     }
@@ -891,55 +894,6 @@ public partial class MainWindow
         panel.Children.Add(comboBox);
     }
 
-    private void AddThemeOption(Panel panel = null, int defaultValue = 0)
-    {
-        panel ??= settingPanel;
-        var comboBox = new ComboBox
-        {
-            Style = FindResource("ComboBoxExtend") as Style,
-            Margin = new Thickness(5)
-        };
-        var light = new ComboBoxItem();
-        light.BindLocalization("LightColor", ContentProperty);
-        var dark = new ComboBoxItem();
-        dark.BindLocalization("DarkColor", ContentProperty);
-        var followSystem = new ComboBoxItem();
-        followSystem.BindLocalization("FollowingSystem", ContentProperty);
-        comboBox.Items.Add(light);
-        comboBox.Items.Add(dark);
-        comboBox.Items.Add(followSystem);
-        var binding = new Binding("Idle")
-        {
-            Source = ViewModel,
-            Mode = BindingMode.OneWay
-        };
-        comboBox.SetBinding(IsEnabledProperty, binding);
-        comboBox.BindLocalization("ThemeOption");
-        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-
-        comboBox.SelectionChanged += (sender, _) =>
-        {
-            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-
-            switch (index)
-            {
-                case 0:
-                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Light;
-                    break;
-                case 1:
-                    ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
-                    break;
-                default:
-                    FollowSystemTheme();
-                    break;
-            }
-
-            ThemeManager.Current.ApplicationTheme = index == 0 ? ApplicationTheme.Light : ApplicationTheme.Dark;
-            DataSet.SetData("ThemeIndex", index);
-        };
-        comboBox.SelectedIndex = DataSet.GetData("ThemeIndex", defaultValue);
-        panel.Children.Add(comboBox);
-    }
 
     public static void FollowSystemTheme()
     {
@@ -1055,7 +1009,7 @@ public partial class MainWindow
                 string value = match.Groups["value"].Value.ToLower();
                 string content = match.Groups["content"].Value;
 
-                Span span = new Span();
+                var span = new Span();
                 ParseAndApplyTags(content, span);
 
 
@@ -1317,13 +1271,6 @@ public partial class MainWindow
                     }
                 }
 
-                ComboBox comboBox = new ComboBox
-                {
-                    SelectedIndex = option.Index ?? 0,
-                    Style = FindResource("ComboBoxExtend") as Style,
-                    DisplayMemberPath = "Name",
-                    Margin = new Thickness(5),
-                };
 
                 var multiBinding = new MultiBinding
                 {
@@ -1339,29 +1286,106 @@ public partial class MainWindow
                 {
                     Source = ViewModel
                 });
-
-                comboBox.SetBinding(IsEnabledProperty, multiBinding);
-
-                comboBox.ItemsSource = interfaceOption.Cases;
-
-                comboBox.Tag = option.Name;
-
-                comboBox.SelectionChanged += (_, _) =>
+                Console.WriteLine(interfaceOption.Cases.ShouldSwitchButton(out _, out _));
+                if (interfaceOption.Cases.ShouldSwitchButton(out var yes, out var no))
                 {
-                    option.Index = comboBox.SelectedIndex;
+                    var toggleButton = new ToggleButton
+                    {
+                        IsChecked = option.Index == yes,
+                        Style = FindResource("ToggleButtonSwitch") as Style,
+                        HorizontalAlignment = HorizontalAlignment.Right,
+                        Tag = option.Name,
+                        MinWidth = 60,
+                        Margin = new Thickness(0, 0, -12, 0),
+                        VerticalAlignment = VerticalAlignment.Center,
+                    };
+                    Grid.SetColumn(toggleButton, 2);
+                    toggleButton.SetBinding(IsEnabledProperty, multiBinding);
+                    toggleButton.Checked += (_, _) =>
+                    {
+                        option.Index = yes;
+                        DataSet.SetData("TaskItems",
+                            ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                    };
+                    toggleButton.Unchecked += (_, _) =>
+                    {
+                        option.Index = no;
+                        DataSet.SetData("TaskItems",
+                            ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                    };
+                    var textBlock = new TextBlock
+                    {
+                        Text = option.Name,
+                        Margin = new Thickness(0, 0, 5, 0),
+                        TextTrimming = TextTrimming.CharacterEllipsis,VerticalAlignment = VerticalAlignment.Center,
+                        TextWrapping = TextWrapping.NoWrap
+                    };
+                    Grid.SetColumn(textBlock, 0);
+                    toggleButton.SetValue(ToolTipProperty, option.Name);
+                    var grid = new Grid
+                    {
+                        ColumnDefinitions =
+                        {
+                            new ColumnDefinition
+                            {
+                                Width = GridLength.Auto
+                            },
+                            new ColumnDefinition
+                            {
+                                Width = new GridLength(1, GridUnitType.Star)
+                            },
+                            new ColumnDefinition
+                            {
+                                Width = GridLength.Auto
+                            }
+                        },
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        Margin = new Thickness(12, 5, 0, 5),
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    var spacer = new FrameworkElement();
+                    Grid.SetColumn(spacer, 1);
 
-                    DataSet.SetData("TaskItems",
-                        ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
-                };
+                    grid.Children.Add(textBlock);
+                    grid.Children.Add(spacer);
+                    grid.Children.Add(toggleButton);
 
-                comboBox.SetValue(ToolTipProperty, option.Name);
-                comboBox.SetValue(TitleElement.TitleProperty, option.Name);
-                comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 
-                panel.Children.Add(comboBox);
+                    panel.Children.Add(grid);
+                }
+                else
+                {
+                    var comboBox = new ComboBox
+                    {
+                        SelectedIndex = option.Index ?? 0,
+                        Style = FindResource("ComboBoxExtend") as Style,
+                        DisplayMemberPath = "Name",
+                        Margin = new Thickness(5),
+                    };
+                    comboBox.SetBinding(IsEnabledProperty, multiBinding);
+
+                    comboBox.ItemsSource = interfaceOption.Cases;
+
+                    comboBox.Tag = option.Name;
+
+                    comboBox.SelectionChanged += (_, _) =>
+                    {
+                        option.Index = comboBox.SelectedIndex;
+
+                        DataSet.SetData("TaskItems",
+                            ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                    };
+
+                    comboBox.SetValue(ToolTipProperty, option.Name);
+                    comboBox.SetValue(TitleElement.TitleProperty, option.Name);
+                    comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+
+                    panel.Children.Add(comboBox);
+                }
             }
         }
     }
+
 
     private void AddRepeatOption(Panel panel, DragItemViewModel source)
     {

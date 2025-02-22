@@ -276,6 +276,7 @@
                                     Visibility="Collapsed"
                                     Width="15"
                                     hc:IconElement.Geometry="{StaticResource SettingsRegular}" />
+
                                 <RadioButton
                                     Background="Transparent"
                                     BorderThickness="0"

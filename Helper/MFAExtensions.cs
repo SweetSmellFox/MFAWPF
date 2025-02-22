@@ -468,7 +468,38 @@ public static class MFAExtensions
             .Where(vm => vm.ResourceKey != null)
             .Select(vm => vm.ResourceKey));
     }
+    public static bool ShouldSwitchButton(this List<MaaInterface.MaaInterfaceOptionCase>? cases, out int yes, out int no)
+    {
+        yes = -1;
+        no = -1;
 
+        if (cases == null || cases.Count != 2)
+            return false;
+
+        var yesItem = cases
+            .Select((c, index) => new
+            {
+                c.Name,
+                Index = index
+            })
+            .Where(x => x.Name?.Equals("yes", StringComparison.OrdinalIgnoreCase) == true).ToList();
+
+        var noItem = cases
+            .Select((c, index) => new
+            {
+                c.Name,
+                Index = index
+            })
+            .Where(x => x.Name?.Equals("no", StringComparison.OrdinalIgnoreCase) == true).ToList();
+
+        if (yesItem.Count == 0 || noItem.Count == 0 )
+            return false;
+
+        yes = yesItem[0].Index;
+        no = noItem[0].Index;
+
+        return true;
+    }
     public static bool IsDebugMode()
     {
         if (DataSet.MaaConfig.GetConfig("recording", false) || DataSet.MaaConfig.GetConfig("save_draw", false) || DataSet.MaaConfig.GetConfig("show_hit_draw", false)) return true;
