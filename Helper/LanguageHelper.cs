@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using WPFLocalizeExtension.Engine;
@@ -21,7 +22,7 @@ public static class LanguageHelper
         }
     }
 
-    public static readonly List<SupportedLanguage> SupportedLanguages =
+    public static readonly ObservableCollection<SupportedLanguage> SupportedLanguages =
     [
         new("zh-hans", "简体中文"),
         new("zh-hant", "繁體中文"),

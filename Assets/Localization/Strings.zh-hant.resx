@@ -506,8 +506,8 @@
     <data name="DingTalkMessageAsync" xml:space="preserve">
     <value>釘釘群發送訊息通知</value>
   </data>
-    <data name="EnableGPU" xml:space="preserve">
-    <value>啟用GPU加速</value>
+  <data name="EnableGPU" xml:space="preserve">
+    <value>使用 GPU 加速推理</value>
   </data>
     <data name="SelectExistingImage" xml:space="preserve">
     <value>選擇一張已有圖片</value>
@@ -805,5 +805,17 @@
   </data>
   <data name="ConfigAddedSuccessfully" xml:space="preserve">
     <value>配置 &lt;{0}&gt; 新增成功！</value>
+  </data>
+  <data name="GpuOptionDisable" xml:space="preserve">
+    <value>不使用</value>
+  </data>
+  <data name="GpuOptionAuto" xml:space="preserve">
+    <value>自動</value>
+  </data>
+  <data name="Github" xml:space="preserve">
+    <value>原始碼: GitHub</value>
+  </data>
+  <data name="Issue" xml:space="preserve">
+    <value>問題回饋</value>
   </data>
 </root>

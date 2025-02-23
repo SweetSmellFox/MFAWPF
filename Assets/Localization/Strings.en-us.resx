@@ -506,8 +506,8 @@
     <data name="DingTalkMessageAsync" xml:space="preserve">
     <value>DingTalk group message notification</value>
   </data>
-    <data name="EnableGPU" xml:space="preserve">
-    <value>Enable GPU acceleration</value>
+  <data name="EnableGPU" xml:space="preserve">
+    <value>Use GPU for inference acceleration</value>
   </data>
     <data name="SelectExistingImage" xml:space="preserve">
     <value>Select an existing image</value>
@@ -805,5 +805,17 @@
   </data>
   <data name="ConfigAddedSuccessfully" xml:space="preserve">
     <value>Configuration &lt;{0}&gt; added successfully!</value>
+  </data>
+  <data name="GpuOptionDisable" xml:space="preserve">
+    <value>Don’t use</value>
+  </data>
+  <data name="GpuOptionAuto" xml:space="preserve">
+    <value>Auto</value>
+  </data>
+  <data name="Github" xml:space="preserve">
+    <value>Source code: GitHub</value>
+  </data>
+  <data name="Issue" xml:space="preserve">
+    <value>Issue</value>
   </data>
 </root>

@@ -52,7 +52,7 @@ public partial class NotifyIcon
             langMenu.Click += (_, _) =>
             {
                 LanguageHelper.ChangeLanguage(lang);
-                var index = LanguageHelper.SupportedLanguages.FindIndex(language => language.Key == lang.Key);
+                var index = LanguageHelper.SupportedLanguages.ToList().FindIndex(language => language.Key == lang.Key);
                 DataSet.SetData("LangIndex", index == -1 ? 0 : index);
             };
 

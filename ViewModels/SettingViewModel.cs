@@ -5,6 +5,7 @@ using HandyControl.Tools.Extension;
 using MFAWPF.Data;
 using MFAWPF.Helper;
 using MFAWPF.Views;
+using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
@@ -171,19 +172,41 @@ public partial class SettingViewModel : ViewModel
     ];
 
 
-    private int _languageIndex = 0;
+    [ObservableProperty] private int _languageIndex = DataSet.GetData("LangIndex", 0);
 
-    public int LanguageIndex
+    partial void OnLanguageIndexChanged(int value)
     {
-        set => SetProperty(ref _languageIndex, value);
-        get
-        {
-            _languageIndex = DataSet.GetData("LangIndex", 0);
-            return _languageIndex;
-        }
+        LanguageHelper.ChangeLanguage(SupportedLanguages[value]);
+        DataSet.SetData("LangIndex", value);
     }
 
+    [ObservableProperty] private int _themeIndex = DataSet.GetData("ThemeIndex", 0);
 
+    [ObservableProperty] private ObservableCollection<LocalizationViewModel> _themes =
+    [
+        new("LightColor"),
+        new("DarkColor"),
+        new("FollowingSystem"),
+    ];
+
+    partial void OnThemeIndexChanged(int value)
+    {
+        ThemeHelper.UpdateThemeIndexChanged(value);
+        DataSet.SetData("ThemeIndex", value);
+    }
+    private bool _shouldMinimizeToTray = DataSet.GetData("ShouldMinimizeToTray", false);
+
+    public bool ShouldMinimizeToTray
+    {
+        set
+        {
+            SetProperty(ref _shouldMinimizeToTray, value);
+            DataSet.SetData("ShouldMinimizeToTray", value);
+        }
+        get => _shouldMinimizeToTray;
+    }
+
+    public ObservableCollection<LanguageHelper.SupportedLanguage> SupportedLanguages => LanguageHelper.SupportedLanguages;
     private int _downloadSourceIndex;
 
     public int DownloadSourceIndex
@@ -200,12 +223,153 @@ public partial class SettingViewModel : ViewModel
         }
     }
 
+    [ObservableProperty] private bool _rememberAdb = DataSet.GetData("RememberAdb", true);
+
+    partial void OnRememberAdbChanged(bool value)
+    {
+        DataSet.SetData("RememberAdb", value);
+    }
+
+    public static ObservableCollection<string> AdbControlScreenCapTypes =>
+    [
+        "Default", "RawWithGzip", "RawByNetcat",
+        "Encode", "EncodeToFileAndPull", "MinicapDirect", "MinicapStream",
+        "EmulatorExtras"
+    ];
+    public static ObservableCollection<LocalizationViewModel> AdbControlInputTypes => [new("MiniTouch"), new("MaaTouch"), new("AdbInput"), new("AutoDetect")];
+    public static ObservableCollection<string> Win32ControlScreenCapTypes => ["FramePool", "DXGIDesktopDup", "GDI"];
+    public static ObservableCollection<string> Win32ControlInputTypes => ["Seize", "SendMessage"];
+
+    [ObservableProperty] private string _adbControlScreenCapType = DataSet.GetData("AdbControlScreenCapType", AdbControlScreenCapTypes[0]);
+    [ObservableProperty] private string _adbControlInputType = DataSet.GetData("AdbControlInputType", AdbControlInputTypes[0].ResourceKey);
+    [ObservableProperty] private string _win32ControlScreenCapType = DataSet.GetData("Win32ControlScreenCapType", Win32ControlScreenCapTypes[0]);
+    [ObservableProperty] private string _win32ControlInputType = DataSet.GetData("Win32ControlInputType", Win32ControlInputTypes[0]);
+    partial void OnAdbControlScreenCapTypeChanged(string value)
+    {
+        DataSet.SetData("AdbControlScreenCapType", value);
+        MaaProcessor.Instance.SetCurrentTasker();
+    }
+    partial void OnAdbControlInputTypeChanged(string value)
+    {
+        DataSet.SetData("AdbControlInputType", value);
+        MaaProcessor.Instance.SetCurrentTasker();
+    }
+    partial void OnWin32ControlScreenCapTypeChanged(string value)
+    {
+        DataSet.SetData("Win32ControlScreenCapType", value);
+        MaaProcessor.Instance.SetCurrentTasker();
+    }
+    partial void OnWin32ControlInputTypeChanged(string value)
+    {
+        DataSet.SetData("Win32ControlInputType", value);
+        MaaProcessor.Instance.SetCurrentTasker();
+    }
+
+    public static ObservableCollection<LocalizationViewModel> GpuOptions => [new("GpuOptionAuto"), new("GpuOptionDisable")];
+
+    [ObservableProperty] private int _gpuIndex = DataSet.GetData("EnableGPU", false) ? 0 : 1;
+
+    partial void OnGpuIndexChanged(int value)
+    {
+        DataSet.SetData("EnableGPU", value == 0);
+    }
+    [ObservableProperty] private bool _enableRecording = DataSet.MaaConfig.GetConfig("recording", false);
+
+    [ObservableProperty] private bool _enableSaveDraw = DataSet.MaaConfig.GetConfig("save_draw", false);
+
+    [ObservableProperty] private bool _showHitDraw = DataSet.MaaConfig.GetConfig("show_hit_draw", false);
+
+    [ObservableProperty] private string _prescript = DataSet.GetData("Prescript", string.Empty);
+
+    [ObservableProperty] private string _postScript = DataSet.GetData("Post-script", string.Empty);
+
+    partial void OnEnableRecordingChanged(bool value)
+    {
+        DataSet.MaaConfig.SetConfig("recording", value);
+    }
+
+    partial void OnEnableSaveDrawChanged(bool value)
+    {
+        DataSet.MaaConfig.SetConfig("save_draw", value);
+    }
+
+    partial void OnShowHitDrawChanged(bool value)
+    {
+        DataSet.MaaConfig.SetConfig("show_hit_draw", value);
+    }
+
+    partial void OnPrescriptChanged(string value)
+    {
+        DataSet.SetData("Prescript", value);
+    }
+
+    partial void OnPostScriptChanged(string value)
+    {
+        DataSet.SetData("Post-script", value);
+    }
+
+    [ObservableProperty] private bool _autoMinimize = DataSet.GetData("AutoMinimize", false);
+
+    [ObservableProperty] private bool _autoHide = DataSet.GetData("AutoHide", false);
+
+    [ObservableProperty] private string _softwarePath = DataSet.GetData("SoftwarePath", string.Empty);
+    [ObservableProperty] private string _emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
+
+    [ObservableProperty] private double _waitSoftwareTime = DataSet.GetData("WaitSoftwareTime", 60.0);
+
+
+    partial void OnAutoMinimizeChanged(bool value)
+    {
+        DataSet.SetData("AutoMinimize", value);
+    }
+
+    partial void OnAutoHideChanged(bool value)
+    {
+        DataSet.SetData("AutoHide", value);
+    }
+
+    partial void OnSoftwarePathChanged(string value)
+    {
+        DataSet.SetData("SoftwarePath", value);
+    }
+
+    partial void OnEmulatorConfigChanged(string value)
+    {
+        DataSet.SetData("EmulatorConfig", value);
+    }
+
+    partial void OnWaitSoftwareTimeChanged(double value)
+    {
+        DataSet.SetData("WaitSoftwareTime", value);
+    }
+
+    [RelayCommand]
+    private void ExternalNotificationSendTest()
+    {
+        MaaProcessor.ExternalNotificationAsync();
+    }
+
+    [RelayCommand]
+    private void SelectSoft()
+    {
+        OpenFileDialog openFileDialog = new OpenFileDialog
+        {
+            Title = "SelectExecutableFile".ToLocalization(),
+            Filter = "ExeFilter".ToLocalization()
+        };
+
+        if (openFileDialog.ShowDialog().IsTrue())
+        {
+            SoftwarePath = openFileDialog.FileName;
+        }
+    }
 
     [ObservableProperty] private List<LocalizationViewModel> _downloadSourceList =
     [
         new("GitHub"),
         new("MirrorChyan"),
     ];
+
     [ObservableProperty] private bool _retryOnDisconnected = DataSet.GetData("RetryOnDisconnected", false);
 
     partial void OnRetryOnDisconnectedChanged(bool value)
@@ -330,19 +494,46 @@ public partial class SettingViewModel : ViewModel
         DingTalkEnabled = EnabledExternalNotificationProviderList.Contains("DingTalk");
     }
 
-    [ObservableProperty] private int _themeIndex = DataSet.GetData("ThemeIndex", 0);
+    [ObservableProperty] private bool _enableCheckVersion = DataSet.GetData("EnableCheckVersion", true);
 
-    [ObservableProperty] private ObservableCollection<LocalizationViewModel> _themes =
-    [
-        new("LightColor"),
-        new("DarkColor"),
-        new("FollowingSystem"),
-    ];
+    [ObservableProperty] private bool _enableAutoUpdateResource = DataSet.GetData("EnableAutoUpdateResource", false);
 
-    partial void OnThemeIndexChanged(int value)
+    [ObservableProperty] private bool _enableAutoUpdateMFA = DataSet.GetData("EnableAutoUpdateMFA", false);
+
+    partial void OnEnableCheckVersionChanged(bool value)
     {
-        ThemeHelper.UpdateThemeIndexChanged(value);
-        DataSet.SetData("ThemeIndex", value);
+        DataSet.SetData("EnableCheckVersion", value);
+    }
+
+    partial void OnEnableAutoUpdateResourceChanged(bool value)
+    {
+        DataSet.SetData("EnableAutoUpdateResource", value);
+    }
+
+    partial void OnEnableAutoUpdateMFAChanged(bool value)
+    {
+        DataSet.SetData("EnableAutoUpdateMFA", value);
+    }
+
+    [RelayCommand]
+    private void UpdateResource()
+    {
+        VersionChecker.UpdateResourceAsync();
+    }
+    [RelayCommand]
+    private void CheckResourceUpdate()
+    {
+        VersionChecker.CheckResourceVersionAsync();
+    }
+    [RelayCommand]
+    private void UpdateMFA()
+    {
+        VersionChecker.UpdateMFAAsync();
+    }
+    [RelayCommand]
+    private void UpdateMaaFW()
+    {
+        VersionChecker.UpdateMaaFwAsync();
     }
 
     public TimerModel TimerModels { get; set; } = new();
@@ -351,20 +542,21 @@ public partial class SettingViewModel : ViewModel
     {
         public partial class TimerProperties : ObservableObject
         {
-            public TimerProperties(int timeId, bool isOn, int hour, int min)
+            public TimerProperties(int timeId, bool isOn, int hour, int min, string? timerConfig)
             {
                 TimerId = timeId;
                 _isOn = isOn;
                 _hour = hour;
                 _min = min;
-                // if (timerConfig == null || !DataSet.GetConfigurationList().Contains(timerConfig))
-                // {
-                //     _timerConfig = DataSet.GetCurrentConfiguration();
-                // }
-                // else
-                // {
-                //     _timerConfig = timerConfig;
-                // }
+                TimerName = $"{"Timer".ToLocalization()} {TimerId + 1}";
+                if (timerConfig == null || !DataSet.Configs.Any(c => c.Name.Equals(timerConfig)))
+                {
+                    _timerConfig = DataSet.GetCurrentConfiguration();
+                }
+                else
+                {
+                    _timerConfig = timerConfig;
+                }
                 LanguageHelper.LanguageChanged += OnLanguageChanged;
             }
 
@@ -424,20 +616,20 @@ public partial class SettingViewModel : ViewModel
                 }
             }
 
-            // private string? _timerConfig;
-            //
-            // /// <summary>
-            // /// Gets or sets the config of the timer.
-            // /// </summary>
-            // public string? TimerConfig
-            // {
-            //     get => _timerConfig;
-            //     set
-            //     {
-            //         SetProperty(ref _timerConfig, value ?? DataSet.GetCurrentConfiguration());
-            //         DataSet.SetTimerConfig(TimerId, _timerConfig);
-            //     }
-            // }
+            private string? _timerConfig;
+
+            /// <summary>
+            /// Gets or sets the config of the timer.
+            /// </summary>
+            public string? TimerConfig
+            {
+                get => _timerConfig;
+                set
+                {
+                    SetProperty(ref _timerConfig, value ?? DataSet.GetCurrentConfiguration());
+                    DataSet.SetTimerConfig(TimerId, _timerConfig);
+                }
+            }
         }
 
         public TimerProperties[] Timers { get; set; } = new TimerProperties[8];
@@ -450,7 +642,7 @@ public partial class SettingViewModel : ViewModel
                     i,
                     DataSet.GetTimer(i, false),
                     int.Parse(DataSet.GetTimerHour(i, $"{i * 3}")),
-                    int.Parse(DataSet.GetTimerMin(i, "0")));
+                    int.Parse(DataSet.GetTimerMin(i, "0")), DataSet.GetTimerConfig(i, DataSet.GetCurrentConfiguration()));
             }
             _dispatcherTimer = new();
             _dispatcherTimer.Interval = TimeSpan.FromMinutes(1);
@@ -480,6 +672,22 @@ public partial class SettingViewModel : ViewModel
         }
     }
 
+    public ObservableCollection<MFAConfig> ConfigurationList { get; set; } = DataSet.Configs;
+
+    private string? _currentConfiguration = DataSet.GetCurrentConfiguration();
+
+    public string? CurrentConfiguration
+    {
+        get => _currentConfiguration;
+        set
+        {
+            SetProperty(ref _currentConfiguration, value);
+            DataSet.SetDefaultConfig(value);
+
+            MaaProcessor.RestartMFA();
+        }
+    }
+
     [ObservableProperty] private string _newConfigurationName;
 
     [RelayCommand]
@@ -487,27 +695,29 @@ public partial class SettingViewModel : ViewModel
     {
         if (string.IsNullOrWhiteSpace(NewConfigurationName))
         {
-            GrowlHelper.Error("ConfigNameCannotBeEmpty".ToLocalizationFormatted(NewConfigurationName));
-            return;
+            NewConfigurationName = DateTime.Now.ToString("yyyyMMdd_HHmmss");
         }
+
         var configDPath = Path.Combine(AppContext.BaseDirectory, "config");
-        var configPath = Path.Combine(configDPath, $"{DataSet.ConfigName}.json");
+        var configPath = Path.Combine(configDPath, $"{DataSet.GetActualConfiguration()}.json");
         var newConfigPath = Path.Combine(configDPath, $"{NewConfigurationName}.json");
         bool configExists = Directory.GetFiles(configDPath, "*.json")
             .Select(Path.GetFileNameWithoutExtension)
             .Any(name => name.Equals(NewConfigurationName, StringComparison.OrdinalIgnoreCase));
 
         if (configExists)
-        { 
+        {
             GrowlHelper.Error("ConfigNameAlreadyExists".ToLocalizationFormatted(NewConfigurationName));
             return;
         }
-
         if (File.Exists(configPath))
         {
             var content = File.ReadAllText(configPath);
             File.WriteAllText(newConfigPath, content);
+
+            DataSet.AddNewConfig(NewConfigurationName);
+            GrowlHelper.Success("ConfigAddedSuccessfully".ToLocalizationFormatted(NewConfigurationName));
         }
-        GrowlHelper.Success("ConfigAddedSuccessfully".ToLocalizationFormatted(NewConfigurationName));
+
     }
 }

@@ -18,7 +18,17 @@ public static class DataSet
     public static ObservableCollection<MFAConfig> Configs = new();
     public static Configuration Config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
     public static int ConfigIndex { get; set; } = 0;
-    public static string ConfigName = "config";
+    public static string ConfigName { get; set; } = "config";
+
+    public static string GetCurrentConfiguration() => ConfigName;
+
+    public static string GetActualConfiguration()
+    {
+        if (ConfigName.Equals("Default", StringComparison.OrdinalIgnoreCase))
+            return "config";
+        return GetCurrentConfiguration();
+    }
+
     public static void LoadConfig()
     {
         LoggerService.LogInfo("Loading configuration file...");
@@ -43,19 +53,43 @@ public static class DataSet
 
         Data = Configs.FirstOrDefault(c
             => !string.IsNullOrWhiteSpace(c.Name)
-            && (ConfigName.Equals("config", StringComparison.OrdinalIgnoreCase) && c.Name.Equals("Default", StringComparison.OrdinalIgnoreCase)
-                || c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase)), null).Config;
+            && c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase), null).Config;
 
         ConfigIndex = Configs.ToList().FindIndex(c => !string.IsNullOrWhiteSpace(c.Name)
-            && (ConfigName.Equals("config", StringComparison.OrdinalIgnoreCase) && c.Name.Equals("Default", StringComparison.OrdinalIgnoreCase)
-                || c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase)));
+            && c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase));
     }
 
-    public static void SetDefaultConfig(string name)
+    public static void SetDefaultConfig(string? name)
     {
+        if (string.IsNullOrWhiteSpace(name))
+            return;
         Config.AppSettings.Settings["DefaultConfig"].Value = name;
         Config.Save(ConfigurationSaveMode.Modified);
         ConfigurationManager.RefreshSection("appSettings");
+    }
+
+    public static MFAConfig AddNewConfig(string name)
+    {
+        var configPath = Path.Combine(AppContext.BaseDirectory, "config");
+        var newConfigPath = Path.Combine(configPath, $"{name}.json");
+        var newConfig = new MFAConfig
+        {
+            Name = name.Equals("config", StringComparison.OrdinalIgnoreCase) ? "Default" : name,
+            FileName = name,
+            Config = JsonHelper.ReadFromConfigJsonFile(name, new Dictionary<string, object>())
+        };
+        Configs.Add(newConfig);
+        return newConfig;
+    }
+
+    public static void DeleteConfig(string name)
+    {
+        var configPath = Path.Combine(AppContext.BaseDirectory, "config");
+        var deleteConfig = Path.Combine(configPath, $"{name}.json");
+        if (File.Exists(deleteConfig))
+        {
+            File.Delete(deleteConfig);
+        }
     }
 
     public static void SetConfig(this Dictionary<string, object>? config, string key, object? value)
@@ -64,7 +98,7 @@ public static class DataSet
         config[key] = value;
         if (key == "LangIndex")
             SettingsView.ViewModel.LanguageIndex = Convert.ToInt32(value);
-        var fileName = config == Data ? ConfigName : "maa_option";
+        var fileName = config == Data ? GetActualConfiguration() : "maa_option";
         if (config == MaaConfig)
             MainWindow.ViewModel.IsDebugMode = MFAExtensions.IsDebugMode();
         JsonHelper.WriteToConfigJsonFile(fileName, config, new MaaInterfaceSelectOptionConverter(false));
@@ -179,10 +213,13 @@ public static class DataSet
         SetData($"Timer.Timer{i + 1}Min", value);
     }
 
-    public partial class MFAConfig
+    public static string GetTimerConfig(int i, string defaultValue)
     {
-        public string Name { get; set; }
-        public string FileName { get; set; }
-        public Dictionary<string, object> Config { get; set; }
+        return GetData($"Timer.Timer{i + 1}.Config", defaultValue);
+    }
+
+    public static void SetTimerConfig(int i, string value)
+    {
+        SetData($"Timer.Timer{i + 1}.Config", value);
     }
 }

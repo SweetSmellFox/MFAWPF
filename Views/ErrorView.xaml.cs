@@ -117,5 +117,4 @@ public partial class ErrorView : INotifyPropertyChanged
         await Task.Delay(3000);
         CopiedTip.IsOpen = false;
     }
-    
-   }
+}

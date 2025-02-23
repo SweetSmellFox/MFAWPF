@@ -92,8 +92,9 @@
                     <controls:CustomTextBlock>
                         <Hyperlink
                             Click="Hyperlink_OnClick"
-                            Name="LinkToCreateGitHubIssue"
-                            NavigateUri="{Binding Source={x:Static constants:MFAUrls.NewIssueUri}}">
+                            Command="{x:Static hc:ControlCommands.OpenLink}"
+                            CommandParameter="{x:Static constants:MFAUrls.NewIssueUri}"
+                            Name="LinkToCreateGitHubIssue">
                             <Run Text="{lex:Loc ErrorFeedbackLinkText}" />
                         </Hyperlink>
                     </controls:CustomTextBlock>

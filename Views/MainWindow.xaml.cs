@@ -1510,31 +1510,32 @@ public partial class MainWindow
         return ConfigureWin32ScreenCapTypes().ToString();
     }
 
+
     private AdbInputMethods ConfigureAdbInputTypes()
     {
-        return DataSet.GetData("AdbControlInputType", 0) switch
+        return DataSet.GetData("AdbControlInputType", "MinitouchAndAdbKey") switch
         {
-            0 => AdbInputMethods.MinitouchAndAdbKey,
-            1 => AdbInputMethods.Maatouch,
-            2 => AdbInputMethods.AdbShell,
-            3 => AdbInputMethods.All,
-            _ => 0
+            "MiniTouch" => AdbInputMethods.MinitouchAndAdbKey,
+            "MaaTouch" => AdbInputMethods.Maatouch,
+            "AdbInput" => AdbInputMethods.AdbShell,
+            "AutoDetect" => AdbInputMethods.All,
+            _ => AdbInputMethods.MinitouchAndAdbKey 
         };
     }
 
     private AdbScreencapMethods ConfigureAdbScreenCapTypes()
     {
-        return DataSet.GetData("AdbControlScreenCapType", 0) switch
+        return DataSet.GetData("AdbControlScreenCapType", "Default") switch
         {
-            0 => AdbScreencapMethods.Default,
-            1 => AdbScreencapMethods.RawWithGzip,
-            2 => AdbScreencapMethods.RawByNetcat,
-            3 => AdbScreencapMethods.Encode,
-            4 => AdbScreencapMethods.EncodeToFileAndPull,
-            5 => AdbScreencapMethods.MinicapDirect,
-            6 => AdbScreencapMethods.MinicapStream,
-            7 => AdbScreencapMethods.EmulatorExtras,
-            _ => 0
+            "Default" => AdbScreencapMethods.Default,
+            "RawWithGzip" => AdbScreencapMethods.RawWithGzip,
+            "RawByNetcat" => AdbScreencapMethods.RawByNetcat,
+            "Encode" => AdbScreencapMethods.Encode,
+            "EncodeToFileAndPull" => AdbScreencapMethods.EncodeToFileAndPull,
+            "MinicapDirect" => AdbScreencapMethods.MinicapDirect,
+            "MinicapStream" => AdbScreencapMethods.MinicapStream,
+            "EmulatorExtras" => AdbScreencapMethods.EmulatorExtras,
+            _ => AdbScreencapMethods.Default 
         };
     }
 
@@ -1547,9 +1548,7 @@ public partial class MainWindow
 
             MaaProcessor.Config.DesktopWindow.Input = win32InputType;
             MaaProcessor.Config.DesktopWindow.ScreenCap = winScreenCapType;
-
-            Console.WriteLine(
-                $"{"AdbInputMode".ToLocalization()}{win32InputType},{"AdbCaptureMode".ToLocalization()}{winScreenCapType}");
+            
             LoggerService.LogInfo(
                 $"{"AdbInputMode".ToLocalization()}{win32InputType},{"AdbCaptureMode".ToLocalization()}{winScreenCapType}");
         }
@@ -1557,22 +1556,22 @@ public partial class MainWindow
 
     private Win32ScreencapMethod ConfigureWin32ScreenCapTypes()
     {
-        return DataSet.GetData("Win32ControlScreenCapType", 0) switch
+        return DataSet.GetData("Win32ControlScreenCapType", "FramePool") switch
         {
-            0 => Win32ScreencapMethod.FramePool,
-            1 => Win32ScreencapMethod.DXGIDesktopDup,
-            2 => Win32ScreencapMethod.GDI,
-            _ => 0
+            "FramePool" => Win32ScreencapMethod.FramePool,
+            "DXGIDesktopDup" => Win32ScreencapMethod.DXGIDesktopDup,
+            "GDI" => Win32ScreencapMethod.GDI,
+            _ => Win32ScreencapMethod.FramePool
         };
     }
 
     private Win32InputMethod ConfigureWin32InputTypes()
     {
-        return DataSet.GetData("Win32ControlInputType", 0) switch
+        return DataSet.GetData("Win32ControlInputType", "Seize") switch
         {
-            0 => Win32InputMethod.Seize,
-            1 => Win32InputMethod.SendMessage,
-            _ => 0
+            "Seize" => Win32InputMethod.Seize,
+            "SendMessage" => Win32InputMethod.SendMessage,
+            _ => Win32InputMethod.Seize
         };
     }
 
