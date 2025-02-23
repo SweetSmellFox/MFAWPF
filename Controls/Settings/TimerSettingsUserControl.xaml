@@ -9,6 +9,7 @@
     xmlns:controls="clr-namespace:MFAWPF.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:view="clr-namespace:MFAWPF.Views"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -19,6 +20,14 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <controls:CustomTextBlock
+            FontWeight="Bold"
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            Text="{lex:Loc GlobalConfigTip}"
+            TextAlignment="Center"
+            Visibility="{c:Binding 'ConfigurationList.Count > 1',
+                                   Source={x:Static view:SettingsView.ViewModel}}" />
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition />

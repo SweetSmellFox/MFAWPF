@@ -78,7 +78,7 @@ public class DragDropHandler : IDropTarget
                 if (MaaInterface.Instance != null)
                     MaaInterface.Instance.Task = tasks;
                 // 保存当前的 ItemsSource 到 JSON
-                DataSet.SetData("TaskItems",
+                MFAConfiguration.SetConfiguration("TaskItems",
                     MainWindow.ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }

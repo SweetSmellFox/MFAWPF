@@ -3,7 +3,7 @@ using MFAWPF.Helper;
 
 namespace MFAWPF.Data;
 
-public class Config
+public class MaaFWConfig
 {
     public AdbDeviceCoreConfig AdbDevice { get; set; } = new();
     public DesktopWindowCoreConfig DesktopWindow { get; set; } = new();

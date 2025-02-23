@@ -16,19 +16,19 @@ public partial class MFAConfig : ObservableObject
     public void DeleteConfiguration(MFAConfig config)
     {
         var configName = config.Name;
-        if (!DataSet.Configs.Any(c => c.Name.Equals(configName, StringComparison.OrdinalIgnoreCase)))
+        if (!MFAConfiguration.Configs.Any(c => c.Name.Equals(configName, StringComparison.OrdinalIgnoreCase)))
         {
             LoggerService.LogError($"Configuration {configName} does not exist");
             return;
         }
 
-        if (DataSet.ConfigName == configName)
+        if (MFAConfiguration.ConfigName == configName)
         {
             LoggerService.LogError($"Configuration {configName} is current configuration, cannot delete");
             return;
         }
         SettingsView.ViewModel.ConfigurationList.Remove(config);
-        DataSet.DeleteConfig(configName);
+        MFAConfiguration.DeleteConfig(configName);
     }
 
     public override string ToString()

@@ -44,7 +44,7 @@ public partial class DragItemViewModel : ViewModel
                 SetProperty(ref _isCheckedWithNull, value);
                 if (InterfaceItem != null)
                     InterfaceItem.Check = IsChecked;
-                DataSet.SetData("TaskItems",
+                MFAConfiguration.SetConfiguration("TaskItems",
                     MainWindow.ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }

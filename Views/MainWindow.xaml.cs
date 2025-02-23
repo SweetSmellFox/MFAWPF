@@ -50,8 +50,8 @@ public partial class MainWindow
 
     public MainWindow(ViewModels.MainViewModel viewModel)
     {
-        DataSet.LoadConfig();
-        DataSet.MaaConfig = JsonHelper.ReadFromConfigJsonFile("maa_option", new Dictionary<string, object>());
+        MFAConfiguration.LoadConfig();
+        MFAConfiguration.MaaConfig = JsonHelper.ReadFromConfigJsonFile("maa_option", new Dictionary<string, object>());
         LanguageHelper.Initialize();
         InitializeComponent();
         ViewModel = viewModel;
@@ -61,10 +61,10 @@ public partial class MainWindow
         Loaded += (_, _) => { LoadUI(); };
         InitializeData();
         OCRHelper.Initialize();
-        ThemeHelper.UpdateThemeIndexChanged(DataSet.GetData("ThemeIndex", 0));
+        ThemeHelper.UpdateThemeIndexChanged(MFAConfiguration.GetConfiguration("ThemeIndex", 0));
         StateChanged += (_, _) =>
         {
-            if (DataSet.GetData("ShouldMinimizeToTray", false))
+            if (MFAConfiguration.GetConfiguration("ShouldMinimizeToTray", false))
             {
                 ChangeVisibility(WindowState != WindowState.Minimized);
             }
@@ -114,10 +114,10 @@ public partial class MainWindow
 
             if (FirstTask)
             {
-                if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > DataSet.GetData("ResourceIndex", 0))
+                if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > MFAConfiguration.GetConfiguration("ResourceIndex", 0))
                     MaaProcessor.CurrentResources =
                         MaaInterface.Instance.Resources[
-                            MaaInterface.Instance.Resources.Keys.ToList()[DataSet.GetData("ResourceIndex", 0)]];
+                            MaaInterface.Instance.Resources.Keys.ToList()[MFAConfiguration.GetConfiguration("ResourceIndex", 0)]];
                 else
                     MaaProcessor.CurrentResources =
                     [
@@ -196,7 +196,7 @@ public partial class MainWindow
 
         if (ViewModel.TaskItemViewModels.Count == 0)
         {
-            var items = DataSet.GetData("TaskItems",
+            var items = MFAConfiguration.GetConfiguration("TaskItems",
                     new List<TaskInterfaceItem>())
                 ?? new List<TaskInterfaceItem>();
             var dragItemViewModels = items.Select(interfaceItem => new DragItemViewModel(interfaceItem)).ToList();
@@ -233,7 +233,7 @@ public partial class MainWindow
     protected override void OnClosing(CancelEventArgs e)
     {
         e.Cancel = !ConfirmExit();
-        DataSet.SetData("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+        MFAConfiguration.SetConfiguration("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         base.OnClosed(e);
     }
 
@@ -463,20 +463,20 @@ public partial class MainWindow
         {
             Growl.Info(string.Format(LocExtension.GetLocalizedValue<string>("WindowSelectionMessage"),
                 window.Name));
-            MaaProcessor.Config.DesktopWindow.Name = window.Name;
-            MaaProcessor.Config.DesktopWindow.HWnd = window.Handle;
+            MaaProcessor.MaaFwConfig.DesktopWindow.Name = window.Name;
+            MaaProcessor.MaaFwConfig.DesktopWindow.HWnd = window.Handle;
             MaaProcessor.Instance.SetCurrentTasker();
         }
         else if (deviceComboBox.SelectedItem is AdbDeviceInfo device)
         {
             Growl.Info(string.Format(LocExtension.GetLocalizedValue<string>("EmulatorSelectionMessage"),
                 device.Name));
-            MaaProcessor.Config.AdbDevice.Name = device.Name;
-            MaaProcessor.Config.AdbDevice.AdbPath = device.AdbPath;
-            MaaProcessor.Config.AdbDevice.AdbSerial = device.AdbSerial;
-            MaaProcessor.Config.AdbDevice.Config = device.Config;
+            MaaProcessor.MaaFwConfig.AdbDevice.Name = device.Name;
+            MaaProcessor.MaaFwConfig.AdbDevice.AdbPath = device.AdbPath;
+            MaaProcessor.MaaFwConfig.AdbDevice.AdbSerial = device.AdbSerial;
+            MaaProcessor.MaaFwConfig.AdbDevice.Config = device.Config;
             MaaProcessor.Instance.SetCurrentTasker();
-            DataSet.SetData("AdbDevice", device);
+            MFAConfiguration.SetConfiguration("AdbDevice", device);
         }
     }
 
@@ -551,7 +551,7 @@ public partial class MainWindow
                 var devices = _maaToolkit.AdbDevice.Find();
                 DispatcherHelper.RunOnMainThread(() => deviceComboBox.ItemsSource = devices);
                 SetConnected(devices.Count > 0);
-                var emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
+                var emulatorConfig = MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty);
                 var resultIndex = 0;
                 if (!string.IsNullOrWhiteSpace(emulatorConfig))
                 {
@@ -595,7 +595,7 @@ public partial class MainWindow
                                         result = 1;
                                         break;
                                 }
-                                DataSet.SetData("AdbControlInputType", result);
+                                MFAConfiguration.SetConfiguration("AdbControlInputType", result);
                             }
                             if (adbController.Adb.ScreenCap != null)
                             {
@@ -624,7 +624,7 @@ public partial class MainWindow
                                         result = 7;
                                         break;
                                 }
-                                DataSet.SetData("AdbControlScreenCapType", result);
+                                MFAConfiguration.SetConfiguration("AdbControlScreenCapType", result);
                             }
                         }
                     }
@@ -677,7 +677,7 @@ public partial class MainWindow
                                         result = 1;
                                         break;
                                 }
-                                DataSet.SetData("Win32ControlInputType", result);
+                                MFAConfiguration.SetConfiguration("Win32ControlInputType", result);
                             }
                             if (win32Controller.Win32.ScreenCap != null)
                             {
@@ -694,7 +694,7 @@ public partial class MainWindow
                                         result = 1;
                                         break;
                                 }
-                                DataSet.SetData("Win32ControlScreenCapType", result);
+                                MFAConfiguration.SetConfiguration("Win32ControlScreenCapType", result);
                             }
                         }
                     }
@@ -834,7 +834,7 @@ public partial class MainWindow
     //             RestartMFA();
     //         }
     //     };
-    //     // comboBox.SelectedIndex = DataSet.GetData("SwitchConfigurationIndex", defaultValue);
+    //     // comboBox.SelectedIndex = MFAConfiguration.GetConfiguration("SwitchConfigurationIndex", defaultValue);
     //     panel.Children.Add(comboBox);
     // }
 
@@ -850,7 +850,7 @@ public partial class MainWindow
         panel ??= settingPanel;
         var comboBox = new ComboBox
         {
-            SelectedIndex = DataSet.GetData("ResourceIndex", defaultValue),
+            SelectedIndex = MFAConfiguration.GetConfiguration("ResourceIndex", defaultValue),
             Style = FindResource("ComboBoxExtend") as Style,
             DisplayMemberPath = "Name",
             Margin = new Thickness(5)
@@ -889,7 +889,7 @@ public partial class MainWindow
             if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > index)
                 MaaProcessor.CurrentResources =
                     MaaInterface.Instance.Resources[MaaInterface.Instance.Resources.Keys.ToList()[index]];
-            DataSet.SetData("ResourceIndex", index);
+            MFAConfiguration.SetConfiguration("ResourceIndex", index);
         };
 
         panel.Children.Add(comboBox);
@@ -900,8 +900,8 @@ public partial class MainWindow
         panel ??= settingPanel;
         var textBox = new TextBox
         {
-            //Text = DataSet.GetData("AdbConfig", "{\"extras\":{}}"), HorizontalAlignment = HorizontalAlignment.Stretch,
-            Text = DataSet.GetData("EmulatorConfig", ""),
+            //Text = MFAConfiguration.GetConfiguration("AdbConfig", "{\"extras\":{}}"), HorizontalAlignment = HorizontalAlignment.Stretch,
+            Text = MFAConfiguration.GetConfiguration("EmulatorConfig", ""),
             HorizontalAlignment = HorizontalAlignment.Stretch,
             ToolTip = "mumu是-v 多开号(从0开始),雷电是index=多开号(也是0)",
             Margin = new Thickness(5)
@@ -914,7 +914,7 @@ public partial class MainWindow
         textBox.TextChanged += (sender, _) =>
         {
             var text = (sender as TextBox)?.Text ?? string.Empty;
-            DataSet.SetData("EmulatorConfig", text);
+            MFAConfiguration.SetConfiguration("EmulatorConfig", text);
         };
 
 
@@ -954,10 +954,10 @@ public partial class MainWindow
         // {
         //     if ((sender as ComboBox)?.SelectedItem is LanguageManager.SupportedLanguage language)
         //         LanguageManager.ChangeLanguage(language);
-        //     DataSet.SetData("ConnectEmulatorMode", (sender as ComboBox)?.SelectedIndex ?? 0);
+        //     MFAConfiguration.SetConfiguration("ConnectEmulatorMode", (sender as ComboBox)?.SelectedIndex ?? 0);
         // };
         //
-        // comboBox.SelectedIndex = DataSet.GetData("ConnectEmulatorMode", "General");
+        // comboBox.SelectedIndex = MFAConfiguration.GetConfiguration("ConnectEmulatorMode", "General");
         // panel.Children.Add(comboBox);
         panel.Children.Add(textBox);
     }
@@ -1077,12 +1077,12 @@ public partial class MainWindow
         comboBox.ItemsSource = ViewModel.BeforeTaskList;
         comboBox.BindLocalization("AutoStartOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-        comboBox.SelectedIndex = DataSet.GetData("AutoStartIndex", defaultValue);
+        comboBox.SelectedIndex = MFAConfiguration.GetConfiguration("AutoStartIndex", defaultValue);
 
         comboBox.SelectionChanged += (sender, _) =>
         {
             var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-            DataSet.SetData("AutoStartIndex", index);
+            MFAConfiguration.SetConfiguration("AutoStartIndex", index);
             ViewModel.BeforeTask = ViewModel.BeforeTaskList[index].Name;
         };
 
@@ -1103,11 +1103,11 @@ public partial class MainWindow
 
         comboBox.BindLocalization("AfterTaskOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-        comboBox.SelectedIndex = DataSet.GetData("AfterTaskIndex", defaultValue);
+        comboBox.SelectedIndex = MFAConfiguration.GetConfiguration("AfterTaskIndex", defaultValue);
         comboBox.SelectionChanged += (sender, _) =>
         {
             var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-            DataSet.SetData("AfterTaskIndex", index);
+            MFAConfiguration.SetConfiguration("AfterTaskIndex", index);
             ViewModel.AfterTask = ViewModel.AfterTaskList[index].Name;
         };
 
@@ -1145,13 +1145,13 @@ public partial class MainWindow
 
         var t1 = new TextBox
         {
-            Text = DataSet.GetData("SoftwarePath", string.Empty),
+            Text = MFAConfiguration.GetConfiguration("SoftwarePath", string.Empty),
             HorizontalAlignment = HorizontalAlignment.Stretch
         };
         t1.TextChanged += (sender, _) =>
         {
             var text = (sender as TextBox)?.Text ?? string.Empty;
-            DataSet.SetData("SoftwarePath", text);
+            MFAConfiguration.SetConfiguration("SoftwarePath", text);
         };
         t1.SetValue(InfoElement.ShowClearButtonProperty, true);
         t1.BindLocalization("SoftwarePath");
@@ -1198,7 +1198,7 @@ public partial class MainWindow
         var numericUpDown = new NumericUpDown
         {
             Margin = new Thickness(5),
-            Value = DataSet.GetData("WaitSoftwareTime", 60.0),
+            Value = MFAConfiguration.GetConfiguration("WaitSoftwareTime", 60.0),
             Style = FindResource("NumericUpDownExtend") as Style
         };
 
@@ -1208,7 +1208,7 @@ public partial class MainWindow
         numericUpDown.ValueChanged += (sender, _) =>
         {
             var value = (sender as NumericUpDown)?.Value ?? 60;
-            DataSet.SetData("WaitSoftwareTime", value);
+            MFAConfiguration.SetConfiguration("WaitSoftwareTime", value);
         };
         panel.Children.Add(grid);
         panel.Children.Add(numericUpDown);
@@ -1298,13 +1298,13 @@ public partial class MainWindow
                     toggleButton.Checked += (_, _) =>
                     {
                         option.Index = yes;
-                        DataSet.SetData("TaskItems",
+                        MFAConfiguration.SetConfiguration("TaskItems",
                             ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                     };
                     toggleButton.Unchecked += (_, _) =>
                     {
                         option.Index = no;
-                        DataSet.SetData("TaskItems",
+                        MFAConfiguration.SetConfiguration("TaskItems",
                             ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                     };
                     var textBlock = new TextBlock
@@ -1367,7 +1367,7 @@ public partial class MainWindow
                     {
                         option.Index = comboBox.SelectedIndex;
 
-                        DataSet.SetData("TaskItems",
+                        MFAConfiguration.SetConfiguration("TaskItems",
                             ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                     };
 
@@ -1417,7 +1417,7 @@ public partial class MainWindow
             numericUpDown.ValueChanged += (_, _) =>
             {
                 source.InterfaceItem.RepeatCount = Convert.ToInt16(numericUpDown.Value);
-                DataSet.SetData("TaskItems",
+                MFAConfiguration.SetConfiguration("TaskItems",
                     ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             };
             numericUpDown.BindLocalization("RepeatOption");
@@ -1478,7 +1478,7 @@ public partial class MainWindow
         if (addTaskDialog.OutputContent != null)
         {
             ViewModel?.TaskItemViewModels.Add(addTaskDialog.OutputContent.Clone());
-            DataSet.SetData("TaskItems", ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+            MFAConfiguration.SetConfiguration("TaskItems", ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         }
     }
 
@@ -1495,8 +1495,8 @@ public partial class MainWindow
             var adbInputType = ConfigureAdbInputTypes();
             var adbScreenCapType = ConfigureAdbScreenCapTypes();
 
-            MaaProcessor.Config.AdbDevice.Input = adbInputType;
-            MaaProcessor.Config.AdbDevice.ScreenCap = adbScreenCapType;
+            MaaProcessor.MaaFwConfig.AdbDevice.Input = adbInputType;
+            MaaProcessor.MaaFwConfig.AdbDevice.ScreenCap = adbScreenCapType;
 
             Console.WriteLine(
                 $"{LocExtension.GetLocalizedValue<string>("AdbInputMode")}{adbInputType},{LocExtension.GetLocalizedValue<string>("AdbCaptureMode")}{adbScreenCapType}");
@@ -1513,7 +1513,7 @@ public partial class MainWindow
 
     private AdbInputMethods ConfigureAdbInputTypes()
     {
-        return DataSet.GetData("AdbControlInputType", "MinitouchAndAdbKey") switch
+        return MFAConfiguration.GetConfiguration("AdbControlInputType", "MinitouchAndAdbKey") switch
         {
             "MiniTouch" => AdbInputMethods.MinitouchAndAdbKey,
             "MaaTouch" => AdbInputMethods.Maatouch,
@@ -1525,7 +1525,7 @@ public partial class MainWindow
 
     private AdbScreencapMethods ConfigureAdbScreenCapTypes()
     {
-        return DataSet.GetData("AdbControlScreenCapType", "Default") switch
+        return MFAConfiguration.GetConfiguration("AdbControlScreenCapType", "Default") switch
         {
             "Default" => AdbScreencapMethods.Default,
             "RawWithGzip" => AdbScreencapMethods.RawWithGzip,
@@ -1546,8 +1546,8 @@ public partial class MainWindow
             var win32InputType = ConfigureWin32InputTypes();
             var winScreenCapType = ConfigureWin32ScreenCapTypes();
 
-            MaaProcessor.Config.DesktopWindow.Input = win32InputType;
-            MaaProcessor.Config.DesktopWindow.ScreenCap = winScreenCapType;
+            MaaProcessor.MaaFwConfig.DesktopWindow.Input = win32InputType;
+            MaaProcessor.MaaFwConfig.DesktopWindow.ScreenCap = winScreenCapType;
             
             LoggerService.LogInfo(
                 $"{"AdbInputMode".ToLocalization()}{win32InputType},{"AdbCaptureMode".ToLocalization()}{winScreenCapType}");
@@ -1556,7 +1556,7 @@ public partial class MainWindow
 
     private Win32ScreencapMethod ConfigureWin32ScreenCapTypes()
     {
-        return DataSet.GetData("Win32ControlScreenCapType", "FramePool") switch
+        return MFAConfiguration.GetConfiguration("Win32ControlScreenCapType", "FramePool") switch
         {
             "FramePool" => Win32ScreencapMethod.FramePool,
             "DXGIDesktopDup" => Win32ScreencapMethod.DXGIDesktopDup,
@@ -1567,7 +1567,7 @@ public partial class MainWindow
 
     private Win32InputMethod ConfigureWin32InputTypes()
     {
-        return DataSet.GetData("Win32ControlInputType", "Seize") switch
+        return MFAConfiguration.GetConfiguration("Win32ControlInputType", "Seize") switch
         {
             "Seize" => Win32InputMethod.Seize,
             "SendMessage" => Win32InputMethod.SendMessage,
@@ -1586,7 +1586,7 @@ public partial class MainWindow
                 // 获取选中项的索引
                 int index = ViewModel.TaskItemViewModels.IndexOf(taskItemViewModel);
                 ViewModel.TaskItemViewModels.RemoveAt(index);
-                DataSet.SetData("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                MFAConfiguration.SetConfiguration("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }
     }
@@ -1632,7 +1632,7 @@ public partial class MainWindow
             InitializationSettings();
             ConnectionTabControl.SelectedIndex = MaaInterface.Instance?.DefaultController == "win32" ? 1 : 0;
             ConfigureTaskSettingsPanel();
-            if (DataSet.GetData("AutoStartIndex", 0) >= 1)
+            if (MFAConfiguration.GetConfiguration("AutoStartIndex", 0) >= 1)
             {
                 MaaProcessor.Instance.TaskQueue.Push(new MFATask
                 {
@@ -1640,11 +1640,11 @@ public partial class MainWindow
                     Type = MFATask.MFATaskType.MFA,
                     Action = WaitSoftware,
                 });
-                Start(DataSet.GetData("AutoStartIndex", 0) == 1, checkUpdate: true);
+                Start(MFAConfiguration.GetConfiguration("AutoStartIndex", 0) == 1, checkUpdate: true);
             }
             else
             {
-                if (ViewModel?.IsAdb == true && DataSet.GetData("RememberAdb", true) && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) && DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
+                if (ViewModel?.IsAdb == true && MFAConfiguration.GetConfiguration("RememberAdb", true) && "adb".Equals(MaaProcessor.MaaFwConfig.AdbDevice.AdbPath) && MFAConfiguration.TryGetData<JObject>("AdbDevice", out var jObject))
                 {
                     var settings = new JsonSerializerSettings();
                     settings.Converters.Add(new AdbInputMethodsConverter());
@@ -1670,10 +1670,10 @@ public partial class MainWindow
             if (ViewModel != null)
                 ViewModel.NotLock = MaaInterface.Instance?.LockController != true;
             ConnectSettingButton.IsChecked = true;
-            var value = DataSet.GetData("EnableEdit", false);
+            var value = MFAConfiguration.GetConfiguration("EnableEdit", false);
             if (!value)
                 EditButton.Visibility = Visibility.Collapsed;
-            DataSet.SetData("EnableEdit", value);
+            MFAConfiguration.SetConfiguration("EnableEdit", value);
             ViewModel.IsDebugMode = MFAExtensions.IsDebugMode();
             if (!string.IsNullOrWhiteSpace(MaaInterface.Instance?.Message))
             {
@@ -1686,12 +1686,12 @@ public partial class MainWindow
             await Task.Delay(1000);
             DispatcherHelper.RunOnMainThread(() =>
             {
-                if (DataSet.GetData("AutoMinimize", false))
+                if (MFAConfiguration.GetConfiguration("AutoMinimize", false))
                 {
                     Collapse();
                 }
 
-                if (DataSet.GetData("AutoHide", false))
+                if (MFAConfiguration.GetConfiguration("AutoHide", false))
                 {
                     Hide();
                 }
@@ -1761,8 +1761,8 @@ public partial class MainWindow
     {
         bool enable = str switch
         {
-            "Prescript" => !string.IsNullOrWhiteSpace(DataSet.GetData("Prescript", string.Empty)),
-            "Post-script" => !string.IsNullOrWhiteSpace(DataSet.GetData("Post-script", string.Empty)),
+            "Prescript" => !string.IsNullOrWhiteSpace(MFAConfiguration.GetConfiguration("Prescript", string.Empty)),
+            "Post-script" => !string.IsNullOrWhiteSpace(MFAConfiguration.GetConfiguration("Post-script", string.Empty)),
             _ => false,
         };
         if (!enable)
@@ -1772,8 +1772,8 @@ public partial class MainWindow
 
         Func<bool> func = str switch
         {
-            "Prescript" => () => ExecuteScript(DataSet.GetData("Prescript", string.Empty)),
-            "Post-script" => () => ExecuteScript(DataSet.GetData("Post-script", string.Empty)),
+            "Prescript" => () => ExecuteScript(MFAConfiguration.GetConfiguration("Prescript", string.Empty)),
+            "Post-script" => () => ExecuteScript(MFAConfiguration.GetConfiguration("Post-script", string.Empty)),
             _ => () => false,
         };
 
@@ -1875,12 +1875,12 @@ public partial class MainWindow
 
     public async void WaitSoftware()
     {
-        if (DataSet.GetData("AutoStartIndex", 0) >= 1)
+        if (MFAConfiguration.GetConfiguration("AutoStartIndex", 0) >= 1)
         {
             MaaProcessor.Instance.StartSoftware();
         }
 
-        if ((ViewModel?.IsAdb).IsTrue() && DataSet.GetData("RememberAdb", true) && "adb".Equals(MaaProcessor.Config.AdbDevice.AdbPath) && DataSet.TryGetData<JObject>("AdbDevice", out var jObject))
+        if ((ViewModel?.IsAdb).IsTrue() && MFAConfiguration.GetConfiguration("RememberAdb", true) && "adb".Equals(MaaProcessor.MaaFwConfig.AdbDevice.AdbPath) && MFAConfiguration.TryGetData<JObject>("AdbDevice", out var jObject))
         {
             var settings = new JsonSerializerSettings();
             settings.Converters.Add(new AdbInputMethodsConverter());

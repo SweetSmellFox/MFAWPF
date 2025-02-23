@@ -825,4 +825,10 @@
   <data name="Issue" xml:space="preserve">
     <value>问题反馈</value>
   </data>
+  <data name="GlobalConfigTip" xml:space="preserve">
+    <value>此选项页为全局配置</value>
+  </data>
+  <data name="CheckMFA" xml:space="preserve">
+    <value>检查软件</value>
+  </data>
 </root>

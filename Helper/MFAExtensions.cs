@@ -502,7 +502,7 @@ public static class MFAExtensions
     }
     public static bool IsDebugMode()
     {
-        if (DataSet.MaaConfig.GetConfig("recording", false) || DataSet.MaaConfig.GetConfig("save_draw", false) || DataSet.MaaConfig.GetConfig("show_hit_draw", false)) return true;
+        if (MFAConfiguration.MaaConfig.GetConfig("recording", false) || MFAConfiguration.MaaConfig.GetConfig("save_draw", false) || MFAConfiguration.MaaConfig.GetConfig("show_hit_draw", false)) return true;
         return false;
     }
 }

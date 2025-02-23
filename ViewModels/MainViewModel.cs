@@ -5,11 +5,11 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools.Command;
+using MFAWPF.Data;
 using MFAWPF.Helper;
 using Newtonsoft.Json;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
-using DataSet = MFAWPF.Data.DataSet;
 
 
 namespace MFAWPF.ViewModels;
@@ -91,7 +91,7 @@ public partial class MainViewModel : ViewModel
     [ObservableProperty] private ObservableCollection<DragItemViewModel> _taskItemViewModels = new();
     partial void OnTaskItemViewModelsChanged(ObservableCollection<DragItemViewModel>? oldValue, ObservableCollection<DragItemViewModel> newValue)
     {
-            DataSet.SetData("TaskItems", newValue.ToList().Select(model => model.InterfaceItem));
+            MFAConfiguration.SetConfiguration("TaskItems", newValue.ToList().Select(model => model.InterfaceItem));
     }
 
     public ObservableCollection<DragItemViewModel> TasksSource { get; private set; } =
@@ -259,7 +259,7 @@ public partial class MainViewModel : ViewModel
     {
         get
         {
-            _beforeTask = BeforeTaskList[DataSet.GetData("AutoStartIndex", 0)].ResourceKey;
+            _beforeTask = BeforeTaskList[MFAConfiguration.GetConfiguration("AutoStartIndex", 0)].ResourceKey;
             return _beforeTask;
         }
         set => SetProperty(ref _beforeTask, value);
@@ -271,7 +271,7 @@ public partial class MainViewModel : ViewModel
     {
         get
         {
-            _afterTask = AfterTaskList[DataSet.GetData("AfterTaskIndex", 0)].ResourceKey;
+            _afterTask = AfterTaskList[MFAConfiguration.GetConfiguration("AfterTaskIndex", 0)].ResourceKey;
             return _afterTask;
         }
         set => SetProperty(ref _afterTask, value);

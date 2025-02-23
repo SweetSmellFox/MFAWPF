@@ -213,7 +213,7 @@ public partial class EditTaskDialogViewModel : ViewModel
     //         {
     //             var attribute =
     //                 JsonConvert.DeserializeObject<Attribute>(
-    //                     (string)iData.GetData(DataFormats.Text));
+    //                     (string)iData.GetConfiguration(DataFormats.Text));
     //             // AttributeButton button = Dialog?.AddAttribute(attribute);
     //             // if (button != null)
     //             //     UndoTaskStack.Push(new RelayCommand(_ => Dialog?.Parts.Children.Remove(button)));

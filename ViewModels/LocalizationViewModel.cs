@@ -20,20 +20,24 @@ public partial class LocalizationViewModel : ViewModel
         }
     }
 
+    public LocalizationViewModel()
+    {
+    }
+
     public LocalizationViewModel(string resourceKey)
     {
         _resourceKey = resourceKey;
-        
+
         UpdateName();
         LanguageHelper.LanguageChanged += OnLanguageChanged;
     }
-    
-    [ObservableProperty]
-    private string? _name;
-    
+
+    [ObservableProperty] private string? _name;
+
     private void UpdateName()
     {
-        Name = ResourceKey.ToLocalization();
+        if (!string.IsNullOrWhiteSpace(ResourceKey))
+            Name = ResourceKey.ToLocalization();
     }
 
     private void OnLanguageChanged(object sender, EventArgs e)

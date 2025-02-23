@@ -11,14 +11,14 @@ namespace MFAWPF.Data
 
 ;
 
-public static class DataSet
+public static class MFAConfiguration
 {
     public static Dictionary<string, object> Data = new();
     public static Dictionary<string, object> MaaConfig = new();
     public static ObservableCollection<MFAConfig> Configs = new();
-    public static Configuration Config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
     public static int ConfigIndex { get; set; } = 0;
-    public static string ConfigName { get; set; } = "config";
+    public static string ConfigName { get; set; } = "Default";
 
     public static string GetCurrentConfiguration() => ConfigName;
 
@@ -32,7 +32,8 @@ public static class DataSet
     public static void LoadConfig()
     {
         LoggerService.LogInfo("Loading configuration file...");
-        ConfigName = ConfigurationManager.AppSettings["DefaultConfig"] ?? ConfigName;
+        ConfigName = GlobalConfiguration.GetConfiguration("DefaultConfig", ConfigName);
+        Console.WriteLine($"配置文件:{ConfigName}");
 
         var configPath = Path.Combine(AppContext.BaseDirectory, "config");
         foreach (var file in Directory.GetFiles(configPath))
@@ -53,7 +54,7 @@ public static class DataSet
 
         Data = Configs.FirstOrDefault(c
             => !string.IsNullOrWhiteSpace(c.Name)
-            && c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase), null).Config;
+            && c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase), null)?.Config ?? new Dictionary<string, object>();
 
         ConfigIndex = Configs.ToList().FindIndex(c => !string.IsNullOrWhiteSpace(c.Name)
             && c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase));
@@ -63,9 +64,7 @@ public static class DataSet
     {
         if (string.IsNullOrWhiteSpace(name))
             return;
-        Config.AppSettings.Settings["DefaultConfig"].Value = name;
-        Config.Save(ConfigurationSaveMode.Modified);
-        ConfigurationManager.RefreshSection("appSettings");
+        GlobalConfiguration.SetConfiguration("DefaultConfig", name);
     }
 
     public static MFAConfig AddNewConfig(string name)
@@ -136,7 +135,7 @@ public static class DataSet
         return defaultValue;
     }
 
-    public static void SetData(string key, object value)
+    public static void SetConfiguration(string key, object value)
     {
         Data.SetConfig(key, value);
     }
@@ -178,48 +177,8 @@ public static class DataSet
         return false;
     }
 
-    public static T GetData<T>(string key, T defaultValue)
+    public static T GetConfiguration<T>(string key, T defaultValue)
     {
         return Data.GetConfig(key, defaultValue);
-    }
-
-    public static bool GetTimer(int i, bool defaultValue)
-    {
-        return GetData($"Timer.Timer{i + 1}", defaultValue);
-    }
-
-    public static void SetTimer(int i, bool value)
-    {
-        SetData($"Timer.Timer{i + 1}", value);
-    }
-
-    public static string GetTimerHour(int i, string defaultValue)
-    {
-        return GetData($"Timer.Timer{i + 1}Hour", defaultValue);
-    }
-
-    public static void SetTimerHour(int i, string value)
-    {
-        SetData($"Timer.Timer{i + 1}Hour", value);
-    }
-
-    public static string GetTimerMin(int i, string defaultValue)
-    {
-        return GetData($"Timer.Timer{i + 1}Min", defaultValue);
-    }
-
-    public static void SetTimerMin(int i, string value)
-    {
-        SetData($"Timer.Timer{i + 1}Min", value);
-    }
-
-    public static string GetTimerConfig(int i, string defaultValue)
-    {
-        return GetData($"Timer.Timer{i + 1}.Config", defaultValue);
-    }
-
-    public static void SetTimerConfig(int i, string value)
-    {
-        SetData($"Timer.Timer{i + 1}.Config", value);
     }
 }

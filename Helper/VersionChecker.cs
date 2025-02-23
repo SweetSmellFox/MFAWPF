@@ -28,19 +28,19 @@ public class VersionChecker
 
     public static void Check()
     {
-        if (DataSet.GetData("EnableAutoUpdateResource", false))
+        if (MFAConfiguration.GetConfiguration("EnableAutoUpdateResource", false))
         {
             Checker.Queue.Enqueue(new MFATask
             {
-                Action = () => Checker.UpdateResourceBySelection(DataSet.GetData("EnableAutoUpdateMFA", false), true, () =>
+                Action = () => Checker.UpdateResourceBySelection(MFAConfiguration.GetConfiguration("EnableAutoUpdateMFA", false), true, () =>
                 {
-                    if (DataSet.GetData("EnableAutoUpdateMFA", false))
+                    if (MFAConfiguration.GetConfiguration("EnableAutoUpdateMFA", false))
                         Checker.UpdateMFABySelection(true);
                 }),
                 Name = "更新资源"
             });
         }
-        else if (DataSet.GetData("EnableCheckVersion", true))
+        else if (MFAConfiguration.GetConfiguration("EnableCheckVersion", true))
         {
             Checker.Queue.Enqueue(new MFATask
             {
@@ -49,7 +49,7 @@ public class VersionChecker
             });
         }
 
-        if (DataSet.GetData("EnableAutoUpdateMFA", false) && !DataSet.GetData("EnableAutoUpdateResource", false))
+        if (MFAConfiguration.GetConfiguration("EnableAutoUpdateMFA", false) && !MFAConfiguration.GetConfiguration("EnableAutoUpdateResource", false))
         {
             Checker.Queue.Enqueue(new MFATask
             {
@@ -57,11 +57,11 @@ public class VersionChecker
                 Name = "更新软件"
             });
         }
-        else if (DataSet.GetData("EnableCheckVersion", true))
+        else if (MFAConfiguration.GetConfiguration("EnableCheckVersion", true))
         {
             Checker.Queue.Enqueue(new MFATask
             {
-                Action = () => Checker.CheckGuiBySelection(),
+                Action = () => Checker.CheckMFABySelection(),
                 Name = "检测资源版本"
             });
         }
@@ -78,7 +78,7 @@ public class VersionChecker
         }
     }
 
-    public static void CheckGUIVersionAsync() => TaskManager.RunTaskAsync(() => Checker.CheckGuiBySelection());
+    public static void CheckMFAVersionAsync() => TaskManager.RunTaskAsync(() => Checker.CheckMFABySelection());
     public static void CheckResourceVersionAsync() => TaskManager.RunTaskAsync(() => Checker.CheckResourceBySelection());
     public static void UpdateResourceAsync() => TaskManager.RunTaskAsync(() => Checker.UpdateResourceBySelection());
     public static void UpdateMFAAsync() => TaskManager.RunTaskAsync(() => Checker.UpdateMFABySelection());
@@ -105,7 +105,7 @@ public class VersionChecker
                 break;
         }
     }
-    public void CheckGuiBySelection()
+    public void CheckMFABySelection()
     {
         switch (SettingsView.ViewModel.DownloadSourceIndex)
         {
@@ -162,7 +162,7 @@ public class VersionChecker
 
         var resId = GetResourceID();
         var currentVersion = GetResourceVersion();
-        var cdk = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
+        var cdk = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("DownloadCDK", string.Empty));
         dialog?.UpdateProgress(10);
         if (string.IsNullOrWhiteSpace(resId))
         {
@@ -388,7 +388,7 @@ public class VersionChecker
                 return;
             }
             var currentVersion = GetLocalVersion();
-            var cdk = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
+            var cdk = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("DownloadCDK", string.Empty));
 
             GetDownloadUrlFromMirror(currentVersion, resId, cdk, out var downloadUrl, out var latestVersion, "MFA", true, true);
 
@@ -646,7 +646,7 @@ public class VersionChecker
 
         var resId = "MaaFramework";
         var currentVersion = MaaProcessor.MaaUtility.Version;
-        var cdk = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
+        var cdk = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("DownloadCDK", string.Empty));
         MainWindow.Instance.SetUpdating(true);
         string downloadUrl = string.Empty, latestVersion = string.Empty;
         try
@@ -777,7 +777,7 @@ public class VersionChecker
 
         var resId = "MFAWPF";
         var currentVersion = GetLocalVersion();
-        var cdk = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
+        var cdk = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("DownloadCDK", string.Empty));
         MainWindow.Instance.SetUpdating(true);
         string downloadUrl = string.Empty, latestVersion = string.Empty;
         try
@@ -1277,7 +1277,7 @@ public class VersionChecker
         {
             var resId = "MFAWPF";
             var currentVersion = GetLocalVersion();
-            var cdk = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
+            var cdk = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("DownloadCDK", string.Empty));
             MainWindow.Instance.SetUpdating(true);
             GetDownloadUrlFromMirror(currentVersion, resId, cdk, out var downloadUrl, out var latestVersion, "MFA", true, true);
 

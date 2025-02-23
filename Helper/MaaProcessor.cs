@@ -53,7 +53,7 @@ public class MaaProcessor
     public Queue<MFATask> TaskQueue { get; } = new();
     public static int Money { get; set; } = 0;
     public static int AllMoney { get; set; }
-    public static Config Config { get; } = new();
+    public static MaaFWConfig MaaFwConfig { get; } = new();
     public static List<string>? CurrentResources { get; set; }
     public static AutoInitDictionary AutoInitDictionary { get; } = new();
 
@@ -116,7 +116,7 @@ public class MaaProcessor
                     var instance = Task.Run(GetCurrentTasker, token);
                     instance.Wait(token);
                     bool connected = instance.Result is { Initialized: true };
-                    if (!connected && MainWindow.ViewModel.IsAdb && DataSet.GetData("RetryOnDisconnected", false))
+                    if (!connected && MainWindow.ViewModel.IsAdb && MFAConfiguration.GetConfiguration("RetryOnDisconnected", false))
                     {
                         MainWindow.AddLog("ConnectFailed".ToLocalization() + "\n" + "TryToStartEmulator".ToLocalization());
 
@@ -153,7 +153,7 @@ public class MaaProcessor
                         instance.Wait(token);
                         connected = instance.Result is { Initialized: true };
                     }
-                    if (!connected && MainWindow.ViewModel.IsAdb && DataSet.GetData("AllowAdbRestart", true))
+                    if (!connected && MainWindow.ViewModel.IsAdb && MFAConfiguration.GetConfiguration("AllowAdbRestart", true))
                     {
                         MainWindow.AddLog("ConnectFailed".ToLocalization() + "\n" + "RestartAdb".ToLocalization());
 
@@ -171,7 +171,7 @@ public class MaaProcessor
                     }
 
                     // 尝试杀掉 ADB 进程
-                    if (!connected && MainWindow.ViewModel.IsAdb && DataSet.GetData("AllowAdbHardRestart", true))
+                    if (!connected && MainWindow.ViewModel.IsAdb && MFAConfiguration.GetConfiguration("AllowAdbHardRestart", true))
                     {
                         MainWindow.AddLog("ConnectFailed".ToLocalization() + "\n" + "HardRestartAdb".ToLocalization());
 
@@ -351,7 +351,7 @@ public class MaaProcessor
     public void HandleAfterTaskOperation()
     {
         if (IsStopped) return;
-        int afterTaskIndex = DataSet.GetData("AfterTaskIndex", 0);
+        int afterTaskIndex = MFAConfiguration.GetConfiguration("AfterTaskIndex", 0);
         switch (afterTaskIndex)
         {
             case 1:
@@ -383,8 +383,8 @@ public class MaaProcessor
     public void StartSoftware()
     {
         _emulatorCancellationTokenSource = new CancellationTokenSource();
-        StartRunnableFile(DataSet.GetData("SoftwarePath", string.Empty),
-            DataSet.GetData("WaitSoftwareTime", 60.0), _emulatorCancellationTokenSource.Token);
+        StartRunnableFile(MFAConfiguration.GetConfiguration("SoftwarePath", string.Empty),
+            MFAConfiguration.GetConfiguration("WaitSoftwareTime", 60.0), _emulatorCancellationTokenSource.Token);
     }
 
     private void StartRunnableFile(string exePath, double waitTimeInSeconds, CancellationToken token)
@@ -400,9 +400,9 @@ public class MaaProcessor
         };
         if (Process.GetProcessesByName(processName).Length == 0)
         {
-            if (!string.IsNullOrWhiteSpace(DataSet.GetData("EmulatorConfig", string.Empty)))
+            if (!string.IsNullOrWhiteSpace(MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty)))
             {
-                startInfo.Arguments = DataSet.GetData("EmulatorConfig", string.Empty);
+                startInfo.Arguments = MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty);
                 _softwareProcess =
                     Process.Start(startInfo);
             }
@@ -411,9 +411,9 @@ public class MaaProcessor
         }
         else
         {
-            if (!string.IsNullOrWhiteSpace(DataSet.GetData("EmulatorConfig", string.Empty)))
+            if (!string.IsNullOrWhiteSpace(MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty)))
             {
-                startInfo.Arguments = DataSet.GetData("EmulatorConfig", string.Empty);
+                startInfo.Arguments = MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty);
                 _softwareProcess = Process.Start(startInfo);
             }
             else
@@ -483,7 +483,7 @@ public class MaaProcessor
             }
             else
             {
-                CloseProcessesByName(Config.DesktopWindow.Name, DataSet.GetData("EmulatorConfig", string.Empty));
+                CloseProcessesByName(MaaFwConfig.DesktopWindow.Name, MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty));
                 _softwareProcess = null;
             }
 
@@ -859,8 +859,8 @@ public class MaaProcessor
             LoggerService.LogInfo(string.Join(",", CurrentResources ?? Array.Empty<string>().ToList()));
             maaResource = new MaaResource(CurrentResources ?? Array.Empty<string>().ToList());
 
-            maaResource.SetOptionInferenceDevice(DataSet.GetData("EnableGPU", true) ? InferenceDevice.Auto : InferenceDevice.CPU);
-            LoggerService.LogInfo($"GPU acceleration: {DataSet.GetData("EnableGPU", true)}");
+            maaResource.SetOptionInferenceDevice(MFAConfiguration.GetConfiguration("EnableGPU", true) ? InferenceDevice.Auto : InferenceDevice.CPU);
+            LoggerService.LogInfo($"GPU acceleration: {MFAConfiguration.GetConfiguration("EnableGPU", true)}");
         }
         catch (Exception e)
         {
@@ -899,9 +899,9 @@ public class MaaProcessor
                 DisposeOptions = DisposeOptions.All,
             };
             RegisterCustomRecognitionsAndActions(tasker);
-            tasker.Utility.SetOptionRecording(DataSet.MaaConfig.GetConfig("recording", false));
-            tasker.Utility.SetOptionSaveDraw(DataSet.MaaConfig.GetConfig("save_draw", false));
-            tasker.Utility.SetOptionShowHitDraw(DataSet.MaaConfig.GetConfig("show_hit_draw", false));
+            tasker.Utility.SetOptionRecording(MFAConfiguration.MaaConfig.GetConfig("recording", false));
+            tasker.Utility.SetOptionSaveDraw(MFAConfiguration.MaaConfig.GetConfig("save_draw", false));
+            tasker.Utility.SetOptionShowHitDraw(MFAConfiguration.MaaConfig.GetConfig("show_hit_draw", false));
             return tasker;
         }
         catch (Exception e)
@@ -915,36 +915,36 @@ public class MaaProcessor
     {
         if ((MainWindow.ViewModel?.IsAdb).IsTrue())
         {
-            LoggerService.LogInfo($"AdbPath: {Config.AdbDevice.AdbPath}");
-            LoggerService.LogInfo($"AdbSerial: {Config.AdbDevice.AdbSerial}");
-            LoggerService.LogInfo($"ScreenCap: {Config.AdbDevice.ScreenCap}");
-            LoggerService.LogInfo($"Input: {Config.AdbDevice.Input}");
-            LoggerService.LogInfo($"Config: {Config.AdbDevice.Config}");
+            LoggerService.LogInfo($"AdbPath: {MaaFwConfig.AdbDevice.AdbPath}");
+            LoggerService.LogInfo($"AdbSerial: {MaaFwConfig.AdbDevice.AdbSerial}");
+            LoggerService.LogInfo($"ScreenCap: {MaaFwConfig.AdbDevice.ScreenCap}");
+            LoggerService.LogInfo($"Input: {MaaFwConfig.AdbDevice.Input}");
+            LoggerService.LogInfo($"Config: {MaaFwConfig.AdbDevice.Config}");
         }
         else
         {
-            LoggerService.LogInfo($"HWnd: {Config.DesktopWindow.HWnd}");
-            LoggerService.LogInfo($"ScreenCap: {Config.DesktopWindow.ScreenCap}");
-            LoggerService.LogInfo($"Input: {Config.DesktopWindow.Input}");
-            LoggerService.LogInfo($"Link: {Config.DesktopWindow.Link}");
-            LoggerService.LogInfo($"Check: {Config.DesktopWindow.Check}");
+            LoggerService.LogInfo($"HWnd: {MaaFwConfig.DesktopWindow.HWnd}");
+            LoggerService.LogInfo($"ScreenCap: {MaaFwConfig.DesktopWindow.ScreenCap}");
+            LoggerService.LogInfo($"Input: {MaaFwConfig.DesktopWindow.Input}");
+            LoggerService.LogInfo($"Link: {MaaFwConfig.DesktopWindow.Link}");
+            LoggerService.LogInfo($"Check: {MaaFwConfig.DesktopWindow.Check}");
         }
         return (MainWindow.ViewModel?.IsAdb).IsTrue()
             ? new MaaAdbController(
-                Config.AdbDevice.AdbPath,
-                Config.AdbDevice.AdbSerial,
-                Config.AdbDevice.ScreenCap, Config.AdbDevice.Input,
-                !string.IsNullOrWhiteSpace(Config.AdbDevice.Config) ? Config.AdbDevice.Config : "{}")
+                MaaFwConfig.AdbDevice.AdbPath,
+                MaaFwConfig.AdbDevice.AdbSerial,
+                MaaFwConfig.AdbDevice.ScreenCap, MaaFwConfig.AdbDevice.Input,
+                !string.IsNullOrWhiteSpace(MaaFwConfig.AdbDevice.Config) ? MaaFwConfig.AdbDevice.Config : "{}")
             //!string.IsNullOrWhiteSpace(Config.AdbDevice.Config) && Config.AdbDevice.Config != "{}" &&
-            //(DataSet.GetData("AdbConfig", "{\"extras\":{}}") == "{\"extras\":{}}" ||
-            //string.IsNullOrWhiteSpace(DataSet.GetData("AdbConfig", "{\"extras\":{}}")))
+            //(MFAConfiguration.GetConfiguration("AdbConfig", "{\"extras\":{}}") == "{\"extras\":{}}" ||
+            //string.IsNullOrWhiteSpace(MFAConfiguration.GetConfiguration("AdbConfig", "{\"extras\":{}}")))
             //   ? Config.AdbDevice.Config
-            //   : DataSet.GetData("AdbConfig", "{\"extras\":{}}"))
+            //   : MFAConfiguration.GetConfiguration("AdbConfig", "{\"extras\":{}}"))
             : new MaaWin32Controller(
-                Config.DesktopWindow.HWnd,
-                Config.DesktopWindow.ScreenCap, Config.DesktopWindow.Input,
-                Config.DesktopWindow.Link,
-                Config.DesktopWindow.Check);
+                MaaFwConfig.DesktopWindow.HWnd,
+                MaaFwConfig.DesktopWindow.ScreenCap, MaaFwConfig.DesktopWindow.Input,
+                MaaFwConfig.DesktopWindow.Link,
+                MaaFwConfig.DesktopWindow.Check);
     }
 
     private static List<MetadataReference>? _metadataReferences;
@@ -1260,12 +1260,12 @@ public class MaaProcessor
 
     public void RestartAdb()
     {
-        if (!DataSet.GetData("AllowAdbRestart", false))
+        if (!MFAConfiguration.GetConfiguration("AllowAdbRestart", false))
         {
             return;
         }
 
-        var adbPath = Config.AdbDevice.AdbPath;
+        var adbPath = MaaFwConfig.AdbDevice.AdbPath;
 
         if (string.IsNullOrEmpty(adbPath))
         {
@@ -1295,8 +1295,8 @@ public class MaaProcessor
 
     public void ReconnectByAdb()
     {
-        var adbPath = Config.AdbDevice.AdbPath;
-        var address = Config.AdbDevice.AdbSerial;
+        var adbPath = MaaFwConfig.AdbDevice.AdbPath;
+        var address = MaaFwConfig.AdbDevice.AdbSerial;
 
         if (string.IsNullOrEmpty(adbPath))
         {
@@ -1325,12 +1325,12 @@ public class MaaProcessor
 
     public void HardRestartAdb()
     {
-        if (!DataSet.GetData("AllowAdbHardRestart", false))
+        if (!MFAConfiguration.GetConfiguration("AllowAdbHardRestart", false))
         {
             return;
         }
 
-        var adbPath = Config.AdbDevice.AdbPath;
+        var adbPath = MaaFwConfig.AdbDevice.AdbPath;
         if (string.IsNullOrEmpty(adbPath))
         {
             return;

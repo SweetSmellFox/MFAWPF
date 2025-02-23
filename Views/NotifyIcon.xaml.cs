@@ -33,7 +33,7 @@ public partial class NotifyIcon
     private void InitIcon()
     {
         notifyIcon.Icon = IconHelper.ICON;
-        notifyIcon.Visibility = DataSet.GetData("EnableShowIcon", true) ? Visibility.Visible : Visibility.Collapsed;
+        notifyIcon.Visibility = MFAConfiguration.GetConfiguration("EnableShowIcon", true) ? Visibility.Visible : Visibility.Collapsed;
 
         notifyIcon.Click += NotifyIcon_MouseClick;
         notifyIcon.MouseDoubleClick += NotifyIcon_MouseClick;
@@ -53,7 +53,7 @@ public partial class NotifyIcon
             {
                 LanguageHelper.ChangeLanguage(lang);
                 var index = LanguageHelper.SupportedLanguages.ToList().FindIndex(language => language.Key == lang.Key);
-                DataSet.SetData("LangIndex", index == -1 ? 0 : index);
+                MFAConfiguration.SetConfiguration("LangIndex", index == -1 ? 0 : index);
             };
 
             switchLangMenu.Items.Add(langMenu);

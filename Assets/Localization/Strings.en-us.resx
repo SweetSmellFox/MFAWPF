@@ -818,4 +818,10 @@
   <data name="Issue" xml:space="preserve">
     <value>Issue</value>
   </data>
+  <data name="GlobalConfigTip" xml:space="preserve">
+    <value>This option page is for global config</value>
+  </data>
+  <data name="CheckMFA" xml:space="preserve">
+    <value>Check Software</value>
+  </data>
 </root>

@@ -21,7 +21,7 @@ public class AnomalyDetectionAction : MaaCustomAction
     {
         var shouldWaiting = false;
         context.OverrideNext(args.NodeName, ["启动检测"]);
-        context.StartApp(DataSet.GetData("ResourceIndex", 0) == 0 ? "com.hypergryph.arknights" : "com.hypergryph.arknights.bilibili");
+        context.StartApp(MFAConfiguration.GetConfiguration("ResourceIndex", 0) == 0 ? "com.hypergryph.arknights" : "com.hypergryph.arknights.bilibili");
         var handle = () =>
         {
             var image = context.GetImage();
