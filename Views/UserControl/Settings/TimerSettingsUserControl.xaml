@@ -30,15 +30,27 @@
             TextAlignment="Center"
             Visibility="{c:Binding 'ConfigurationList.Count > 1',
                                    Source={x:Static ui:SettingsView.ViewModel}}" />
-        <CheckBox
-            Content="{lex:Loc TimerCustomConfig}"
+        <StackPanel
             Grid.Row="1"
-            Height="30"
             HorizontalAlignment="Center"
-            IsChecked="{Binding ViewModel.CustomConfig}"
-            Margin="5,0"
-            ToolTip="{lex:Loc TimerCustomConfigTip}"
-            VerticalContentAlignment="Center" />
+            Orientation="Horizontal">
+            <CheckBox
+                Content="{lex:Loc ForceScheduledStart}"
+                Height="30"
+                HorizontalAlignment="Center"
+                IsChecked="{Binding ViewModel.ForceScheduledStart}"
+                Margin="5,0"
+                ToolTip="{lex:Loc ForceScheduledStartTip}"
+                VerticalContentAlignment="Center" />
+            <CheckBox
+                Content="{lex:Loc TimerCustomConfig}"
+                Height="30"
+                HorizontalAlignment="Center"
+                IsChecked="{Binding ViewModel.CustomConfig}"
+                Margin="5,0"
+                ToolTip="{lex:Loc TimerCustomConfigTip}"
+                VerticalContentAlignment="Center" />
+        </StackPanel>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition />

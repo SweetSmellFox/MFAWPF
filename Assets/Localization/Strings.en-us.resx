@@ -830,4 +830,10 @@
   <data name="TimerCustomConfigTip" xml:space="preserve">
     <value>Restart and switch configuration two minutes in advance</value>
   </data>
+  <data name="ForceScheduledStart" xml:space="preserve">
+    <value>Force scheduled start</value>
+  </data>
+  <data name="ForceScheduledStartTip" xml:space="preserve">
+    <value>Stop current task, restart game and start new tasks</value>
+  </data>
 </root>

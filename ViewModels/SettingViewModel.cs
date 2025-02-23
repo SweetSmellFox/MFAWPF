@@ -506,10 +506,17 @@ public partial class SettingViewModel : ViewModel
 
     public TimerModel TimerModels { get; set; } = new();
     [ObservableProperty] private bool _customConfig = Convert.ToBoolean(GlobalConfiguration.GetConfiguration("CustomConfig", bool.FalseString));
+    [ObservableProperty] private bool _forceScheduledStart = Convert.ToBoolean(GlobalConfiguration.GetConfiguration("ForceScheduledStart", bool.FalseString));
 
+    
     partial void OnCustomConfigChanged(bool value)
     {
         GlobalConfiguration.SetConfiguration("CustomConfig", value.ToString());
+    }
+
+    partial void OnForceScheduledStartChanged(bool value)
+    {
+        GlobalConfiguration.SetConfiguration("ForceScheduledStart", value.ToString());
     }
 
     public partial class TimerModel
@@ -659,6 +666,8 @@ public partial class SettingViewModel : ViewModel
             var timer = Timers.FirstOrDefault(t => t.TimerId == timerId, null);
             if (timer != null)
             {
+                if (Convert.ToBoolean(GlobalConfiguration.GetConfiguration("ForceScheduledStart", bool.FalseString)) && RootView.ViewModel.IsRunning)
+                    RootView.Instance.Stop();
                 RootView.Instance.Start();
             }
         }

@@ -837,4 +837,10 @@
   <data name="TimerCustomConfigTip" xml:space="preserve">
     <value>将提前两分钟重启并切换配置</value>
   </data>
+  <data name="ForceScheduledStart" xml:space="preserve">
+    <value>强制定时启动</value>
+  </data>
+  <data name="ForceScheduledStartTip" xml:space="preserve">
+    <value>停止当前任务，重启游戏并开始新任务</value>
+  </data>
 </root>
