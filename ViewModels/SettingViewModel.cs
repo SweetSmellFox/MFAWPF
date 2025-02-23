@@ -22,14 +22,14 @@ public partial class SettingViewModel : ViewModel
 
     public bool ShowResourceVersion => !string.IsNullOrWhiteSpace(ResourceVersion);
 
-    private enum NotifyType
+    public enum NotifyType
     {
         None,
         SelectedIndex,
         ScrollOffset,
     }
 
-    private NotifyType _notifySource = NotifyType.None;
+    [ObservableProperty] private NotifyType _notifySource = NotifyType.None;
 
     private System.Timers.Timer? _resetNotifyTimer;
 
@@ -49,113 +49,71 @@ public partial class SettingViewModel : ViewModel
         _resetNotifyTimer = new(20);
         _resetNotifyTimer.Elapsed += (_, _) =>
         {
-            _notifySource = NotifyType.None;
+            NotifySource = NotifyType.None;
         };
         _resetNotifyTimer.AutoReset = false;
         _resetNotifyTimer.Enabled = true;
         _resetNotifyTimer.Start();
     }
 
-    /// <summary>
-    /// Gets or sets the height of scroll viewport.
-    /// </summary>
-    public double ScrollViewportHeight { get; set; }
+    [ObservableProperty] private int _selectedIndex;
 
-    /// <summary>
-    /// Gets or sets the extent height of scroll.
-    /// </summary>
-    public double ScrollExtentHeight { get; set; }
+    [ObservableProperty] private double _scrollOffset;
 
-    public List<double> DividerVerticalOffsetList { get; set; } = new();
+    [ObservableProperty] private double _scrollViewportHeight;
 
-    private int _selectedIndex;
+    [ObservableProperty] private double _scrollExtentHeight;
 
-    /// <summary>
-    /// Gets or sets the index selected.
-    /// </summary>
-    public int SelectedIndex
+    [ObservableProperty] private List<double> _dividerVerticalOffsetList = new();
+    partial void OnSelectedIndexChanged(int value)
     {
-        get => _selectedIndex;
-        set
+        if (NotifySource == NotifyType.None && DividerVerticalOffsetList.Count > value && value >= 0)
         {
-            switch (_notifySource)
-            {
-                case NotifyType.None:
-                    _notifySource = NotifyType.SelectedIndex;
-                    SetProperty(ref _selectedIndex, value);
-
-                    if (DividerVerticalOffsetList?.Count > 0 && value < DividerVerticalOffsetList.Count)
-                    {
-                        ScrollOffset = DividerVerticalOffsetList[value];
-                    }
-
-                    ResetNotifySource();
-                    break;
-
-                case NotifyType.ScrollOffset:
-                    SetProperty(ref _selectedIndex, value);
-                    break;
-
-                case NotifyType.SelectedIndex:
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            NotifySource = NotifyType.SelectedIndex;
+            ScrollOffset = DividerVerticalOffsetList[value];
+            ResetNotifySource();
         }
     }
 
-    private double _scrollOffset;
-
-    /// <summary>
-    /// Gets or sets the scroll offset.
-    /// </summary>
-    public double ScrollOffset
+    partial void OnScrollOffsetChanged(double value)
     {
-        get => _scrollOffset;
-        set
+        if (NotifySource == NotifyType.None)
         {
-            switch (_notifySource)
-            {
-                case NotifyType.None:
-                    _notifySource = NotifyType.ScrollOffset;
-                    SetProperty(ref _scrollOffset, value);
-
-                    // 设置 ListBox SelectedIndex 为当前 ScrollOffset 索引
-                    if (DividerVerticalOffsetList?.Count > 0)
-                    {
-                        // 滚动条滚动到底部，返回最后一个 Divider 索引
-                        if (value + ScrollViewportHeight >= ScrollExtentHeight)
-                        {
-                            SelectedIndex = DividerVerticalOffsetList.Count - 1;
-                            ResetNotifySource();
-                            break;
-                        }
-
-                        // 根据出当前 ScrollOffset 选出最后一个在可视范围的 Divider 索引
-                        var dividerSelect = DividerVerticalOffsetList.Select((n, i) => (
-                            dividerAppeared: value >= n,
-                            index: i));
-
-                        var index = dividerSelect.LastOrDefault(n => n.dividerAppeared).index;
-                        SelectedIndex = index;
-                    }
-
-                    ResetNotifySource();
-                    break;
-
-                case NotifyType.SelectedIndex:
-                    SetProperty(ref _scrollOffset, value);
-                    break;
-
-                case NotifyType.ScrollOffset:
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            NotifySource = NotifyType.ScrollOffset;
+            SelectedIndex = FindClosestDividerIndex(value);
+            ResetNotifySource();
         }
     }
+
+    private int FindClosestDividerIndex(double scrollOffset)
+    {
+        if (DividerVerticalOffsetList.Count == 0) return -1;
+
+        double viewportBottom = scrollOffset + ScrollViewportHeight;
+        const double TOLERANCE = 2;
+
+        if (viewportBottom >= ScrollExtentHeight - TOLERANCE)
+            return DividerVerticalOffsetList.Count - 1;
+
+        if (scrollOffset <= DividerVerticalOffsetList[0] + TOLERANCE)
+            return 0;
+
+        int left = 0, right = DividerVerticalOffsetList.Count - 1;
+        while (left < right)
+        {
+            int mid = (left + right + 1) / 2;
+            if (DividerVerticalOffsetList[mid] > scrollOffset)
+                right = mid - 1;
+            else
+                left = mid;
+        }
+
+        var shouldSelectNext = left < DividerVerticalOffsetList.Count - 1
+            && (DividerVerticalOffsetList[left + 1] < viewportBottom || Math.Abs(DividerVerticalOffsetList[left + 1] - scrollOffset) < Math.Abs(DividerVerticalOffsetList[left] - scrollOffset));
+
+        return shouldSelectNext ? left + 1 : left;
+    }
+
 
     [ObservableProperty] private List<LocalizationViewModel> _listTitle =
     [
@@ -172,15 +130,15 @@ public partial class SettingViewModel : ViewModel
     ];
 
 
-    [ObservableProperty] private int _languageIndex = DataSet.GetData("LangIndex", 0);
+    [ObservableProperty] private int _languageIndex = MFAConfiguration.GetConfiguration("LangIndex", 0);
 
     partial void OnLanguageIndexChanged(int value)
     {
         LanguageHelper.ChangeLanguage(SupportedLanguages[value]);
-        DataSet.SetData("LangIndex", value);
+        MFAConfiguration.SetConfiguration("LangIndex", value);
     }
 
-    [ObservableProperty] private int _themeIndex = DataSet.GetData("ThemeIndex", 0);
+    [ObservableProperty] private int _themeIndex = MFAConfiguration.GetConfiguration("ThemeIndex", 0);
 
     [ObservableProperty] private ObservableCollection<LocalizationViewModel> _themes =
     [
@@ -192,16 +150,16 @@ public partial class SettingViewModel : ViewModel
     partial void OnThemeIndexChanged(int value)
     {
         ThemeHelper.UpdateThemeIndexChanged(value);
-        DataSet.SetData("ThemeIndex", value);
+        MFAConfiguration.SetConfiguration("ThemeIndex", value);
     }
-    private bool _shouldMinimizeToTray = DataSet.GetData("ShouldMinimizeToTray", false);
+    private bool _shouldMinimizeToTray = MFAConfiguration.GetConfiguration("ShouldMinimizeToTray", false);
 
     public bool ShouldMinimizeToTray
     {
         set
         {
             SetProperty(ref _shouldMinimizeToTray, value);
-            DataSet.SetData("ShouldMinimizeToTray", value);
+            MFAConfiguration.SetConfiguration("ShouldMinimizeToTray", value);
         }
         get => _shouldMinimizeToTray;
     }
@@ -213,21 +171,21 @@ public partial class SettingViewModel : ViewModel
     {
         set
         {
-            DataSet.SetData("DownloadSourceIndex", value);
+            MFAConfiguration.SetConfiguration("DownloadSourceIndex", value);
             SetCurrentProperty(ref _downloadSourceIndex, value);
         }
         get
         {
-            _downloadSourceIndex = DataSet.GetData("DownloadSourceIndex", 0);
+            _downloadSourceIndex = MFAConfiguration.GetConfiguration("DownloadSourceIndex", 0);
             return _downloadSourceIndex;
         }
     }
 
-    [ObservableProperty] private bool _rememberAdb = DataSet.GetData("RememberAdb", true);
+    [ObservableProperty] private bool _rememberAdb = MFAConfiguration.GetConfiguration("RememberAdb", true);
 
     partial void OnRememberAdbChanged(bool value)
     {
-        DataSet.SetData("RememberAdb", value);
+        MFAConfiguration.SetConfiguration("RememberAdb", value);
     }
 
     public static ObservableCollection<string> AdbControlScreenCapTypes =>
@@ -240,107 +198,107 @@ public partial class SettingViewModel : ViewModel
     public static ObservableCollection<string> Win32ControlScreenCapTypes => ["FramePool", "DXGIDesktopDup", "GDI"];
     public static ObservableCollection<string> Win32ControlInputTypes => ["Seize", "SendMessage"];
 
-    [ObservableProperty] private string _adbControlScreenCapType = DataSet.GetData("AdbControlScreenCapType", AdbControlScreenCapTypes[0]);
-    [ObservableProperty] private string _adbControlInputType = DataSet.GetData("AdbControlInputType", AdbControlInputTypes[0].ResourceKey);
-    [ObservableProperty] private string _win32ControlScreenCapType = DataSet.GetData("Win32ControlScreenCapType", Win32ControlScreenCapTypes[0]);
-    [ObservableProperty] private string _win32ControlInputType = DataSet.GetData("Win32ControlInputType", Win32ControlInputTypes[0]);
+    [ObservableProperty] private string _adbControlScreenCapType = MFAConfiguration.GetConfiguration("AdbControlScreenCapType", AdbControlScreenCapTypes[0]);
+    [ObservableProperty] private string _adbControlInputType = MFAConfiguration.GetConfiguration("AdbControlInputType", AdbControlInputTypes[0].ResourceKey);
+    [ObservableProperty] private string _win32ControlScreenCapType = MFAConfiguration.GetConfiguration("Win32ControlScreenCapType", Win32ControlScreenCapTypes[0]);
+    [ObservableProperty] private string _win32ControlInputType = MFAConfiguration.GetConfiguration("Win32ControlInputType", Win32ControlInputTypes[0]);
     partial void OnAdbControlScreenCapTypeChanged(string value)
     {
-        DataSet.SetData("AdbControlScreenCapType", value);
+        MFAConfiguration.SetConfiguration("AdbControlScreenCapType", value);
         MaaProcessor.Instance.SetCurrentTasker();
     }
     partial void OnAdbControlInputTypeChanged(string value)
     {
-        DataSet.SetData("AdbControlInputType", value);
+        MFAConfiguration.SetConfiguration("AdbControlInputType", value);
         MaaProcessor.Instance.SetCurrentTasker();
     }
     partial void OnWin32ControlScreenCapTypeChanged(string value)
     {
-        DataSet.SetData("Win32ControlScreenCapType", value);
+        MFAConfiguration.SetConfiguration("Win32ControlScreenCapType", value);
         MaaProcessor.Instance.SetCurrentTasker();
     }
     partial void OnWin32ControlInputTypeChanged(string value)
     {
-        DataSet.SetData("Win32ControlInputType", value);
+        MFAConfiguration.SetConfiguration("Win32ControlInputType", value);
         MaaProcessor.Instance.SetCurrentTasker();
     }
 
     public static ObservableCollection<LocalizationViewModel> GpuOptions => [new("GpuOptionAuto"), new("GpuOptionDisable")];
 
-    [ObservableProperty] private int _gpuIndex = DataSet.GetData("EnableGPU", false) ? 0 : 1;
+    [ObservableProperty] private int _gpuIndex = MFAConfiguration.GetConfiguration("EnableGPU", false) ? 0 : 1;
 
     partial void OnGpuIndexChanged(int value)
     {
-        DataSet.SetData("EnableGPU", value == 0);
+        MFAConfiguration.SetConfiguration("EnableGPU", value == 0);
     }
-    [ObservableProperty] private bool _enableRecording = DataSet.MaaConfig.GetConfig("recording", false);
+    [ObservableProperty] private bool _enableRecording = MFAConfiguration.MaaConfig.GetConfig("recording", false);
 
-    [ObservableProperty] private bool _enableSaveDraw = DataSet.MaaConfig.GetConfig("save_draw", false);
+    [ObservableProperty] private bool _enableSaveDraw = MFAConfiguration.MaaConfig.GetConfig("save_draw", false);
 
-    [ObservableProperty] private bool _showHitDraw = DataSet.MaaConfig.GetConfig("show_hit_draw", false);
+    [ObservableProperty] private bool _showHitDraw = MFAConfiguration.MaaConfig.GetConfig("show_hit_draw", false);
 
-    [ObservableProperty] private string _prescript = DataSet.GetData("Prescript", string.Empty);
+    [ObservableProperty] private string _prescript = MFAConfiguration.GetConfiguration("Prescript", string.Empty);
 
-    [ObservableProperty] private string _postScript = DataSet.GetData("Post-script", string.Empty);
+    [ObservableProperty] private string _postScript = MFAConfiguration.GetConfiguration("Post-script", string.Empty);
 
     partial void OnEnableRecordingChanged(bool value)
     {
-        DataSet.MaaConfig.SetConfig("recording", value);
+        MFAConfiguration.MaaConfig.SetConfig("recording", value);
     }
 
     partial void OnEnableSaveDrawChanged(bool value)
     {
-        DataSet.MaaConfig.SetConfig("save_draw", value);
+        MFAConfiguration.MaaConfig.SetConfig("save_draw", value);
     }
 
     partial void OnShowHitDrawChanged(bool value)
     {
-        DataSet.MaaConfig.SetConfig("show_hit_draw", value);
+        MFAConfiguration.MaaConfig.SetConfig("show_hit_draw", value);
     }
 
     partial void OnPrescriptChanged(string value)
     {
-        DataSet.SetData("Prescript", value);
+        MFAConfiguration.SetConfiguration("Prescript", value);
     }
 
     partial void OnPostScriptChanged(string value)
     {
-        DataSet.SetData("Post-script", value);
+        MFAConfiguration.SetConfiguration("Post-script", value);
     }
 
-    [ObservableProperty] private bool _autoMinimize = DataSet.GetData("AutoMinimize", false);
+    [ObservableProperty] private bool _autoMinimize = MFAConfiguration.GetConfiguration("AutoMinimize", false);
 
-    [ObservableProperty] private bool _autoHide = DataSet.GetData("AutoHide", false);
+    [ObservableProperty] private bool _autoHide = MFAConfiguration.GetConfiguration("AutoHide", false);
 
-    [ObservableProperty] private string _softwarePath = DataSet.GetData("SoftwarePath", string.Empty);
-    [ObservableProperty] private string _emulatorConfig = DataSet.GetData("EmulatorConfig", string.Empty);
+    [ObservableProperty] private string _softwarePath = MFAConfiguration.GetConfiguration("SoftwarePath", string.Empty);
+    [ObservableProperty] private string _emulatorConfig = MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty);
 
-    [ObservableProperty] private double _waitSoftwareTime = DataSet.GetData("WaitSoftwareTime", 60.0);
+    [ObservableProperty] private double _waitSoftwareTime = MFAConfiguration.GetConfiguration("WaitSoftwareTime", 60.0);
 
 
     partial void OnAutoMinimizeChanged(bool value)
     {
-        DataSet.SetData("AutoMinimize", value);
+        MFAConfiguration.SetConfiguration("AutoMinimize", value);
     }
 
     partial void OnAutoHideChanged(bool value)
     {
-        DataSet.SetData("AutoHide", value);
+        MFAConfiguration.SetConfiguration("AutoHide", value);
     }
 
     partial void OnSoftwarePathChanged(string value)
     {
-        DataSet.SetData("SoftwarePath", value);
+        MFAConfiguration.SetConfiguration("SoftwarePath", value);
     }
 
     partial void OnEmulatorConfigChanged(string value)
     {
-        DataSet.SetData("EmulatorConfig", value);
+        MFAConfiguration.SetConfiguration("EmulatorConfig", value);
     }
 
     partial void OnWaitSoftwareTimeChanged(double value)
     {
-        DataSet.SetData("WaitSoftwareTime", value);
+        MFAConfiguration.SetConfiguration("WaitSoftwareTime", value);
     }
 
     [RelayCommand]
@@ -366,28 +324,31 @@ public partial class SettingViewModel : ViewModel
 
     [ObservableProperty] private List<LocalizationViewModel> _downloadSourceList =
     [
-        new("GitHub"),
+        new()
+        {
+            Name = "GitHub"
+        },
         new("MirrorChyan"),
     ];
 
-    [ObservableProperty] private bool _retryOnDisconnected = DataSet.GetData("RetryOnDisconnected", false);
+    [ObservableProperty] private bool _retryOnDisconnected = MFAConfiguration.GetConfiguration("RetryOnDisconnected", false);
 
     partial void OnRetryOnDisconnectedChanged(bool value)
     {
-        DataSet.SetData("RetryOnDisconnected", value);
+        MFAConfiguration.SetConfiguration("RetryOnDisconnected", value);
     }
-    [ObservableProperty] private bool _allowAdbRestart = DataSet.GetData("AllowAdbRestart", true);
+    [ObservableProperty] private bool _allowAdbRestart = MFAConfiguration.GetConfiguration("AllowAdbRestart", true);
 
     partial void OnAllowAdbRestartChanged(bool value)
     {
-        DataSet.SetData("AllowAdbRestart", value);
+        MFAConfiguration.SetConfiguration("AllowAdbRestart", value);
     }
 
-    [ObservableProperty] private bool _allowAdbHardRestart = DataSet.GetData("AllowAdbHardRestart", true);
+    [ObservableProperty] private bool _allowAdbHardRestart = MFAConfiguration.GetConfiguration("AllowAdbHardRestart", true);
 
     partial void OnAllowAdbHardRestartChanged(bool value)
     {
-        DataSet.SetData("AllowAdbHardRestart", value);
+        MFAConfiguration.SetConfiguration("AllowAdbHardRestart", value);
     }
 
 
@@ -398,7 +359,7 @@ public partial class SettingViewModel : ViewModel
 
     public static List<LocalizationViewModel> ExternalNotificationProvidersShow => ExternalNotificationProviders;
 
-    private static object[] _enabledExternalNotificationProviders = ExternalNotificationProviders.Where(s => DataSet.GetData("ExternalNotificationEnabled", string.Empty).Split(',').Contains(s.ResourceKey))
+    private static object[] _enabledExternalNotificationProviders = ExternalNotificationProviders.Where(s => MFAConfiguration.GetConfiguration("ExternalNotificationEnabled", string.Empty).Split(',').Contains(s.ResourceKey))
         .Distinct()
         .ToArray();
 
@@ -418,7 +379,7 @@ public partial class SettingViewModel : ViewModel
                     .Distinct();
 
                 var config = string.Join(",", validProviders);
-                DataSet.SetData("ExternalNotificationEnabled", config);
+                MFAConfiguration.SetConfiguration("ExternalNotificationEnabled", config);
                 UpdateExternalNotificationProvider();
                 EnabledExternalNotificationProviderCount = _enabledExternalNotificationProviders.Length;
             }
@@ -450,7 +411,7 @@ public partial class SettingViewModel : ViewModel
         set => SetProperty(ref _dingTalkEnabled, value);
     }
 
-    private string _cdkPassword = SimpleEncryptionHelper.Decrypt(DataSet.GetData("DownloadCDK", string.Empty));
+    private string _cdkPassword = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("DownloadCDK", string.Empty));
 
     public string CdkPassword
     {
@@ -459,11 +420,11 @@ public partial class SettingViewModel : ViewModel
         {
             SetProperty(ref _cdkPassword, value);
             value = SimpleEncryptionHelper.Encrypt(value);
-            DataSet.SetData("DownloadCDK", value);
+            MFAConfiguration.SetConfiguration("DownloadCDK", value);
         }
     }
 
-    private string _dingTalkToken = SimpleEncryptionHelper.Decrypt(DataSet.GetData("ExternalNotificationDingTalkToken", string.Empty));
+    private string _dingTalkToken = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("ExternalNotificationDingTalkToken", string.Empty));
 
     public string DingTalkToken
     {
@@ -472,11 +433,11 @@ public partial class SettingViewModel : ViewModel
         {
             SetProperty(ref _dingTalkToken, value);
             value = SimpleEncryptionHelper.Encrypt(value);
-            DataSet.SetData("ExternalNotificationDingTalkToken", value);
+            MFAConfiguration.SetConfiguration("ExternalNotificationDingTalkToken", value);
         }
     }
 
-    private string _dingTalkSecret = SimpleEncryptionHelper.Decrypt(DataSet.GetData("ExternalNotificationDingTalkSecret", string.Empty));
+    private string _dingTalkSecret = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("ExternalNotificationDingTalkSecret", string.Empty));
 
     public string DingTalkSecret
     {
@@ -485,7 +446,7 @@ public partial class SettingViewModel : ViewModel
         {
             SetProperty(ref _dingTalkSecret, value);
             value = SimpleEncryptionHelper.Encrypt(value);
-            DataSet.SetData("ExternalNotificationDingTalkSecret", value);
+            MFAConfiguration.SetConfiguration("ExternalNotificationDingTalkSecret", value);
         }
     }
 
@@ -494,25 +455,25 @@ public partial class SettingViewModel : ViewModel
         DingTalkEnabled = EnabledExternalNotificationProviderList.Contains("DingTalk");
     }
 
-    [ObservableProperty] private bool _enableCheckVersion = DataSet.GetData("EnableCheckVersion", true);
+    [ObservableProperty] private bool _enableCheckVersion = MFAConfiguration.GetConfiguration("EnableCheckVersion", true);
 
-    [ObservableProperty] private bool _enableAutoUpdateResource = DataSet.GetData("EnableAutoUpdateResource", false);
+    [ObservableProperty] private bool _enableAutoUpdateResource = MFAConfiguration.GetConfiguration("EnableAutoUpdateResource", false);
 
-    [ObservableProperty] private bool _enableAutoUpdateMFA = DataSet.GetData("EnableAutoUpdateMFA", false);
+    [ObservableProperty] private bool _enableAutoUpdateMFA = MFAConfiguration.GetConfiguration("EnableAutoUpdateMFA", false);
 
     partial void OnEnableCheckVersionChanged(bool value)
     {
-        DataSet.SetData("EnableCheckVersion", value);
+        MFAConfiguration.SetConfiguration("EnableCheckVersion", value);
     }
 
     partial void OnEnableAutoUpdateResourceChanged(bool value)
     {
-        DataSet.SetData("EnableAutoUpdateResource", value);
+        MFAConfiguration.SetConfiguration("EnableAutoUpdateResource", value);
     }
 
     partial void OnEnableAutoUpdateMFAChanged(bool value)
     {
-        DataSet.SetData("EnableAutoUpdateMFA", value);
+        MFAConfiguration.SetConfiguration("EnableAutoUpdateMFA", value);
     }
 
     [RelayCommand]
@@ -530,6 +491,12 @@ public partial class SettingViewModel : ViewModel
     {
         VersionChecker.UpdateMFAAsync();
     }
+    [RelayCommand]
+    private void CheckMFAUpdate()
+    {
+        VersionChecker.CheckMFAVersionAsync();
+    }
+
     [RelayCommand]
     private void UpdateMaaFW()
     {
@@ -549,9 +516,9 @@ public partial class SettingViewModel : ViewModel
                 _hour = hour;
                 _min = min;
                 TimerName = $"{"Timer".ToLocalization()} {TimerId + 1}";
-                if (timerConfig == null || !DataSet.Configs.Any(c => c.Name.Equals(timerConfig)))
+                if (timerConfig == null || !MFAConfiguration.Configs.Any(c => c.Name.Equals(timerConfig)))
                 {
-                    _timerConfig = DataSet.GetCurrentConfiguration();
+                    _timerConfig = MFAConfiguration.GetCurrentConfiguration();
                 }
                 else
                 {
@@ -580,7 +547,7 @@ public partial class SettingViewModel : ViewModel
                 set
                 {
                     SetProperty(ref _isOn, value);
-                    DataSet.SetTimer(TimerId, value);
+                    GlobalConfiguration.SetTimer(TimerId, value.ToString());
                 }
             }
 
@@ -596,7 +563,7 @@ public partial class SettingViewModel : ViewModel
                 {
                     value = Math.Clamp(value, 0, 23);
                     SetProperty(ref _hour, value);
-                    DataSet.SetTimerHour(TimerId, _hour.ToString());
+                    GlobalConfiguration.SetTimerHour(TimerId, _hour.ToString());
                 }
             }
 
@@ -612,7 +579,7 @@ public partial class SettingViewModel : ViewModel
                 {
                     value = Math.Clamp(value, 0, 59);
                     SetProperty(ref _min, value);
-                    DataSet.SetTimerMin(TimerId, _min.ToString());
+                    GlobalConfiguration.SetTimerMin(TimerId, _min.ToString());
                 }
             }
 
@@ -626,8 +593,8 @@ public partial class SettingViewModel : ViewModel
                 get => _timerConfig;
                 set
                 {
-                    SetProperty(ref _timerConfig, value ?? DataSet.GetCurrentConfiguration());
-                    DataSet.SetTimerConfig(TimerId, _timerConfig);
+                    SetProperty(ref _timerConfig, value ?? MFAConfiguration.GetCurrentConfiguration());
+                    GlobalConfiguration.SetTimerConfig(TimerId, _timerConfig);
                 }
             }
         }
@@ -640,9 +607,9 @@ public partial class SettingViewModel : ViewModel
             {
                 Timers[i] = new TimerProperties(
                     i,
-                    DataSet.GetTimer(i, false),
-                    int.Parse(DataSet.GetTimerHour(i, $"{i * 3}")),
-                    int.Parse(DataSet.GetTimerMin(i, "0")), DataSet.GetTimerConfig(i, DataSet.GetCurrentConfiguration()));
+                    GlobalConfiguration.GetTimer(i, bool.FalseString) == bool.TrueString,
+                    int.Parse(GlobalConfiguration.GetTimerHour(i, $"{i * 3}")),
+                    int.Parse(GlobalConfiguration.GetTimerMin(i, "0")), GlobalConfiguration.GetTimerConfig(i, MFAConfiguration.GetCurrentConfiguration()));
             }
             _dispatcherTimer = new();
             _dispatcherTimer.Interval = TimeSpan.FromMinutes(1);
@@ -672,9 +639,9 @@ public partial class SettingViewModel : ViewModel
         }
     }
 
-    public ObservableCollection<MFAConfig> ConfigurationList { get; set; } = DataSet.Configs;
+    public ObservableCollection<MFAConfig> ConfigurationList { get; set; } = MFAConfiguration.Configs;
 
-    private string? _currentConfiguration = DataSet.GetCurrentConfiguration();
+    private string? _currentConfiguration = MFAConfiguration.GetCurrentConfiguration();
 
     public string? CurrentConfiguration
     {
@@ -682,7 +649,7 @@ public partial class SettingViewModel : ViewModel
         set
         {
             SetProperty(ref _currentConfiguration, value);
-            DataSet.SetDefaultConfig(value);
+            MFAConfiguration.SetDefaultConfig(value);
 
             MaaProcessor.RestartMFA();
         }
@@ -699,7 +666,7 @@ public partial class SettingViewModel : ViewModel
         }
 
         var configDPath = Path.Combine(AppContext.BaseDirectory, "config");
-        var configPath = Path.Combine(configDPath, $"{DataSet.GetActualConfiguration()}.json");
+        var configPath = Path.Combine(configDPath, $"{MFAConfiguration.GetActualConfiguration()}.json");
         var newConfigPath = Path.Combine(configDPath, $"{NewConfigurationName}.json");
         bool configExists = Directory.GetFiles(configDPath, "*.json")
             .Select(Path.GetFileNameWithoutExtension)
@@ -715,7 +682,7 @@ public partial class SettingViewModel : ViewModel
             var content = File.ReadAllText(configPath);
             File.WriteAllText(newConfigPath, content);
 
-            DataSet.AddNewConfig(NewConfigurationName);
+            MFAConfiguration.AddNewConfig(NewConfigurationName);
             GrowlHelper.Success("ConfigAddedSuccessfully".ToLocalizationFormatted(NewConfigurationName));
         }
 

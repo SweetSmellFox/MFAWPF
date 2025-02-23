@@ -13,7 +13,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Media;
+using System.Windows.Threading;
 using ComboBox = System.Windows.Controls.ComboBox;
+using ScrollViewer = HandyControl.Controls.ScrollViewer;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace MFAWPF.Views;
@@ -26,70 +29,46 @@ public partial class SettingsView
         InitializeComponent();
         ViewModel = model;
         DataContext = this;
-        Initialize();
+        Loaded += OnLoaded;
+        SizeChanged += OnSizeChanged;
     }
 
-    void Initialize()
+    private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        // 重构消失了
+        UpdateDividerPositions();
     }
 
-
-    private void SetSettingOption(ComboBox comboBox,
-        string titleKey,
-        IEnumerable<string> options,
-        string datatype,
-        int defaultValue = 0)
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        comboBox.SelectedIndex = DataSet.GetData(datatype, defaultValue);
-        comboBox.ItemsSource = options;
-        comboBox.BindLocalization(titleKey);
-        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
-        comboBox.SelectionChanged += (sender, _) =>
+        UpdateDividerPositions();
+    }
+
+    private void ScrollViewer_LayoutUpdated(object sender, EventArgs e)
+    {
+        UpdateDividerPositions();
+    }
+
+    private void UpdateDividerPositions()
+    {
+        if (Viewer.Content is Grid grid)
         {
-            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-            DataSet.SetData(datatype, index);
-            MaaProcessor.Instance.SetCurrentTasker();
-        };
-    }
+            var stackPanel = grid.Children.OfType<StackPanel>().FirstOrDefault();
+            if (stackPanel == null) return;
 
-    private void SetBindSettingOption(ComboBox comboBox,
-        string titleKey,
-        IEnumerable<string> options,
-        string datatype,
-        int defaultValue = 0)
-
-    {
-        comboBox.SelectedIndex = DataSet.GetData(datatype, defaultValue);
-
-        foreach (var s in options)
-        {
-            var comboBoxItem = new ComboBoxItem();
-            comboBoxItem.BindLocalization(s, ContentProperty);
-            comboBox.Items.Add(comboBoxItem);
+            double currentY = 0;
+            var dividerPositions = new List<double>();
+            foreach (var child in stackPanel.Children)
+            {
+                if (child is FrameworkElement element)
+                {
+                    if (child is Divider)
+                    {
+                        dividerPositions.Add(currentY);
+                    }
+                    currentY += element.ActualHeight + element.Margin.Top + element.Margin.Bottom;
+                }
+            }
+            ViewModel.DividerVerticalOffsetList = dividerPositions;
         }
-
-        comboBox.BindLocalization(titleKey);
-        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Left);
-        comboBox.SelectionChanged += (sender, _) =>
-        {
-            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-            DataSet.SetData(datatype, index);
-            MaaProcessor.Instance.SetCurrentTasker();
-        };
-    }
-    
-    private void SwapFiles(string file1Path, string file2Path)
-    {
-        // 备份文件
-        string backupFilePath = $"{file1Path}.bak";
-        File.Copy(file1Path, backupFilePath, true);
-
-        // 读取文件内容
-        string file1Content = File.ReadAllText(file1Path);
-        string file2Content = File.ReadAllText(file2Path);
-
-        // 只更换 config.json 的内容
-        File.WriteAllText(file1Path, file2Content);
     }
 }

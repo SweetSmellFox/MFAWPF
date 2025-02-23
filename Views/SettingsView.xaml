@@ -27,44 +27,51 @@
         <ListBox
             DisplayMemberPath="Name"
             Grid.Column="0"
-            IsSynchronizedWithCurrentItem="true"
+            IsSynchronizedWithCurrentItem="True"
             ItemsSource="{Binding ViewModel.ListTitle}"
             Margin="10"
-            SelectedIndex="{Binding ViewModel.SelectedIndex}"
+            SelectedIndex="{Binding ViewModel.SelectedIndex, Mode=TwoWay}"
             x:Name="MasterListBox" />
 
         <hc:ScrollViewer
             Grid.Column="1"
             HorizontalAlignment="Stretch"
             IsInertiaEnabled="True"
+            LayoutUpdated="ScrollViewer_LayoutUpdated"
             Margin="20,5,20,10"
             PanningMode="Both"
+            VerticalScrollBarVisibility="Auto"
             properties:ScrollViewerBinding.DividerVerticalOffsetList="{Binding ViewModel.DividerVerticalOffsetList}"
             properties:ScrollViewerBinding.ExtentHeight="{Binding ViewModel.ScrollExtentHeight}"
             properties:ScrollViewerBinding.VerticalOffset="{Binding ViewModel.ScrollOffset}"
-            properties:ScrollViewerBinding.ViewportHeight="{Binding ViewModel.ScrollViewportHeight}">
-            <StackPanel>
-                <hc:Divider Content="{Binding ViewModel.ListTitle[0].Name}" HorizontalContentAlignment="Left" />
-                <settings:ConfigurationMgrUserControl HorizontalAlignment="Center" />
-                <hc:Divider Content="{Binding ViewModel.ListTitle[1].Name}" HorizontalContentAlignment="Left" />
-                <settings:TimerSettingsUserControl HorizontalAlignment="Center" />
-                <hc:Divider Content="{Binding ViewModel.ListTitle[2].Name}" HorizontalContentAlignment="Left" />
-                <settings:GuiSettingsUserControl HorizontalAlignment="Center" />
-                <hc:Divider Content="{Binding ViewModel.ListTitle[3].Name}" HorizontalContentAlignment="Left" />
-                <settings:ConnectSettingsUserControl HorizontalAlignment="Center" />
-                <hc:Divider Content="{Binding ViewModel.ListTitle[4].Name}" HorizontalContentAlignment="Left" />
-                <settings:PerformanceUserControl HorizontalAlignment="Center" />
-                <hc:Divider Content="{Binding ViewModel.ListTitle[5].Name}" HorizontalContentAlignment="Left" />
-                <settings:StartSettingsUserControl HorizontalAlignment="Center" />
-                <hc:Divider Content="{Binding ViewModel.ListTitle[6].Name}" HorizontalContentAlignment="Left" />
-                <settings:ExternalNotificationSettingsUserControl HorizontalAlignment="Center" />
-                <hc:Divider Content="{Binding ViewModel.ListTitle[7].Name}" HorizontalContentAlignment="Left" />
-                <settings:GameSettingsUserControl HorizontalAlignment="Center" />
-                <hc:Divider Content="{Binding ViewModel.ListTitle[8].Name}" HorizontalContentAlignment="Left" />
-                <settings:VersionUpdateSettingsUserControl HorizontalAlignment="Center" />
-                <hc:Divider Content="{Binding ViewModel.ListTitle[9].Name}" HorizontalContentAlignment="Left" />
-                <settings:AboutUserControl HorizontalAlignment="Center" />
-            </StackPanel>
+            properties:ScrollViewerBinding.ViewportHeight="{Binding ViewModel.ScrollViewportHeight}"
+            x:Name="Viewer">
+            <Grid Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=ScrollViewer}}">
+
+                <StackPanel>
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[0].Name}" HorizontalContentAlignment="Left" />
+                    <settings:ConfigurationMgrUserControl HorizontalAlignment="Center" />
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[1].Name}" HorizontalContentAlignment="Left" />
+                    <settings:TimerSettingsUserControl HorizontalAlignment="Center" />
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[2].Name}" HorizontalContentAlignment="Left" />
+                    <settings:GuiSettingsUserControl HorizontalAlignment="Center" />
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[3].Name}" HorizontalContentAlignment="Left" />
+                    <settings:ConnectSettingsUserControl HorizontalAlignment="Center" />
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[4].Name}" HorizontalContentAlignment="Left" />
+                    <settings:PerformanceUserControl HorizontalAlignment="Center" />
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[5].Name}" HorizontalContentAlignment="Left" />
+                    <settings:StartSettingsUserControl HorizontalAlignment="Center" />
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[6].Name}" HorizontalContentAlignment="Left" />
+                    <settings:ExternalNotificationSettingsUserControl HorizontalAlignment="Center" />
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[7].Name}" HorizontalContentAlignment="Left" />
+                    <settings:GameSettingsUserControl HorizontalAlignment="Center" />
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[8].Name}" HorizontalContentAlignment="Left" />
+                    <settings:VersionUpdateSettingsUserControl HorizontalAlignment="Center" />
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[9].Name}" HorizontalContentAlignment="Left" />
+                    <settings:AboutUserControl HorizontalAlignment="Center" />
+
+                </StackPanel>
+            </Grid>
         </hc:ScrollViewer>
     </Grid>
 </UserControl>
