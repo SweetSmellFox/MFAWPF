@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
-using MFAWPF.Views.Controls;
+using MFAWPF.Views.UserControl;
 using MFAWPF.Helper;
 using MFAWPF.Views;
 using CommunityToolkit.Mvvm.ComponentModel;

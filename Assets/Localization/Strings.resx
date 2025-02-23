@@ -831,4 +831,10 @@
   <data name="CheckMFA" xml:space="preserve">
     <value>检查软件</value>
   </data>
+  <data name="TimerCustomConfig" xml:space="preserve">
+    <value>自定义配置选择</value>
+  </data>
+  <data name="TimerCustomConfigTip" xml:space="preserve">
+    <value>将提前两分钟重启并切换配置</value>
+  </data>
 </root>

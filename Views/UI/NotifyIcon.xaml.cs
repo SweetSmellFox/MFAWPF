@@ -21,8 +21,6 @@ public partial class NotifyIcon
             _menuItemNum = notifyIcon.ContextMenu.Items.Count;
         }
 
-
-
     }
 
     private void InitIcon()
@@ -79,20 +77,17 @@ public partial class NotifyIcon
         }
     }
 
-    private static void NotifyIcon_MouseClick(object sender, RoutedEventArgs e)
-    {
-        RootView.Instance?.ShowWindow();
-    }
+    private static void NotifyIcon_MouseClick(object sender, RoutedEventArgs e) =>
+        RootView.Instance.ShowWindow();
 
-    private static void StartTask(object sender, RoutedEventArgs e)
-    {
+
+    private static void StartTask(object sender, RoutedEventArgs e) =>
         RootView.Instance.Start();
-    }
 
-    private static void StopTask(object sender, RoutedEventArgs e)
-    {
+
+    private static void StopTask(object sender, RoutedEventArgs e) =>
         RootView.Instance.Stop();
-    }
+
 
     private static void App_exit(object sender, RoutedEventArgs e)
     {
@@ -100,19 +95,10 @@ public partial class NotifyIcon
             Application.Current.Shutdown();
     }
 
-    private void App_hide(object sender, RoutedEventArgs e)
-    {
-        if (DataContext is RootViewModel model)
-        {
-            model.IsVisible = false;
-        }
-    }
+    private void App_hide(object sender, RoutedEventArgs e) =>
+        RootView.ViewModel.IsVisible = false;
+
 
     private void App_show(object sender, RoutedEventArgs e)
-    {
-        if (DataContext is RootViewModel model)
-        {
-            model.IsVisible = true;
-        }
-    }
+        => RootView.ViewModel.IsVisible = true;
 }

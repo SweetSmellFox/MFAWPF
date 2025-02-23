@@ -531,8 +531,10 @@ public class MaaProcessor
     }
 
 
-    public static void RestartMFA()
+    public static void RestartMFA(bool noAutoStart = false)
     {
+        if (noAutoStart)
+            GlobalConfiguration.SetConfiguration("NoAutoStart", bool.TrueString);
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
         DispatcherHelper.RunOnMainThread(Application.Current.Shutdown);
     }
@@ -542,7 +544,7 @@ public class MaaProcessor
         CloseSoftware();
         Process.Start("shutdown", "/r /t 0");
     }
-    
+
     public static void CloseSoftwareAndRestartMFA()
     {
         CloseSoftware();

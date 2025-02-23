@@ -19,18 +19,18 @@ using ViewModel = MFAWPF.ViewModels.ViewModel;
 
 namespace MFAWPF.Views.UI;
 
-public partial class TaskQueueView 
+public partial class TaskQueueView
 {
     public TaskQueueView()
     {
         InitializeComponent();
     }
-    
+
     public void Start(object sender, RoutedEventArgs e) => Instance.Start();
 
     public void Stop(object sender, RoutedEventArgs e) => Instance.Stop();
 
-    
+
     private void AddResourcesOption(int defaultValue = 0)
     {
         var comboBox = new ComboBox
@@ -141,7 +141,7 @@ public partial class TaskQueueView
         var parent = parentObject as T;
         return parent ?? FindVisualParent<T>(parentObject);
     }
-    
+
     private void TaskList_OnPreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
         var scrollViewer = FindVisualParent<ScrollViewer>((DependencyObject)sender);
@@ -160,7 +160,7 @@ public partial class TaskQueueView
         {
             Margin = new Thickness(2)
         };
-
+        AddResourcesOption();
         AddAutoStartOption();
         AddAfterTaskOption();
 
@@ -175,38 +175,7 @@ public partial class TaskQueueView
     }
 
     private void ConfigureTaskSettingsPanel(object sender, RoutedEventArgs e) => ConfigureTaskSettingsPanel();
-    public void ConfigureSettingsPanel()
-    {
-        SettingPanel.Children.Clear();
 
-        StackPanel s1 = new()
-            {
-                Margin = new Thickness(2)
-            },
-            s2 = new()
-            {
-                Margin = new Thickness(2)
-            };
-        AddResourcesOption();
-
-        ScrollViewer sv1 = new()
-            {
-                Content = s1,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch
-            },
-            sv2 = new()
-            {
-                Content = s2,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch
-            };
-
-        SettingPanel.Children.Add(sv1);
-    }
-    private void ConfigureSettingsPanel(object sender, RoutedEventArgs e) => ConfigureSettingsPanel();
     private void AddIntroduction(Panel panel = null, string input = "")
     {
         input = LanguageHelper.GetLocalizedString(input);

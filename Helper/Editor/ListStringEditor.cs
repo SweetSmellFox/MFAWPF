@@ -1,9 +1,8 @@
 using System.Windows;
 using System.Windows.Data;
 using HandyControl.Controls;
-using MFAWPF.Views.Controls;
+using MFAWPF.Views.UserControl;
 using MFAWPF.Helper.Converters;
-using MFAWPF.Views.Controls;
 
 namespace MFAWPF.Helper.Editor;
 

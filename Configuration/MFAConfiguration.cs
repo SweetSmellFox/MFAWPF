@@ -34,7 +34,6 @@ public static class MFAConfiguration
     {
         LoggerService.LogInfo("Loading configuration file...");
         ConfigName = GlobalConfiguration.GetConfiguration("DefaultConfig", ConfigName);
-        Console.WriteLine($"配置文件:{ConfigName}");
 
         var configPath = Path.Combine(AppContext.BaseDirectory, "config");
         foreach (var file in Directory.GetFiles(configPath))

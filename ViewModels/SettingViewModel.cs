@@ -120,12 +120,12 @@ public partial class SettingViewModel : ViewModel
     [
         new("SwitchConfiguration"),
         new("ScheduleSettings"),
-        new("UiSettings"),
-        new("ConnectionSettings"),
         new("PerformanceSettings"),
+        new("RunningSettings"),
+        new("ConnectionSettings"),
         new("StartupSettings"),
         new("ExternalNotificationSettings"),
-        new("RunningSettings"),
+        new("UiSettings"),
         new("SoftwareUpdate"),
         new("About"),
     ];
@@ -505,6 +505,12 @@ public partial class SettingViewModel : ViewModel
     }
 
     public TimerModel TimerModels { get; set; } = new();
+    [ObservableProperty] private bool _customConfig = Convert.ToBoolean(GlobalConfiguration.GetConfiguration("CustomConfig", bool.FalseString));
+
+    partial void OnCustomConfigChanged(bool value)
+    {
+        GlobalConfiguration.SetConfiguration("CustomConfig", value.ToString());
+    }
 
     public partial class TimerModel
     {
@@ -627,6 +633,24 @@ public partial class SettingViewModel : ViewModel
                 {
                     ExecuteTimerTask(timer.TimerId);
                 }
+                if (timer.IsOn && timer.Hour == currentTime.Hour && timer.Min == currentTime.Minute + 2)
+                {
+                    SwitchConfiguration(timer.TimerId);
+                }
+            }
+        }
+
+        private void SwitchConfiguration(int timerId)
+        {
+            var timer = Timers.FirstOrDefault(t => t.TimerId == timerId, null);
+            if (timer != null)
+            {
+                var config = timer.TimerConfig ?? MFAConfiguration.GetCurrentConfiguration();
+                if (config != MFAConfiguration.GetCurrentConfiguration())
+                {
+                    MFAConfiguration.SetDefaultConfig(config);
+                    MaaProcessor.RestartMFA(true);
+                }
             }
         }
 
@@ -651,7 +675,6 @@ public partial class SettingViewModel : ViewModel
         {
             SetProperty(ref _currentConfiguration, value);
             MFAConfiguration.SetDefaultConfig(value);
-
             MaaProcessor.RestartMFA();
         }
     }

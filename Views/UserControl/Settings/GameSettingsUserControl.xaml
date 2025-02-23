@@ -1,0 +1,73 @@
+<UserControl
+    d:DataContext="{d:DesignInstance ui:SettingsView,
+                                     IsDesignTimeCreatable=False}"
+    d:DesignWidth="550"
+    mc:Ignorable="d"
+    x:Class="MFAWPF.Views.UserControl.Settings.GameSettingsUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:local="clr-namespace:MFAWPF.Views.UserControl.Settings"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="clr-namespace:MFAWPF.Views.UI"
+    xmlns:views="clr-namespace:MFAWPF.Views"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel>
+        <hc:TextBox
+            AllowDrop="True"
+            Drop="StartsWithScript_Drop"
+            IsEnabled="{calcBinding:Binding Idle,
+                                            Source={x:Static ui:RootView.ViewModel}}"
+            Margin="30,10,30,10"
+            PreviewDragOver="TextBox_PreviewDragOver"
+            Text="{Binding ViewModel.Prescript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Width="360"
+            hc:InfoElement.Placeholder="Example: &quot;C:\1.cmd&quot; -minimized"
+            hc:TitleElement.HorizontalAlignment="Right"
+            hc:TitleElement.Title="{lex:Loc Prescript}"
+            hc:TitleElement.TitlePlacement="Left"
+            hc:TitleElement.TitleWidth="110"
+            x:Name="BeforeTaskSettings" />
+        <hc:TextBox
+            AllowDrop="True"
+            Drop="EndsWithScript_Drop"
+            IsEnabled="{calcBinding:Binding Idle,
+                                            Source={x:Static ui:RootView.ViewModel}}"
+            Margin="30,10,30,10"
+            PreviewDragOver="TextBox_PreviewDragOver"
+            Text="{Binding ViewModel.PostScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            Width="360"
+            hc:InfoElement.Placeholder="Example: &quot;C:\1.cmd&quot; -noWindow"
+            hc:TitleElement.HorizontalAlignment="Right"
+            hc:TitleElement.Title="{lex:Loc Post-script}"
+            hc:TitleElement.TitlePlacement="Left"
+            hc:TitleElement.TitleWidth="110"
+            x:Name="AfterTaskSettings" />
+        <CheckBox
+            Content="{lex:Loc EnableRecording}"
+            HorizontalAlignment="Center"
+            IsChecked="{Binding ViewModel.EnableRecording}"
+            IsEnabled="{calcBinding:Binding Idle,
+                                            Source={x:Static ui:RootView.ViewModel}}"
+            Margin="30,10,30,10"
+            x:Name="EnableRecordingSettings" />
+        <CheckBox
+            Content="{lex:Loc EnableSaveDraw}"
+            HorizontalAlignment="Center"
+            IsChecked="{Binding ViewModel.EnableSaveDraw}"
+            IsEnabled="{calcBinding:Binding Idle,
+                                            Source={x:Static ui:RootView.ViewModel}}"
+            Margin="30,10,30,10"
+            x:Name="EnableSaveDrawSettings" />
+        <CheckBox
+            Content="{lex:Loc ShowHitDraw}"
+            HorizontalAlignment="Center"
+            IsChecked="{Binding ViewModel.ShowHitDraw}"
+            IsEnabled="{calcBinding:Binding Idle,
+                                            Source={x:Static ui:RootView.ViewModel}}"
+            Margin="30,10,30,10"
+            x:Name="ShowHitDrawSettings" />
+    </StackPanel>
+</UserControl>

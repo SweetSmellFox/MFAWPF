@@ -1,0 +1,197 @@
+<UserControl
+    d:DataContext="{d:DesignInstance ui:SettingsView,
+                                     IsDesignTimeCreatable=False}"
+    d:DesignWidth="600"
+    mc:Ignorable="d"
+    x:Class="MFAWPF.Views.UserControl.Settings.VersionUpdateSettingsUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
+    xmlns:controls="clr-namespace:MFAWPF.Views.UserControl"
+    xmlns:controls1="clr-namespace:MFAWPF.Views.UserControl"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:local="clr-namespace:MFAWPF.Views.UserControl.Settings"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="clr-namespace:MFAWPF.Views.UI"
+    xmlns:utils="clr-namespace:MFAWPF.Helper"
+    xmlns:views="clr-namespace:MFAWPF.Views"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel>
+        <controls1:CustomTextBlock
+            FontWeight="Bold"
+            Grid.Row="0"
+            HorizontalAlignment="Center"
+            Text="{lex:Loc GlobalConfigTip}"
+            TextAlignment="Center"
+            Visibility="{calcBinding:Binding 'ConfigurationList.Count > 1',
+                                             Source={x:Static ui:SettingsView.ViewModel}}" />
+        <Grid HorizontalAlignment="Center" Margin="30,10,30,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+
+            <StackPanel
+                Grid.Column="0"
+                Orientation="Vertical"
+                VerticalAlignment="Center">
+                <CheckBox
+                    Content="{lex:Loc AutomaticDetectionUpdate}"
+                    HorizontalAlignment="Left"
+                    IsChecked="{Binding ViewModel.EnableCheckVersion}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static ui:RootView.ViewModel}}"
+                    Margin="10"
+                    VerticalAlignment="Center"
+                    x:Name="enableCheckVersionSettings" />
+                <CheckBox
+                    Content="{lex:Loc AutomaticUpdateResource}"
+                    HorizontalAlignment="Left"
+                    IsChecked="{Binding ViewModel.EnableAutoUpdateResource}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static ui:RootView.ViewModel}}"
+                    Margin="10"
+                    VerticalAlignment="Center"
+                    x:Name="enableAutoUpdateResourceSettings" />
+                <CheckBox
+                    Content="{lex:Loc AutomaticUpdateMFA}"
+                    HorizontalAlignment="Left"
+                    IsChecked="{Binding ViewModel.EnableAutoUpdateMFA}"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static ui:RootView.ViewModel}}"
+                    Margin="10"
+                    VerticalAlignment="Center"
+                    x:Name="enableAutoUpdateMFASettings" />
+                <hc:ComboBox
+                    DisplayMemberPath="Name"
+                    HorizontalAlignment="Left"
+                    IsEnabled="{calcBinding:Binding Idle,
+                                                    Source={x:Static ui:RootView.ViewModel}}"
+                    ItemsSource="{Binding ViewModel.DownloadSourceList}"
+                    Margin="10,5,5,5"
+                    SelectedIndex="{Binding ViewModel.DownloadSourceIndex}"
+                    Width="200"
+                    hc:TitleElement.HorizontalAlignment="Left"
+                    hc:TitleElement.Title="{lex:Loc ResourceDownloadSource}"
+                    hc:TitleElement.TitlePlacement="Top"
+                    x:Name="DownloadSourceCombox" />
+                <StackPanel
+                    HorizontalAlignment="Left"
+                    Margin="10,2,5,5"
+                    Orientation="Vertical"
+                    Visibility="{calcBinding:Binding 'ViewModel.DownloadSourceIndex==1'}">
+                    <hc:PasswordBox
+                        IsEnabled="{calcBinding:Binding Idle,
+                                                        Source={x:Static ui:RootView.ViewModel}}"
+                        IsSafeEnabled="False"
+                        Margin="0,2,5,10"
+                        ShowEyeButton="True"
+                        UnsafePassword="{Binding ViewModel.CdkPassword}"
+                        Width="200"
+                        hc:TitleElement.HorizontalAlignment="Left"
+                        hc:TitleElement.Title="CDK"
+                        x:Name="CdkPassword" />
+                    <TextBlock Margin="6,0,5,10" VerticalAlignment="Center">
+                        <Hyperlink Command="{x:Static hc:ControlCommands.OpenLink}" CommandParameter="{x:Static utils:MFAUrls.PurchaseLink}">
+                            <Run Text="{lex:Loc PurchaseLink}" />
+                        </Hyperlink>
+                    </TextBlock>
+                </StackPanel>
+
+            </StackPanel>
+            <StackPanel
+                Grid.Column="1"
+                Margin="10,0,0,0"
+                Orientation="Vertical"
+                VerticalAlignment="Center">
+
+                <hc:Shield
+                    Color="#6969AA"
+                    Command="{x:Static hc:ControlCommands.OpenLink}"
+                    CommandParameter="{x:Static utils:MFAUrls.GitHub}"
+                    HorizontalAlignment="Center"
+                    Margin="5"
+                    Subject="{lex:Loc SoftwareVersion}"
+                    x:Name="MFAShield">
+                    <TextBlock
+                        Foreground="White"
+                        Margin="0,3,0,3"
+                        MaxWidth="150"
+                        MinWidth="40"
+                        Text="{Binding ViewModel.MfaVersion}"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap"
+                        x:Name="MFAShieldTextBlock" />
+                </hc:Shield>
+                <hc:Shield
+                    Color="#6969AA"
+                    HorizontalAlignment="Center"
+                    Margin="5"
+                    Subject="{lex:Loc ResourceVersion}"
+                    Visibility="{calcBinding:Binding 'ViewModel.ShowResourceVersion'}"
+                    x:Name="ResourceShield">
+                    <TextBlock
+                        Foreground="White"
+                        Margin="0,3,0,3"
+                        MaxWidth="150"
+                        MinWidth="40"
+                        Text="{Binding ViewModel.ResourceVersion}"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap"
+                        x:Name="ResourceShieldTextBlock" />
+                </hc:Shield>
+                <hc:Shield
+                    Color="#6969AA"
+                    HorizontalAlignment="Center"
+                    Margin="5"
+                    Subject="{lex:Loc MaaFWVersion}"
+                    x:Name="MaafwShield">
+                    <TextBlock
+                        Foreground="White"
+                        Margin="0,3,0,3"
+                        MaxWidth="150"
+                        MinWidth="40"
+                        Text="{Binding ViewModel.MaaFwVersion}"
+                        TextAlignment="Center"
+                        TextWrapping="Wrap"
+                        x:Name="MaafwShieldTextBlock" />
+                </hc:Shield>
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button
+                        Command="{Binding ViewModel.CheckMFAUpdateCommand}"
+                        Content="{lex:Loc CheckMFA}"
+                        IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                        Margin="5" />
+                    <Button
+                        Command="{Binding ViewModel.CheckResourceUpdateCommand}"
+                        Content="{lex:Loc CheckResource}"
+                        IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                        Margin="5" />
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button
+                        Command="{Binding ViewModel.UpdateMFACommand}"
+                        Content="{lex:Loc SoftwareUpdate}"
+                        IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                        Margin="5" />
+                    <Button
+                        Command="{Binding ViewModel.UpdateResourceCommand}"
+                        Content="{lex:Loc UpdateResource}"
+                        IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                        Margin="5" />
+                </StackPanel>
+
+
+                <Button
+                    Command="{Binding ViewModel.UpdateMaaFWCommand}"
+                    Content="{lex:Loc UpdateMaaFW}"
+                    IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                    Margin="5"
+                    Visibility="{calcBinding:Binding 'ViewModel.DownloadSourceIndex==1'}" />
+            </StackPanel>
+        </Grid>
+    </StackPanel>
+
+</UserControl>

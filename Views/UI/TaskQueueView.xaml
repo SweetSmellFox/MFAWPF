@@ -7,7 +7,7 @@
     x:Class="MFAWPF.Views.UI.TaskQueueView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
-    xmlns:controls="clr-namespace:MFAWPF.Views.Controls"
+    xmlns:controls="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dd="urn:gong-wpf-dragdrop"
     xmlns:hc="https://handyorg.github.io/handycontrol"
@@ -116,23 +116,23 @@
                         Width="15"
                         hc:IconElement.Geometry="{StaticResource SettingsRegular}" />
 
-                    <RadioButton
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Checked="ConfigureSettingsPanel"
-                        Foreground="{DynamicResource GrayColor4}"
-                        GroupName="TaskSettings"
-                        IsChecked="{Binding ViewModel.ConnectSettingChecked}"
-                        Margin="0"
-                        Padding="7,0,5,0"
-                        Style="{DynamicResource RadioGroupItemSingle}"
-                        ToolTip="{lex:Loc TooltipSettings}"
-                        hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
-                        hc:IconElement.Height="15"
-                        hc:IconElement.Width="15"
-                        hc:VisualElement.HighlightBackground="Transparent"
-                        hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
-                        x:Name="ConnectSettingButton" />
+                    <!--  <RadioButton  -->
+                    <!--  Background="Transparent"  -->
+                    <!--  BorderThickness="0"  -->
+                    <!--  Checked="ConfigureSettingsPanel"  -->
+                    <!--  Foreground="{DynamicResource GrayColor4}"  -->
+                    <!--  GroupName="TaskSettings"  -->
+                    <!--    -->
+                    <!--  Margin="0"  -->
+                    <!--  Padding="7,0,5,0"  -->
+                    <!--  Style="{DynamicResource RadioGroupItemSingle}"  -->
+                    <!--  ToolTip="{lex:Loc TooltipSettings}"  -->
+                    <!--  hc:IconElement.Geometry="{StaticResource ConfigGeometry}"  -->
+                    <!--  hc:IconElement.Height="15"  -->
+                    <!--  hc:IconElement.Width="15"  -->
+                    <!--  hc:VisualElement.HighlightBackground="Transparent"  -->
+                    <!--  hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"  -->
+                    <!--  x:Name="ConnectSettingButton" />  -->
 
                 </StackPanel>
             </Grid>
@@ -239,6 +239,7 @@
                         Checked="ConfigureTaskSettingsPanel"
                         Foreground="{DynamicResource GrayColor4}"
                         GroupName="TaskSettings"
+                        IsChecked="{Binding ViewModel.ConnectSettingChecked}"
                         Style="{DynamicResource RadioGroupItemSingle}"
                         ToolTip="{lex:Loc TaskSettings}"
                         hc:IconElement.Geometry="{StaticResource ConfigGeometry}"

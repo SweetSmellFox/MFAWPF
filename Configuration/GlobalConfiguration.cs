@@ -51,6 +51,7 @@ public static class GlobalConfiguration
 
     public static string GetTimerHour(int i, string defaultValue)
     {
+
         return GetConfiguration($"Timer.Timer{i + 1}Hour", defaultValue);
     }
 
@@ -71,11 +72,14 @@ public static class GlobalConfiguration
 
     public static string GetTimerConfig(int i, string defaultValue)
     {
-        return GetConfiguration($"Timer.Timer{i + 1}.Config", defaultValue);
+        var result = GetConfiguration($"Timer.Timer{i + 1}.Config", defaultValue);
+        LoggerService.LogInfo($"Timer.Timer{i + 1}.Config:{result} , 默认:{defaultValue}");
+        return result;
     }
 
     public static void SetTimerConfig(int i, string value)
     {
+        LoggerService.LogInfo($"Timer.Timer{i + 1}.Config设置为:{value}");
         SetConfiguration($"Timer.Timer{i + 1}.Config", value);
     }
 }

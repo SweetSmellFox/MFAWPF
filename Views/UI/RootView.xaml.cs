@@ -30,6 +30,7 @@ using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 using ScrollViewer = HandyControl.Controls.ScrollViewer;
 using TextBox = HandyControl.Controls.TextBox;
 using MFAWPF.Views.UI.Dialog;
+using Notifications.Wpf.Annotations;
 
 namespace MFAWPF.Views.UI;
 
@@ -427,10 +428,6 @@ public partial class RootView
         AutoDetectDevice();
 
         MaaProcessor.Instance.SetCurrentTasker();
-        if (TaskQueueView.ConnectSettingButton.IsChecked.IsTrue())
-        {
-            TaskQueueView.ConfigureSettingsPanel();
-        }
     }
 
     public void DeviceComboBox_OnSelectionChanged()
@@ -701,7 +698,7 @@ public partial class RootView
 
     private static EditTaskDialog? _taskDialog;
 
-    public static EditTaskDialog TaskDialog
+    public static EditTaskDialog? TaskDialog
     {
         get
         {
@@ -729,7 +726,7 @@ public partial class RootView
             MaaProcessor.MaaFwConfig.AdbDevice.Input = adbInputType;
             MaaProcessor.MaaFwConfig.AdbDevice.ScreenCap = adbScreenCapType;
 
-            Console.WriteLine(
+            LoggerService.LogInfo(
                 $"{LocExtension.GetLocalizedValue<string>("AdbInputMode")}{adbInputType},{LocExtension.GetLocalizedValue<string>("AdbCaptureMode")}{adbScreenCapType}");
         }
     }
@@ -847,7 +844,7 @@ public partial class RootView
         {
             InitializationSettings();
             ConnectingView.ConnectionTabControl.SelectedIndex = MaaInterface.Instance?.DefaultController == "win32" ? 1 : 0;
-            if (MFAConfiguration.GetConfiguration("AutoStartIndex", 0) >= 1)
+            if (!Convert.ToBoolean(GlobalConfiguration.GetConfiguration("NoAutoStart", bool.FalseString)) && MFAConfiguration.GetConfiguration("AutoStartIndex", 0) >= 1)
             {
                 MaaProcessor.Instance.TaskQueue.Push(new MFATask
                 {
@@ -881,9 +878,10 @@ public partial class RootView
                 }
                 VersionChecker.Check();
             }
+
+            GlobalConfiguration.SetConfiguration("NoAutoStart", bool.FalseString);
             ConnectingView.ConnectionTabControl.SelectionChanged += ConnectionTabControlOnSelectionChanged;
-            if (ViewModel != null)
-                ViewModel.NotLock = MaaInterface.Instance?.LockController != true;
+            ViewModel.NotLock = MaaInterface.Instance?.LockController != true;
             // TaskQueueView.ConnectSettingButton.IsChecked = true;
             MFAConfiguration.SetConfiguration("EnableEdit", MFAConfiguration.GetConfiguration("EnableEdit", false));
             ViewModel.IsDebugMode = MFAExtensions.IsDebugMode();

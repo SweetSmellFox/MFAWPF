@@ -3,11 +3,9 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Data;
 using HandyControl.Controls;
-using MFAWPF.Views.Controls;
+using MFAWPF.Views.UserControl;
 using MFAWPF.Helper.Converters;
 using MFAWPF.ViewModels;
-using MFAWPF.Views;
-using MFAWPF.Views.Controls;
 using MFAWPF.Views.UI;
 using ComboBox = System.Windows.Controls.ComboBox;
 
@@ -26,7 +24,6 @@ public class SingleIntListOrAutoEditor : PropertyEditorBase
         return ctrl;
     }
 
-    // 动态设置 ItemsSource，根据字段名称定制选项
     public static List<string> AutoProperty()
     {
         return ["Roi", "Begin", "End", "Target"];
@@ -50,8 +47,7 @@ public class SingleIntListOrAutoEditor : PropertyEditorBase
 
         return new ObservableCollection<string>();
     }
-
-    // 根据属性的字段名称，动态返回不同的 DisplayMemberPath
+    
     private string GetDisplayMemberPath(PropertyItem propertyItem)
     {
         if (AutoProperty().Contains(propertyItem.PropertyName))

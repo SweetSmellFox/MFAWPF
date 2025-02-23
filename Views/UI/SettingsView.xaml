@@ -7,7 +7,7 @@
     x:Class="MFAWPF.Views.UI.SettingsView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
-    xmlns:controls="clr-namespace:MFAWPF.Views.Controls"
+    xmlns:controls="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:custom="clr-namespace:MFAWPF.Custom"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:data="clr-namespace:MFAWPF.Data"
@@ -15,7 +15,7 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:properties="clr-namespace:MFAWPF.Styles.Properties"
-    xmlns:settings="clr-namespace:MFAWPF.Views.Controls.Settings"
+    xmlns:settings="clr-namespace:MFAWPF.Views.UserControl.Settings"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:utils="clr-namespace:MFAWPF.Helper"
     xmlns:views="clr-namespace:MFAWPF.Views"
@@ -54,17 +54,17 @@
                     <hc:Divider Content="{Binding ViewModel.ListTitle[1].Name}" HorizontalContentAlignment="Left" />
                     <settings:TimerSettingsUserControl HorizontalAlignment="Center" />
                     <hc:Divider Content="{Binding ViewModel.ListTitle[2].Name}" HorizontalContentAlignment="Left" />
-                    <settings:GuiSettingsUserControl HorizontalAlignment="Center" />
-                    <hc:Divider Content="{Binding ViewModel.ListTitle[3].Name}" HorizontalContentAlignment="Left" />
-                    <settings:ConnectSettingsUserControl HorizontalAlignment="Center" />
-                    <hc:Divider Content="{Binding ViewModel.ListTitle[4].Name}" HorizontalContentAlignment="Left" />
                     <settings:PerformanceUserControl HorizontalAlignment="Center" />
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[3].Name}" HorizontalContentAlignment="Left" />
+                    <settings:GameSettingsUserControl HorizontalAlignment="Center" />
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[4].Name}" HorizontalContentAlignment="Left" />
+                    <settings:ConnectSettingsUserControl HorizontalAlignment="Center" />
                     <hc:Divider Content="{Binding ViewModel.ListTitle[5].Name}" HorizontalContentAlignment="Left" />
                     <settings:StartSettingsUserControl HorizontalAlignment="Center" />
                     <hc:Divider Content="{Binding ViewModel.ListTitle[6].Name}" HorizontalContentAlignment="Left" />
                     <settings:ExternalNotificationSettingsUserControl HorizontalAlignment="Center" />
                     <hc:Divider Content="{Binding ViewModel.ListTitle[7].Name}" HorizontalContentAlignment="Left" />
-                    <settings:GameSettingsUserControl HorizontalAlignment="Center" />
+                    <settings:GuiSettingsUserControl HorizontalAlignment="Center" />
                     <hc:Divider Content="{Binding ViewModel.ListTitle[8].Name}" HorizontalContentAlignment="Left" />
                     <settings:VersionUpdateSettingsUserControl HorizontalAlignment="Center" />
                     <hc:Divider Content="{Binding ViewModel.ListTitle[9].Name}" HorizontalContentAlignment="Left" />

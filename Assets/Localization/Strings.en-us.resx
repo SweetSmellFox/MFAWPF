@@ -824,4 +824,10 @@
   <data name="CheckMFA" xml:space="preserve">
     <value>Check Software</value>
   </data>
+  <data name="TimerCustomConfig" xml:space="preserve">
+    <value>Custom config</value>
+  </data>
+  <data name="TimerCustomConfigTip" xml:space="preserve">
+    <value>Restart and switch configuration two minutes in advance</value>
+  </data>
 </root>
