@@ -17,6 +17,7 @@ using MaaFramework.Binding.Notification;
 using MFAWPF.Data;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
+using MFAWPF.Views.UI;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
@@ -85,7 +86,7 @@ public class MaaProcessor
     public void Start(List<DragItemViewModel>? tasks, bool onlyStart = false, bool checkUpdate = false)
     {
         SetCurrentTasker();
-        MainWindow.ViewModel?.SetIdle(false);
+        RootView.ViewModel?.SetIdle(false);
         if (!onlyStart)
             TaskQueue.Push(new MFATask
             {
@@ -93,7 +94,7 @@ public class MaaProcessor
                 Type = MFATask.MFATaskType.MFA,
                 Action = () =>
                 {
-                    MainWindow.Instance.RunScript();
+                    RootView.Instance.RunScript();
                 }
             });
 
@@ -110,15 +111,15 @@ public class MaaProcessor
                 Type = MFATask.MFATaskType.MFA,
                 Action = () =>
                 {
-                    MainWindow.AddLogByKey("ConnectingTo", null, (MainWindow.ViewModel?.IsAdb).IsTrue()
+                    RootView.AddLogByKey("ConnectingTo", null, (RootView.ViewModel?.IsAdb).IsTrue()
                         ? "Emulator"
                         : "Window");
                     var instance = Task.Run(GetCurrentTasker, token);
                     instance.Wait(token);
                     bool connected = instance.Result is { Initialized: true };
-                    if (!connected && MainWindow.ViewModel.IsAdb && MFAConfiguration.GetConfiguration("RetryOnDisconnected", false))
+                    if (!connected && RootView.ViewModel.IsAdb && MFAConfiguration.GetConfiguration("RetryOnDisconnected", false))
                     {
-                        MainWindow.AddLog("ConnectFailed".ToLocalization() + "\n" + "TryToStartEmulator".ToLocalization());
+                        RootView.AddLog("ConnectFailed".ToLocalization() + "\n" + "TryToStartEmulator".ToLocalization());
 
                         StartSoftware();
 
@@ -127,19 +128,19 @@ public class MaaProcessor
                             Stop();
                             return;
                         }
-                        MainWindow.Instance.AutoDetectDevice();
+                        RootView.Instance.AutoDetectDevice();
 
                         instance = Task.Run(GetCurrentTasker, token);
                         instance.Wait(token);
                         connected = instance.Result is { Initialized: true };
 
-                        MainWindow.Instance.AutoDetectDevice();
+                        RootView.Instance.AutoDetectDevice();
                     }
 
 
-                    if (!connected && MainWindow.ViewModel.IsAdb)
+                    if (!connected && RootView.ViewModel.IsAdb)
                     {
-                        MainWindow.AddLog("ConnectFailed".ToLocalization() + "\n" + "TryToReconnectByAdb".ToLocalization());
+                        RootView.AddLog("ConnectFailed".ToLocalization() + "\n" + "TryToReconnectByAdb".ToLocalization());
                         ReconnectByAdb();
 
                         if (token.IsCancellationRequested)
@@ -148,14 +149,14 @@ public class MaaProcessor
                             return;
                         }
 
-                        MainWindow.Instance.SetConnected(false);
+                        RootView.Instance.SetConnected(false);
                         instance = Task.Run(GetCurrentTasker, token);
                         instance.Wait(token);
                         connected = instance.Result is { Initialized: true };
                     }
-                    if (!connected && MainWindow.ViewModel.IsAdb && MFAConfiguration.GetConfiguration("AllowAdbRestart", true))
+                    if (!connected && RootView.ViewModel.IsAdb && MFAConfiguration.GetConfiguration("AllowAdbRestart", true))
                     {
-                        MainWindow.AddLog("ConnectFailed".ToLocalization() + "\n" + "RestartAdb".ToLocalization());
+                        RootView.AddLog("ConnectFailed".ToLocalization() + "\n" + "RestartAdb".ToLocalization());
 
                         RestartAdb();
 
@@ -171,9 +172,9 @@ public class MaaProcessor
                     }
 
                     // 尝试杀掉 ADB 进程
-                    if (!connected && MainWindow.ViewModel.IsAdb && MFAConfiguration.GetConfiguration("AllowAdbHardRestart", true))
+                    if (!connected && RootView.ViewModel.IsAdb && MFAConfiguration.GetConfiguration("AllowAdbHardRestart", true))
                     {
-                        MainWindow.AddLog("ConnectFailed".ToLocalization() + "\n" + "HardRestartAdb".ToLocalization());
+                        RootView.AddLog("ConnectFailed".ToLocalization() + "\n" + "HardRestartAdb".ToLocalization());
 
                         HardRestartAdb();
 
@@ -191,17 +192,17 @@ public class MaaProcessor
                     if (!connected)
                     {
                         LoggerService.LogWarning("ConnectFailed".ToLocalization());
-                        MainWindow.AddLogByKey("ConnectFailed");
-                        MainWindow.Instance.SetConnected(false);
+                        RootView.AddLogByKey("ConnectFailed");
+                        RootView.Instance.SetConnected(false);
                         Stop();
                     }
 
-                    if (connected) MainWindow.Instance.SetConnected(true);
+                    if (connected) RootView.Instance.SetConnected(true);
 
-                    if (!MainWindow.Instance.IsConnected())
+                    if (!RootView.Instance.IsConnected())
                     {
                         GrowlHelper.Warning("Warning_CannotConnect".ToLocalization()
-                            .FormatWith((MainWindow.ViewModel?.IsAdb).IsTrue()
+                            .FormatWith((RootView.ViewModel?.IsAdb).IsTrue()
                                 ? "Emulator".ToLocalization()
                                 : "Window".ToLocalization()));
                         throw new Exception();
@@ -229,7 +230,7 @@ public class MaaProcessor
                     Count = task.Count ?? 1,
                     Action = () =>
                     {
-                        if (task.Tasks != null) MainWindow.Instance.TaskDictionary = task.Tasks;
+                        if (task.Tasks != null) RootView.Instance.TaskDictionary = task.Tasks;
                         TryRunTasks(_currentTasker, task.Entry, task.Param);
                     },
                 });
@@ -239,7 +240,7 @@ public class MaaProcessor
             {
                 Name = "结束",
                 Type = MFATask.MFATaskType.MFA,
-                Action = () => { MainWindow.Instance.RunScript("Post-script"); }
+                Action = () => { RootView.Instance.RunScript("Post-script"); }
             });
         if (checkUpdate)
             TaskQueue.Push(new MFATask
@@ -272,11 +273,11 @@ public class MaaProcessor
             TaskManager.RunTaskAsync(() =>
             {
                 if (IsStopped)
-                    MainWindow.AddLogByKey("Stopping");
+                    RootView.AddLogByKey("Stopping");
                 if (_currentTasker == null || _currentTasker?.Abort().Wait() == MaaJobStatus.Succeeded)
                 {
                     DisplayTaskCompletionMessage(onlyStart);
-                    MainWindow.ViewModel?.SetIdle(true);
+                    RootView.ViewModel?.SetIdle(true);
                 }
                 else
                 {
@@ -429,8 +430,8 @@ public class MaaProcessor
 
             if (remainingTime % 10 == 0)
             {
-                MainWindow.AddLogByKey("WaitSoftwareTime", null,
-                    (MainWindow.ViewModel?.IsAdb).IsTrue()
+                RootView.AddLogByKey("WaitSoftwareTime", null,
+                    (RootView.ViewModel?.IsAdb).IsTrue()
                         ? "Emulator"
                         : "Window",
                     remainingTime.ToString()
@@ -471,7 +472,7 @@ public class MaaProcessor
 
     public static void CloseSoftware(Action? action = null)
     {
-        if ((MainWindow.ViewModel?.IsAdb).IsTrue())
+        if ((RootView.ViewModel?.IsAdb).IsTrue())
         {
             EmulatorHelper.KillEmulatorModeSwitcher();
         }
@@ -603,7 +604,7 @@ public class MaaProcessor
             NullValueHandling = NullValueHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore
         };
-        var json = JsonConvert.SerializeObject(MainWindow.Instance.BaseTasks, settings);
+        var json = JsonConvert.SerializeObject(RootView.Instance.BaseTasks, settings);
 
         var tasks = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(json, settings);
         tasks = tasks.MergeTaskModels(taskModels);
@@ -620,8 +621,8 @@ public class MaaProcessor
     private void UpdateTaskDictionary(ref Dictionary<string, TaskModel> taskModels,
         List<MaaInterface.MaaInterfaceSelectOption>? options)
     {
-        if (MainWindow.Instance?.TaskDictionary != null)
-            MainWindow.Instance.TaskDictionary = MainWindow.Instance.TaskDictionary.MergeTaskModels(taskModels);
+        if (RootView.Instance?.TaskDictionary != null)
+            RootView.Instance.TaskDictionary = RootView.Instance.TaskDictionary.MergeTaskModels(taskModels);
 
         if (options == null) return;
 
@@ -630,13 +631,13 @@ public class MaaProcessor
             if (MaaInterface.Instance?.Option?.TryGetValue(selectOption.Name ?? string.Empty,
                     out var interfaceOption)
                 == true
-                && MainWindow.Instance != null
+                && RootView.Instance != null
                 && selectOption.Index is int index
                 && interfaceOption.Cases is { } cases
                 && cases[index]?.PipelineOverride != null)
             {
                 var param = interfaceOption.Cases[selectOption.Index.Value].PipelineOverride;
-                MainWindow.Instance.TaskDictionary = MainWindow.Instance.TaskDictionary.MergeTaskModels(param);
+                RootView.Instance.TaskDictionary = RootView.Instance.TaskDictionary.MergeTaskModels(param);
                 taskModels = taskModels.MergeTaskModels(param);
             }
         }
@@ -674,18 +675,18 @@ public class MaaProcessor
         switch (elapsedMilliseconds)
         {
             case >= 800:
-                MainWindow.AddLogByKey("ToScreencapErrorTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
-                    MainWindow.Instance.ScreenshotType());
+                RootView.AddLogByKey("ToScreencapErrorTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
+                    RootView.Instance.ScreenshotType());
                 break;
 
             case >= 400:
-                MainWindow.AddLogByKey("ScreencapWarningTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
-                    MainWindow.Instance.ScreenshotType());
+                RootView.AddLogByKey("ScreencapWarningTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
+                    RootView.Instance.ScreenshotType());
                 break;
 
             default:
-                MainWindow.AddLogByKey("ScreencapCost", null, elapsedMilliseconds.ToString(),
-                    MainWindow.Instance.ScreenshotType());
+                RootView.AddLogByKey("ScreencapCost", null, elapsedMilliseconds.ToString(),
+                    RootView.Instance.ScreenshotType());
                 break;
         }
     }
@@ -701,18 +702,18 @@ public class MaaProcessor
         switch (elapsedMilliseconds)
         {
             case >= 800:
-                MainWindow.AddLogByKey("ToScreencapErrorTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
-                    MainWindow.Instance.ScreenshotType());
+                RootView.AddLogByKey("ToScreencapErrorTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
+                    RootView.Instance.ScreenshotType());
                 break;
 
             case >= 400:
-                MainWindow.AddLogByKey("ScreencapWarningTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
-                    MainWindow.Instance.ScreenshotType());
+                RootView.AddLogByKey("ScreencapWarningTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
+                    RootView.Instance.ScreenshotType());
                 break;
 
             default:
-                MainWindow.AddLogByKey("ScreencapCost", null, elapsedMilliseconds.ToString(),
-                    MainWindow.Instance.ScreenshotType());
+                RootView.AddLogByKey("ScreencapCost", null, elapsedMilliseconds.ToString(),
+                    RootView.Instance.ScreenshotType());
                 break;
         }
 
@@ -741,7 +742,7 @@ public class MaaProcessor
         if (IsStopped)
         {
             Growl.Info("TaskStopped".ToLocalization());
-            MainWindow.AddLogByKey("TaskAbandoned");
+            RootView.AddLogByKey("TaskAbandoned");
             IsStopped = false;
         }
         else
@@ -750,12 +751,12 @@ public class MaaProcessor
             if (_startTime != null)
             {
                 var elapsedTime = DateTime.Now - (DateTime)_startTime;
-                MainWindow.AddLogByKey("TaskAllCompletedWithTime", null, ((int)elapsedTime.TotalHours).ToString(),
+                RootView.AddLogByKey("TaskAllCompletedWithTime", null, ((int)elapsedTime.TotalHours).ToString(),
                     ((int)elapsedTime.TotalMinutes % 60).ToString(), ((int)elapsedTime.TotalSeconds % 60).ToString());
             }
             else
             {
-                MainWindow.AddLogByKey("TaskAllCompleted");
+                RootView.AddLogByKey("TaskAllCompleted");
             }
             if (!onlyStart)
             {
@@ -879,7 +880,7 @@ public class MaaProcessor
         {
             HandleInitializationError(e,
                 "ConnectingEmulatorOrWindow".ToLocalization()
-                    .FormatWith((MainWindow.ViewModel?.IsAdb).IsTrue()
+                    .FormatWith((RootView.ViewModel?.IsAdb).IsTrue()
                         ? "Emulator".ToLocalization()
                         : "Window".ToLocalization()), true,
                 "InitControllerFailed".ToLocalization());
@@ -913,7 +914,7 @@ public class MaaProcessor
 
     private MaaController InitializeController()
     {
-        if ((MainWindow.ViewModel?.IsAdb).IsTrue())
+        if ((RootView.ViewModel?.IsAdb).IsTrue())
         {
             LoggerService.LogInfo($"AdbPath: {MaaFwConfig.AdbDevice.AdbPath}");
             LoggerService.LogInfo($"AdbSerial: {MaaFwConfig.AdbDevice.AdbSerial}");
@@ -929,7 +930,7 @@ public class MaaProcessor
             LoggerService.LogInfo($"Link: {MaaFwConfig.DesktopWindow.Link}");
             LoggerService.LogInfo($"Check: {MaaFwConfig.DesktopWindow.Check}");
         }
-        return (MainWindow.ViewModel?.IsAdb).IsTrue()
+        return (RootView.ViewModel?.IsAdb).IsTrue()
             ? new MaaAdbController(
                 MaaFwConfig.AdbDevice.AdbPath,
                 MaaFwConfig.AdbDevice.AdbSerial,
@@ -1101,7 +1102,7 @@ public class MaaProcessor
             var name = jObject["name"]?.ToString() ?? string.Empty;
             if (args.Message.StartsWith(MaaMsg.Node.Action.Prefix))
             {
-                if (MainWindow.Instance.TaskDictionary.TryGetValue(name, out var taskModel))
+                if (RootView.Instance.TaskDictionary.TryGetValue(name, out var taskModel))
                 {
                     DisplayFocus(taskModel, args.Message);
                 }
@@ -1132,7 +1133,7 @@ public class MaaProcessor
                             LoggerService.LogError(e);
                         }
 
-                        MainWindow.AddLog(HandleStringsWithVariables(tip), brush);
+                        RootView.AddLog(HandleStringsWithVariables(tip), brush);
                     }
                 }
                 break;
@@ -1154,7 +1155,7 @@ public class MaaProcessor
                             LoggerService.LogError(e);
                         }
 
-                        MainWindow.AddLog(HandleStringsWithVariables(tip), brush);
+                        RootView.AddLog(HandleStringsWithVariables(tip), brush);
                     }
                 }
                 break;
@@ -1182,7 +1183,7 @@ public class MaaProcessor
                             LoggerService.LogError(e);
                         }
 
-                        MainWindow.AddLog(HandleStringsWithVariables(tip), brush);
+                        RootView.AddLog(HandleStringsWithVariables(tip), brush);
                     }
                 }
                 break;

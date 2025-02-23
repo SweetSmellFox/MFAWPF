@@ -3,10 +3,12 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Data;
 using HandyControl.Controls;
-using MFAWPF.Controls;
+using MFAWPF.Views.Controls;
 using MFAWPF.Helper.Converters;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
+using MFAWPF.Views.Controls;
+using MFAWPF.Views.UI;
 
 namespace MFAWPF.Helper.Editor;
 
@@ -37,12 +39,12 @@ public class ListAutoStringEditor : PropertyEditorBase
         if (propertyItem.PropertyName == "Roi" || propertyItem.PropertyName == "Next" ||
             propertyItem.PropertyName == "OnError" || propertyItem.PropertyName == "Interrupt")
         {
-            return MainWindow.TaskDialog?.Data?.DataList;
+            return RootView.TaskDialog?.Data?.DataList;
         }
 
         if (AutoProperty().Contains(propertyItem.PropertyName))
         {
-            var originalDataList = MainWindow.TaskDialog?.Data?.DataList;
+            var originalDataList = RootView.TaskDialog?.Data?.DataList;
             if (originalDataList != null)
             {
                 var newDataList = new ObservableCollection<TaskItemViewModel>(originalDataList);
@@ -55,7 +57,7 @@ public class ListAutoStringEditor : PropertyEditorBase
 
         if (propertyItem.PropertyName.Contains("Color"))
         {
-            return MainWindow.TaskDialog?.Data?.Colors;
+            return RootView.TaskDialog?.Data?.Colors;
         }
 
         return new ObservableCollection<string>();

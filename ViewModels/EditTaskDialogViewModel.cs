@@ -3,11 +3,12 @@ using System.Drawing;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
-using MFAWPF.Controls;
+using MFAWPF.Views.Controls;
 using MFAWPF.Helper;
 using MFAWPF.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using HandyControl.Tools.Command;
+using MFAWPF.Views.UI.Dialog;
 using Newtonsoft.Json;
 
 namespace MFAWPF.ViewModels;
@@ -45,7 +46,7 @@ public partial class EditTaskDialogViewModel : ViewModel
     private int _selectedIndex;
     
 
-    public EditTaskDialog Dialog;
+    public MFAWPF.Views.UI.Dialog.EditTaskDialog Dialog;
     public readonly Stack<ICommand> UndoStack = new();
     public readonly Stack<ICommand> UndoTaskStack = new();
 

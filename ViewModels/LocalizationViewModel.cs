@@ -11,32 +11,38 @@ public partial class LocalizationViewModel : ViewModel
     public string? ResourceKey
     {
         get => _resourceKey;
-        set
+        private init
         {
-            if (SetProperty(ref _resourceKey, value))
-            {
-                UpdateName();
-            }
+            SetProperty(ref _resourceKey, value);
+            UpdateName();
         }
     }
 
     public LocalizationViewModel()
     {
     }
+    private readonly string[]? _formatArgsKeys;
 
     public LocalizationViewModel(string resourceKey)
     {
-        _resourceKey = resourceKey;
-
-        UpdateName();
+        ResourceKey = resourceKey;
         LanguageHelper.LanguageChanged += OnLanguageChanged;
     }
-
-    [ObservableProperty] private string? _name;
+    public LocalizationViewModel(string resourceKey, params string[] keys)
+    {
+        ResourceKey = resourceKey;
+        _formatArgsKeys = keys;
+        LanguageHelper.LanguageChanged += OnLanguageChanged;
+    }
+    [ObservableProperty] private string _name = string.Empty;
 
     private void UpdateName()
     {
-        if (!string.IsNullOrWhiteSpace(ResourceKey))
+        if (string.IsNullOrWhiteSpace(ResourceKey))
+            return;
+        if (_formatArgsKeys != null && _formatArgsKeys.Length != 0)
+            Name = ResourceKey.ToLocalizationFormatted(_formatArgsKeys);
+        else
             Name = ResourceKey.ToLocalization();
     }
 
@@ -44,6 +50,7 @@ public partial class LocalizationViewModel : ViewModel
     {
         UpdateName();
     }
+
     public override string ToString()
-        => ResourceKey;
+        => Name;
 }

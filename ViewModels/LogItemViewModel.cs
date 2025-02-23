@@ -115,11 +115,11 @@ namespace MFAWPF.ViewModels
                 try
                 {
                     Content = Regex.Unescape(
-                        _resourceKey.ToLocalizationFormatted(formatArgs.Cast<object>().ToArray()));
+                        _resourceKey.ToLocalizationFormatted(formatArgs.ToArray()));
                 }
                 catch
                 {
-                    Content = _resourceKey.ToLocalizationFormatted(formatArgs.Cast<object>().ToArray());
+                    Content = _resourceKey.ToLocalizationFormatted(formatArgs.ToArray());
                 }
             }
         }

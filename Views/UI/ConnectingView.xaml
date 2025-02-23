@@ -1,0 +1,106 @@
+<UserControl
+    d:DataContext="{d:DesignInstance local:RootView,
+                                     IsDesignTimeCreatable=False}"
+    d:DesignHeight="495"
+    d:DesignWidth="800"
+    mc:Ignorable="d"
+    x:Class="MFAWPF.Views.UI.ConnectingView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:helper="clr-namespace:MFAWPF.Helper"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:local="clr-namespace:MFAWPF.Views.UI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <DataTemplate x:Key="DeviceInfoTemplate">
+            <TextBlock>
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0} ({1})">
+                        <Binding Path="Name" />
+                        <Binding Path="AdbSerial" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </DataTemplate>
+        <!--  DataTemplate for WindowInfo  -->
+        <DataTemplate x:Key="WindowInfoTemplate">
+            <TextBlock Text="{Binding Name}" />
+        </DataTemplate>
+
+        <!--  DataTemplateSelector  -->
+        <helper:DeviceWindowTemplateSelector
+            DeviceInfoTemplate="{StaticResource DeviceInfoTemplate}"
+            WindowInfoTemplate="{StaticResource WindowInfoTemplate}"
+            x:Key="DeviceWindowTemplateSelector" />
+    </UserControl.Resources>
+    <Grid Background="{DynamicResource SecundaryBackgroundColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="45" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Grid
+            Grid.Row="0"
+            Height="30"
+            Margin="15,6,10,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MinWidth="150" Width="Auto" />
+                <ColumnDefinition MinWidth="250" Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TabControl
+                Background="Transparent"
+                BorderThickness="0"
+                Grid.Column="0"
+                IsEnabled="{calcBinding:Binding 'ViewModel.NotLock and ViewModel.Idle'}"
+                Style="{StaticResource TabControlCapsuleSolid}"
+                TabStripPlacement="Top"
+                x:Name="ConnectionTabControl">
+                <TabItem Header="{lex:Loc TabADB}" x:Name="AdbTab" />
+                <TabItem Header="{lex:Loc TabWin32}" x:Name="Win32Tab" />
+            </TabControl>
+            <ComboBox
+                Grid.Column="1"
+                IsEnabled="{Binding ViewModel.Idle}"
+                ItemTemplateSelector="{StaticResource DeviceWindowTemplateSelector}"
+                Margin="4,0,0,0"
+                SelectionChanged="DeviceComboBox_OnSelectionChanged"
+                x:Name="DeviceComboBox" />
+            <WrapPanel Grid.Column="2">
+                <Button
+                    Click="Refresh"
+                    Foreground="{DynamicResource GrayColor4}"
+                    Height="20"
+                    IsEnabled="{Binding ViewModel.Idle}"
+                    Margin="6,5,2,0"
+                    Padding="0"
+                    Style="{StaticResource textBoxButton}"
+                    ToolTip="{lex:Loc TooltipRefresh}"
+                    Width="20"
+                    hc:IconElement.Geometry="{StaticResource clear}"
+                    hc:IconElement.Width="14" />
+                <Button
+                    Click="CustomAdb"
+                    Foreground="{DynamicResource GrayColor4}"
+                    Height="20"
+                    IsEnabled="{Binding ViewModel.Idle}"
+                    Margin="2,5,2,0"
+                    Padding="0"
+                    Style="{StaticResource textBoxButton}"
+                    ToolTip="{lex:Loc Custom}"
+                    Width="20"
+                    hc:IconElement.Geometry="{StaticResource CustomGeometry}"
+                    hc:IconElement.Width="14"
+                    x:Name="ButtonCustom" />
+            </WrapPanel>
+        </Grid>
+        <hc:SimpleStackPanel
+            Grid.Row="1"
+            Margin="10"
+            Orientation="Vertical"
+            x:Name="ConnectionSettingPanel" />
+    </Grid>
+</UserControl>

@@ -5,6 +5,7 @@ using HandyControl.Tools.Extension;
 using MFAWPF.Data;
 using MFAWPF.Helper;
 using MFAWPF.Views;
+using MFAWPF.Views.UI;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -16,7 +17,7 @@ namespace MFAWPF.ViewModels;
 public partial class SettingViewModel : ViewModel
 {
     [ObservableProperty] private string _maaFwVersion = MaaProcessor.MaaUtility.Version;
-    [ObservableProperty] private string _mfaVersion = MainWindow.Version;
+    [ObservableProperty] private string _mfaVersion = RootView.Version;
 
     [ObservableProperty] private string _resourceVersion = MaaInterface.Instance?.Version ?? string.Empty;
 
@@ -634,7 +635,7 @@ public partial class SettingViewModel : ViewModel
             var timer = Timers.FirstOrDefault(t => t.TimerId == timerId, null);
             if (timer != null)
             {
-                MainWindow.Instance.Start();
+                RootView.Instance.Start();
             }
         }
     }

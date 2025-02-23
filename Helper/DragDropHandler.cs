@@ -4,6 +4,7 @@ using GongSolutions.Wpf.DragDrop;
 using MFAWPF.Data;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
+using MFAWPF.Views.UI;
 
 
 namespace MFAWPF.Helper;
@@ -79,7 +80,7 @@ public class DragDropHandler : IDropTarget
                     MaaInterface.Instance.Task = tasks;
                 // 保存当前的 ItemsSource 到 JSON
                 MFAConfiguration.SetConfiguration("TaskItems",
-                    MainWindow.ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                    RootView.ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }
     }

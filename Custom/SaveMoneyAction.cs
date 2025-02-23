@@ -3,6 +3,7 @@ using MaaFramework.Binding.Custom;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
+using MFAWPF.Views.UI;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -146,7 +147,7 @@ public class SaveMoneyAction : MaaCustomAction
         }
 
         MaaProcessor.Money += after - before;
-        MainWindow.AddLogByColor(
+        RootView.AddLogByColor(
             $"已投资 {MaaProcessor.Money}(+{after - before}),存款: {after}",
             "LightSeaGreen");
         if (result != 0 && after != 999)

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Views;
+using MFAWPF.Views.UI;
 
 namespace MFAWPF.Helper;
 
@@ -25,7 +26,7 @@ public partial class MFATask : ObservableObject
             for (int i = 0; i < Count; i++)
             {
                 if (Type == MFATaskType.MAAFW)
-                    MainWindow.AddLogByKey("TaskStart", null, Name ?? string.Empty);
+                    RootView.AddLogByKey("TaskStart", null, Name ?? string.Empty);
                 Action();
             }
             return true;

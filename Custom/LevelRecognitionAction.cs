@@ -4,6 +4,7 @@ using MaaFramework.Binding.Custom;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
+using MFAWPF.Views.UI;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -104,37 +105,37 @@ public class LevelRecognitionAction : MaaCustomAction
             if (context.TemplateMatch("encounter.png", image, out detail, 0.8, 545, 330, 260, 200))
             {
                 ix = 0;
-                MainWindow.AddLogByColor("事件: 相遇");
+                RootView.AddLogByColor("事件: 相遇");
                 return true;
             }
             if (context.TemplateMatch("disabuse.png", image, out detail, 0.8, 545, 330, 260, 200))
             {
                 ix = 1;
-                MainWindow.AddLogByColor("事件: 解惑");
+                RootView.AddLogByColor("事件: 解惑");
                 return true;
             }
             if (context.TemplateMatch("haunting.png", image, out detail, 0.8, 545, 330, 260, 200))
             {
                 ix = 2;
-                MainWindow.AddLogByColor("事件: 阴魂不散");
+                RootView.AddLogByColor("事件: 阴魂不散");
                 return true;
             }
             if (context.TemplateMatch("fallingObject.png", image, out detail, 0.8, 545, 330, 260, 200))
             {
                 ix = 3;
-                MainWindow.AddLogByColor("事件: 高空坠物");
+                RootView.AddLogByColor("事件: 高空坠物");
                 return true;
             }
             if (context.TemplateMatch("afterStory.png", image, out detail, 0.8, 545, 330, 260, 200))
             {
                 ix = 4;
-                MainWindow.AddLogByColor("事件: 在故事结束之后");
+                RootView.AddLogByColor("事件: 在故事结束之后");
                 return true;
             }
             if (context.TemplateMatch("entomkaz.png", image, out detail, 0.8, 545, 330, 260, 200))
             {
                 ix = 5;
-                MainWindow.AddLogByColor("事件: 虫卡兹");
+                RootView.AddLogByColor("事件: 虫卡兹");
                 return true;
             }
             return false;
@@ -259,7 +260,7 @@ public class LevelRecognitionAction : MaaCustomAction
             if (context.TemplateMatch("Sarkaz@Roguelike@StageTraderCR.png", image, out detail, 0.8, x, y, width, height))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);
-                MainWindow.AddLogByColor("关卡: 诡意行商", "ForestGreen");
+                RootView.AddLogByColor("关卡: 诡意行商", "ForestGreen");
                 i = 2;
                 return true;
             }
@@ -272,14 +273,14 @@ public class LevelRecognitionAction : MaaCustomAction
             if (context.TemplateMatch("Sarkaz@Roguelike@StageCombatDps.png", image, out detail, 0.8, x, y, width, height))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);
-                MainWindow.AddLogByColor("关卡: 作战", "MediumPurple");
+                RootView.AddLogByColor("关卡: 作战", "MediumPurple");
                 i = 1;
                 return true;
             }
             if (context.TemplateMatch("Sarkaz@Roguelike@StageEmergencyDps.png", image, out detail, 0.85, x, y, width, height))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);
-                MainWindow.AddLogByColor("关卡: 紧急作战", "MediumPurple");
+                RootView.AddLogByColor("关卡: 紧急作战", "MediumPurple");
                 i = 1;
                 return true;
             }

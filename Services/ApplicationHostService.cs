@@ -1,4 +1,5 @@
 using MFAWPF.Views;
+using MFAWPF.Views.UI;
 using Microsoft.Extensions.Hosting;
 using System.Windows;
 
@@ -33,7 +34,7 @@ public class ApplicationHostService(IServiceProvider serviceProvider) : IHostedS
     {
         await Task.CompletedTask;
 
-        if (!Application.Current.Windows.OfType<MainWindow>().Any())
+        if (!Application.Current.Windows.OfType<RootView>().Any())
         {
             _window = (serviceProvider.GetService(typeof(Window)) as Window)!;
             _window!.Show();

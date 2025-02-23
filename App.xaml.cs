@@ -9,6 +9,7 @@ using MFAWPF.Services;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
+using MFAWPF.Views.UI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,11 +43,11 @@ public partial class App
                 _ = services.AddHostedService<ApplicationHostService>();
 
                 // Main window with navigation
-                _ = services.AddSingleton<Window, Views.MainWindow>();
-                _ = services.AddSingleton<MainViewModel>();
+                _ = services.AddSingleton<Window, RootView>();
+                _ = services.AddSingleton<RootViewModel>();
 
                 // Views and ViewModels
-                _ = services.AddSingleton<Views.SettingsView>();
+                _ = services.AddSingleton<SettingsView>();
                 _ = services.AddSingleton<ViewModels.SettingViewModel>();
                 // _ = services.AddSingleton<Views.Pages.DataPage>();
                 // _ = services.AddSingleton<ViewModels.DataPageViewModel>();

@@ -1,0 +1,31 @@
+<UserControl
+    d:DataContext="{d:DesignInstance ui:SettingsView,
+                                     IsDesignTimeCreatable=False}"
+    d:DesignWidth="550"
+    mc:Ignorable="d"
+    x:Class="MFAWPF.Views.Controls.Settings.PerformanceUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:local="clr-namespace:MFAWPF.Views.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="clr-namespace:MFAWPF.Views.UI"
+    xmlns:views="clr-namespace:MFAWPF.Views"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <hc:ComboBox
+            DisplayMemberPath="Name"
+            HorizontalAlignment="Center"
+            IsEnabled="{calcBinding:Binding Idle,
+                                            Source={x:Static ui:RootView.ViewModel}}"
+            ItemsSource="{Binding ViewModel.GpuOptions}"
+            Margin="30,10,30,10"
+            SelectedIndex="{Binding ViewModel.GpuIndex}"
+            Width="240"
+            hc:TitleElement.HorizontalAlignment="Right"
+            hc:TitleElement.Title="{lex:Loc EnableGPU}"
+            hc:TitleElement.TitlePlacement="Left" />
+    </Grid>
+</UserControl>

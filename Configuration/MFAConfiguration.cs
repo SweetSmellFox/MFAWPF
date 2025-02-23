@@ -2,6 +2,7 @@
 using MFAWPF.Helper;
 using MFAWPF.Helper.Converters;
 using MFAWPF.Views;
+using MFAWPF.Views.UI;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
 using System.Configuration;
@@ -99,7 +100,7 @@ public static class MFAConfiguration
             SettingsView.ViewModel.LanguageIndex = Convert.ToInt32(value);
         var fileName = config == Data ? GetActualConfiguration() : "maa_option";
         if (config == MaaConfig)
-            MainWindow.ViewModel.IsDebugMode = MFAExtensions.IsDebugMode();
+            RootView.ViewModel.IsDebugMode = MFAExtensions.IsDebugMode();
         JsonHelper.WriteToConfigJsonFile(fileName, config, new MaaInterfaceSelectOptionConverter(false));
     }
 

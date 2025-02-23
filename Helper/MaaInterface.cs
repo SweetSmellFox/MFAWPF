@@ -1,5 +1,6 @@
 using MFAWPF.Helper.Converters;
 using MFAWPF.Views;
+using MFAWPF.Views.UI;
 using Newtonsoft.Json;
 using System.IO;
 
@@ -236,11 +237,11 @@ public class MaaInterface
 
 
             if (value.Name != null)
-                MainWindow.Instance?.ShowResourceName(value.Name);
+                RootView.Instance?.ShowResourceName(value.Name);
             if (value.Version != null)
-                MainWindow.Instance?.ShowResourceVersion(value.Version);
+                RootView.Instance?.ShowResourceVersion(value.Version);
             if (value.CustomTitle != null)
-                MainWindow.Instance?.ShowCustomTitle(value.CustomTitle);
+                RootView.Instance?.ShowCustomTitle(value.CustomTitle);
         }
     }
 
