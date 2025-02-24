@@ -1,5 +1,4 @@
 using MFAWPF.Helper.Converters;
-using MFAWPF.Views;
 using MFAWPF.Views.UI;
 using Newtonsoft.Json;
 using System.IO;
@@ -170,7 +169,8 @@ public class MaaInterface
     // [JsonIgnore] public List<MaaCustomActionExecutor> CustomActionExecutors { get; } = new();
 
     [JsonIgnore]
-    public Dictionary<string, List<string>> Resources { get; } = new();
+    public Dictionary<string, MaaCustomResource> Resources { get; } = new();
+
 
     // 替换单个字符串中的 "{PROJECT_DIR}" 为指定的替换值
     public static string? ReplacePlaceholder(string? input, string? replacement)
@@ -189,59 +189,32 @@ public class MaaInterface
     public static MaaInterface? Instance
     {
         get => _instance;
-        set
+        private set
         {
             _instance = value;
-            if (value == null) return;
 
-            // _instance?.CustomRecognizerExecutors.Clear();
-            // _instance?.CustomActionExecutors.Clear();
-            _instance?.Resources.Clear();
-
-            // if (value.recognizer != null)
-            // {
-            //     foreach (var customExecutor in value.recognizer)
-            //     {
-            //         _instance?.CustomRecognizerExecutors.Add(new Maacustom
-            //         {
-            //             Name = customExecutor.Key,
-            //             Path = ReplacePlaceholder(customExecutor.Value.exec_path, MaaProcessor.Resource),
-            //             Parameter = ReplacePlaceholder(customExecutor.Value.exec_param, MaaProcessor.Resource)
-            //         });
-            //     }
-            // }
-            //
-            // if (value.action != null)
-            // {
-            //     foreach (var customExecutor in value.action)
-            //     {
-            //         _instance?.CustomActionExecutors.Add(new MaaCustomActionExecutor
-            //         {
-            //             Name = customExecutor.Key,
-            //             Path = ReplacePlaceholder(customExecutor.Value.exec_path, MaaProcessor.Resource),
-            //             Parameter = ReplacePlaceholder(customExecutor.Value.exec_param, MaaProcessor.Resource)
-            //         });
-            //     }
-            // }
-
-            if (value.Resource != null)
+            if (value?.Resource != null)
             {
                 foreach (var customResource in value.Resource)
                 {
                     var paths = ReplacePlaceholder(customResource.Path ?? new List<string>(),
                         AppContext.BaseDirectory);
                     if (_instance != null)
-                        _instance.Resources[customResource.Name ?? string.Empty] = paths;
+                    {
+                        _instance.Resources[customResource.Name ?? string.Empty] = new MaaCustomResource
+                        {
+                            Name = LanguageHelper.GetLocalizedString(customResource.Name),
+                            Path = paths,
+                        };
+                    }
                 }
             }
-
-
-            if (value.Name != null)
-                RootView.Instance?.ShowResourceName(value.Name);
-            if (value.Version != null)
-                RootView.Instance?.ShowResourceVersion(value.Version);
-            if (value.CustomTitle != null)
-                RootView.Instance?.ShowCustomTitle(value.CustomTitle);
+            if (value?.Name != null)
+                RootView.Instance.ShowResourceName(value.Name);
+            if (value?.Version != null)
+                RootView.Instance.ShowResourceVersion(value.Version);
+            if (value?.CustomTitle != null)
+                RootView.Instance.ShowCustomTitle(value.CustomTitle);
         }
     }
 

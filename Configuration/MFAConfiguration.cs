@@ -53,11 +53,13 @@ public static class MFAConfiguration
         }
 
         Data = Configs.FirstOrDefault(c
-            => !string.IsNullOrWhiteSpace(c.Name)
-            && c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase), null)?.Config ?? new Dictionary<string, object>();
+                => !string.IsNullOrWhiteSpace(c.Name)
+                && c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase), null)?.Config
+            ?? new Dictionary<string, object>();
 
         ConfigIndex = Configs.ToList().FindIndex(c => !string.IsNullOrWhiteSpace(c.Name)
             && c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase));
+       MaaConfig = JsonHelper.ReadFromConfigJsonFile("maa_option", new Dictionary<string, object>());
     }
 
     public static void SetDefaultConfig(string? name)
@@ -135,7 +137,7 @@ public static class MFAConfiguration
         return defaultValue;
     }
 
-    public static void SetConfiguration(string key, object value)
+    public static void SetConfiguration(string key, object? value)
     {
         Data.SetConfig(key, value);
     }

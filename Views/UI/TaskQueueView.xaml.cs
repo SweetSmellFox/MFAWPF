@@ -4,6 +4,7 @@ using MFAWPF.Data;
 using MFAWPF.Helper;
 using MFAWPF.Helper.Converters;
 using MFAWPF.ViewModels;
+using MFAWPF.Views.UserControl.Settings;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,54 +32,6 @@ public partial class TaskQueueView
     public void Stop(object sender, RoutedEventArgs e) => Instance.Stop();
 
 
-    private void AddResourcesOption(int defaultValue = 0)
-    {
-        var comboBox = new ComboBox
-        {
-            SelectedIndex = MFAConfiguration.GetConfiguration("ResourceIndex", defaultValue),
-            Style = FindResource("ComboBoxExtend") as Style,
-            DisplayMemberPath = "Name",
-            Margin = new Thickness(5)
-        };
-
-        var binding = new Binding("Idle")
-        {
-            Source = RootView.ViewModel,
-            Mode = BindingMode.OneWay
-        };
-        comboBox.SetBinding(IsEnabledProperty, binding);
-
-        comboBox.BindLocalization("ResourceOption");
-        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-
-        if (MaaInterface.Instance?.Resource != null)
-        {
-            var a = new List<MaaInterface.MaaCustomResource>();
-            foreach (var VARIABLE in MaaInterface.Instance.Resource)
-            {
-                var o = new MaaInterface.MaaCustomResource
-                {
-                    Name = LanguageHelper.GetLocalizedString(VARIABLE.Name),
-                    Path = VARIABLE.Path
-                };
-                a.Add(o);
-
-            }
-            comboBox.ItemsSource = a;
-        }
-
-        comboBox.SelectionChanged += (sender, _) =>
-        {
-            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-
-            if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > index)
-                MaaProcessor.CurrentResources =
-                    MaaInterface.Instance.Resources[MaaInterface.Instance.Resources.Keys.ToList()[index]];
-            MFAConfiguration.SetConfiguration("ResourceIndex", index);
-        };
-
-        SettingPanel.Children.Add(comboBox);
-    }
     private void Edit(object sender, RoutedEventArgs e)
     {
         if (!Instance.IsConnected())
@@ -153,25 +106,34 @@ public partial class TaskQueueView
         }
     }
 
+    private TaskQueueSettingsUserControl? TaskQueueSettingsUserControl { get; set; }
+
     public void ConfigureTaskSettingsPanel()
     {
         SettingPanel.Children.Clear();
-        StackPanel s2 = new()
-        {
-            Margin = new Thickness(2)
-        };
-        AddResourcesOption();
-        AddAutoStartOption();
-        AddAfterTaskOption();
 
-        ScrollViewer sv2 = new()
+        if (TaskQueueSettingsUserControl == null)
         {
-            Content = s2,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            VerticalAlignment = VerticalAlignment.Stretch
-        };
-        SettingPanel.Children.Add(sv2);
+            TaskQueueSettingsUserControl = new TaskQueueSettingsUserControl();
+            //     var sv = new StackPanel()
+            //     {
+            //         Margin = new Thickness(2)
+            //     };
+            //
+            SetResourcesOption(TaskQueueSettingsUserControl.ResourceComboBox);
+            //     AddAutoStartOption(sv);
+            //     AddAfterTaskOption(sv);
+            //
+            //     TaskSettingsPanel = new()
+            //     {
+            //         Content = TaskSettingsPanel,
+            //         VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            //         HorizontalAlignment = HorizontalAlignment.Stretch,
+            //         VerticalAlignment = VerticalAlignment.Stretch
+            //     };
+            //     TaskSettingsPanel.Content = sv;
+        }
+        SettingPanel.Children.Add(TaskQueueSettingsUserControl);
     }
 
     private void ConfigureTaskSettingsPanel(object sender, RoutedEventArgs e) => ConfigureTaskSettingsPanel();
@@ -275,51 +237,88 @@ public partial class TaskQueueView
         panel.Children.Add(richTextBox);
     }
 
-
-    private void AddAutoStartOption(int defaultValue = 0)
+    private void SetResourcesOption(HandyControl.Controls.ComboBox comboBox)
     {
-        var comboBox = new ComboBox
-        {
-            Style = FindResource("ComboBoxExtend") as Style,
-            Margin = new Thickness(5)
-        };
+        // if (MaaInterface.Instance?.Resource != null)
+        // {
+        //     var a = new List<MaaInterface.MaaCustomResource>();
+        //     foreach (var resource in MaaInterface.Instance.Resource)
+        //     {
+        //         var o = new MaaInterface.MaaCustomResource
+        //         {
+        //             Name = LanguageHelper.GetLocalizedString(resource?.Name),
+        //             Path = resource.Path
+        //         };
+        //         a.Add(o);
+        //
+        //     }
+        //     comboBox.ItemsSource = a;
+        // }
+        // comboBox.SelectedIndex = MFAConfiguration.GetConfiguration("ResourceIndex", 0);
+        // comboBox.SelectionChanged += (sender, _) =>
+        // {
+        //     var index = (sender as ComboBox)?.SelectedIndex ?? 0;
+        //
+        //     if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > index)
+        //         RootView.ViewModel.CurrentResources =
+        //             MaaInterface.Instance.Resources[MaaInterface.Instance.Resources.Keys.ToList()[index]];
+        //     MFAConfiguration.SetConfiguration("ResourceIndex", index);
+        // };
 
-        comboBox.ItemsSource = RootView.ViewModel.BeforeTaskList;
-        comboBox.BindLocalization("AutoStartOption");
-        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-        comboBox.SelectedIndex = MFAConfiguration.GetConfiguration("AutoStartIndex", defaultValue);
-
-        comboBox.SelectionChanged += (sender, _) =>
-        {
-            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-            MFAConfiguration.SetConfiguration("AutoStartIndex", index);
-            RootView.ViewModel.BeforeTask = RootView.ViewModel.BeforeTaskList[index].Name;
-        };
-
-
-        SettingPanel.Children.Add(comboBox);
     }
 
-    private void AddAfterTaskOption(int defaultValue = 0)
+
+    private void AddAutoStartOption(StackPanel stackPanel)
     {
         var comboBox = new ComboBox
         {
             Style = FindResource("ComboBoxExtend") as Style,
             Margin = new Thickness(5),
+            SelectedValuePath = "ResourceKey",
+            DisplayMemberPath = "Name"
         };
-        comboBox.ItemsSource = RootView.ViewModel.AfterTaskList;
 
+        var source = new Binding("BeforeTaskList")
+        {
+            Source = RootView.ViewModel
+        };
+        comboBox.SetBinding(ItemsControl.ItemsSourceProperty, source);
+        comboBox.BindLocalization("AutoStartOption");
+        comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+        var value = new Binding("BeforeTask")
+        {
+            Source = RootView.ViewModel,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+            Mode = BindingMode.TwoWay
+        };
+        comboBox.SetBinding(Selector.SelectedValueProperty, value);
+        stackPanel.Children.Add(comboBox);
+    }
+
+    private void AddAfterTaskOption(StackPanel stackPanel, int defaultValue = 0)
+    {
+        var comboBox = new ComboBox
+        {
+            Style = FindResource("ComboBoxExtend") as Style,
+            Margin = new Thickness(5),
+            SelectedValuePath = "ResourceKey",
+            DisplayMemberPath = "Name"
+        };
+        var source = new Binding("AfterTaskList")
+        {
+            Source = RootView.ViewModel
+        };
+        comboBox.SetBinding(ItemsControl.ItemsSourceProperty, source);
         comboBox.BindLocalization("AfterTaskOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
-        comboBox.SelectedIndex = MFAConfiguration.GetConfiguration("AfterTaskIndex", defaultValue);
-        comboBox.SelectionChanged += (sender, _) =>
+        var value = new Binding("AfterTask")
         {
-            var index = (sender as ComboBox)?.SelectedIndex ?? 0;
-            MFAConfiguration.SetConfiguration("AfterTaskIndex", index);
-            RootView.ViewModel.AfterTask = RootView.ViewModel.AfterTaskList[index].Name;
+            Source = RootView.ViewModel,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+            Mode = BindingMode.TwoWay
         };
-
-        SettingPanel.Children.Add(comboBox);
+        comboBox.SetBinding(Selector.SelectedValueProperty, value);
+        stackPanel.Children.Add(comboBox);
     }
 
     public void SetOption(DragItemViewModel dragItem, bool value)

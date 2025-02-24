@@ -1,4 +1,6 @@
 using HandyControl.Controls;
+using MFAWPF.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
 using ComboBox = System.Windows.Controls.ComboBox;
@@ -9,11 +11,11 @@ namespace MFAWPF.Views.UI;
 
 public partial class SettingsView
 {
-    public static ViewModels.SettingViewModel ViewModel { get; set; }
-    public SettingsView(ViewModels.SettingViewModel model)
+    public static ViewModels.SettingsViewModel ViewModel { get; set; }
+    public SettingsView()
     {
         InitializeComponent();
-        ViewModel = model;
+        ViewModel = App.Services.GetRequiredService<SettingsViewModel>();
         DataContext = this;
         Loaded += (_, _) => { UpdateDividerPositions(); };
     }

@@ -49,8 +49,6 @@ public partial class RootView
 
     public RootView(ViewModels.RootViewModel viewModel)
     {
-        MFAConfiguration.LoadConfig();
-        MFAConfiguration.MaaConfig = JsonHelper.ReadFromConfigJsonFile("maa_option", new Dictionary<string, object>());
         LanguageHelper.Initialize();
         InitializeComponent();
         ViewModel = viewModel;
@@ -60,6 +58,8 @@ public partial class RootView
         Loaded += (_, _) => { LoadUI(); };
         InitializeData();
         OCRHelper.Initialize();
+        LanguageHelper.ChangeLanguage(LanguageHelper.SupportedLanguages[MFAConfiguration.GetConfiguration("LangIndex", 0)]);
+
         ThemeHelper.UpdateThemeIndexChanged(MFAConfiguration.GetConfiguration("ThemeIndex", 0));
         StateChanged += (_, _) =>
         {
@@ -113,14 +113,16 @@ public partial class RootView
 
             if (FirstTask)
             {
-                if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > MFAConfiguration.GetConfiguration("ResourceIndex", 0))
-                    MaaProcessor.CurrentResources =
-                        MaaInterface.Instance.Resources[
-                            MaaInterface.Instance.Resources.Keys.ToList()[MFAConfiguration.GetConfiguration("ResourceIndex", 0)]];
+                if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > 0)
+                    ViewModel.CurrentResources = new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList());
                 else
-                    MaaProcessor.CurrentResources =
+                    ViewModel.CurrentResources =
                     [
-                        MaaProcessor.ResourceBase
+                        new MaaInterface.MaaCustomResource
+                        {
+                            Name = "Default",
+                            Path = [MaaProcessor.ResourceBase]
+                        }
                     ];
                 FirstTask = false;
             }
@@ -248,9 +250,15 @@ public partial class RootView
         try
         {
             var taskDictionary = new Dictionary<string, TaskModel>();
-            if (MaaProcessor.CurrentResources != null)
+            if (ViewModel.CurrentResources.Count > 0)
             {
-                foreach (var resourcePath in MaaProcessor.CurrentResources)
+                if (string.IsNullOrWhiteSpace(ViewModel.CurrentResource) && !string.IsNullOrWhiteSpace(ViewModel.CurrentResources[0].Name))
+                    ViewModel.CurrentResource = ViewModel.CurrentResources[0].Name;
+            }
+            if (ViewModel.CurrentResources.Any(r => r.Name == ViewModel.CurrentResource))
+            {
+                var resources = ViewModel.CurrentResources.Where(r => r.Name == ViewModel.CurrentResource);
+                foreach (var resourcePath in resources)
                 {
                     if (!Path.Exists($"{resourcePath}/pipeline/"))
                         break;
@@ -844,7 +852,7 @@ public partial class RootView
         {
             InitializationSettings();
             ConnectingView.ConnectionTabControl.SelectedIndex = MaaInterface.Instance?.DefaultController == "win32" ? 1 : 0;
-            if (!Convert.ToBoolean(GlobalConfiguration.GetConfiguration("NoAutoStart", bool.FalseString)) && MFAConfiguration.GetConfiguration("AutoStartIndex", 0) >= 1)
+            if (!Convert.ToBoolean(GlobalConfiguration.GetConfiguration("NoAutoStart", bool.FalseString)) && MFAConfiguration.GetConfiguration("BeforeTask", "None").Contains("Startup", StringComparison.OrdinalIgnoreCase))
             {
                 MaaProcessor.Instance.TaskQueue.Push(new MFATask
                 {
@@ -852,7 +860,7 @@ public partial class RootView
                     Type = MFATask.MFATaskType.MFA,
                     Action = WaitSoftware,
                 });
-                Start(MFAConfiguration.GetConfiguration("AutoStartIndex", 0) == 1, checkUpdate: true);
+                Start(!MFAConfiguration.GetConfiguration("BeforeTask", "None").Contains("And", StringComparison.OrdinalIgnoreCase), checkUpdate: true);
             }
             else
             {
@@ -1060,7 +1068,7 @@ public partial class RootView
 
     public async void WaitSoftware()
     {
-        if (MFAConfiguration.GetConfiguration("AutoStartIndex", 0) >= 1)
+        if (MFAConfiguration.GetConfiguration("BeforeTask", "None").Contains("Startup", StringComparison.OrdinalIgnoreCase))
         {
             MaaProcessor.Instance.StartSoftware();
         }

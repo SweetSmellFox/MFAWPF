@@ -1,23 +1,18 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using HandyControl.Themes;
+﻿
 using System.Text;
 using System.Windows;
 using System.Windows.Threading;
 using Lierda.WPFHelper;
-using MaaFramework.Binding.Interop.Native;
+using MFAWPF.Data;
 using MFAWPF.Services;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
-using MFAWPF.Views;
 using MFAWPF.Views.UI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Win32;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Windows.Controls;
 
 namespace MFAWPF;
 
@@ -48,7 +43,7 @@ public partial class App
 
                 // Views and ViewModels
                 _ = services.AddSingleton<SettingsView>();
-                _ = services.AddSingleton<ViewModels.SettingViewModel>();
+                _ = services.AddSingleton<ViewModels.SettingsViewModel>();
                 // _ = services.AddSingleton<Views.Pages.DataPage>();
                 // _ = services.AddSingleton<ViewModels.DataPageViewModel>();
                 // _ = services.AddSingleton<Views.Pages.SettingsPage>();
@@ -82,7 +77,7 @@ public partial class App
                 }
             }
         }
-
+        MFAConfiguration.LoadConfig();
         //Task线程内未捕获异常处理事件
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         //非UI线程未捕获异常处理事件

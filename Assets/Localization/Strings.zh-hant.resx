@@ -752,10 +752,10 @@
   <data name="ExternalNotificationSendTest" xml:space="preserve">
     <value>發送測試</value>
   </data>
-  <data name="ExternalNotificationTelegramDingTalkToken" xml:space="preserve">
+  <data name="ExternalNotificationDingTalkToken" xml:space="preserve">
     <value>釘釘 Token</value>
   </data>
-  <data name="ExternalNotificationTelegramDingTalkSecret" xml:space="preserve">
+  <data name="ExternalNotificationDingTalkSecret" xml:space="preserve">
     <value>釘釘 Secret</value>
   </data>
   <data name="DingTalk" xml:space="preserve">
@@ -835,5 +835,14 @@
   </data>
   <data name="ForceScheduledStartTip" xml:space="preserve">
     <value>停止當前任務，重新啟動遊戲並開始新任務</value>
+  </data>
+  <data name="ExternalNotificationEmailAccount" xml:space="preserve">
+    <value>電郵 帳戶</value>
+  </data>
+  <data name="ExternalNotificationEmailSecret" xml:space="preserve">
+    <value>電郵 Secret</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>電郵</value>
   </data>
 </root>

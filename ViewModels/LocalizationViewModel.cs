@@ -6,9 +6,9 @@ namespace MFAWPF.ViewModels;
 
 public partial class LocalizationViewModel : ViewModel
 {
-    private string? _resourceKey;
+    private string _resourceKey = string.Empty;
 
-    public string? ResourceKey
+    public string ResourceKey
     {
         get => _resourceKey;
         private init
@@ -52,5 +52,5 @@ public partial class LocalizationViewModel : ViewModel
     }
 
     public override string ToString()
-        => Name;
+        => ResourceKey;
 }

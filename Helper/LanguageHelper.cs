@@ -9,12 +9,12 @@ namespace MFAWPF.Helper;
 
 public static class LanguageHelper
 {
-    public static event EventHandler LanguageChanged;
+    public static event EventHandler? LanguageChanged;
 
     public class SupportedLanguage
     {
-        public string Name { get; set; } = string.Empty;
-        public string Key { get; set; } = string.Empty;
+        public string? Name { get; set; }
+        public string? Key { get; set; }
         public SupportedLanguage(string key, string name)
         {
             Name = name;
@@ -94,7 +94,7 @@ public static class LanguageHelper
             : new Dictionary<string, string>();
     }
 
-    public static string GetLocalizedString(string key)
+    public static string GetLocalizedString(string? key)
     {
         if (key == null)
             return string.Empty;

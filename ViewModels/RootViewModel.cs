@@ -88,6 +88,14 @@ public partial class RootViewModel : ViewModel
         });
     }
 
+    public ObservableCollection<MaaInterface.MaaCustomResource> CurrentResources { get; set; } = [];
+    [ObservableProperty] private string _currentResource = MFAConfiguration.GetConfiguration("Resource", string.Empty);
+
+    partial void OnCurrentResourceChanged(string value)
+    {
+        MFAConfiguration.SetConfiguration("Resource", value);
+    }
+
     [ObservableProperty] private ObservableCollection<DragItemViewModel> _taskItemViewModels = new();
     partial void OnTaskItemViewModelsChanged(ObservableCollection<DragItemViewModel>? oldValue, ObservableCollection<DragItemViewModel> newValue)
     {
@@ -262,29 +270,6 @@ public partial class RootViewModel : ViewModel
         });
     }
 
-    private string? _beforeTask = "None".ToLocalization();
-
-    public string? BeforeTask
-    {
-        get
-        {
-            _beforeTask = BeforeTaskList[MFAConfiguration.GetConfiguration("AutoStartIndex", 0)].ResourceKey;
-            return _beforeTask;
-        }
-        set => SetProperty(ref _beforeTask, value);
-    }
-
-    private string? _afterTask = "None".ToLocalization();
-
-    public string? AfterTask
-    {
-        get
-        {
-            _afterTask = AfterTaskList[MFAConfiguration.GetConfiguration("AfterTaskIndex", 0)].ResourceKey;
-            return _afterTask;
-        }
-        set => SetProperty(ref _afterTask, value);
-    }
 
     public ObservableCollection<LocalizationViewModel> BeforeTaskList =>
     [
@@ -304,6 +289,21 @@ public partial class RootViewModel : ViewModel
         new("CloseEmulatorAndRestartMFA"),
         new("RestartPC"),
     ];
+
+
+    [ObservableProperty] private string? _beforeTask = MFAConfiguration.GetConfiguration("BeforeTask", "None");
+
+    partial void OnBeforeTaskChanged(string? value)
+    {
+        MFAConfiguration.SetConfiguration("BeforeTask", value);
+    }
+
+    [ObservableProperty] private string? _afterTask = MFAConfiguration.GetConfiguration("AfterTask", "None");
+
+    partial void OnAfterTaskChanged(string? value)
+    {
+        MFAConfiguration.SetConfiguration("AfterTask", value);
+    }
 
     private bool _shouldTip = true;
     private bool _isDebugMode;

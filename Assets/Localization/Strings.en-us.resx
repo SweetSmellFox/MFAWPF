@@ -752,10 +752,10 @@
   <data name="ExternalNotificationSendTest" xml:space="preserve">
     <value>Send Test</value>
   </data>
-  <data name="ExternalNotificationTelegramDingTalkToken" xml:space="preserve">
+  <data name="ExternalNotificationDingTalkToken" xml:space="preserve">
     <value>DingTalk Token</value>
   </data>
-  <data name="ExternalNotificationTelegramDingTalkSecret" xml:space="preserve">
+  <data name="ExternalNotificationDingTalkSecret" xml:space="preserve">
     <value>DingTalk Secret</value>
   </data>
   <data name="DingTalk" xml:space="preserve">
@@ -835,5 +835,14 @@
   </data>
   <data name="ForceScheduledStartTip" xml:space="preserve">
     <value>Stop current task, restart game and start new tasks</value>
+  </data>
+  <data name="ExternalNotificationEmailAccount" xml:space="preserve">
+    <value>Email Account</value>
+  </data>
+  <data name="ExternalNotificationEmailSecret" xml:space="preserve">
+    <value>Email Secret</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
   </data>
 </root>

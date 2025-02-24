@@ -23,6 +23,7 @@
         <PackageReference Include="Maa.Framework" Version="3.0.1-preview.25073.7" />
         <PackageReference Include="Maa.Framework.Native" Version="3.0.1-preview.25073.7" />
         <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="3.0.4" />
+        <PackageReference Include="MailKit" Version="4.10.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
         <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
         <PackageReference Include="Notification.Wpf" Version="8.0.0" />
