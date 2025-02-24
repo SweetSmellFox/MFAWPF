@@ -114,7 +114,6 @@ public partial class RootView
 
     public void SwitchWindowState()
     {
-        Console.WriteLine(WindowState);
         if (WindowState == WindowState.Minimized)
         {
             ShowWindow();

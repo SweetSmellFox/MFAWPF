@@ -35,7 +35,6 @@ public partial class AdbEditorDialog
 
     private void Save(object sender, RoutedEventArgs e)
     {
-        Console.WriteLine($"{AdbName},{AdbPath},{AdbSerial}");
         DialogResult = true;
     }
 

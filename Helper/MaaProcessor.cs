@@ -342,7 +342,6 @@ public class MaaProcessor
         try
         {
             var smtpConfig = GetSmtpConfigByEmail(email);
-            Console.WriteLine(smtpConfig);
 
             var mail = new MimeMessage();
             mail.From.Add(new MailboxAddress("", email));

@@ -743,7 +743,6 @@ public partial class TaskQueueView
                 {
                     Source = Instances.RootViewModel
                 });
-                Console.WriteLine(interfaceOption.Cases.ShouldSwitchButton(out _, out _));
                 if (interfaceOption.Cases.ShouldSwitchButton(out var yes, out var no))
                 {
                     var toggleButton = new ToggleButton
