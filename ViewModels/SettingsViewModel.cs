@@ -14,7 +14,7 @@ using System.Windows.Threading;
 
 namespace MFAWPF.ViewModels;
 
-public partial class SettingViewModel : ViewModel
+public partial class SettingsViewModel : ViewModel
 {
     [ObservableProperty] private string _maaFwVersion = MaaProcessor.MaaUtility.Version;
     [ObservableProperty] private string _mfaVersion = RootView.Version;
@@ -34,7 +34,7 @@ public partial class SettingViewModel : ViewModel
 
     private System.Timers.Timer? _resetNotifyTimer;
 
-    public SettingViewModel()
+    public SettingsViewModel()
     {
         UpdateExternalNotificationProvider();
     }
@@ -153,6 +153,7 @@ public partial class SettingViewModel : ViewModel
         ThemeHelper.UpdateThemeIndexChanged(value);
         MFAConfiguration.SetConfiguration("ThemeIndex", value);
     }
+
     private bool _shouldMinimizeToTray = MFAConfiguration.GetConfiguration("ShouldMinimizeToTray", false);
 
     public bool ShouldMinimizeToTray
@@ -355,7 +356,7 @@ public partial class SettingViewModel : ViewModel
 
     public static readonly List<LocalizationViewModel> ExternalNotificationProviders =
     [
-        new("DingTalk"),
+        new("DingTalk"), new("Email"),
     ];
 
     public static List<LocalizationViewModel> ExternalNotificationProvidersShow => ExternalNotificationProviders;
@@ -404,13 +405,8 @@ public partial class SettingViewModel : ViewModel
         .ToArray();
 
 
-    private bool _dingTalkEnabled;
-
-    public bool DingTalkEnabled
-    {
-        get => _dingTalkEnabled;
-        set => SetProperty(ref _dingTalkEnabled, value);
-    }
+    [ObservableProperty] private bool _dingTalkEnabled;
+    [ObservableProperty] private bool _emailEnabled;
 
     private string _cdkPassword = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("DownloadCDK", string.Empty));
 
@@ -425,35 +421,36 @@ public partial class SettingViewModel : ViewModel
         }
     }
 
-    private string _dingTalkToken = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("ExternalNotificationDingTalkToken", string.Empty));
-
-    public string DingTalkToken
+    [ObservableProperty] private string _dingTalkToken = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("ExternalNotificationDingTalkToken", string.Empty));
+    partial void OnDingTalkTokenChanged(string value)
     {
-        get => _dingTalkToken;
-        set
-        {
-            SetProperty(ref _dingTalkToken, value);
-            value = SimpleEncryptionHelper.Encrypt(value);
-            MFAConfiguration.SetConfiguration("ExternalNotificationDingTalkToken", value);
-        }
+        MFAConfiguration.SetConfiguration("ExternalNotificationDingTalkToken", SimpleEncryptionHelper.Encrypt(value));
     }
 
-    private string _dingTalkSecret = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("ExternalNotificationDingTalkSecret", string.Empty));
 
-    public string DingTalkSecret
+    [ObservableProperty] private string _dingTalkSecret = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("ExternalNotificationDingTalkSecret", string.Empty));
+    partial void OnDingTalkSecretChanged(string value)
     {
-        get => _dingTalkSecret;
-        set
-        {
-            SetProperty(ref _dingTalkSecret, value);
-            value = SimpleEncryptionHelper.Encrypt(value);
-            MFAConfiguration.SetConfiguration("ExternalNotificationDingTalkSecret", value);
-        }
+        MFAConfiguration.SetConfiguration("ExternalNotificationDingTalkSecret", SimpleEncryptionHelper.Encrypt(value));
+    }
+
+    [ObservableProperty] private string _emailAccount = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("ExternalNotificationEmailAccount", string.Empty));
+    partial void OnEmailAccountChanged(string value)
+    {
+        MFAConfiguration.SetConfiguration("ExternalNotificationEmailAccount", SimpleEncryptionHelper.Encrypt(value));
+    }
+
+
+    [ObservableProperty] private string _emailSecret = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("ExternalNotificationEmailSecret", string.Empty));
+    partial void OnEmailSecretChanged(string value)
+    {
+        MFAConfiguration.SetConfiguration("ExternalNotificationEmailSecret", SimpleEncryptionHelper.Encrypt(value));
     }
 
     public void UpdateExternalNotificationProvider()
     {
         DingTalkEnabled = EnabledExternalNotificationProviderList.Contains("DingTalk");
+        EmailEnabled = EnabledExternalNotificationProviderList.Contains("Email");
     }
 
     [ObservableProperty] private bool _enableCheckVersion = MFAConfiguration.GetConfiguration("EnableCheckVersion", true);
@@ -508,7 +505,7 @@ public partial class SettingViewModel : ViewModel
     [ObservableProperty] private bool _customConfig = Convert.ToBoolean(GlobalConfiguration.GetConfiguration("CustomConfig", bool.FalseString));
     [ObservableProperty] private bool _forceScheduledStart = Convert.ToBoolean(GlobalConfiguration.GetConfiguration("ForceScheduledStart", bool.FalseString));
 
-    
+
     partial void OnCustomConfigChanged(bool value)
     {
         GlobalConfiguration.SetConfiguration("CustomConfig", value.ToString());
@@ -675,17 +672,12 @@ public partial class SettingViewModel : ViewModel
 
     public ObservableCollection<MFAConfig> ConfigurationList { get; set; } = MFAConfiguration.Configs;
 
-    private string? _currentConfiguration = MFAConfiguration.GetCurrentConfiguration();
+    [ObservableProperty] private string? _currentConfiguration = MFAConfiguration.GetCurrentConfiguration();
 
-    public string? CurrentConfiguration
+    partial void OnCurrentConfigurationChanged(string? value)
     {
-        get => _currentConfiguration;
-        set
-        {
-            SetProperty(ref _currentConfiguration, value);
-            MFAConfiguration.SetDefaultConfig(value);
-            MaaProcessor.RestartMFA();
-        }
+        MFAConfiguration.SetDefaultConfig(value);
+        MaaProcessor.RestartMFA();
     }
 
     [ObservableProperty] private string _newConfigurationName;

@@ -23,6 +23,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <controls1:CustomTextBlock
@@ -68,8 +69,7 @@
                 ShowEyeButton="True"
                 UnsafePassword="{calcBinding:Binding ViewModel.DingTalkToken}"
                 Width="400"
-                hc:InfoElement.Title="{lex:Loc ExternalNotificationTelegramDingTalkToken}"
-                x:Name="DingTalkToken" />
+                hc:InfoElement.Title="{lex:Loc ExternalNotificationDingTalkToken}" />
             <hc:PasswordBox
                 Height="30"
                 IsSafeEnabled="False"
@@ -77,10 +77,32 @@
                 ShowEyeButton="True"
                 UnsafePassword="{calcBinding:Binding ViewModel.DingTalkSecret}"
                 Width="400"
-                hc:InfoElement.Title="{lex:Loc ExternalNotificationTelegramDingTalkSecret}"
-                x:Name="DingTalkSecret" />
+                hc:InfoElement.Title="{lex:Loc ExternalNotificationDingTalkSecret}" />
+
         </StackPanel>
 
+        <StackPanel
+            Grid.Row="3"
+            Orientation="Vertical"
+            Visibility="{calcBinding:Binding 'ViewModel.EmailEnabled'}">
+            <hc:Divider Content="{lex:Loc Email}" HorizontalContentAlignment="Left" />
+            <hc:PasswordBox
+                Height="30"
+                IsSafeEnabled="False"
+                Margin="10"
+                ShowEyeButton="True"
+                UnsafePassword="{calcBinding:Binding ViewModel.EmailAccount}"
+                Width="400"
+                hc:InfoElement.Title="{lex:Loc ExternalNotificationEmailAccount}" />
+            <hc:PasswordBox
+                Height="30"
+                IsSafeEnabled="False"
+                Margin="10"
+                ShowEyeButton="True"
+                UnsafePassword="{calcBinding:Binding ViewModel.EmailSecret}"
+                Width="400"
+                hc:InfoElement.Title="{lex:Loc ExternalNotificationEmailSecret}" />
 
+        </StackPanel>
     </Grid>
 </UserControl>
