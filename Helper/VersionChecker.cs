@@ -5,6 +5,7 @@ using HandyControl.Controls;
 using MFAWPF.Data;
 using MFAWPF.Helper.Converters;
 using MFAWPF.ViewModels;
+using MFAWPF.ViewModels.UI;
 using MFAWPF.Views;
 using MFAWPF.Views.UI;
 using Microsoft.Extensions.DependencyInjection;
@@ -535,7 +536,24 @@ public class VersionChecker
 
         var resourcePath = Path.Combine(AppContext.BaseDirectory, "resource");
         if (Directory.Exists(resourcePath))
-            Directory.Delete(resourcePath, true);
+        {
+            foreach (var rfile in Directory.EnumerateFiles(resourcePath, "*", SearchOption.AllDirectories))
+            {
+                var fileName = Path.GetFileName(rfile);
+                if (fileName.Equals(AnnouncementViewModel.AnnouncementFileName, StringComparison.OrdinalIgnoreCase))
+                    continue;
+        
+                try
+                {
+                    File.SetAttributes(rfile, FileAttributes.Normal); 
+                    File.Delete(rfile);
+                }
+                catch (Exception ex)
+                {
+                    LoggerService.LogWarning($"文件删除失败: {rfile} - {ex.Message}");
+                }
+            }
+        }
 
         var interfacePath = Path.Combine(tempExtractDir, "interface.json");
         var resourceDirPath = Path.Combine(tempExtractDir, "resource");
@@ -589,7 +607,6 @@ public class VersionChecker
         dialog?.UpdateProgress(100);
         try
         {
-            var settingsView = App.Services.GetRequiredService<SettingsView>();
             Instances.SettingsViewModel.ResourceVersion = latestVersion;
         }
         catch (Exception e)
@@ -1097,7 +1114,7 @@ public class VersionChecker
             if ((int)responseData["code"] == 0)
             {
                 var data = responseData["data"];
-                if (!onlyCheck) SaveAnnouncement(data);
+                if (!onlyCheck) SaveAnnouncement(data, "release_note");
                 var versionName = data["version_name"]?.ToString();
                 var downloadUrl = data["url"]?.ToString();
                 url = downloadUrl;
@@ -1113,28 +1130,7 @@ public class VersionChecker
             throw new Exception($"{e.Message}");
         }
     }
-    private void SaveAnnouncement(JToken? releaseData, string from = "release_note")
-    {
-        try
-        {
-            var bodyContent = releaseData?[from]?.ToString();
-            if (!string.IsNullOrWhiteSpace(bodyContent))
-            {
-                var resourceDirectory = Path.Combine(AppContext.BaseDirectory, "resource");
-                Directory.CreateDirectory(resourceDirectory);
-                var filePath = Path.Combine(resourceDirectory, "Announcement.md");
-                File.WriteAllText(filePath, bodyContent);
-                LoggerService.LogInfo("Announcement.md saved successfully.");
-                GlobalConfiguration.SetConfiguration("AnnouncementInfo.DoNotShowAgain", bool.FalseString);
-            }
-        }
-        catch (Exception ex)
-        {
-            LoggerService.LogError($"Error saving Announcement.md: {ex.Message}");
-        }
-    }
-
-    private void SaveAnnouncement(JObject releaseData, string from = "body")
+    private void SaveAnnouncement(JToken? releaseData, string from)
     {
         try
         {
@@ -1143,15 +1139,15 @@ public class VersionChecker
             {
                 var resourceDirectory = Path.Combine(AppContext.BaseDirectory, "resource");
                 Directory.CreateDirectory(resourceDirectory);
-                var filePath = Path.Combine(resourceDirectory, "Announcement.md");
+                var filePath = Path.Combine(resourceDirectory, AnnouncementViewModel.AnnouncementFileName);
                 File.WriteAllText(filePath, bodyContent);
-                LoggerService.LogInfo("Announcement.md saved successfully.");
+                LoggerService.LogInfo($"{AnnouncementViewModel.AnnouncementFileName} saved successfully.");
                 GlobalConfiguration.SetConfiguration("AnnouncementInfo.DoNotShowAgain", bool.FalseString);
             }
         }
         catch (Exception ex)
         {
-            LoggerService.LogError($"Error saving Announcement.md: {ex.Message}");
+            LoggerService.LogError($"Error saving {AnnouncementViewModel.AnnouncementFileName}: {ex.Message}");
         }
     }
 
@@ -1472,8 +1468,8 @@ public class VersionChecker
                         {
                             continue;
                         }
-                        if (!isDownload && repo != "MFAWPF")
-                            SaveAnnouncement(tag);
+                        if (isDownload && repo != "MFAWPF")
+                            SaveAnnouncement(tag, "body");
                         return tag["tag_name"]?.ToString();
                     }
                 }

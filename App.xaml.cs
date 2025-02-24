@@ -1,5 +1,4 @@
-﻿
-using System.Text;
+﻿using System.Text;
 using System.Windows;
 using System.Windows.Threading;
 using Lierda.WPFHelper;
@@ -7,7 +6,9 @@ using MFAWPF.Data;
 using MFAWPF.Services;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
+using MFAWPF.ViewModels.UI;
 using MFAWPF.Views.UI;
+using MFAWPF.Views.UserControl.Settings;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -37,13 +38,22 @@ public partial class App
                 // App Host
                 _ = services.AddHostedService<ApplicationHostService>();
 
+
                 // Main window with navigation
-                _ = services.AddSingleton<Window, RootView>();
+                _ = services.AddSingleton<RootView>();
                 _ = services.AddSingleton<RootViewModel>();
 
+
                 // Views and ViewModels
+                _ = services.AddSingleton<TaskQueueView>();
+                _ = services.AddSingleton<TaskQueueViewModel>();
+                _ = services.AddSingleton<TaskQueueSettingsUserControl>();
+                _ = services.AddSingleton<ConnectingView>();
+                
                 _ = services.AddSingleton<SettingsView>();
-                _ = services.AddSingleton<ViewModels.SettingsViewModel>();
+                _ = services.AddSingleton<SettingsViewModel>();
+                
+                _ = services.AddSingleton<AnnouncementViewModel>();
                 // _ = services.AddSingleton<Views.Pages.DataPage>();
                 // _ = services.AddSingleton<ViewModels.DataPageViewModel>();
                 // _ = services.AddSingleton<Views.Pages.SettingsPage>();
@@ -85,6 +95,7 @@ public partial class App
             CurrentDomain_UnhandledException;
         var cracker = new LierdaCracker();
         cracker.Cracker();
+
         await Host.StartAsync();
     }
 
@@ -121,7 +132,6 @@ public partial class App
     [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
     private extern static IntPtr LoadLibrary(string lpFileName);
 
-    
 
     void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
