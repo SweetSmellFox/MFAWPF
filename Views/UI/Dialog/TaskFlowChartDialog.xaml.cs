@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using MFAWPF.ViewModels;
+using MFAWPF.ViewModels.Tool;
 using QuickGraph;
 using System.Windows.Data;
 using TextBlock = System.Windows.Controls.TextBlock;

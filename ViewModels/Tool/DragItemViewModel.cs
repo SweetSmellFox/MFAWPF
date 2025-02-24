@@ -1,12 +1,10 @@
-﻿using System.Windows;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Data;
 using MFAWPF.Helper;
-using MFAWPF.Views;
-using MFAWPF.Views.UI;
 using Newtonsoft.Json;
+using System.Windows;
 
-namespace MFAWPF.ViewModels;
+namespace MFAWPF.ViewModels.Tool;
 
 public partial class DragItemViewModel : ViewModel
 {
@@ -46,7 +44,7 @@ public partial class DragItemViewModel : ViewModel
                 if (InterfaceItem != null)
                     InterfaceItem.Check = IsChecked;
                 MFAConfiguration.SetConfiguration("TaskItems",
-                    RootView.ViewModel?.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                    Instances.TaskQueueViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }
     }
@@ -73,7 +71,7 @@ public partial class DragItemViewModel : ViewModel
         set
         {
             SetProperty(ref _enableSetting, value);
-            RootView.Instance.TaskQueueView.SetOption(this, value);
+            Instances.TaskQueueView.SetOption(this, value);
         }
     }
 

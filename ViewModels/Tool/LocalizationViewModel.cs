@@ -1,8 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Helper;
-using System.Text.RegularExpressions;
 
-namespace MFAWPF.ViewModels;
+namespace MFAWPF.ViewModels.Tool;
 
 public partial class LocalizationViewModel : ViewModel
 {

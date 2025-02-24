@@ -1,13 +1,12 @@
 using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace MFAWPF.ViewModels;
+namespace MFAWPF.ViewModels.UI.Dialog;
 
 public class AddTaskDialogViewModel: ViewModel
 {
-    private ObservableCollection<DragItemViewModel> _dataList = new ();
+    private ObservableCollection<Tool.DragItemViewModel> _dataList = new ();
 
-    public ObservableCollection<DragItemViewModel> DataList
+    public ObservableCollection<Tool.DragItemViewModel> DataList
     {
         get => _dataList;
         set => SetProperty(ref _dataList, value);

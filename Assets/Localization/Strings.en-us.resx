@@ -845,4 +845,13 @@
   <data name="Email" xml:space="preserve">
     <value>Email</value>
   </data>
+  <data name="ShowDisclaimerNoMore" xml:space="preserve">
+    <value>Don't show again</value>
+  </data>
+  <data name="Announcement" xml:space="preserve">
+    <value>Announcement</value>
+  </data>
+  <data name="CurrentResourcesNotSupportGitHub" xml:space="preserve">
+    <value>The current resources do not support GitHub.</value>
+  </data>
 </root>

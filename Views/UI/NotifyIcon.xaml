@@ -38,7 +38,7 @@
                 <MenuItem
                     Header="{lex:Loc Show}"
                     Name="showMenu"
-                    Visibility="{c:Binding '!IViewModel.sVisible'}" />
+                    Visibility="{c:Binding '!ViewModel.IsVisible'}" />
                 <MenuItem Header="{lex:Loc Quit}" Name="exitMenu" />
             </ContextMenu>
         </hc:NotifyIcon.ContextMenu>

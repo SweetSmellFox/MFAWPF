@@ -78,27 +78,27 @@ public partial class NotifyIcon
     }
 
     private static void NotifyIcon_MouseClick(object sender, RoutedEventArgs e) =>
-        RootView.Instance.ShowWindow();
+        Instances.RootView.ShowWindow();
 
 
     private static void StartTask(object sender, RoutedEventArgs e) =>
-        RootView.Instance.Start();
+        Instances.TaskQueueView.Start();
 
 
     private static void StopTask(object sender, RoutedEventArgs e) =>
-        RootView.Instance.Stop();
+        Instances.TaskQueueView.Stop();
 
 
     private static void App_exit(object sender, RoutedEventArgs e)
     {
-        if (RootView.Instance.ConfirmExit())
+        if (Instances.RootView.ConfirmExit())
             Application.Current.Shutdown();
     }
 
     private void App_hide(object sender, RoutedEventArgs e) =>
-        RootView.ViewModel.IsVisible = false;
+        Instances.RootViewModel.IsVisible = false;
 
 
     private void App_show(object sender, RoutedEventArgs e)
-        => RootView.ViewModel.IsVisible = true;
+        => Instances.RootViewModel.IsVisible = true;
 }

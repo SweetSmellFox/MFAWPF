@@ -30,15 +30,15 @@ public class ApplicationHostService(IServiceProvider serviceProvider) : IHostedS
     /// <summary>
     /// Creates main window during activation.
     /// </summary>
-    private async Task HandleActivationAsync()
+    async private Task HandleActivationAsync()
     {
         await Task.CompletedTask;
 
         if (!Application.Current.Windows.OfType<RootView>().Any())
         {
-            _window = (serviceProvider.GetService(typeof(Window)) as Window)!;
+            _window = (serviceProvider.GetService(typeof(RootView)) as Window)!;
             _window!.Show();
-            
+
         }
 
         await Task.CompletedTask;

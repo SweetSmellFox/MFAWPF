@@ -1,9 +1,7 @@
-﻿
-using MFAWPF.Helper;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using MFAWPF.Helper;
 using Newtonsoft.Json;
 
-namespace MFAWPF.ViewModels;
+namespace MFAWPF.ViewModels.Tool;
 
 public class TaskItemViewModel : ViewModel
 {

@@ -3,7 +3,10 @@ using System.Windows;
 using HandyControl.Data;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
+using MFAWPF.ViewModels.UI;
+using MFAWPF.ViewModels.UI.Dialog;
 using MFAWPF.Views.UI;
+using DragItemViewModel = MFAWPF.ViewModels.Tool.DragItemViewModel;
 
 namespace MFAWPF.Views.UI.Dialog;
 
@@ -42,7 +45,7 @@ public partial class AddTaskDialog
 
     protected override void OnClosed(EventArgs e)
     {
-        RootView.ViewModel?.SetIdle(true);
+        Instances.RootViewModel.SetIdle(true);
         base.OnClosed(e);
     }
 

@@ -8,6 +8,7 @@
     xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:helper="clr-namespace:MFAWPF.Helper"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:MFAWPF.Views.UserControl.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -29,7 +30,7 @@
                 HorizontalAlignment="Left"
                 IsChecked="{Binding ViewModel.ShouldMinimizeToTray}"
                 IsEnabled="{calcBinding:Binding Idle,
-                                                Source={x:Static ui:RootView.ViewModel}}"
+                                                Source={x:Static helper:Instances.RootViewModel}}"
                 Margin="10"
                 VerticalAlignment="Center" />
 
@@ -41,7 +42,7 @@
             <hc:ComboBox
                 DisplayMemberPath="Name"
                 IsEnabled="{calcBinding:Binding Idle,
-                                                Source={x:Static ui:RootView.ViewModel}}"
+                                                Source={x:Static helper:Instances.RootViewModel}}"
                 ItemsSource="{Binding ViewModel.SupportedLanguages}"
                 Margin="5"
                 SelectedIndex="{Binding ViewModel.LanguageIndex}"
@@ -51,7 +52,7 @@
             <hc:ComboBox
                 DisplayMemberPath="Name"
                 IsEnabled="{calcBinding:Binding Idle,
-                                                Source={x:Static ui:RootView.ViewModel}}"
+                                                Source={x:Static helper:Instances.RootViewModel}}"
                 ItemsSource="{Binding ViewModel.Themes}"
                 Margin="5"
                 SelectedIndex="{Binding ViewModel.ThemeIndex}"

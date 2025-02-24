@@ -6,6 +6,7 @@ using HandyControl.Controls;
 using MFAWPF.Views.UserControl;
 using MFAWPF.Helper.Converters;
 using MFAWPF.ViewModels;
+using MFAWPF.ViewModels.Tool;
 using MFAWPF.Views.UI;
 using ComboBox = System.Windows.Controls.ComboBox;
 

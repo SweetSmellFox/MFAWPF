@@ -6,8 +6,10 @@ using MaaFramework.Binding.Buffers;
 using MFAWPF.Data;
 using MFAWPF.Helper.Exceptions;
 using MFAWPF.ViewModels;
+using MFAWPF.ViewModels.Tool;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Extensions;
+using LocalizationViewModel = MFAWPF.ViewModels.Tool.LocalizationViewModel;
 
 namespace MFAWPF.Helper;
 
@@ -500,9 +502,9 @@ public static class MFAExtensions
 
         return true;
     }
-    public static bool IsDebugMode()
-    {
-        if (MFAConfiguration.MaaConfig.GetConfig("recording", false) || MFAConfiguration.MaaConfig.GetConfig("save_draw", false) || MFAConfiguration.MaaConfig.GetConfig("show_hit_draw", false)) return true;
-        return false;
-    }
+    // public static bool IsDebugMode()
+    // {
+    //     if (MFAConfiguration.MaaConfig.GetConfig("recording", false) || MFAConfiguration.MaaConfig.GetConfig("save_draw", false) || MFAConfiguration.MaaConfig.GetConfig("show_hit_draw", false)) return true;
+    //     return false;
+    // }
 }

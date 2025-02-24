@@ -1,10 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using HandyControl.Themes;
-using HandyControl.Tools.Extension;
 using MFAWPF.Data;
 using MFAWPF.Helper;
-using MFAWPF.Views;
 using MFAWPF.Views.UI;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
@@ -12,7 +9,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace MFAWPF.ViewModels;
+namespace MFAWPF.ViewModels.UI;
 
 public partial class SettingsViewModel : ViewModel
 {
@@ -116,7 +113,7 @@ public partial class SettingsViewModel : ViewModel
     }
 
 
-    [ObservableProperty] private List<LocalizationViewModel> _listTitle =
+    [ObservableProperty] private List<Tool.LocalizationViewModel> _listTitle =
     [
         new("SwitchConfiguration"),
         new("ScheduleSettings"),
@@ -141,7 +138,7 @@ public partial class SettingsViewModel : ViewModel
 
     [ObservableProperty] private int _themeIndex = MFAConfiguration.GetConfiguration("ThemeIndex", 0);
 
-    [ObservableProperty] private ObservableCollection<LocalizationViewModel> _themes =
+    [ObservableProperty] private ObservableCollection<Tool.LocalizationViewModel> _themes =
     [
         new("LightColor"),
         new("DarkColor"),
@@ -196,7 +193,7 @@ public partial class SettingsViewModel : ViewModel
         "Encode", "EncodeToFileAndPull", "MinicapDirect", "MinicapStream",
         "EmulatorExtras"
     ];
-    public static ObservableCollection<LocalizationViewModel> AdbControlInputTypes => [new("MiniTouch"), new("MaaTouch"), new("AdbInput"), new("AutoDetect")];
+    public static ObservableCollection<Tool.LocalizationViewModel> AdbControlInputTypes => [new("MiniTouch"), new("MaaTouch"), new("AdbInput"), new("AutoDetect")];
     public static ObservableCollection<string> Win32ControlScreenCapTypes => ["FramePool", "DXGIDesktopDup", "GDI"];
     public static ObservableCollection<string> Win32ControlInputTypes => ["Seize", "SendMessage"];
 
@@ -225,7 +222,7 @@ public partial class SettingsViewModel : ViewModel
         MaaProcessor.Instance.SetCurrentTasker();
     }
 
-    public static ObservableCollection<LocalizationViewModel> GpuOptions => [new("GpuOptionAuto"), new("GpuOptionDisable")];
+    public static ObservableCollection<Tool.LocalizationViewModel> GpuOptions => [new("GpuOptionAuto"), new("GpuOptionDisable")];
 
     [ObservableProperty] private int _gpuIndex = MFAConfiguration.GetConfiguration("EnableGPU", false) ? 0 : 1;
 
@@ -233,6 +230,7 @@ public partial class SettingsViewModel : ViewModel
     {
         MFAConfiguration.SetConfiguration("EnableGPU", value == 0);
     }
+
     [ObservableProperty] private bool _enableRecording = MFAConfiguration.MaaConfig.GetConfig("recording", false);
 
     [ObservableProperty] private bool _enableSaveDraw = MFAConfiguration.MaaConfig.GetConfig("save_draw", false);
@@ -243,19 +241,34 @@ public partial class SettingsViewModel : ViewModel
 
     [ObservableProperty] private string _postScript = MFAConfiguration.GetConfiguration("Post-script", string.Empty);
 
+    [ObservableProperty] private bool _isDebugMode = MFAConfiguration.MaaConfig.GetConfig("recording", false) || MFAConfiguration.MaaConfig.GetConfig("save_draw", false) || MFAConfiguration.MaaConfig.GetConfig("show_hit_draw", false);
+    private bool _shouldTip = true;
+    
+    partial void OnIsDebugModeChanged(bool value)
+    {
+        if (value && _shouldTip)
+        {
+            MessageBoxHelper.Show("DebugModeWarning".ToLocalization(), "Tip".ToLocalization(), MessageBoxButton.OK, MessageBoxImage.Warning);
+            _shouldTip = false;
+        }
+    }
+    
     partial void OnEnableRecordingChanged(bool value)
     {
         MFAConfiguration.MaaConfig.SetConfig("recording", value);
+        IsDebugMode = EnableSaveDraw || EnableRecording || ShowHitDraw;
     }
 
     partial void OnEnableSaveDrawChanged(bool value)
     {
         MFAConfiguration.MaaConfig.SetConfig("save_draw", value);
+        IsDebugMode = EnableSaveDraw || EnableRecording || ShowHitDraw;
     }
 
     partial void OnShowHitDrawChanged(bool value)
     {
         MFAConfiguration.MaaConfig.SetConfig("show_hit_draw", value);
+        IsDebugMode = EnableSaveDraw || EnableRecording || ShowHitDraw;
     }
 
     partial void OnPrescriptChanged(string value)
@@ -324,7 +337,7 @@ public partial class SettingsViewModel : ViewModel
         }
     }
 
-    [ObservableProperty] private List<LocalizationViewModel> _downloadSourceList =
+    [ObservableProperty] private List<Tool.LocalizationViewModel> _downloadSourceList =
     [
         new()
         {
@@ -354,12 +367,12 @@ public partial class SettingsViewModel : ViewModel
     }
 
 
-    public static readonly List<LocalizationViewModel> ExternalNotificationProviders =
+    public static readonly List<Tool.LocalizationViewModel> ExternalNotificationProviders =
     [
         new("DingTalk"), new("Email"),
     ];
 
-    public static List<LocalizationViewModel> ExternalNotificationProvidersShow => ExternalNotificationProviders;
+    public static List<Tool.LocalizationViewModel> ExternalNotificationProvidersShow => ExternalNotificationProviders;
 
     private static object[] _enabledExternalNotificationProviders = ExternalNotificationProviders.Where(s => MFAConfiguration.GetConfiguration("ExternalNotificationEnabled", string.Empty).Split(',').Contains(s.ResourceKey))
         .Distinct()
@@ -373,7 +386,7 @@ public partial class SettingsViewModel : ViewModel
         {
             try
             {
-                var settingViewModels = value.Cast<LocalizationViewModel>();
+                var settingViewModels = value.Cast<Tool.LocalizationViewModel>();
                 SetProperty(ref _enabledExternalNotificationProviders, value);
                 var validProviders = settingViewModels
                     .Where(provider => ExternalNotificationProviders.ContainsKey(provider.ResourceKey ?? string.Empty))
@@ -663,9 +676,9 @@ public partial class SettingsViewModel : ViewModel
             var timer = Timers.FirstOrDefault(t => t.TimerId == timerId, null);
             if (timer != null)
             {
-                if (Convert.ToBoolean(GlobalConfiguration.GetConfiguration("ForceScheduledStart", bool.FalseString)) && RootView.ViewModel.IsRunning)
-                    RootView.Instance.Stop();
-                RootView.Instance.Start();
+                if (Convert.ToBoolean(GlobalConfiguration.GetConfiguration("ForceScheduledStart", bool.FalseString)) && Instances.RootViewModel.IsRunning)
+                    Instances.TaskQueueView.Stop();
+                Instances.TaskQueueView.Start();
             }
         }
     }

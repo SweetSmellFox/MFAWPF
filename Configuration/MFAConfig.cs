@@ -28,7 +28,7 @@ public partial class MFAConfig : ObservableObject
             LoggerService.LogError($"Configuration {configName} is current configuration, cannot delete");
             return;
         }
-        SettingsView.ViewModel.ConfigurationList.Remove(config);
+        Instances.SettingsViewModel.ConfigurationList.Remove(config);
         MFAConfiguration.DeleteConfig(configName);
     }
 

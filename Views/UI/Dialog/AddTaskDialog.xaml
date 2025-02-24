@@ -6,13 +6,15 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:controls="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:dialog="clr-namespace:MFAWPF.ViewModels.UI.Dialog"
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:MFAWPF.ViewModels"
+    xmlns:ui="clr-namespace:MFAWPF.ViewModels.UI"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <controls:CustomWindow.DataContext>
-        <models:AddTaskDialogViewModel />
+        <dialog:AddTaskDialogViewModel />
     </controls:CustomWindow.DataContext>
     <Border
         Background="{DynamicResource SecundaryBackgroundColor}"

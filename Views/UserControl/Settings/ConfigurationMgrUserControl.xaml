@@ -10,6 +10,7 @@
     xmlns:controls1="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:helper="clr-namespace:MFAWPF.Helper"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:MFAWPF.Views.UserControl.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -25,8 +26,8 @@
             HorizontalContentAlignment="Stretch"
             IsEditable="True"
             IsEnabled="{calcBinding:Binding Idle,
-                                            Source={x:Static ui:RootView.ViewModel}}"
-            IsHitTestVisible="{Binding Idle, Source={x:Static ui:RootView.ViewModel}}"
+                                            Source={x:Static helper:Instances.RootViewModel}}"
+            IsHitTestVisible="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
             IsReadOnly="True"
             ItemsSource="{Binding ViewModel.ConfigurationList}"
             Margin="10"

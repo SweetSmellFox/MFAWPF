@@ -10,6 +10,7 @@
     xmlns:controls1="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:helper="clr-namespace:MFAWPF.Helper"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
@@ -29,7 +30,7 @@
             Text="{lex:Loc GlobalConfigTip}"
             TextAlignment="Center"
             Visibility="{c:Binding 'ConfigurationList.Count > 1',
-                                   Source={x:Static ui:SettingsView.ViewModel}}" />
+                                   Source={x:Static helper:Instances.SettingsViewModel}}" />
         <StackPanel
             Grid.Row="1"
             HorizontalAlignment="Center"
@@ -99,7 +100,7 @@
                 <ComboBox
                     Focusable="False"
                     HorizontalAlignment="Center"
-                    IsEnabled="{Binding Idle, Source={x:Static ui:RootView.ViewModel}}"
+                    IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                     ItemsSource="{Binding ViewModel.ConfigurationList}"
                     SelectedValue="{Binding ViewModel.TimerModels.Timers[0].TimerConfig, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     SelectedValuePath="Name"
@@ -145,7 +146,7 @@
                 <ComboBox
                     Focusable="False"
                     HorizontalAlignment="Center"
-                    IsEnabled="{Binding Idle, Source={x:Static ui:RootView.ViewModel}}"
+                    IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                     ItemsSource="{Binding ViewModel.ConfigurationList}"
                     SelectedValue="{Binding ViewModel.TimerModels.Timers[1].TimerConfig, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     SelectedValuePath="Name"
@@ -191,7 +192,7 @@
                 <ComboBox
                     Focusable="False"
                     HorizontalAlignment="Center"
-                    IsEnabled="{Binding Idle, Source={x:Static ui:RootView.ViewModel}}"
+                    IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                     ItemsSource="{Binding ViewModel.ConfigurationList}"
                     SelectedValue="{Binding ViewModel.TimerModels.Timers[2].TimerConfig, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     SelectedValuePath="Name"
@@ -237,7 +238,7 @@
                 <ComboBox
                     Focusable="False"
                     HorizontalAlignment="Center"
-                    IsEnabled="{Binding Idle, Source={x:Static ui:RootView.ViewModel}}"
+                    IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                     ItemsSource="{Binding ViewModel.ConfigurationList}"
                     SelectedValue="{Binding ViewModel.TimerModels.Timers[3].TimerConfig, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     SelectedValuePath="Name"
@@ -283,7 +284,7 @@
                 <ComboBox
                     Focusable="False"
                     HorizontalAlignment="Center"
-                    IsEnabled="{Binding Idle, Source={x:Static ui:RootView.ViewModel}}"
+                    IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                     ItemsSource="{Binding ViewModel.ConfigurationList}"
                     SelectedValue="{Binding ViewModel.TimerModels.Timers[4].TimerConfig, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     SelectedValuePath="Name"
@@ -329,7 +330,7 @@
                 <ComboBox
                     Focusable="False"
                     HorizontalAlignment="Center"
-                    IsEnabled="{Binding Idle, Source={x:Static ui:RootView.ViewModel}}"
+                    IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                     ItemsSource="{Binding ViewModel.ConfigurationList}"
                     SelectedValue="{Binding ViewModel.TimerModels.Timers[5].TimerConfig, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     SelectedValuePath="Name"
@@ -375,7 +376,7 @@
                 <ComboBox
                     Focusable="False"
                     HorizontalAlignment="Center"
-                    IsEnabled="{Binding Idle, Source={x:Static ui:RootView.ViewModel}}"
+                    IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                     ItemsSource="{Binding ViewModel.ConfigurationList}"
                     SelectedValue="{Binding ViewModel.TimerModels.Timers[6].TimerConfig, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     SelectedValuePath="Name"
@@ -421,7 +422,7 @@
                 <ComboBox
                     Focusable="False"
                     HorizontalAlignment="Center"
-                    IsEnabled="{Binding Idle, Source={x:Static ui:RootView.ViewModel}}"
+                    IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                     ItemsSource="{Binding ViewModel.ConfigurationList}"
                     SelectedValue="{Binding ViewModel.TimerModels.Timers[7].TimerConfig, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                     SelectedValuePath="Name"

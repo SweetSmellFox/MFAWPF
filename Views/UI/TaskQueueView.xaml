@@ -1,5 +1,5 @@
 <UserControl
-    d:DataContext="{d:DesignInstance local:RootView,
+    d:DataContext="{d:DesignInstance local:TaskQueueView,
                                      IsDesignTimeCreatable=False}"
     d:DesignHeight="495"
     d:DesignWidth="800"
@@ -11,10 +11,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dd="urn:gong-wpf-dragdrop"
     xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:helper="clr-namespace:MFAWPF.Helper"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:MFAWPF.Views.UI"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:properties="clr-namespace:MFAWPF.Styles.Properties"
+    xmlns:settings="clr-namespace:MFAWPF.Views.UserControl.Settings"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <UserControl.Resources>
         <ContextMenu x:Key="TaskMenu">
@@ -61,7 +63,7 @@
                         Click="SelectAll"
                         Foreground="{DynamicResource GrayColor4}"
                         Height="15"
-                        IsEnabled="{Binding ViewModel.Idle}"
+                        IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                         Margin="7,0,0,0"
                         Padding="0"
                         Style="{StaticResource textBoxButton}"
@@ -72,7 +74,7 @@
                         Click="SelectNone"
                         Foreground="{DynamicResource GrayColor4}"
                         Height="15"
-                        IsEnabled="{Binding ViewModel.Idle}"
+                        IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                         Margin="7,0,0,0"
                         Padding="0"
                         Style="{StaticResource textBoxButton}"
@@ -83,12 +85,13 @@
                         Click="Edit"
                         Foreground="{DynamicResource GrayColor4}"
                         Height="15"
-                        IsEnabled="{Binding ViewModel.Idle}"
+                        IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                         Margin="7,0,0,0"
                         Padding="0"
                         Style="{StaticResource textBoxButton}"
                         ToolTip="{lex:Loc EditTask}"
-                        Visibility="{calcBinding:Binding 'ViewModel.EnableEdit'}"
+                        Visibility="{calcBinding:Binding 'EnableEdit',
+                                                         Source={x:Static helper:Instances.RootViewModel}}"
                         Width="15"
                         hc:IconElement.Geometry="{StaticResource EditGeometry}"
                         x:Name="EditButton" />
@@ -96,7 +99,7 @@
                         Click="Add"
                         Foreground="{DynamicResource GrayColor4}"
                         Height="15"
-                        IsEnabled="{Binding ViewModel.Idle}"
+                        IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                         Margin="7,0,0,0"
                         Padding="0"
                         Style="{StaticResource textBoxButton}"
@@ -107,7 +110,7 @@
                         Click="Edit"
                         Foreground="{DynamicResource GrayColor4}"
                         Height="15"
-                        IsEnabled="{Binding ViewModel.Idle}"
+                        IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                         Margin="7,0,0,0"
                         Padding="0"
                         Style="{StaticResource textBoxButton}"
@@ -151,8 +154,8 @@
                     PreviewMouseWheel="TaskList_OnPreviewMouseWheel"
                     ScrollViewer.CanContentScroll="True"
                     dd:DragDrop.DropHandler="{Binding ViewModel.DropHandler}"
-                    dd:DragDrop.IsDragSource="{Binding ViewModel.Idle}"
-                    dd:DragDrop.IsDropTarget="{Binding ViewModel.Idle}"
+                    dd:DragDrop.IsDragSource="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
+                    dd:DragDrop.IsDropTarget="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                     x:Name="TaskList">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
@@ -167,7 +170,7 @@
                                     Grid.Column="0"
                                     HorizontalAlignment="Left"
                                     IsChecked="{Binding IsCheckedWithNull}"
-                                    IsHitTestVisible="{Binding ElementName=TaskList, Path=DataContext.ViewModel.Idle}"
+                                    IsHitTestVisible="{Binding Path=Idle, Source={x:Static helper:Instances.RootViewModel}}"
                                     ToolTip="{lex:Loc TooltipDragLabel}">
                                     <CheckBox.ContentTemplate>
                                         <DataTemplate>
@@ -206,7 +209,6 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
             </hc:ScrollViewer>
-
             <StackPanel
                 Grid.Row="2"
                 HorizontalAlignment="Stretch"
@@ -236,7 +238,6 @@
                     <RadioButton
                         Background="Transparent"
                         BorderThickness="0"
-                        Checked="ConfigureTaskSettingsPanel"
                         Foreground="{DynamicResource GrayColor4}"
                         GroupName="TaskSettings"
                         IsChecked="{Binding ViewModel.ConnectSettingChecked}"
@@ -244,7 +245,8 @@
                         ToolTip="{lex:Loc TaskSettings}"
                         hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
                         hc:VisualElement.HighlightBackground="Transparent"
-                        hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}" />
+                        hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
+                        x:Name="RadioButton" />
                 </hc:ButtonGroup>
             </StackPanel>
             <StackPanel
@@ -259,7 +261,8 @@
                     Height="40"
                     Margin="20,5,20,8"
                     VerticalContentAlignment="Center"
-                    Visibility="{calcBinding:Binding '!ViewModel.IsRunning'}"
+                    Visibility="{calcBinding:Binding '!IsRunning',
+                                                     Source={x:Static helper:Instances.RootViewModel}}"
                     Width="90"
                     x:Name="startButton" />
                 <Button
@@ -270,24 +273,34 @@
                     Height="40"
                     Margin="20,5,20,8"
                     VerticalContentAlignment="Center"
-                    Visibility="{calcBinding:Binding 'ViewModel.IsRunning'}"
+                    Visibility="{calcBinding:Binding 'IsRunning',
+                                                     Source={x:Static helper:Instances.RootViewModel}}"
                     Width="90"
                     x:Name="stopButton" />
             </StackPanel>
 
         </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <ContentPresenter
+                Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskQueueSettingsUserControl}}"
+                Grid.Row="1"
+                Visibility="{calcBinding:Binding 'ViewModel.ConnectSettingChecked'}" />
+            <hc:SimpleStackPanel
+                Grid.Row="1"
+                Margin="10"
+                Orientation="Vertical"
+                x:Name="SettingPanel">
+                <hc:SimpleStackPanel.RenderTransform>
+                    <TranslateTransform Y="-5" />
 
-        <hc:SimpleStackPanel
-            Grid.Column="1"
-            Margin="10"
-            Orientation="Vertical"
-            x:Name="SettingPanel">
-            <hc:SimpleStackPanel.RenderTransform>
-                <TranslateTransform Y="-5" />
+                </hc:SimpleStackPanel.RenderTransform>
 
-            </hc:SimpleStackPanel.RenderTransform>
-
-        </hc:SimpleStackPanel>
+            </hc:SimpleStackPanel>
+        </Grid>
 
 
         <hc:ScrollViewer

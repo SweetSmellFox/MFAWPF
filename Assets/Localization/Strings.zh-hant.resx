@@ -780,7 +780,7 @@
     <value>框架版本</value>
   </data>
   <data name="CurrentResourcesNotSupportMirror" xml:space="preserve">
-    <value>當前資源不支援 Mirror 醬</value>
+    <value>該資源操作暫不支援 Mirror醬</value>
   </data>
   <data name="MirrorUseLimitReached" xml:space="preserve">
     <value>Mirror 醬的使用已達到上限</value>
@@ -844,5 +844,14 @@
   </data>
   <data name="Email" xml:space="preserve">
     <value>電郵</value>
+  </data>
+  <data name="ShowDisclaimerNoMore" xml:space="preserve">
+    <value>下次不再提示</value>
+  </data>
+  <data name="Announcement" xml:space="preserve">
+    <value>公告</value>
+  </data>
+  <data name="CurrentResourcesNotSupportGitHub" xml:space="preserve">
+    <value>該資源操作暫不支援 GitHub</value>
   </data>
 </root>

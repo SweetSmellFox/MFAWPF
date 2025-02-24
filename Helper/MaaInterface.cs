@@ -209,12 +209,7 @@ public class MaaInterface
                     }
                 }
             }
-            if (value?.Name != null)
-                RootView.Instance.ShowResourceName(value.Name);
-            if (value?.Version != null)
-                RootView.Instance.ShowResourceVersion(value.Version);
-            if (value?.CustomTitle != null)
-                RootView.Instance.ShowCustomTitle(value.CustomTitle);
+
         }
     }
 
@@ -230,7 +225,7 @@ public class MaaInterface
         return JsonConvert.SerializeObject(this, settings);
     }
 
-    public static void Check()
+    public static (string Name, string Version, string CustomTitle) Check()
     {
         if (!File.Exists($"{AppContext.BaseDirectory}/interface.json"))
         {
@@ -293,5 +288,7 @@ public class MaaInterface
                     new MaaInterface(),
                     () => { }, new MaaInterfaceSelectOptionConverter(false));
         }
+        return (Instance?.Name ?? string.Empty, Instance?.Version ?? string.Empty, Instance?.CustomTitle ?? string.Empty);
+
     }
 }

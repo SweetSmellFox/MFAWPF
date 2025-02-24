@@ -1,6 +1,7 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Tools.Helper;
 using MFAWPF.ViewModels;
+using MFAWPF.ViewModels.Tool;
 using System.Collections;
 using System.Reflection;
 using System.Windows;

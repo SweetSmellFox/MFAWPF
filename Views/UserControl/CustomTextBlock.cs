@@ -98,7 +98,7 @@ namespace MFAWPF.Views.UserControl
             set
             {
                 SetValue(ForegroundKeyProperty, value);
-                var brush = RootView.Instance?.FindResource(value) as Brush;
+                var brush = Instances.RootView?.FindResource(value) as Brush;
                 SetResourceReference(ForegroundProperty, brush);
                 // if (Application.Current.Resources.Contains(value))
                 // {

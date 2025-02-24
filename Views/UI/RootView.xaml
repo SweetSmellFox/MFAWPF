@@ -45,6 +45,7 @@
                 HorizontalAlignment="Left"
                 IsHitTestVisible="False"
                 Orientation="Horizontal">
+                <!--  调试模式  -->
                 <TextBlock
                     FontSize="13"
                     FontWeight="Bold"
@@ -53,60 +54,70 @@
                     Margin="5,0,-2,0"
                     Text="{lex:Loc DebugMode}"
                     VerticalAlignment="Center"
-                    Visibility="{c:Binding 'ViewModel.IsDebugMode'}" />
+                    Visibility="{c:Binding 'IsDebugMode',
+                                           Source={x:Static utils:Instances.SettingsViewModel}}" />
+                <!--  默认标题  -->
                 <TextBlock
                     Foreground="{DynamicResource PrimaryTextBrush}"
                     IsHitTestVisible="False"
                     Margin="6,0,4,0"
                     Text="{lex:Loc AppTitle}"
                     VerticalAlignment="Center"
-                    x:Name="title" />
+                    Visibility="{c:Binding ViewModel.IsDefaultTitleVisible}" />
+
+                <!--  版本号  -->
                 <TextBlock
                     Foreground="{StaticResource GrayColor1}"
                     IsHitTestVisible="False"
                     Margin="2,0,4,0"
-                    Text="Debug"
+                    Text="{Binding Version}"
                     VerticalAlignment="Center"
-                    x:Name="version" />
+                    Visibility="{c:Binding ViewModel.IsVersionVisible}" />
+
+                <!--  资源名称前缀  -->
                 <TextBlock
                     Foreground="{DynamicResource PrimaryTextBrush}"
                     IsHitTestVisible="False"
                     Margin="6,0,4,0"
                     Text="{lex:Loc ResourceName}"
                     VerticalAlignment="Center"
-                    Visibility="Collapsed"
-                    x:Name="resourceNameText" />
+                    Visibility="{c:Binding ViewModel.IsResourceNameVisible}" />
+                <!--  资源名称  -->
                 <TextBlock
                     Foreground="{StaticResource GrayColor1}"
                     IsHitTestVisible="False"
                     Margin="2,0,4,0"
-                    Text="Debug"
+                    Text="{Binding ViewModel.ResourceName}"
                     VerticalAlignment="Center"
-                    Visibility="Collapsed"
-                    x:Name="resourceName" />
+                    Visibility="{c:Binding ViewModel.IsResourceNameVisible}" />
+
+                <!--  资源版本前缀  -->
                 <TextBlock
                     Foreground="{DynamicResource PrimaryTextBrush}"
                     IsHitTestVisible="False"
                     Margin="6,0,4,0"
                     Text="{lex:Loc ResourceVersion}"
                     VerticalAlignment="Center"
-                    Visibility="Collapsed"
-                    x:Name="resourceVersionText" />
+                    Visibility="{c:Binding ViewModel.IsResourceVersionVisible}" />
+
+
+                <!--  自定义标题  -->
                 <TextBlock
                     Foreground="{DynamicResource PrimaryTextBrush}"
                     IsHitTestVisible="False"
                     Margin="6,0,4,0"
+                    Text="{Binding ViewModel.CustomTitle}"
                     VerticalAlignment="Center"
-                    Visibility="Collapsed"
-                    x:Name="customTitle" />
+                    Visibility="{c:Binding ViewModel.IsCustomTitleVisible}" />
+
+                <!--  资源版本  -->
                 <TextBlock
-                    Foreground="{StaticResource GrayColor1}"
+                    Foreground="{DynamicResource GrayColor1}"
                     IsHitTestVisible="False"
                     Margin="2,0,4,0"
-                    Text="Debug"
+                    Text="{Binding ViewModel.ResourceVersion}"
                     VerticalAlignment="Center"
-                    Visibility="Collapsed"
-                    x:Name="resourceVersion" />
+                    Visibility="{c:Binding ViewModel.IsResourceVersionVisible}" />
 
                 <TextBlock
                     Foreground="{StaticResource GrayColor1}"
@@ -162,13 +173,15 @@
                 Header="{lex:Loc Home}"
                 IsSelected="True"
                 Style="{StaticResource CustomTabItemStyle}">
-                <ui:TaskQueueView x:Name="TaskQueueView" />
+                <ContentControl Content="{utils:ServiceProvider ServiceType={x:Type ui:TaskQueueView}}" />
             </TabItem>
             <TabItem Header="{lex:Loc Connection}" Style="{StaticResource CustomTabItemStyle}">
-                <ui:ConnectingView x:Name="ConnectingView" />
+                <ContentControl Content="{utils:ServiceProvider ServiceType={x:Type ui:ConnectingView}}" />
             </TabItem>
             <TabItem Header="{lex:Loc Settings}" Style="{StaticResource CustomTabItemStyle}">
-                <Border Background="{DynamicResource SecundaryBackgroundColor}" x:Name="SettingViewBorder" />
+                <Border Background="{DynamicResource SecundaryBackgroundColor}" x:Name="SettingViewBorder">
+                    <ContentControl Content="{utils:ServiceProvider ServiceType={x:Type ui:SettingsView}}" />
+                </Border>
             </TabItem>
         </TabControl>
 

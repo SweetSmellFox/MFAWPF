@@ -25,6 +25,7 @@
         <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="3.0.4" />
         <PackageReference Include="MailKit" Version="4.10.0" />
         <PackageReference Include="MdXaml" Version="1.27.0" />
+        <PackageReference Include="MdXaml.Html" Version="1.27.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
         <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
         <PackageReference Include="Notification.Wpf" Version="8.0.0" />
@@ -230,9 +231,6 @@
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>Strings.resx</DependentUpon>
-        </Compile>
-        <Compile Update="Views\UI\VersionUpdateView.cs">
-          <SubType>Form</SubType>
         </Compile>
     </ItemGroup>
 

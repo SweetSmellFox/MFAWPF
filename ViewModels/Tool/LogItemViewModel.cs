@@ -1,9 +1,8 @@
+using MFAWPF.Helper;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
-using CommunityToolkit.Mvvm.ComponentModel;
-using MFAWPF.Helper;
 
-namespace MFAWPF.ViewModels
+namespace MFAWPF.ViewModels.Tool
 {
     public class LogItemViewModel : ViewModel
     {

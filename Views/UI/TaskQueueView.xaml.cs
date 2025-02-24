@@ -1,10 +1,16 @@
 using HandyControl.Controls;
 using HandyControl.Data;
+using MaaFramework.Binding;
 using MFAWPF.Data;
 using MFAWPF.Helper;
 using MFAWPF.Helper.Converters;
 using MFAWPF.ViewModels;
+using MFAWPF.ViewModels.UI;
 using MFAWPF.Views.UserControl.Settings;
+using Newtonsoft.Json;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,8 +19,10 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using WPFLocalizeExtension.Extensions;
 using static MFAWPF.Views.UI.RootView;
 using ComboBox = System.Windows.Controls.ComboBox;
+using DragItemViewModel = MFAWPF.ViewModels.Tool.DragItemViewModel;
 using ScrollViewer = HandyControl.Controls.ScrollViewer;
 using ViewModel = MFAWPF.ViewModels.ViewModel;
 
@@ -22,22 +30,403 @@ namespace MFAWPF.Views.UI;
 
 public partial class TaskQueueView
 {
+    public TaskQueueViewModel ViewModel { get; set; }
+    public Dictionary<string, TaskModel> BaseTasks = new();
+    public Dictionary<string, TaskModel> TaskDictionary = new();
     public TaskQueueView()
     {
+        DataContext = this;
+        ViewModel = Instances.TaskQueueViewModel;
         InitializeComponent();
     }
 
-    public void Start(object sender, RoutedEventArgs e) => Instance.Start();
+    public bool InitializeData(Collection<DragItemViewModel>? dragItem = null)
+    {
+        var (name, version, customTitle) = MaaInterface.Check();
+        if (!string.IsNullOrWhiteSpace(name))
+            Instances.RootViewModel.ShowResourceName(name);
+        if (!string.IsNullOrWhiteSpace(version))
+            Instances.RootViewModel.ShowResourceVersion(version);
+        if (!string.IsNullOrWhiteSpace(customTitle))
+            Instances.RootViewModel.ShowCustomTitle(customTitle);
+        if (MaaInterface.Instance != null)
+        {
+            AppendVersionLog(MaaInterface.Instance.Version);
+            Instances.TaskQueueViewModel.TasksSource.Clear();
+            LoadTasks(MaaInterface.Instance.Task ?? new List<TaskInterfaceItem>(), dragItem);
+        }
 
-    public void Stop(object sender, RoutedEventArgs e) => Instance.Stop();
+        ConnectToMAA();
+
+        return LoadTask();
+    }
+
+    private bool LoadTask()
+    {
+        try
+        {
+            var taskDictionary = new Dictionary<string, TaskModel>();
+            if (Instances.TaskQueueViewModel.CurrentResources.Count > 0)
+            {
+                if (string.IsNullOrWhiteSpace(Instances.TaskQueueViewModel.CurrentResource) && !string.IsNullOrWhiteSpace(Instances.TaskQueueViewModel.CurrentResources[0].Name))
+                    Instances.TaskQueueViewModel.CurrentResource = Instances.TaskQueueViewModel.CurrentResources[0].Name;
+            }
+            if (Instances.TaskQueueViewModel.CurrentResources.Any(r => r.Name == Instances.TaskQueueViewModel.CurrentResource))
+            {
+                var resources = Instances.TaskQueueViewModel.CurrentResources.Where(r => r.Name == Instances.TaskQueueViewModel.CurrentResource);
+                foreach (var resourcePath in resources)
+                {
+                    if (!Path.Exists($"{resourcePath}/pipeline/"))
+                        break;
+                    var jsonFiles = Directory.GetFiles($"{resourcePath}/pipeline/", "*.json", SearchOption.AllDirectories);
+                    var taskDictionaryA = new Dictionary<string, TaskModel>();
+                    foreach (var file in jsonFiles)
+                    {
+                        var content = File.ReadAllText(file);
+                        var taskData = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(content);
+                        if (taskData == null || taskData.Count == 0)
+                            break;
+                        foreach (var task in taskData)
+                        {
+                            if (!taskDictionaryA.TryAdd(task.Key, task.Value))
+                            {
+                                GrowlHelper.Error(string.Format(
+                                    LocExtension.GetLocalizedValue<string>("DuplicateTaskError"), task.Key));
+                                return false;
+                            }
+                        }
+                    }
+
+                    taskDictionary = taskDictionary.MergeTaskModels(taskDictionaryA);
+                }
+            }
+
+            if (taskDictionary.Count == 0)
+            {
+
+                if (!string.IsNullOrWhiteSpace($"{MaaProcessor.ResourceBase}/pipeline") && !Directory.Exists($"{MaaProcessor.ResourceBase}/pipeline"))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory($"{MaaProcessor.ResourceBase}/pipeline");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"创建目录时发生错误: {ex.Message}");
+                        LoggerService.LogError(ex);
+                    }
+                }
+
+                if (!File.Exists($"{MaaProcessor.ResourceBase}/pipeline/sample.json"))
+                {
+                    try
+                    {
+                        File.WriteAllText($"{MaaProcessor.ResourceBase}/pipeline/sample.json",
+                            JsonConvert.SerializeObject(new Dictionary<string, TaskModel>
+                            {
+                                {
+                                    "MFAWPF", new TaskModel()
+                                    {
+                                        Action = "DoNothing"
+                                    }
+                                }
+                            }, new JsonSerializerSettings()
+                            {
+                                Formatting = Formatting.Indented,
+                                NullValueHandling = NullValueHandling.Ignore,
+                                DefaultValueHandling = DefaultValueHandling.Ignore
+                            }));
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"创建文件时发生错误: {ex.Message}");
+                        LoggerService.LogError(ex);
+                    }
+                }
+            }
+
+            PopulateTasks(taskDictionary);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            GrowlHelper.Error(string.Format(LocExtension.GetLocalizedValue<string>("PipelineLoadError"),
+                ex.Message));
+            Console.WriteLine(ex);
+            LoggerService.LogError(ex);
+            return false;
+        }
+    }
+
+    private void PopulateTasks(Dictionary<string, TaskModel> taskDictionary)
+    {
+        BaseTasks = taskDictionary;
+        foreach (var task in taskDictionary)
+        {
+            task.Value.Name = task.Key;
+            ValidateTaskLinks(taskDictionary, task);
+        }
+    }
+
+    private void ValidateTaskLinks(Dictionary<string, TaskModel> taskDictionary,
+        KeyValuePair<string, TaskModel> task)
+    {
+        ValidateNextTasks(taskDictionary, task.Value.Next);
+        ValidateNextTasks(taskDictionary, task.Value.OnError, "on_error");
+        ValidateNextTasks(taskDictionary, task.Value.Interrupt, "interrupt");
+    }
+
+    private void ValidateNextTasks(Dictionary<string, TaskModel> taskDictionary,
+        object? nextTasks,
+        string name = "next")
+    {
+        if (nextTasks is List<string> tasks)
+        {
+            foreach (var task in tasks)
+            {
+                if (!taskDictionary.ContainsKey(task))
+                {
+                    GrowlHelper.Error(string.Format(LocExtension.GetLocalizedValue<string>("TaskNotFoundError"),
+                        name, task));
+                }
+            }
+        }
+    }
+    public void ConnectToMAA()
+    {
+        ConfigureMaaProcessorForADB();
+        ConfigureMaaProcessorForWin32();
+    }
+
+    private void ConfigureMaaProcessorForADB()
+    {
+        if (Instances.RootViewModel.IsAdb)
+        {
+            var adbInputType = ConfigureAdbInputTypes();
+            var adbScreenCapType = ConfigureAdbScreenCapTypes();
+
+            MaaProcessor.MaaFwConfig.AdbDevice.Input = adbInputType;
+            MaaProcessor.MaaFwConfig.AdbDevice.ScreenCap = adbScreenCapType;
+
+            LoggerService.LogInfo(
+                $"{LocExtension.GetLocalizedValue<string>("AdbInputMode")}{adbInputType},{LocExtension.GetLocalizedValue<string>("AdbCaptureMode")}{adbScreenCapType}");
+        }
+    }
+
+    public string ScreenshotType()
+    {
+        if (Instances.RootViewModel.IsAdb)
+            return ConfigureAdbScreenCapTypes().ToString();
+        return ConfigureWin32ScreenCapTypes().ToString();
+    }
+
+
+    private AdbInputMethods ConfigureAdbInputTypes()
+    {
+        return MFAConfiguration.GetConfiguration("AdbControlInputType", "MinitouchAndAdbKey") switch
+        {
+            "MiniTouch" => AdbInputMethods.MinitouchAndAdbKey,
+            "MaaTouch" => AdbInputMethods.Maatouch,
+            "AdbInput" => AdbInputMethods.AdbShell,
+            "AutoDetect" => AdbInputMethods.All,
+            _ => AdbInputMethods.MinitouchAndAdbKey
+        };
+    }
+
+    private AdbScreencapMethods ConfigureAdbScreenCapTypes()
+    {
+        return MFAConfiguration.GetConfiguration("AdbControlScreenCapType", "Default") switch
+        {
+            "Default" => AdbScreencapMethods.Default,
+            "RawWithGzip" => AdbScreencapMethods.RawWithGzip,
+            "RawByNetcat" => AdbScreencapMethods.RawByNetcat,
+            "Encode" => AdbScreencapMethods.Encode,
+            "EncodeToFileAndPull" => AdbScreencapMethods.EncodeToFileAndPull,
+            "MinicapDirect" => AdbScreencapMethods.MinicapDirect,
+            "MinicapStream" => AdbScreencapMethods.MinicapStream,
+            "EmulatorExtras" => AdbScreencapMethods.EmulatorExtras,
+            _ => AdbScreencapMethods.Default
+        };
+    }
+
+    private void ConfigureMaaProcessorForWin32()
+    {
+        if (!Instances.RootViewModel.IsAdb)
+        {
+            var win32InputType = ConfigureWin32InputTypes();
+            var winScreenCapType = ConfigureWin32ScreenCapTypes();
+
+            MaaProcessor.MaaFwConfig.DesktopWindow.Input = win32InputType;
+            MaaProcessor.MaaFwConfig.DesktopWindow.ScreenCap = winScreenCapType;
+
+            LoggerService.LogInfo(
+                $"{"AdbInputMode".ToLocalization()}{win32InputType},{"AdbCaptureMode".ToLocalization()}{winScreenCapType}");
+        }
+    }
+
+    private Win32ScreencapMethod ConfigureWin32ScreenCapTypes()
+    {
+        return MFAConfiguration.GetConfiguration("Win32ControlScreenCapType", "FramePool") switch
+        {
+            "FramePool" => Win32ScreencapMethod.FramePool,
+            "DXGIDesktopDup" => Win32ScreencapMethod.DXGIDesktopDup,
+            "GDI" => Win32ScreencapMethod.GDI,
+            _ => Win32ScreencapMethod.FramePool
+        };
+    }
+
+    private Win32InputMethod ConfigureWin32InputTypes()
+    {
+        return MFAConfiguration.GetConfiguration("Win32ControlInputType", "Seize") switch
+        {
+            "Seize" => Win32InputMethod.Seize,
+            "SendMessage" => Win32InputMethod.SendMessage,
+            _ => Win32InputMethod.Seize
+        };
+    }
+
+    public bool FirstTask = true;
+
+    private void LoadTasks(IEnumerable<TaskInterfaceItem> tasks, Collection<DragItemViewModel>? drag = null)
+    {
+        foreach (var task in tasks)
+        {
+            var dragItem = new DragItemViewModel(task);
+
+            if (FirstTask)
+            {
+                if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > 0)
+                    Instances.TaskQueueViewModel.CurrentResources = new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList());
+                else
+                    Instances.TaskQueueViewModel.CurrentResources =
+                    [
+                        new MaaInterface.MaaCustomResource
+                        {
+                            Name = "Default",
+                            Path = [MaaProcessor.ResourceBase]
+                        }
+                    ];
+                FirstTask = false;
+            }
+            if (drag != null)
+            {
+                var oldDict = drag
+                    .Where(vm => vm.InterfaceItem?.Name != null)
+                    .ToDictionary(vm => vm.InterfaceItem.Name);
+
+                foreach (var newItem in tasks)
+                {
+                    if (newItem?.Name == null) continue;
+
+                    if (oldDict.TryGetValue(newItem.Name, out var oldVm))
+                    {
+                        var oldItem = oldVm.InterfaceItem;
+                        if (oldItem == null) continue;
+
+                        if (oldItem.Check.HasValue)
+                        {
+                            newItem.Check = oldItem.Check;
+                        }
+
+                        if (oldItem.Option != null && newItem.Option != null)
+                        {
+                            foreach (var newOption in newItem.Option)
+                            {
+                                var oldOption = oldItem.Option.FirstOrDefault(o =>
+                                    o.Name == newOption.Name && o.Index.HasValue);
+
+                                if (oldOption != null)
+                                {
+
+                                    int maxValidIndex = newItem.Option.Count - 1;
+                                    int desiredIndex = oldOption.Index ?? 0;
+
+                                    newOption.Index = (desiredIndex >= 0 && desiredIndex <= maxValidIndex)
+                                        ? desiredIndex
+                                        : 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (dragItem.InterfaceItem?.Option != null)
+            {
+                foreach (var option in dragItem.InterfaceItem.Option)
+                {
+                    if (MaaInterface.Instance?.Option != null && MaaInterface.Instance.Option.TryGetValue(option.Name, out var interfaceOption))
+                    {
+                        if (interfaceOption.Cases != null)
+                        {
+                            if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase) && interfaceOption.Cases != null)
+                            {
+
+                                var index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
+                                if (index != -1)
+                                {
+                                    option.Index = index;
+                                }
+
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            ViewModel.TasksSource.Add(dragItem);
+        }
+
+        if (ViewModel.TaskItemViewModels.Count == 0)
+        {
+            var items = MFAConfiguration.GetConfiguration("TaskItems",
+                    new List<TaskInterfaceItem>())
+                ?? new List<TaskInterfaceItem>();
+            var dragItemViewModels = items.Select(interfaceItem => new DragItemViewModel(interfaceItem)).ToList();
+            var tempViewModel = new ObservableCollection<DragItemViewModel>();
+            tempViewModel.AddRange(dragItemViewModels);
+            if (tempViewModel.Count == 0 && ViewModel.TasksSource.Count != 0)
+            {
+                foreach (var item in ViewModel.TasksSource)
+                    tempViewModel.Add(item);
+            }
+            ViewModel.TaskItemViewModels = tempViewModel;
+        }
+    }
+
+    public void Start(bool onlyStart = false, bool checkUpdate = false)
+    {
+        if (!Instances.RootViewModel.Idle)
+        {
+            GrowlHelper.Warning("CannotStart".ToLocalization());
+            return;
+        }
+        if (InitializeData())
+        {
+            MaaProcessor.Money = 0;
+            var tasks = ViewModel.TaskItemViewModels.ToList().FindAll(task => task.IsChecked);
+            ConnectToMAA();
+            MaaProcessor.Instance.Start(tasks, onlyStart, checkUpdate);
+        }
+    }
+
+    public void Stop()
+    {
+        MaaProcessor.Instance.Stop();
+    }
+
+    public void Start(object sender, RoutedEventArgs e) => Start();
+
+    public void Stop(object sender, RoutedEventArgs e) => Stop();
 
 
     private void Edit(object sender, RoutedEventArgs e)
     {
-        if (!Instance.IsConnected())
+        if (!Instances.RootView.IsConnected())
         {
             GrowlHelper.Warning(
-                "Warning_CannotConnect".ToLocalizationFormatted(RootView.ViewModel.IsAdb
+                "Warning_CannotConnect".ToLocalizationFormatted(Instances.RootViewModel.IsAdb
                     ? "Emulator".ToLocalization()
                     : "Window".ToLocalization()));
             return;
@@ -45,30 +434,30 @@ public partial class TaskQueueView
 
         TaskDialog?.Show();
 
-        RootView.ViewModel.Idle = false;
+        Instances.RootViewModel.Idle = false;
     }
 
     private void SelectAll(object sender, RoutedEventArgs e)
     {
-        foreach (var task in RootView.ViewModel.TaskItemViewModels)
+        foreach (var task in ViewModel.TaskItemViewModels)
             task.IsChecked = true;
     }
 
     private void SelectNone(object sender, RoutedEventArgs e)
     {
-        foreach (var task in RootView.ViewModel.TaskItemViewModels)
+        foreach (var task in ViewModel.TaskItemViewModels)
             task.IsChecked = false;
     }
 
     private void Add(object sender, RoutedEventArgs e)
     {
-        RootView.ViewModel.Idle = false;
-        var addTaskDialog = new MFAWPF.Views.UI.Dialog.AddTaskDialog(RootView.ViewModel.TasksSource);
+        Instances.RootViewModel.Idle = false;
+        var addTaskDialog = new MFAWPF.Views.UI.Dialog.AddTaskDialog(ViewModel.TasksSource);
         addTaskDialog.ShowDialog();
         if (addTaskDialog.OutputContent != null)
         {
-            RootView.ViewModel.TaskItemViewModels.Add(addTaskDialog.OutputContent.Clone());
-            MFAConfiguration.SetConfiguration("TaskItems", RootView.ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+            ViewModel.TaskItemViewModels.Add(addTaskDialog.OutputContent.Clone());
+            MFAConfiguration.SetConfiguration("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         }
     }
     private void Delete(object sender, RoutedEventArgs e)
@@ -80,9 +469,9 @@ public partial class TaskQueueView
             if (item.DataContext is DragItemViewModel taskItemViewModel)
             {
                 // 获取选中项的索引
-                int index = RootView.ViewModel.TaskItemViewModels.IndexOf(taskItemViewModel);
-                RootView.ViewModel.TaskItemViewModels.RemoveAt(index);
-                MFAConfiguration.SetConfiguration("TaskItems", RootView.ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                int index = ViewModel.TaskItemViewModels.IndexOf(taskItemViewModel);
+                ViewModel.TaskItemViewModels.RemoveAt(index);
+                MFAConfiguration.SetConfiguration("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }
     }
@@ -105,38 +494,6 @@ public partial class TaskQueueView
             e.Handled = true;
         }
     }
-
-    private TaskQueueSettingsUserControl? TaskQueueSettingsUserControl { get; set; }
-
-    public void ConfigureTaskSettingsPanel()
-    {
-        SettingPanel.Children.Clear();
-
-        if (TaskQueueSettingsUserControl == null)
-        {
-            TaskQueueSettingsUserControl = new TaskQueueSettingsUserControl();
-            //     var sv = new StackPanel()
-            //     {
-            //         Margin = new Thickness(2)
-            //     };
-            //
-            SetResourcesOption(TaskQueueSettingsUserControl.ResourceComboBox);
-            //     AddAutoStartOption(sv);
-            //     AddAfterTaskOption(sv);
-            //
-            //     TaskSettingsPanel = new()
-            //     {
-            //         Content = TaskSettingsPanel,
-            //         VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            //         HorizontalAlignment = HorizontalAlignment.Stretch,
-            //         VerticalAlignment = VerticalAlignment.Stretch
-            //     };
-            //     TaskSettingsPanel.Content = sv;
-        }
-        SettingPanel.Children.Add(TaskQueueSettingsUserControl);
-    }
-
-    private void ConfigureTaskSettingsPanel(object sender, RoutedEventArgs e) => ConfigureTaskSettingsPanel();
 
     private void AddIntroduction(Panel panel = null, string input = "")
     {
@@ -260,7 +617,7 @@ public partial class TaskQueueView
         //     var index = (sender as ComboBox)?.SelectedIndex ?? 0;
         //
         //     if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > index)
-        //         RootView.ViewModel.CurrentResources =
+        //         Instances.RootInstances.TaskQueueViewModel.CurrentResources  =
         //             MaaInterface.Instance.Resources[MaaInterface.Instance.Resources.Keys.ToList()[index]];
         //     MFAConfiguration.SetConfiguration("ResourceIndex", index);
         // };
@@ -280,14 +637,14 @@ public partial class TaskQueueView
 
         var source = new Binding("BeforeTaskList")
         {
-            Source = RootView.ViewModel
+            Source = Instances.RootViewModel
         };
         comboBox.SetBinding(ItemsControl.ItemsSourceProperty, source);
         comboBox.BindLocalization("AutoStartOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
         var value = new Binding("BeforeTask")
         {
-            Source = RootView.ViewModel,
+            Source = Instances.RootViewModel,
             UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
             Mode = BindingMode.TwoWay
         };
@@ -306,14 +663,14 @@ public partial class TaskQueueView
         };
         var source = new Binding("AfterTaskList")
         {
-            Source = RootView.ViewModel
+            Source = Instances.RootViewModel
         };
         comboBox.SetBinding(ItemsControl.ItemsSourceProperty, source);
         comboBox.BindLocalization("AfterTaskOption");
         comboBox.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
         var value = new Binding("AfterTask")
         {
-            Source = RootView.ViewModel,
+            Source = Instances.RootViewModel,
             UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
             Mode = BindingMode.TwoWay
         };
@@ -384,7 +741,7 @@ public partial class TaskQueueView
                 });
                 multiBinding.Bindings.Add(new Binding("Idle")
                 {
-                    Source = RootView.ViewModel
+                    Source = Instances.RootViewModel
                 });
                 Console.WriteLine(interfaceOption.Cases.ShouldSwitchButton(out _, out _));
                 if (interfaceOption.Cases.ShouldSwitchButton(out var yes, out var no))
@@ -406,13 +763,13 @@ public partial class TaskQueueView
                     {
                         option.Index = yes;
                         MFAConfiguration.SetConfiguration("TaskItems",
-                            RootView.ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                            ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                     };
                     toggleButton.Unchecked += (_, _) =>
                     {
                         option.Index = no;
                         MFAConfiguration.SetConfiguration("TaskItems",
-                            RootView.ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                            ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                     };
                     var textBlock = new TextBlock
                     {
@@ -475,7 +832,7 @@ public partial class TaskQueueView
                         option.Index = comboBox.SelectedIndex;
 
                         MFAConfiguration.SetConfiguration("TaskItems",
-                            RootView.ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                            ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
                     };
 
                     comboBox.SetValue(ToolTipProperty, option.Name);
@@ -515,7 +872,7 @@ public partial class TaskQueueView
             });
             multiBinding.Bindings.Add(new Binding("Idle")
             {
-                Source = RootView.ViewModel
+                Source = Instances.RootViewModel
             });
 
             numericUpDown.SetBinding(ComboBox.IsEnabledProperty, multiBinding);
@@ -525,7 +882,7 @@ public partial class TaskQueueView
             {
                 source.InterfaceItem.RepeatCount = Convert.ToInt16(numericUpDown.Value);
                 MFAConfiguration.SetConfiguration("TaskItems",
-                    RootView.ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                    ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             };
             numericUpDown.BindLocalization("RepeatOption");
             numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);

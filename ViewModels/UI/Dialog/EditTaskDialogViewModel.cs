@@ -1,17 +1,16 @@
-﻿using System.Collections.ObjectModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using HandyControl.Tools.Command;
+using MFAWPF.Helper;
+using MFAWPF.ViewModels.Tool;
+using MFAWPF.Views.UserControl;
+using Newtonsoft.Json;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
-using MFAWPF.Views.UserControl;
-using MFAWPF.Helper;
-using MFAWPF.Views;
-using CommunityToolkit.Mvvm.ComponentModel;
-using HandyControl.Tools.Command;
-using MFAWPF.Views.UI.Dialog;
-using Newtonsoft.Json;
 
-namespace MFAWPF.ViewModels;
+namespace MFAWPF.ViewModels.UI.Dialog;
 
 public partial class EditTaskDialogViewModel : ViewModel
 {

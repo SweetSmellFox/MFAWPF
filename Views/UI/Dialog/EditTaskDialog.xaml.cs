@@ -7,9 +7,11 @@ using MFAWPF.ViewModels;
 using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools.Command;
+using MFAWPF.ViewModels.Tool;
 using MFAWPF.Views.UI;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using EditTaskDialogViewModel = MFAWPF.ViewModels.UI.Dialog.EditTaskDialogViewModel;
 using ScrollViewer = System.Windows.Controls.ScrollViewer;
 
 namespace MFAWPF.Views.UI.Dialog;
@@ -31,7 +33,7 @@ public partial class EditTaskDialog
     {
         base.OnClosed(e);
         RootView.TaskDialog = null;
-        RootView.ViewModel?.SetIdle(true);
+        Instances.RootViewModel.SetIdle(true);
     }
 
     private void List_KeyDown(object sender, KeyEventArgs e)
@@ -370,7 +372,7 @@ public partial class EditTaskDialog
 
     private void SelectionRegion(object sender, RoutedEventArgs e)
     {
-        RootView.Instance?.ConnectToMAA();
+        Instances.TaskQueueView.ConnectToMAA();
 
         SelectionRegionDialog imageDialog = new SelectionRegionDialog();
         if (imageDialog.ShowDialog().IsTrue())
@@ -399,7 +401,7 @@ public partial class EditTaskDialog
 
     private void Screenshot(object sender, RoutedEventArgs e)
     {
-        RootView.Instance?.ConnectToMAA();
+        Instances.TaskQueueView.ConnectToMAA();
 
         CropImageDialog imageDialog = new CropImageDialog();
         if (imageDialog.ShowDialog().IsTrue())
@@ -427,7 +429,7 @@ public partial class EditTaskDialog
 
     private void Swipe(object sender, RoutedEventArgs e)
     {
-        RootView.Instance?.ConnectToMAA();
+        Instances.TaskQueueView.ConnectToMAA();
 
         SwipeDialog imageDialog = new SwipeDialog();
         if (imageDialog.ShowDialog().IsTrue())
@@ -443,7 +445,7 @@ public partial class EditTaskDialog
 
     private void ColorExtraction(object sender, RoutedEventArgs e)
     {
-        RootView.Instance?.ConnectToMAA();
+        Instances.TaskQueueView.ConnectToMAA();
 
         ColorExtractionDialog imageDialog = new ColorExtractionDialog();
         if (imageDialog.ShowDialog().IsTrue())
@@ -459,7 +461,7 @@ public partial class EditTaskDialog
 
     private void RecognitionText(object sender, RoutedEventArgs e)
     {
-        RootView.Instance?.ConnectToMAA();
+        Instances.TaskQueueView.ConnectToMAA();
 
         RecognitionTextDialog imageDialog = new RecognitionTextDialog();
         if (imageDialog.ShowDialog().IsTrue())

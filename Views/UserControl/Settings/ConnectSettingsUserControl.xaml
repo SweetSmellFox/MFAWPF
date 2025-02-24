@@ -8,6 +8,7 @@
     xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:helper="clr-namespace:MFAWPF.Helper"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:MFAWPF.Views.UserControl.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -18,12 +19,12 @@
         <hc:ComboBox
             HorizontalAlignment="Center"
             IsEnabled="{calcBinding:Binding Idle,
-                                            Source={x:Static ui:RootView.ViewModel}}"
+                                            Source={x:Static helper:Instances.RootViewModel}}"
             ItemsSource="{Binding ViewModel.AdbControlScreenCapTypes}"
             Margin="30,10,30,10"
             SelectedValue="{Binding ViewModel.AdbControlScreenCapType}"
             Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static ui:RootView.ViewModel}}"
+                                             Source={x:Static helper:Instances.RootViewModel}}"
             Width="360"
             hc:TitleElement.HorizontalAlignment="Right"
             hc:TitleElement.Title="{lex:Loc CaptureModeOption}"
@@ -33,13 +34,13 @@
             DisplayMemberPath="Name"
             HorizontalAlignment="Center"
             IsEnabled="{calcBinding:Binding Idle,
-                                            Source={x:Static ui:RootView.ViewModel}}"
+                                            Source={x:Static helper:Instances.RootViewModel}}"
             ItemsSource="{Binding ViewModel.AdbControlInputTypes}"
             Margin="30,10,30,10"
             SelectedValue="{Binding ViewModel.AdbControlInputType}"
             SelectedValuePath="ResourceKey"
             Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static ui:RootView.ViewModel}}"
+                                             Source={x:Static helper:Instances.RootViewModel}}"
             Width="360"
             hc:TitleElement.HorizontalAlignment="Right"
             hc:TitleElement.Title="{lex:Loc InputModeOption}"
@@ -50,19 +51,19 @@
             HorizontalAlignment="Center"
             IsChecked="{Binding ViewModel.RememberAdb}"
             IsEnabled="{calcBinding:Binding Idle,
-                                            Source={x:Static ui:RootView.ViewModel}}"
+                                            Source={x:Static helper:Instances.RootViewModel}}"
             Margin="30,10,30,10"
             Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static ui:RootView.ViewModel}}" />
+                                             Source={x:Static helper:Instances.RootViewModel}}" />
         <hc:ComboBox
             HorizontalAlignment="Center"
             IsEnabled="{calcBinding:Binding Idle,
-                                            Source={x:Static ui:RootView.ViewModel}}"
+                                            Source={x:Static helper:Instances.RootViewModel}}"
             ItemsSource="{Binding ViewModel.Win32ControlScreenCapTypes}"
             Margin="30,10,30,10"
             SelectedValue="{Binding ViewModel.Win32ControlScreenCapType}"
             Visibility="{calcBinding:Binding !IsAdb,
-                                             Source={x:Static ui:RootView.ViewModel}}"
+                                             Source={x:Static helper:Instances.RootViewModel}}"
             Width="360"
             hc:TitleElement.HorizontalAlignment="Right"
             hc:TitleElement.Title="{lex:Loc CaptureModeOption}"
@@ -71,12 +72,12 @@
         <hc:ComboBox
             HorizontalAlignment="Center"
             IsEnabled="{calcBinding:Binding Idle,
-                                            Source={x:Static ui:RootView.ViewModel}}"
+                                            Source={x:Static helper:Instances.RootViewModel}}"
             ItemsSource="{Binding ViewModel.Win32ControlInputTypes}"
             Margin="30,10,30,10"
             SelectedValue="{Binding ViewModel.Win32ControlInputType}"
             Visibility="{calcBinding:Binding !IsAdb,
-                                             Source={x:Static ui:RootView.ViewModel}}"
+                                             Source={x:Static helper:Instances.RootViewModel}}"
             Width="360"
             hc:TitleElement.HorizontalAlignment="Right"
             hc:TitleElement.Title="{lex:Loc InputModeOption}"
@@ -88,20 +89,20 @@
             IsChecked="{Binding ViewModel.RetryOnDisconnected}"
             Margin="20,10"
             Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static ui:RootView.ViewModel}}" />
+                                             Source={x:Static helper:Instances.RootViewModel}}" />
         <CheckBox
             Content="{lex:Loc AllowAdbRestart}"
             HorizontalAlignment="Center"
             IsChecked="{Binding ViewModel.AllowAdbRestart}"
             Margin="20,10"
             Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static ui:RootView.ViewModel}}" />
+                                             Source={x:Static helper:Instances.RootViewModel}}" />
         <CheckBox
             Content="{lex:Loc AllowAdbHardRestart}"
             HorizontalAlignment="Center"
             IsChecked="{Binding ViewModel.AllowAdbHardRestart}"
             Margin="20,10"
             Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static ui:RootView.ViewModel}}" />
+                                             Source={x:Static helper:Instances.RootViewModel}}" />
     </StackPanel>
 </UserControl>

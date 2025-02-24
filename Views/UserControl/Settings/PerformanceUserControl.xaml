@@ -8,6 +8,7 @@
     xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:helper="clr-namespace:MFAWPF.Helper"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -19,7 +20,7 @@
             DisplayMemberPath="Name"
             HorizontalAlignment="Center"
             IsEnabled="{calcBinding:Binding Idle,
-                                            Source={x:Static ui:RootView.ViewModel}}"
+                                            Source={x:Static helper:Instances.RootViewModel}}"
             ItemsSource="{Binding ViewModel.GpuOptions}"
             Margin="30,10,30,10"
             SelectedIndex="{Binding ViewModel.GpuIndex}"

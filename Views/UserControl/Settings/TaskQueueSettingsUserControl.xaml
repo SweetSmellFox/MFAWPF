@@ -1,5 +1,5 @@
 <UserControl
-    d:DataContext="{d:DesignInstance ui:RootView,
+    d:DataContext="{d:DesignInstance ui:TaskQueueView,
                                      IsDesignTimeCreatable=False}"
     d:DesignWidth="200"
     mc:Ignorable="d"
@@ -21,7 +21,7 @@
         <StackPanel Margin="2">
             <hc:ComboBox
                 DisplayMemberPath="Name"
-                IsEnabled="{Binding ViewModel.Idle}"
+                IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                 ItemsSource="{Binding ViewModel.CurrentResources}"
                 Margin="5"
                 SelectedValue="{Binding ViewModel.CurrentResource}"
@@ -31,7 +31,7 @@
                 x:Name="ResourceComboBox" />
             <hc:ComboBox
                 DisplayMemberPath="Name"
-                IsEnabled="{Binding ViewModel.Idle}"
+                IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                 ItemsSource="{Binding ViewModel.BeforeTaskList}"
                 Margin="5"
                 SelectedValue="{Binding ViewModel.BeforeTask}"
@@ -40,7 +40,7 @@
                 hc:TitleElement.TitlePlacement="Top" />
             <hc:ComboBox
                 DisplayMemberPath="Name"
-                IsEnabled="{Binding ViewModel.Idle}"
+                IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                 ItemsSource="{Binding ViewModel.AfterTaskList}"
                 Margin="5"
                 SelectedValue="{Binding ViewModel.AfterTask}"

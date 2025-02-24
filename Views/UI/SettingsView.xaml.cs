@@ -1,21 +1,23 @@
 using HandyControl.Controls;
+using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
 using ComboBox = System.Windows.Controls.ComboBox;
 using ScrollViewer = HandyControl.Controls.ScrollViewer;
+using SettingsViewModel = MFAWPF.ViewModels.UI.SettingsViewModel;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace MFAWPF.Views.UI;
 
 public partial class SettingsView
 {
-    public static ViewModels.SettingsViewModel ViewModel { get; set; }
+    public SettingsViewModel ViewModel { get; set; }
     public SettingsView()
     {
         InitializeComponent();
-        ViewModel = App.Services.GetRequiredService<SettingsViewModel>();
+        ViewModel = Instances.SettingsViewModel;
         DataContext = this;
         Loaded += (_, _) => { UpdateDividerPositions(); };
     }

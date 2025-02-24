@@ -59,7 +59,7 @@ public static class MFAConfiguration
 
         ConfigIndex = Configs.ToList().FindIndex(c => !string.IsNullOrWhiteSpace(c.Name)
             && c.Name.Equals(ConfigName, StringComparison.OrdinalIgnoreCase));
-       MaaConfig = JsonHelper.ReadFromConfigJsonFile("maa_option", new Dictionary<string, object>());
+        MaaConfig = JsonHelper.ReadFromConfigJsonFile("maa_option", new Dictionary<string, object>());
     }
 
     public static void SetDefaultConfig(string? name)
@@ -98,10 +98,8 @@ public static class MFAConfiguration
         if (config == null || value == null) return;
         config[key] = value;
         if (key == "LangIndex")
-            SettingsView.ViewModel.LanguageIndex = Convert.ToInt32(value);
+            Instances.SettingsViewModel.LanguageIndex = Convert.ToInt32(value);
         var fileName = config == Data ? GetActualConfiguration() : "maa_option";
-        if (config == MaaConfig)
-            RootView.ViewModel.IsDebugMode = MFAExtensions.IsDebugMode();
         JsonHelper.WriteToConfigJsonFile(fileName, config, new MaaInterfaceSelectOptionConverter(false));
     }
 

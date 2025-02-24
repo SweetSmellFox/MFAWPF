@@ -10,11 +10,11 @@
     xmlns:controls1="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:helper="clr-namespace:MFAWPF.Helper"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:MFAWPF.Views.UserControl.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
-    xmlns:utils="clr-namespace:MFAWPF.Helper"
     xmlns:views="clr-namespace:MFAWPF.Views"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <StackPanel>
@@ -25,7 +25,7 @@
             Text="{lex:Loc GlobalConfigTip}"
             TextAlignment="Center"
             Visibility="{calcBinding:Binding 'ConfigurationList.Count > 1',
-                                             Source={x:Static ui:SettingsView.ViewModel}}" />
+                                             Source={x:Static helper:Instances.SettingsViewModel}}" />
         <Grid HorizontalAlignment="Center" Margin="30,10,30,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -42,7 +42,7 @@
                     HorizontalAlignment="Left"
                     IsChecked="{Binding ViewModel.EnableCheckVersion}"
                     IsEnabled="{calcBinding:Binding Idle,
-                                                    Source={x:Static ui:RootView.ViewModel}}"
+                                                    Source={x:Static helper:Instances.RootViewModel}}"
                     Margin="10"
                     VerticalAlignment="Center"
                     x:Name="enableCheckVersionSettings" />
@@ -51,7 +51,7 @@
                     HorizontalAlignment="Left"
                     IsChecked="{Binding ViewModel.EnableAutoUpdateResource}"
                     IsEnabled="{calcBinding:Binding Idle,
-                                                    Source={x:Static ui:RootView.ViewModel}}"
+                                                    Source={x:Static helper:Instances.RootViewModel}}"
                     Margin="10"
                     VerticalAlignment="Center"
                     x:Name="enableAutoUpdateResourceSettings" />
@@ -60,7 +60,7 @@
                     HorizontalAlignment="Left"
                     IsChecked="{Binding ViewModel.EnableAutoUpdateMFA}"
                     IsEnabled="{calcBinding:Binding Idle,
-                                                    Source={x:Static ui:RootView.ViewModel}}"
+                                                    Source={x:Static helper:Instances.RootViewModel}}"
                     Margin="10"
                     VerticalAlignment="Center"
                     x:Name="enableAutoUpdateMFASettings" />
@@ -68,7 +68,7 @@
                     DisplayMemberPath="Name"
                     HorizontalAlignment="Left"
                     IsEnabled="{calcBinding:Binding Idle,
-                                                    Source={x:Static ui:RootView.ViewModel}}"
+                                                    Source={x:Static helper:Instances.RootViewModel}}"
                     ItemsSource="{Binding ViewModel.DownloadSourceList}"
                     Margin="10,5,5,5"
                     SelectedIndex="{Binding ViewModel.DownloadSourceIndex}"
@@ -84,7 +84,7 @@
                     Visibility="{calcBinding:Binding 'ViewModel.DownloadSourceIndex==1'}">
                     <hc:PasswordBox
                         IsEnabled="{calcBinding:Binding Idle,
-                                                        Source={x:Static ui:RootView.ViewModel}}"
+                                                        Source={x:Static helper:Instances.RootViewModel}}"
                         IsSafeEnabled="False"
                         Margin="0,2,5,10"
                         ShowEyeButton="True"
@@ -94,7 +94,7 @@
                         hc:TitleElement.Title="CDK"
                         x:Name="CdkPassword" />
                     <TextBlock Margin="6,0,5,10" VerticalAlignment="Center">
-                        <Hyperlink Command="{x:Static hc:ControlCommands.OpenLink}" CommandParameter="{x:Static utils:MFAUrls.PurchaseLink}">
+                        <Hyperlink Command="{x:Static hc:ControlCommands.OpenLink}" CommandParameter="{x:Static helper:MFAUrls.PurchaseLink}">
                             <Run Text="{lex:Loc PurchaseLink}" />
                         </Hyperlink>
                     </TextBlock>
@@ -110,7 +110,7 @@
                 <hc:Shield
                     Color="#6969AA"
                     Command="{x:Static hc:ControlCommands.OpenLink}"
-                    CommandParameter="{x:Static utils:MFAUrls.GitHub}"
+                    CommandParameter="{x:Static helper:MFAUrls.GitHub}"
                     HorizontalAlignment="Center"
                     Margin="5"
                     Subject="{lex:Loc SoftwareVersion}"
