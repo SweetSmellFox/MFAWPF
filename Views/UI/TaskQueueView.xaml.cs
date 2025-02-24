@@ -727,22 +727,23 @@ public partial class TaskQueueView
                         VARIABLE.Name = LanguageHelper.GetLocalizedString(VARIABLE.Name);
                     }
                 }
-
-
+                
                 var multiBinding = new MultiBinding
                 {
                     Converter = FindResource("CustomIsEnabledConverter") as IMultiValueConverter,
                     Mode = BindingMode.OneWay
                 };
-
+                
                 multiBinding.Bindings.Add(new Binding("IsCheckedWithNull")
                 {
                     Source = source
                 });
+                
                 multiBinding.Bindings.Add(new Binding("Idle")
                 {
                     Source = Instances.RootViewModel
                 });
+                
                 if (interfaceOption.Cases.ShouldSwitchButton(out var yes, out var no))
                 {
                     var toggleButton = new ToggleButton

@@ -16,9 +16,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ScrollViewer
         HorizontalAlignment="Stretch"
+        Margin="10"
         VerticalAlignment="Stretch"
         VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="2">
+        <StackPanel>
             <hc:ComboBox
                 DisplayMemberPath="Name"
                 IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"

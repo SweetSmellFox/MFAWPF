@@ -289,17 +289,14 @@
                 Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskQueueSettingsUserControl}}"
                 Grid.Row="1"
                 Visibility="{calcBinding:Binding 'ViewModel.ConnectSettingChecked'}" />
-            <hc:SimpleStackPanel
+            <ScrollViewer
                 Grid.Row="1"
+                HorizontalAlignment="Stretch"
                 Margin="10"
-                Orientation="Vertical"
-                x:Name="SettingPanel">
-                <hc:SimpleStackPanel.RenderTransform>
-                    <TranslateTransform Y="-5" />
-
-                </hc:SimpleStackPanel.RenderTransform>
-
-            </hc:SimpleStackPanel>
+                VerticalAlignment="Stretch"
+                VerticalScrollBarVisibility="Auto">
+                <StackPanel Orientation="Vertical" x:Name="SettingPanel" />
+            </ScrollViewer>
         </Grid>
 
 

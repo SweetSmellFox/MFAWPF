@@ -21,7 +21,14 @@ public partial class TaskQueueViewModel : ViewModel
 
     [ObservableProperty] private bool _connectSettingChecked = true;
 
-
+    partial void OnConnectSettingCheckedChanged(bool value)
+    {
+        if (value)
+        {
+            Instances.TaskQueueView.SettingPanel.Children.Clear();
+        }
+    }
+    
     public ObservableCollection<Tool.DragItemViewModel> TasksSource { get; private set; } =
         [];
 
