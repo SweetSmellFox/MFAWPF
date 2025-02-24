@@ -63,7 +63,7 @@
                         <Image
                             DockPanel.Dock="Left"
                             Height="20"
-                            Source="/logo.ico"
+                            Source="{x:Static utils:IconHelper.ICON}"
                             VerticalAlignment="Center"
                             Width="20"
                             x:Name="logo" />

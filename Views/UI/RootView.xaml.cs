@@ -70,21 +70,19 @@ public partial class RootView
         };
         _maaToolkit = new MaaToolkit(init: true);
         MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
-        SetIconFromExeDirectory();
-
     }
 
 
-    private void SetIconFromExeDirectory()
-    {
-        string exeDirectory = AppContext.BaseDirectory;
-        string iconPath = Path.Combine(exeDirectory, "logo.ico");
-
-        if (File.Exists(iconPath))
-        {
-            Icon = new BitmapImage(new Uri(iconPath));
-        }
-    }
+    // private void SetIconFromExeDirectory()
+    // {
+    //     string exeDirectory = AppContext.BaseDirectory;
+    //     string iconPath = Path.Combine(exeDirectory, "logo.ico");
+    //
+    //     if (File.Exists(iconPath))
+    //     {
+    //         Icon = new BitmapImage(new Uri(iconPath));
+    //     }
+    // }
 
     public bool InitializeData(Collection<DragItemViewModel>? dragItem = null)
     {

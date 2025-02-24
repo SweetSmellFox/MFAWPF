@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -5,30 +7,51 @@ namespace MFAWPF.Helper;
 
 public class IconHelper
 {
-    private static readonly Lazy<BitmapSource> lazyIcon = new(ExtractIcon);
+    private static readonly Lazy<BitmapSource> LazyIcon = new(LoadIconWithFallback);
+    public static BitmapSource ICON => LazyIcon.Value;
 
-    private static BitmapSource ExtractIcon()
+    private static BitmapSource LoadIconWithFallback()
     {
         try
         {
-            var sri = Application.GetResourceStream(new Uri("pack://application:,,,/logo.ico"));
-            if (sri == null)
+            string exeDirectory = AppContext.BaseDirectory;
+            string iconPath = Path.Combine(exeDirectory, "logo.ico");
+
+            if (File.Exists(iconPath))
             {
-                return new BitmapImage();
+                using var fileStream = File.OpenRead(iconPath);
+                return CreateBitmapSource(fileStream);
             }
 
-            using var s = sri.Stream;
-            var decoder = BitmapDecoder.Create(s, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-            var imageSource = decoder.Frames[0];
+            var sri = Application.GetResourceStream(new Uri("pack://application:,,,/logo.ico"));
+            if (sri != null)
+            {
+                using var resourceStream = sri.Stream;
+                return CreateBitmapSource(resourceStream);
+            }
 
-            return imageSource;
+            LoggerService.LogWarning("未找到内嵌图标资源");
+            return CreateEmptyImage();
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            LoggerService.LogError(e);
-            return new BitmapImage();
+            LoggerService.LogError($"图标加载失败: {ex}");
+            return CreateEmptyImage();
         }
     }
 
-    public static BitmapSource ICON => lazyIcon.Value;
+    private static BitmapSource CreateBitmapSource(Stream stream)
+    {
+        var decoder = BitmapDecoder.Create(
+            stream,
+            BitmapCreateOptions.PreservePixelFormat,
+            BitmapCacheOption.OnLoad
+        );
+        return decoder.Frames[0];
+    }
+
+    private static BitmapSource CreateEmptyImage()
+    {
+        return new BitmapImage(); // 返回空图像避免NullReference
+    }
 }

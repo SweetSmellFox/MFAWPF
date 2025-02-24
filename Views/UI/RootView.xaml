@@ -33,7 +33,6 @@
     xmlns:properties="clr-namespace:MFAWPF.Styles.Properties"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:utils="clr-namespace:MFAWPF.Helper"
-    xmlns:viewModels="clr-namespace:MFAWPF.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <hc:Window.NonClientAreaContent>
         <Grid HorizontalAlignment="Stretch">
