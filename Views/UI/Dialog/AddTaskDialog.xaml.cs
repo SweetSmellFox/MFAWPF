@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using HandyControl.Data;
+using MFAWPF.Extensions;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using MFAWPF.ViewModels.UI;

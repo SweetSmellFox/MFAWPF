@@ -14,7 +14,7 @@
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:vm="clr-namespace:MFAWPF.ViewModels"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <ScrollViewer
+    <hc:ScrollViewer
         HorizontalAlignment="Stretch"
         Margin="10"
         VerticalAlignment="Stretch"
@@ -49,5 +49,5 @@
                 hc:TitleElement.Title="{lex:Loc AfterTaskOption}"
                 hc:TitleElement.TitlePlacement="Top" />
         </StackPanel>
-    </ScrollViewer>
+    </hc:ScrollViewer>
 </UserControl>

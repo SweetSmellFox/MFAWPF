@@ -11,6 +11,7 @@
 // but WITHOUT ANY WARRANTY
 // </copyright>
 
+using MFAWPF.Extensions;
 using MFAWPF.Helper;
 using MFAWPF.Views.UI;
 using System.Windows;

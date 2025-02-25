@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using MFAWPF.ViewModels;
 using MFAWPF.ViewModels.UI;
 using MFAWPF.Views.UI;
+using MFAWPF.Views.UserControl.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using RootViewModel = MFAWPF.ViewModels.UI.RootViewModel;
 using SettingsViewModel = MFAWPF.ViewModels.UI.SettingsViewModel;
@@ -57,6 +58,8 @@ public static class Instances
     public static SettingsViewModel SettingsViewModel => Resolve<SettingsViewModel>();
     public static TaskQueueView TaskQueueView => Resolve<TaskQueueView>();
     public static TaskQueueViewModel TaskQueueViewModel => Resolve<TaskQueueViewModel>();
+    public static TaskQueueSettingsUserControl TaskQueueSettingsUserControl => Resolve<TaskQueueSettingsUserControl>();
+    public static TaskOptionSettingsUserControl TaskOptionSettingsUserControl => Resolve<TaskOptionSettingsUserControl>();
     public static ConnectingView ConnectingView => Resolve<ConnectingView>();
     public static AnnouncementViewModel AnnouncementViewModel => Resolve<AnnouncementViewModel>();
 

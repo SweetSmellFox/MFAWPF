@@ -4,6 +4,8 @@ using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Custom;
 using MFAWPF.Data;
+using MFAWPF.Extensions;
+using MFAWPF.Extensions.Maa;
 using System.Threading;
 
 namespace MFAWPF.Custom;

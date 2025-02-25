@@ -1,6 +1,8 @@
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Custom;
+using MFAWPF.Extensions;
+using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;

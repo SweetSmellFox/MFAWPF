@@ -287,16 +287,13 @@
             </Grid.RowDefinitions>
             <ContentPresenter
                 Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskQueueSettingsUserControl}}"
-                Grid.Row="1"
+                Grid.Row="0"
                 Visibility="{calcBinding:Binding 'ViewModel.ConnectSettingChecked'}" />
-            <ScrollViewer
+            <ContentPresenter
+                Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskOptionSettingsUserControl}}"
                 Grid.Row="1"
-                HorizontalAlignment="Stretch"
-                Margin="10"
-                VerticalAlignment="Stretch"
-                VerticalScrollBarVisibility="Auto">
-                <StackPanel Orientation="Vertical" x:Name="SettingPanel" />
-            </ScrollViewer>
+                Visibility="{calcBinding:Binding '!ViewModel.ConnectSettingChecked'}" />
+
         </Grid>
 
 

@@ -3,6 +3,8 @@ using System.Net;
 using System.Text.RegularExpressions;
 using HandyControl.Controls;
 using MFAWPF.Data;
+using MFAWPF.Extensions;
+using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper.Converters;
 using MFAWPF.ViewModels;
 using MFAWPF.ViewModels.UI;

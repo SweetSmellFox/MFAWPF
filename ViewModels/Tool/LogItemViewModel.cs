@@ -1,3 +1,4 @@
+using MFAWPF.Extensions;
 using MFAWPF.Helper;
 using System.Text.RegularExpressions;
 using System.Windows.Media;

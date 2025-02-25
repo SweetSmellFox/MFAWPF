@@ -1,5 +1,6 @@
 using System.Windows;
 using MaaFramework.Binding;
+using MFAWPF.Extensions;
 using MFAWPF.Helper;
 using Microsoft.Win32;
 

@@ -1,5 +1,6 @@
 ﻿using HandyControl.Controls;
 using HandyControl.Data.Enum;
+using MFAWPF.Extensions;
 using MFAWPF.Helper;
 using System.Windows;
 using System.Windows.Controls;

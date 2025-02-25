@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using GongSolutions.Wpf.DragDrop;
 using MFAWPF.Data;
+using MFAWPF.Extensions.Maa;
 using MFAWPF.ViewModels;
 using MFAWPF.Views;
 using MFAWPF.Views.UI;

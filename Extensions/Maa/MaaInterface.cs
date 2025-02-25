@@ -1,9 +1,9 @@
+using MFAWPF.Helper;
 using MFAWPF.Helper.Converters;
-using MFAWPF.Views.UI;
 using Newtonsoft.Json;
 using System.IO;
 
-namespace MFAWPF.Helper;
+namespace MFAWPF.Extensions.Maa;
 
 public class MaaInterface
 {

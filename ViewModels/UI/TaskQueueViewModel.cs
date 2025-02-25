@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Data;
+using MFAWPF.Extensions;
+using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels.Tool;
 using System.Collections.ObjectModel;
@@ -21,13 +23,13 @@ public partial class TaskQueueViewModel : ViewModel
 
     [ObservableProperty] private bool _connectSettingChecked = true;
 
-    partial void OnConnectSettingCheckedChanged(bool value)
-    {
-        if (value)
-        {
-            Instances.TaskQueueView.SettingPanel.Children.Clear();
-        }
-    }
+    // partial void OnConnectSettingCheckedChanged(bool value)
+    // {
+    //     if (value)
+    //     {
+    //         Instances.TaskQueueView.SettingPanel.Children.Clear();
+    //     }
+    // }
     
     public ObservableCollection<Tool.DragItemViewModel> TasksSource { get; private set; } =
         [];

@@ -1,13 +1,3 @@
-using System.Diagnostics;
-using System.IO;
-using System.Management;
-using System.Net.Http;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using HandyControl.Controls;
 using HandyControl.Tools.Extension;
 using MaaFramework.Binding;
@@ -17,22 +7,31 @@ using MaaFramework.Binding.Notification;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MFAWPF.Data;
-using MFAWPF.ViewModels;
-using MFAWPF.Views;
+using MFAWPF.Helper;
 using MFAWPF.Views.UI;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using MimeKit;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Security.Cryptography;
+using System.Diagnostics;
+using System.IO;
+using System.Management;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using DragItemViewModel = MFAWPF.ViewModels.Tool.DragItemViewModel;
 
 
-namespace MFAWPF.Helper;
+namespace MFAWPF.Extensions.Maa;
 
 public class MaaProcessor
 {

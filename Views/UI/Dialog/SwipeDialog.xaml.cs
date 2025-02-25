@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using MFAWPF.Extensions;
+using MFAWPF.Extensions.Maa;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;

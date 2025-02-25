@@ -1,6 +1,8 @@
 ﻿using MFAWPF.ViewModels;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
+using MFAWPF.Extensions;
+using MFAWPF.Extensions.Maa;
 using Newtonsoft.Json;
 
 // using PaddleOCRSharp;
