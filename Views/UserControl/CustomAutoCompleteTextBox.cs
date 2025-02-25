@@ -15,14 +15,14 @@ namespace MFAWPF.Views.UserControl;
 public class CustomAutoCompleteTextBox : AutoCompleteTextBox
 {
     private const string SearchTextBox = "PART_SearchTextBox";
-    private bool ignoreTextChanging;
-    private TextBox _searchTextBox;
+    private bool _ignoreTextChanging;
+    private TextBox? _searchTextBox;
 
-    private object
+    private object?
         _selectedItem;
 
-    private bool isApplyingTemplate;
-    private bool isSelectionChanging;
+    private bool _isApplyingTemplate;
+    private bool _isSelectionChanging;
 
     public static readonly DependencyProperty DataListProperty = DependencyProperty
         .Register(nameof(DataList), typeof(IEnumerable), typeof(CustomAutoCompleteTextBox),
@@ -30,7 +30,7 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
 
     public IEnumerable DataList
     {
-        get => GetValue(DataListProperty) as IEnumerable;
+        get => (IEnumerable)GetValue(DataListProperty);
         set =>
             SetValue(DataListProperty, value);
     }
@@ -51,7 +51,7 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
                 OnTextChanged));
     }
 
-    public TextBox GetTextBox()
+    public TextBox? GetTextBox()
     {
         return _searchTextBox;
     }
@@ -78,12 +78,12 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
     {
         try
         {
-            if (isApplyingTemplate)
+            if (_isApplyingTemplate)
             {
                 return;
             }
 
-            isApplyingTemplate = true;
+            _isApplyingTemplate = true;
 
             if (_searchTextBox != null)
             {
@@ -111,7 +111,7 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
             }
 
             UpdateTextBoxBySelectedItem(_selectedItem);
-            isApplyingTemplate = false;
+            _isApplyingTemplate = false;
         }
         catch (Exception e)
         {
@@ -124,12 +124,12 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
     {
         try
         {
-            if (isSelectionChanging)
+            if (_isSelectionChanging)
             {
                 return;
             }
 
-            isSelectionChanging = true;
+            _isSelectionChanging = true;
 
             // 调用 ComboBox 的 OnSelectionChanged 方法
             MethodInfo baseMethod =
@@ -145,7 +145,7 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
                 UpdateTextBoxBySelectedItem(_selectedItem);
             }
 
-            isSelectionChanging = false;
+            _isSelectionChanging = false;
         }
         catch (Exception exception)
         {
@@ -165,9 +165,9 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
             _selectedItem = null;
             SelectedIndex = -1;
 
-            if (ignoreTextChanging)
+            if (_ignoreTextChanging)
             {
-                ignoreTextChanging = false;
+                _ignoreTextChanging = false;
                 return;
             }
 
@@ -236,7 +236,7 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
                 return;
             }
 
-            ignoreTextChanging = true;
+            _ignoreTextChanging = true;
 
             if (ItemContainerGenerator.ContainerFromIndex(selectedIndex) is AutoCompleteTextBoxItem boxItem)
             {
@@ -262,7 +262,7 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
                 return;
             }
 
-            ignoreTextChanging = true;
+            _ignoreTextChanging = true;
 
             string toString = BindingHelper.GetString(selectedItem, DisplayMemberPath);
             if (!string.IsNullOrEmpty(toString))
@@ -270,12 +270,12 @@ public class CustomAutoCompleteTextBox : AutoCompleteTextBox
                 _searchTextBox.Text = toString;
                 _searchTextBox.CaretIndex = _searchTextBox.Text.Length;
 
-                ignoreTextChanging = true;
+                _ignoreTextChanging = true;
 
                 Text = _searchTextBox.Text;
             }
 
-            ignoreTextChanging = false;
+            _ignoreTextChanging = false;
         }
         catch (Exception e)
         {

@@ -63,7 +63,7 @@
     <value>Edit Task</value>
   </data>
     <data name="ResourceOption" xml:space="preserve">
-    <value>Resources</value>
+    <value>Resources Type</value>
   </data>
   <data name="ThemeOption" xml:space="preserve">
     <value>UI Theme</value>

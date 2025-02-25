@@ -23,16 +23,6 @@
             <hc:ComboBox
                 DisplayMemberPath="Name"
                 IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
-                ItemsSource="{Binding ViewModel.CurrentResources}"
-                Margin="5"
-                SelectedValue="{Binding ViewModel.CurrentResource}"
-                SelectedValuePath="Name"
-                hc:TitleElement.Title="{lex:Loc ResourceOption}"
-                hc:TitleElement.TitlePlacement="Top"
-                x:Name="ResourceComboBox" />
-            <hc:ComboBox
-                DisplayMemberPath="Name"
-                IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
                 ItemsSource="{Binding ViewModel.BeforeTaskList}"
                 Margin="5"
                 SelectedValue="{Binding ViewModel.BeforeTask}"

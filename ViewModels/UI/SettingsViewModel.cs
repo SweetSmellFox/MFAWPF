@@ -15,6 +15,14 @@ namespace MFAWPF.ViewModels.UI;
 
 public partial class SettingsViewModel : ViewModel
 {
+    public ObservableCollection<MaaInterface.MaaCustomResource> CurrentResources { get; set; } = [];
+    [ObservableProperty] private string _currentResource = MFAConfiguration.GetConfiguration("Resource", string.Empty);
+
+    partial void OnCurrentResourceChanged(string value)
+    {
+        MFAConfiguration.SetConfiguration("Resource", value);
+    }
+
     [ObservableProperty] private string _maaFwVersion = MaaProcessor.MaaUtility.Version;
     [ObservableProperty] private string _mfaVersion = RootView.Version;
 
@@ -245,7 +253,7 @@ public partial class SettingsViewModel : ViewModel
 
     [ObservableProperty] private bool _isDebugMode = MFAConfiguration.MaaConfig.GetConfig("recording", false) || MFAConfiguration.MaaConfig.GetConfig("save_draw", false) || MFAConfiguration.MaaConfig.GetConfig("show_hit_draw", false);
     private bool _shouldTip = true;
-    
+
     partial void OnIsDebugModeChanged(bool value)
     {
         if (value && _shouldTip)
@@ -254,7 +262,7 @@ public partial class SettingsViewModel : ViewModel
             _shouldTip = false;
         }
     }
-    
+
     partial void OnEnableRecordingChanged(bool value)
     {
         MFAConfiguration.MaaConfig.SetConfig("recording", value);

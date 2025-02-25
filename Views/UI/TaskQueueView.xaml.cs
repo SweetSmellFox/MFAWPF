@@ -68,14 +68,14 @@ public partial class TaskQueueView
         try
         {
             var taskDictionary = new Dictionary<string, TaskModel>();
-            if (Instances.TaskQueueViewModel.CurrentResources.Count > 0)
+            if (Instances.SettingsViewModel.CurrentResources.Count > 0)
             {
-                if (string.IsNullOrWhiteSpace(Instances.TaskQueueViewModel.CurrentResource) && !string.IsNullOrWhiteSpace(Instances.TaskQueueViewModel.CurrentResources[0].Name))
-                    Instances.TaskQueueViewModel.CurrentResource = Instances.TaskQueueViewModel.CurrentResources[0].Name;
+                if (string.IsNullOrWhiteSpace(Instances.SettingsViewModel.CurrentResource) && !string.IsNullOrWhiteSpace(Instances.SettingsViewModel.CurrentResources[0].Name))
+                    Instances.SettingsViewModel.CurrentResource = Instances.SettingsViewModel.CurrentResources[0].Name;
             }
-            if (Instances.TaskQueueViewModel.CurrentResources.Any(r => r.Name == Instances.TaskQueueViewModel.CurrentResource))
+            if (Instances.SettingsViewModel.CurrentResources.Any(r => r.Name == Instances.SettingsViewModel.CurrentResource))
             {
-                var resources = Instances.TaskQueueViewModel.CurrentResources.Where(r => r.Name == Instances.TaskQueueViewModel.CurrentResource);
+                var resources = Instances.SettingsViewModel.CurrentResources.Where(r => r.Name == Instances.SettingsViewModel.CurrentResource);
                 foreach (var resourcePath in resources)
                 {
                     if (!Path.Exists($"{resourcePath}/pipeline/"))
@@ -299,9 +299,9 @@ public partial class TaskQueueView
             if (FirstTask)
             {
                 if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > 0)
-                    Instances.TaskQueueViewModel.CurrentResources = new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList());
+                    Instances.SettingsViewModel.CurrentResources = new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList());
                 else
-                    Instances.TaskQueueViewModel.CurrentResources =
+                    Instances.SettingsViewModel.CurrentResources =
                     [
                         new MaaInterface.MaaCustomResource
                         {

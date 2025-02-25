@@ -13,9 +13,26 @@
     xmlns:local="clr-namespace:MFAWPF.Views.UserControl.Settings"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
+    xmlns:userControl="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:views="clr-namespace:MFAWPF.Views"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <StackPanel>
+        <userControl:CustomTextBlock
+            HorizontalAlignment="Center"
+            Margin="10,0"
+            Text="{lex:Loc ResourceOption}"
+            VerticalAlignment="Center" />
+        <hc:ComboBox
+            DisplayMemberPath="Name"
+            HorizontalAlignment="Center"
+            IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
+            ItemsSource="{Binding ViewModel.CurrentResources}"
+            Margin="10"
+            SelectedValue="{Binding ViewModel.CurrentResource}"
+            SelectedValuePath="Name"
+            VerticalAlignment="Center"
+            Width="200"
+            x:Name="ResourceComboBox" />
         <hc:TextBox
             AllowDrop="True"
             Drop="StartsWithScript_Drop"

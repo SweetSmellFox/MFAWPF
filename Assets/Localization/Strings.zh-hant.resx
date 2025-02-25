@@ -63,7 +63,7 @@
     <value>編輯任務</value>
   </data>
     <data name="ResourceOption" xml:space="preserve">
-    <value>資源</value>
+    <value>資源類型</value>
   </data>
   <data name="ThemeOption" xml:space="preserve">
     <value>介面主題</value>

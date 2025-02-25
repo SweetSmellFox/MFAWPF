@@ -73,7 +73,7 @@
     <value>编辑任务</value>
   </data>
     <data name="ResourceOption" xml:space="preserve">
-    <value>资源</value>
+    <value>资源类型</value>
   </data>
   <data name="ThemeOption" xml:space="preserve">
     <value>界面主题</value>

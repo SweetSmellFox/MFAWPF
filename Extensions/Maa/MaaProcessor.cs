@@ -962,7 +962,7 @@ public class MaaProcessor
         MaaResource maaResource;
         try
         {
-            var resources = Instances.TaskQueueViewModel.CurrentResources.FirstOrDefault(c => c.Name == Instances.TaskQueueViewModel.CurrentResource)?.Path ?? [];
+            var resources = Instances.SettingsViewModel.CurrentResources.FirstOrDefault(c => c.Name == Instances.SettingsViewModel.CurrentResource)?.Path ?? [];
             LoggerService.LogInfo($"Resource: {string.Join(",", resources)}");
             maaResource = new MaaResource(resources);
 
@@ -1168,7 +1168,7 @@ public class MaaProcessor
         return customClasses;
     }
 
-    private static IEnumerable<CustomValue<object>> _customClasses;
+    private static IEnumerable<CustomValue<object>>? _customClasses;
     private static IEnumerable<CustomValue<object>> GetCustomClasses(string directory, string[] interfacesToImplement)
     {
         if (_customClasses == null || _shouldLoadCustomClasses)
@@ -1219,7 +1219,6 @@ public class MaaProcessor
 
     private void DisplayFocus(TaskModel taskModel, string message)
     {
-        var converter = new BrushConverter();
         switch (message)
         {
             case MaaMsg.Node.Action.Succeeded:
@@ -1232,7 +1231,7 @@ public class MaaProcessor
                         try
                         {
                             if (taskModel.FocusSucceededColor != null && taskModel.FocusSucceededColor.Count > i)
-                                brush = BrushConverterHelper.ConvertToBrush(taskModel.FocusSucceededColor[i]) as Brush;
+                                brush = BrushConverterHelper.ConvertToBrush(taskModel.FocusSucceededColor[i]);
                         }
                         catch (Exception e)
                         {
@@ -1366,7 +1365,7 @@ public class MaaProcessor
         return buffer;
     }
 
-    public void RestartAdb()
+    public static void RestartAdb()
     {
         if (!MFAConfiguration.GetConfiguration("AllowAdbRestart", false))
         {
@@ -1401,7 +1400,7 @@ public class MaaProcessor
         process.WaitForExit();
     }
 
-    public void ReconnectByAdb()
+    public static void ReconnectByAdb()
     {
         var adbPath = MaaFwConfig.AdbDevice.AdbPath;
         var address = MaaFwConfig.AdbDevice.AdbSerial;
@@ -1431,7 +1430,7 @@ public class MaaProcessor
         process.WaitForExit();
     }
 
-    public void HardRestartAdb()
+    public static void HardRestartAdb()
     {
         if (!MFAConfiguration.GetConfiguration("AllowAdbHardRestart", false))
         {

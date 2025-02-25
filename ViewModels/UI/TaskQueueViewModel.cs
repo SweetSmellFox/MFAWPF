@@ -70,14 +70,6 @@ public partial class TaskQueueViewModel : ViewModel
 
     public GongSolutions.Wpf.DragDrop.IDropTarget DropHandler { get; } = new DragDropHandler();
 
-    public ObservableCollection<MaaInterface.MaaCustomResource> CurrentResources { get; set; } = [];
-    [ObservableProperty] private string _currentResource = MFAConfiguration.GetConfiguration("Resource", string.Empty);
-
-    partial void OnCurrentResourceChanged(string value)
-    {
-        MFAConfiguration.SetConfiguration("Resource", value);
-    }
-
     public ObservableCollection<LogItemViewModel> LogItemViewModels { get; } = new();
 
     public static string FormatFileSize(long size)
