@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using MFAWPF.Data;
+using MFAWPF.Extensions;
 using MFAWPF.Helper;
 using Newtonsoft.Json;
 using System.Windows;
@@ -71,7 +72,7 @@ public partial class DragItemViewModel : ViewModel
         set
         {
             SetProperty(ref _enableSetting, value);
-            Instances.TaskQueueView.SetOption(this, value);
+            Instances.TaskOptionSettingsUserControl.SetOption(this, value);
         }
     }
 

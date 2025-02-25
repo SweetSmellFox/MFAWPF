@@ -48,6 +48,7 @@ public partial class App
                 _ = services.AddSingleton<TaskQueueView>();
                 _ = services.AddSingleton<TaskQueueViewModel>();
                 _ = services.AddSingleton<TaskQueueSettingsUserControl>();
+                _ = services.AddSingleton<TaskOptionSettingsUserControl>();
                 _ = services.AddSingleton<ConnectingView>();
                 
                 _ = services.AddSingleton<SettingsView>();
