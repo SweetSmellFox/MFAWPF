@@ -1,3 +1,5 @@
+using MFAWPF.Helper;
+using MFAWPF.ViewModels.UserControl.Settings;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -5,8 +7,11 @@ namespace MFAWPF.Views.UserControl.Settings;
 
 public partial class StartSettingsUserControl 
 {
+    public StartSettingsUserControlModel ViewModel { get; set; }
     public StartSettingsUserControl()
     {
+        ViewModel = Instances.StartSettingsUserControlModel;
+        DataContext = this;
         InitializeComponent();
     }
     private void TextBox_PreviewDragOver(object sender, DragEventArgs e)

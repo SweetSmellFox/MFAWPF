@@ -99,7 +99,7 @@ public class VersionChecker
 
     public void CheckResourceBySelection()
     {
-        switch (Instances.SettingsViewModel.DownloadSourceIndex)
+        switch (Instances.VersionUpdateSettingsUserControlModel.DownloadSourceIndex)
         {
             case 0:
                 CheckForResourceUpdates();
@@ -111,7 +111,7 @@ public class VersionChecker
     }
     public void CheckMFABySelection()
     {
-        switch (Instances.SettingsViewModel.DownloadSourceIndex)
+        switch (Instances.VersionUpdateSettingsUserControlModel.DownloadSourceIndex)
         {
             case 0:
                 CheckForGUIUpdates();
@@ -123,7 +123,7 @@ public class VersionChecker
     }
     public async void UpdateResourceBySelection(bool closeDialog = false, bool noDialog = false, Action action = null)
     {
-        switch (Instances.SettingsViewModel.DownloadSourceIndex)
+        switch (Instances.VersionUpdateSettingsUserControlModel.DownloadSourceIndex)
         {
             case 0: UpdateResource(closeDialog, noDialog, action); break;
             case 1: UpdateResourceWithMirrorApi(closeDialog, noDialog, action); break;
@@ -131,7 +131,7 @@ public class VersionChecker
     }
     public async void UpdateMFABySelection(bool noDialog = false)
     {
-        switch (Instances.SettingsViewModel.DownloadSourceIndex)
+        switch (Instances.VersionUpdateSettingsUserControlModel.DownloadSourceIndex)
         {
             case 0: UpdateMFA(noDialog); break;
             case 1: UpdateMFAWithMirrorApi(noDialog); break;
@@ -344,15 +344,6 @@ public class VersionChecker
 
         dialog?.UpdateProgress(100);
 
-        try
-        {
-            Instances.SettingsViewModel.ResourceVersion = latestVersion;
-        }
-        catch (Exception e)
-        {
-            LoggerService.LogError(e);
-        }
-
         dialog?.SetText("UpdateCompleted".ToLocalization());
         dialog.SetRestartButtonVisibility(true);
 
@@ -388,7 +379,7 @@ public class VersionChecker
                 ToastNotification.ShowDirect("CurrentResourcesNotSupportMirror".ToLocalization());
                 return;
             }
-            var currentVersion = GetLocalVersion();
+            var currentVersion = GetResourceVersion();
             var cdk = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("DownloadCDK", string.Empty));
 
             GetDownloadUrlFromMirror(currentVersion, resId, cdk, out var downloadUrl, out var latestVersion, "MFA", true, true);
@@ -544,10 +535,10 @@ public class VersionChecker
                 var fileName = Path.GetFileName(rfile);
                 if (fileName.Equals(AnnouncementViewModel.AnnouncementFileName, StringComparison.OrdinalIgnoreCase))
                     continue;
-        
+
                 try
                 {
-                    File.SetAttributes(rfile, FileAttributes.Normal); 
+                    File.SetAttributes(rfile, FileAttributes.Normal);
                     File.Delete(rfile);
                 }
                 catch (Exception ex)
@@ -607,26 +598,12 @@ public class VersionChecker
         }
 
         dialog?.UpdateProgress(100);
-        try
-        {
-            Instances.SettingsViewModel.ResourceVersion = latestVersion;
-        }
-        catch (Exception e)
-        {
-            LoggerService.LogError(e);
-        }
+
         dialog?.SetText("UpdateCompleted".ToLocalization());
         dialog?.SetRestartButtonVisibility(true);
 
         Instances.RootViewModel.SetUpdating(false);
-        try
-        {
-            Instances.SettingsViewModel.ResourceVersion = latestVersion;
-        }
-        catch (Exception e)
-        {
-            LoggerService.LogError(e);
-        }
+
         DispatcherHelper.RunOnMainThread(() =>
         {
             if (closeDialog) dialog?.Close();
@@ -1116,7 +1093,8 @@ public class VersionChecker
             if ((int)responseData["code"] == 0)
             {
                 var data = responseData["data"];
-                if (!onlyCheck) SaveAnnouncement(data, "release_note");
+                if (!onlyCheck)
+                    SaveAnnouncement(data, "release_note");
                 var versionName = data["version_name"]?.ToString();
                 var downloadUrl = data["url"]?.ToString();
                 url = downloadUrl;
@@ -1201,18 +1179,18 @@ public class VersionChecker
             else
             {
                 LoggerService.LogError($"请求GitHub时发生错误: {response.StatusCode} - {response.ReasonPhrase}");
-                throw new Exception($"请求GitHub时发生错误: {response.StatusCode} - {response.ReasonPhrase}");
+                throw new Exception($"{response.StatusCode} - {response.ReasonPhrase}");
             }
         }
         catch (Exception e)
         {
             LoggerService.LogError($"处理GitHub响应时发生错误: {e.Message}");
-            throw new Exception($"处理GitHub响应时发生错误: {e.Message}");
+            throw new Exception($"{e.Message}");
         }
         return string.Empty;
     }
 
-    private async Task<bool> DownloadFileAsync(string url, string filePath, MFAWPF.Views.UI.Dialog.DownloadDialog dialog, string key)
+    async private Task<bool> DownloadFileAsync(string url, string filePath, MFAWPF.Views.UI.Dialog.DownloadDialog dialog, string key)
     {
         try
         {
@@ -1326,6 +1304,10 @@ public class VersionChecker
             {
                 ToastNotification.ShowDirect("MFA" + "NewVersionAvailableLatestVersion".ToLocalization() + latestVersion);
             }
+            else
+            {
+                ToastNotification.ShowDirect("MFAIsLatestVersion".ToLocalization());
+            }
 
             Instances.RootViewModel.SetUpdating(false);
         }
@@ -1341,12 +1323,17 @@ public class VersionChecker
         try
         {
             Instances.RootViewModel.SetUpdating(true);
-            var latestVersion = GetLatestVersionFromGithub();
+            var latestVersion = GetLatestVersionFromGithub(isDownload: false);
             var localVersion = GetLocalVersion();
             if (IsNewVersionAvailable(latestVersion, localVersion))
             {
                 ToastNotification.ShowDirect("MFA" + "NewVersionAvailableLatestVersion".ToLocalization() + latestVersion);
             }
+            else
+            {
+                ToastNotification.ShowDirect("MFAIsLatestVersion".ToLocalization());
+            }
+
             Instances.RootViewModel.SetUpdating(false);
         }
         catch (Exception ex)
@@ -1507,7 +1494,7 @@ public class VersionChecker
 
     private string GetResourceVersion()
     {
-        return MaaInterface.Instance?.Version ?? "DEBUG";
+        return Instances.VersionUpdateSettingsUserControlModel.ResourceVersion;
     }
 
 

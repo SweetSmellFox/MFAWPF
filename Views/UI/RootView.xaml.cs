@@ -49,9 +49,9 @@ public partial class RootView
     {
         // Instances.RootView = this;
         LanguageHelper.Initialize();
-        InitializeComponent();
         ViewModel = viewModel;
         DataContext = this;
+        InitializeComponent();
         Loaded += (_, _) => LoadUI();
         Instances.TaskQueueView.InitializeData();
         OCRHelper.Initialize();

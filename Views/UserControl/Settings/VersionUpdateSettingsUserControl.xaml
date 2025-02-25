@@ -1,5 +1,5 @@
 <UserControl
-    d:DataContext="{d:DesignInstance ui:SettingsView,
+    d:DataContext="{d:DesignInstance local:VersionUpdateSettingsUserControl,
                                      IsDesignTimeCreatable=False}"
     d:DesignWidth="600"
     mc:Ignorable="d"
@@ -162,24 +162,28 @@
                     <Button
                         Command="{Binding ViewModel.CheckMFAUpdateCommand}"
                         Content="{lex:Loc CheckMFA}"
-                        IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                        IsEnabled="{calcBinding:Binding '!IsUpdating',
+                                                        Source={x:Static helper:Instances.RootViewModel}}"
                         Margin="5" />
                     <Button
                         Command="{Binding ViewModel.CheckResourceUpdateCommand}"
                         Content="{lex:Loc CheckResource}"
-                        IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                        IsEnabled="{calcBinding:Binding '!IsUpdating',
+                                                        Source={x:Static helper:Instances.RootViewModel}}"
                         Margin="5" />
                 </StackPanel>
                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                     <Button
                         Command="{Binding ViewModel.UpdateMFACommand}"
                         Content="{lex:Loc SoftwareUpdate}"
-                        IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                        IsEnabled="{calcBinding:Binding '!IsUpdating',
+                                                        Source={x:Static helper:Instances.RootViewModel}}"
                         Margin="5" />
                     <Button
                         Command="{Binding ViewModel.UpdateResourceCommand}"
                         Content="{lex:Loc UpdateResource}"
-                        IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                        IsEnabled="{calcBinding:Binding '!IsUpdating',
+                                                        Source={x:Static helper:Instances.RootViewModel}}"
                         Margin="5" />
                 </StackPanel>
 
@@ -187,7 +191,8 @@
                 <Button
                     Command="{Binding ViewModel.UpdateMaaFWCommand}"
                     Content="{lex:Loc UpdateMaaFW}"
-                    IsEnabled="{calcBinding:Binding '!MainViewModel.IsUpdating'}"
+                    IsEnabled="{calcBinding:Binding '!IsUpdating',
+                                                    Source={x:Static helper:Instances.RootViewModel}}"
                     Margin="5"
                     Visibility="{calcBinding:Binding 'ViewModel.DownloadSourceIndex==1'}" />
             </StackPanel>

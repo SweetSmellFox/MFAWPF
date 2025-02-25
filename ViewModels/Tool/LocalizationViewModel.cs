@@ -28,6 +28,7 @@ public partial class LocalizationViewModel : ViewModel
         ResourceKey = resourceKey;
         LanguageHelper.LanguageChanged += OnLanguageChanged;
     }
+    
     public LocalizationViewModel(string resourceKey, params string[] keys)
     {
         ResourceKey = resourceKey;

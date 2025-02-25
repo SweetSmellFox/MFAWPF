@@ -288,6 +288,7 @@ public class MaaInterface
                     new MaaInterface(),
                     () => { }, new MaaInterfaceSelectOptionConverter(false));
         }
+
         return (Instance?.Name ?? string.Empty, Instance?.Version ?? string.Empty, Instance?.CustomTitle ?? string.Empty);
 
     }

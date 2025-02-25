@@ -439,17 +439,17 @@ public class MaaProcessor
 
     public async static Task ExternalNotificationAsync()
     {
-        var enabledProviders = Instances.SettingsViewModel.EnabledExternalNotificationProviderList;
+        var enabledProviders = Instances.ExternalNotificationSettingsUserControlModel.EnabledExternalNotificationProviderList;
 
         foreach (var enabledProvider in enabledProviders)
         {
             switch (enabledProvider)
             {
                 case "DingTalk":
-                    await DingTalkMessageAsync(Instances.SettingsViewModel.DingTalkToken, Instances.SettingsViewModel.DingTalkSecret);
+                    await DingTalkMessageAsync(Instances.ExternalNotificationSettingsUserControlModel.DingTalkToken, Instances.ExternalNotificationSettingsUserControlModel.DingTalkSecret);
                     break;
                 case "Email":
-                    SendEmail(Instances.SettingsViewModel.EmailAccount, Instances.SettingsViewModel.EmailSecret);
+                    SendEmail(Instances.ExternalNotificationSettingsUserControlModel.EmailAccount, Instances.ExternalNotificationSettingsUserControlModel.EmailSecret);
                     break;
             }
         }
@@ -962,7 +962,7 @@ public class MaaProcessor
         MaaResource maaResource;
         try
         {
-            var resources = Instances.SettingsViewModel.CurrentResources.FirstOrDefault(c => c.Name == Instances.SettingsViewModel.CurrentResource)?.Path ?? [];
+            var resources = Instances.GameSettingsUserControlModel.CurrentResources.FirstOrDefault(c => c.Name == Instances.GameSettingsUserControlModel.CurrentResource)?.Path ?? [];
             LoggerService.LogInfo($"Resource: {string.Join(",", resources)}");
             maaResource = new MaaResource(resources);
 

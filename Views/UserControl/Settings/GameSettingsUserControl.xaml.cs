@@ -1,14 +1,19 @@
+using MFAWPF.Helper;
+using MFAWPF.ViewModels.UserControl.Settings;
 using System.Windows;
 
 namespace MFAWPF.Views.UserControl.Settings;
 
 public partial class GameSettingsUserControl
 {
+    public GameSettingsUserControlModel ViewModel { get; set; }
     public GameSettingsUserControl()
     {
+        ViewModel = Instances.GameSettingsUserControlModel;
+        DataContext = this;
         InitializeComponent();
     }
-    
+
     private void StartsWithScript_Drop(object sender, DragEventArgs e)
     {
         if (!e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -38,4 +43,3 @@ public partial class GameSettingsUserControl
         e.Handled = true;
     }
 }
-

@@ -18,6 +18,7 @@ public partial class ConnectingView
 {
     public ConnectingView()
     {
+        DataContext = this;
         InitializeComponent();
         ConnectionTabControl.SelectionChanged += ConnectionTabControlOnSelectionChanged;
     }

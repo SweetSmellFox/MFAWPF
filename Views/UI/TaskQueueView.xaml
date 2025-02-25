@@ -119,23 +119,6 @@
                         Width="15"
                         hc:IconElement.Geometry="{StaticResource SettingsRegular}" />
 
-                    <!--  <RadioButton  -->
-                    <!--  Background="Transparent"  -->
-                    <!--  BorderThickness="0"  -->
-                    <!--  Checked="ConfigureSettingsPanel"  -->
-                    <!--  Foreground="{DynamicResource GrayColor4}"  -->
-                    <!--  GroupName="TaskSettings"  -->
-                    <!--    -->
-                    <!--  Margin="0"  -->
-                    <!--  Padding="7,0,5,0"  -->
-                    <!--  Style="{DynamicResource RadioGroupItemSingle}"  -->
-                    <!--  ToolTip="{lex:Loc TooltipSettings}"  -->
-                    <!--  hc:IconElement.Geometry="{StaticResource ConfigGeometry}"  -->
-                    <!--  hc:IconElement.Height="15"  -->
-                    <!--  hc:IconElement.Width="15"  -->
-                    <!--  hc:VisualElement.HighlightBackground="Transparent"  -->
-                    <!--  hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"  -->
-                    <!--  x:Name="ConnectSettingButton" />  -->
 
                 </StackPanel>
             </Grid>
@@ -281,19 +264,8 @@
 
         </Grid>
         <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <ContentPresenter
-                Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskQueueSettingsUserControl}}"
-                Grid.Row="0"
-                Visibility="{calcBinding:Binding 'ViewModel.ConnectSettingChecked'}" />
-            <ContentPresenter
-                Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskOptionSettingsUserControl}}"
-                Grid.Row="1"
-                Visibility="{calcBinding:Binding '!ViewModel.ConnectSettingChecked'}" />
-
+            <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskQueueSettingsUserControl}}" Visibility="{calcBinding:Binding 'ViewModel.ConnectSettingChecked'}" />
+            <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskOptionSettingsUserControl}}" Visibility="{calcBinding:Binding '!ViewModel.ConnectSettingChecked'}" />
         </Grid>
 
 

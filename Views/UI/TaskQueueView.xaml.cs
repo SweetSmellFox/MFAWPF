@@ -48,9 +48,13 @@ public partial class TaskQueueView
         if (!string.IsNullOrWhiteSpace(name))
             Instances.RootViewModel.ShowResourceName(name);
         if (!string.IsNullOrWhiteSpace(version))
+        {
             Instances.RootViewModel.ShowResourceVersion(version);
+            Instances.VersionUpdateSettingsUserControlModel.ResourceVersion = version;
+        }
         if (!string.IsNullOrWhiteSpace(customTitle))
             Instances.RootViewModel.ShowCustomTitle(customTitle);
+
         if (MaaInterface.Instance != null)
         {
             AppendVersionLog(MaaInterface.Instance.Version);
@@ -68,14 +72,14 @@ public partial class TaskQueueView
         try
         {
             var taskDictionary = new Dictionary<string, TaskModel>();
-            if (Instances.SettingsViewModel.CurrentResources.Count > 0)
+            if (Instances.GameSettingsUserControlModel.CurrentResources.Count > 0)
             {
-                if (string.IsNullOrWhiteSpace(Instances.SettingsViewModel.CurrentResource) && !string.IsNullOrWhiteSpace(Instances.SettingsViewModel.CurrentResources[0].Name))
-                    Instances.SettingsViewModel.CurrentResource = Instances.SettingsViewModel.CurrentResources[0].Name;
+                if (string.IsNullOrWhiteSpace(Instances.GameSettingsUserControlModel.CurrentResource) && !string.IsNullOrWhiteSpace(Instances.GameSettingsUserControlModel.CurrentResources[0].Name))
+                    Instances.GameSettingsUserControlModel.CurrentResource = Instances.GameSettingsUserControlModel.CurrentResources[0].Name;
             }
-            if (Instances.SettingsViewModel.CurrentResources.Any(r => r.Name == Instances.SettingsViewModel.CurrentResource))
+            if (Instances.GameSettingsUserControlModel.CurrentResources.Any(r => r.Name == Instances.GameSettingsUserControlModel.CurrentResource))
             {
-                var resources = Instances.SettingsViewModel.CurrentResources.Where(r => r.Name == Instances.SettingsViewModel.CurrentResource);
+                var resources = Instances.GameSettingsUserControlModel.CurrentResources.Where(r => r.Name == Instances.GameSettingsUserControlModel.CurrentResource);
                 foreach (var resourcePath in resources)
                 {
                     if (!Path.Exists($"{resourcePath}/pipeline/"))
@@ -299,9 +303,9 @@ public partial class TaskQueueView
             if (FirstTask)
             {
                 if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > 0)
-                    Instances.SettingsViewModel.CurrentResources = new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList());
+                    Instances.GameSettingsUserControlModel.CurrentResources = new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList());
                 else
-                    Instances.SettingsViewModel.CurrentResources =
+                    Instances.GameSettingsUserControlModel.CurrentResources =
                     [
                         new MaaInterface.MaaCustomResource
                         {

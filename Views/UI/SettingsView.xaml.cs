@@ -16,9 +16,9 @@ public partial class SettingsView
     public SettingsViewModel ViewModel { get; set; }
     public SettingsView()
     {
-        InitializeComponent();
         ViewModel = Instances.SettingsViewModel;
         DataContext = this;
+        InitializeComponent();
         Loaded += (_, _) => { UpdateDividerPositions(); };
     }
 

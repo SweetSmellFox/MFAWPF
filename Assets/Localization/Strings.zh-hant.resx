@@ -506,7 +506,7 @@
     <data name="DingTalkMessageAsync" xml:space="preserve">
     <value>釘釘群發送訊息通知</value>
   </data>
-  <data name="EnableGPU" xml:space="preserve">
+  <data name="UseGpuForInference" xml:space="preserve">
     <value>使用 GPU 加速推理</value>
   </data>
     <data name="SelectExistingImage" xml:space="preserve">

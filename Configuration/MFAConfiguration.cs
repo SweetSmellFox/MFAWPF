@@ -103,8 +103,6 @@ public static class MFAConfiguration
     {
         if (config == null || value == null) return;
         config[key] = value;
-        if (key == "LangIndex")
-            Instances.SettingsViewModel.LanguageIndex = Convert.ToInt32(value);
         var fileName = config == Data ? GetActualConfiguration() : "maa_option";
         JsonHelper.WriteToConfigJsonFile(fileName, config, new MaaInterfaceSelectOptionConverter(false));
     }

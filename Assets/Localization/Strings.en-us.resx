@@ -506,7 +506,7 @@
     <data name="DingTalkMessageAsync" xml:space="preserve">
     <value>DingTalk group message notification</value>
   </data>
-  <data name="EnableGPU" xml:space="preserve">
+  <data name="UseGpuForInference" xml:space="preserve">
     <value>Use GPU for inference acceleration</value>
   </data>
     <data name="SelectExistingImage" xml:space="preserve">
@@ -561,7 +561,7 @@
     <value>Connection</value>
   </data>
   <data name="SoftwareUpdate" xml:space="preserve">
-    <value>Update</value>
+    <value>Update Software</value>
   </data>
   <data name="AutomaticDetectionUpdate" xml:space="preserve">
     <value>Automatic Detection Update</value>
@@ -612,10 +612,10 @@
     <value>Update</value>
   </data>
   <data name="AutomaticUpdateResource" xml:space="preserve">
-    <value>Automatic resource update</value>
+    <value>Automatic Resource Update</value>
   </data>
   <data name="AutomaticUpdateMFA" xml:space="preserve">
-    <value>Automatic software update</value>
+    <value>Automatic Software Update</value>
   </data>
   <data name="MFAIsLatestVersion" xml:space="preserve">
     <value>Software is already in the latest version!</value>

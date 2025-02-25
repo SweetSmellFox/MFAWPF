@@ -1,5 +1,5 @@
 <UserControl
-    d:DataContext="{d:DesignInstance ui:SettingsView,
+    d:DataContext="{d:DesignInstance local:GuiSettingsUserControl,
                                      IsDesignTimeCreatable=False}"
     d:DesignWidth="550"
     mc:Ignorable="d"

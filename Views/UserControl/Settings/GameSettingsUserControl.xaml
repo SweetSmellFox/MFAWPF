@@ -1,5 +1,5 @@
 <UserControl
-    d:DataContext="{d:DesignInstance ui:SettingsView,
+    d:DataContext="{d:DesignInstance local:GameSettingsUserControl,
                                      IsDesignTimeCreatable=False}"
     d:DesignWidth="550"
     mc:Ignorable="d"
@@ -41,12 +41,11 @@
             Margin="30,10,30,10"
             PreviewDragOver="TextBox_PreviewDragOver"
             Text="{Binding ViewModel.Prescript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            Width="360"
+            Width="320"
             hc:InfoElement.Placeholder="Example: &quot;C:\1.cmd&quot; -minimized"
             hc:TitleElement.HorizontalAlignment="Right"
             hc:TitleElement.Title="{lex:Loc Prescript}"
             hc:TitleElement.TitlePlacement="Left"
-            hc:TitleElement.TitleWidth="110"
             x:Name="BeforeTaskSettings" />
         <hc:TextBox
             AllowDrop="True"
@@ -56,12 +55,11 @@
             Margin="30,10,30,10"
             PreviewDragOver="TextBox_PreviewDragOver"
             Text="{Binding ViewModel.PostScript, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-            Width="360"
+            Width="320"
             hc:InfoElement.Placeholder="Example: &quot;C:\1.cmd&quot; -noWindow"
             hc:TitleElement.HorizontalAlignment="Right"
             hc:TitleElement.Title="{lex:Loc Post-script}"
             hc:TitleElement.TitlePlacement="Left"
-            hc:TitleElement.TitleWidth="110"
             x:Name="AfterTaskSettings" />
         <CheckBox
             Content="{lex:Loc EnableRecording}"

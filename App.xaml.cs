@@ -7,6 +7,7 @@ using MFAWPF.Services;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using MFAWPF.ViewModels.UI;
+using MFAWPF.ViewModels.UserControl.Settings;
 using MFAWPF.Views.UI;
 using MFAWPF.Views.UserControl.Settings;
 using Microsoft.Extensions.Configuration;
@@ -49,10 +50,31 @@ public partial class App
                 _ = services.AddSingleton<TaskQueueViewModel>();
                 _ = services.AddSingleton<TaskQueueSettingsUserControl>();
                 _ = services.AddSingleton<TaskOptionSettingsUserControl>();
+
                 _ = services.AddSingleton<ConnectingView>();
-                
+
                 _ = services.AddSingleton<SettingsView>();
                 _ = services.AddSingleton<SettingsViewModel>();
+
+                _ = services.AddSingleton<ConfigurationMgrUserControl>();
+                _ = services.AddSingleton<ConnectSettingsUserControl>();
+                _ = services.AddSingleton<ConnectSettingsUserControlModel>();
+                _ = services.AddSingleton<ExternalNotificationSettingsUserControl>();
+                _ = services.AddSingleton<ExternalNotificationSettingsUserControlModel>();
+                _ = services.AddSingleton<GameSettingsUserControl>();
+                _ = services.AddSingleton<GameSettingsUserControlModel>();
+                _ = services.AddSingleton<GameSettingsUserControl>();
+                _ = services.AddSingleton<GuiSettingsUserControl>();
+                _ = services.AddSingleton<GuiSettingsUserControlModel>();
+                _ = services.AddSingleton<PerformanceUserControl>();
+                _ = services.AddSingleton<PerformanceUserControlModel>();
+                _ = services.AddSingleton<StartSettingsUserControl>();
+                _ = services.AddSingleton<StartSettingsUserControlModel>();
+                _ = services.AddSingleton<TimerSettingsUserControl>();
+                _ = services.AddSingleton<TimerSettingsUserControlModel>();
+                _ = services.AddSingleton<VersionUpdateSettingsUserControl>();
+                _ = services.AddSingleton<VersionUpdateSettingsUserControlModel>();
+                _ = services.AddSingleton<AboutUserControl>();
                 
                 _ = services.AddSingleton<AnnouncementViewModel>();
                 // _ = services.AddSingleton<Views.Pages.DataPage>();

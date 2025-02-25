@@ -1,5 +1,5 @@
 <UserControl
-    d:DataContext="{d:DesignInstance ui:SettingsView,
+    d:DataContext="{d:DesignInstance settings:PerformanceUserControl,
                                      IsDesignTimeCreatable=False}"
     d:DesignWidth="550"
     mc:Ignorable="d"
@@ -12,21 +12,37 @@
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:settings="clr-namespace:MFAWPF.Views.UserControl.Settings"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:views="clr-namespace:MFAWPF.Views"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <local:CustomTextBlock
+            Grid.Column="0"
+            Grid.Row="0"
+            Margin="24,0,0,0"
+            Text="{lex:Loc UseGpuForInference}"
+            VerticalAlignment="Center" />
         <hc:ComboBox
             DisplayMemberPath="Name"
+            Grid.Column="1"
+            Grid.Row="0"
             HorizontalAlignment="Center"
             IsEnabled="{calcBinding:Binding Idle,
                                             Source={x:Static helper:Instances.RootViewModel}}"
             ItemsSource="{Binding ViewModel.GpuOptions}"
-            Margin="30,10,30,10"
+            Margin="10,5"
             SelectedIndex="{Binding ViewModel.GpuIndex}"
-            Width="240"
-            hc:TitleElement.HorizontalAlignment="Right"
-            hc:TitleElement.Title="{lex:Loc EnableGPU}"
-            hc:TitleElement.TitlePlacement="Left" />
+            VerticalAlignment="Center"
+            Width="240" />
+
     </Grid>
 </UserControl>

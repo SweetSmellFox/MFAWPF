@@ -55,7 +55,7 @@
                     Text="{lex:Loc DebugMode}"
                     VerticalAlignment="Center"
                     Visibility="{c:Binding 'IsDebugMode',
-                                           Source={x:Static utils:Instances.SettingsViewModel}}" />
+                                           Source={x:Static utils:Instances.GameSettingsUserControlModel}}" />
                 <!--  默认标题  -->
                 <TextBlock
                     Foreground="{DynamicResource PrimaryTextBrush}"
