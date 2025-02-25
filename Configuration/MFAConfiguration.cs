@@ -36,6 +36,11 @@ public static class MFAConfiguration
         ConfigName = GlobalConfiguration.GetConfiguration("DefaultConfig", ConfigName);
 
         var configPath = Path.Combine(AppContext.BaseDirectory, "config");
+        var defaultConfigPath = Path.Combine(configPath, "config.json");
+        if (!Directory.Exists(configPath))
+            Directory.CreateDirectory(configPath);
+        if (!File.Exists(defaultConfigPath))
+            File.WriteAllText(defaultConfigPath, "{}");
         foreach (var file in Directory.GetFiles(configPath))
         {
             var fileName = Path.GetFileName(file);
@@ -51,6 +56,7 @@ public static class MFAConfiguration
                 });
             }
         }
+
 
         Data = Configs.FirstOrDefault(c
                 => !string.IsNullOrWhiteSpace(c.Name)
