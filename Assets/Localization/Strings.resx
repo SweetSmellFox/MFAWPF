@@ -411,11 +411,11 @@
     <data name="ButtonClear" xml:space="preserve">
     <value>清空</value>
   </data>
-    <data name="CommonSetting" xml:space="preserve">
-    <value>普通设置</value>
+  <data name="CommonSetting" xml:space="preserve">
+    <value>     常规设置     </value>
   </data>
-    <data name="AdvancedSetting" xml:space="preserve">
-    <value>高级设置</value>
+  <data name="AdvancedSetting" xml:space="preserve">
+    <value>     高级设置     </value>
   </data>
     <data name="AutoStartOption" xml:space="preserve">
     <value>启动后操作</value>

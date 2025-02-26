@@ -1,32 +1,21 @@
-using HandyControl.Controls;
-using HandyControl.Data;
 using MaaFramework.Binding;
 using MFAWPF.Data;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
-using MFAWPF.Helper.Converters;
-using MFAWPF.ViewModels;
 using MFAWPF.ViewModels.UI;
-using MFAWPF.Views.UserControl.Settings;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using WPFLocalizeExtension.Extensions;
 using static MFAWPF.Views.UI.RootView;
-using ComboBox = System.Windows.Controls.ComboBox;
 using DragItemViewModel = MFAWPF.ViewModels.Tool.DragItemViewModel;
 using ScrollViewer = HandyControl.Controls.ScrollViewer;
-using ViewModel = MFAWPF.ViewModels.ViewModel;
+
 
 namespace MFAWPF.Views.UI;
 
@@ -474,9 +463,9 @@ public partial class TaskQueueView
         {
             if (item.DataContext is DragItemViewModel taskItemViewModel)
             {
-                // 获取选中项的索引
                 int index = ViewModel.TaskItemViewModels.IndexOf(taskItemViewModel);
                 ViewModel.TaskItemViewModels.RemoveAt(index);
+                Instances.TaskOptionSettingsUserControl.SetOption(taskItemViewModel, false);
                 MFAConfiguration.SetConfiguration("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }

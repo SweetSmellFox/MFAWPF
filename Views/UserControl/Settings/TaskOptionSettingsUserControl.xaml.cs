@@ -19,15 +19,16 @@ namespace MFAWPF.Views.UserControl.Settings;
 
 public partial class TaskOptionSettingsUserControl
 {
-
     public TaskOptionSettingsUserControl()
     {
         InitializeComponent();
     }
-    
-    private static readonly ConcurrentDictionary<string, StackPanel> PanelCache = new();
-    
-     public void SetOption(DragItemViewModel dragItem, bool value)
+
+    private static readonly ConcurrentDictionary<string, StackPanel> CommonPanelCache = new();
+    private static readonly ConcurrentDictionary<string, StackPanel> AdvancedPanelCache = new();
+    private static readonly ConcurrentDictionary<string, RichTextBox> IntroductionsCache = new();
+
+    public void SetOption(DragItemViewModel dragItem, bool value)
     {
         if (dragItem.InterfaceItem == null)
         {
@@ -36,28 +37,52 @@ public partial class TaskOptionSettingsUserControl
         }
 
         var cacheKey = $"{dragItem.Name}_{dragItem.InterfaceItem.GetHashCode()}";
-        
+
         if (!value)
         {
             HideCurrentPanel(cacheKey);
             return;
         }
 
-        var newPanel = PanelCache.GetOrAdd(cacheKey, key => 
+        var newPanel = CommonPanelCache.GetOrAdd(cacheKey, key =>
         {
             var p = new StackPanel();
             GeneratePanelContent(p, dragItem);
-            OptionSettings.Children.Add(p); 
+            CommonOptionSettings.Children.Add(p);
             return p;
         });
-        
+        var newIntroduction = IntroductionsCache.GetOrAdd(cacheKey, key =>
+        {
+            var richTextBox = new RichTextBox
+            {
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Background = Brushes.Transparent,
+                Margin = new Thickness(20, 10, 20, 20),
+                BorderThickness = new Thickness(0),
+                IsReadOnly = true
+            };
+            GenerateIntroductionContent(richTextBox, dragItem);
+            Introductions.Children.Add(richTextBox);
+            return richTextBox;
+        });
         newPanel.Visibility = Visibility.Visible;
+        newIntroduction.Visibility = Visibility.Visible;
+    }
+
+    private void GenerateIntroductionContent(RichTextBox richTextBox, DragItemViewModel dragItem)
+    {
+        if (dragItem.InterfaceItem?.Document?.Count > 0)
+        {
+
+            var docText = Regex.Unescape(string.Join("\\n", dragItem.InterfaceItem.Document));
+            AddIntroduction(richTextBox, docText);
+        }
     }
 
     private void GeneratePanelContent(StackPanel panel, DragItemViewModel dragItem)
     {
         AddRepeatOption(panel, dragItem);
-        
+
         if (dragItem.InterfaceItem?.Option != null)
         {
             foreach (var option in dragItem.InterfaceItem.Option)
@@ -66,126 +91,105 @@ public partial class TaskOptionSettingsUserControl
             }
         }
 
-        if (dragItem.InterfaceItem?.Document?.Count > 0)
-        {
-            var docText = Regex.Unescape(string.Join("\\n", dragItem.InterfaceItem.Document));
-            AddIntroduction(panel, docText);
-        }
     }
 
     private void HideCurrentPanel(string key)
     {
-        if (PanelCache.TryGetValue(key, out var oldPanel))
+        if (CommonPanelCache.TryGetValue(key, out var oldPanel))
         {
             oldPanel.Visibility = Visibility.Collapsed;
+        }
+        if (IntroductionsCache.TryGetValue(key, out var oldIntroduction))
+        {
+            oldIntroduction.Visibility = Visibility.Collapsed;
         }
     }
 
     private void HideAllPanels()
     {
-        foreach (var panel in PanelCache.Values)
+        foreach (var panel in CommonPanelCache.Values)
+        {
+            panel.Visibility = Visibility.Collapsed;
+        }
+        foreach (var panel in AdvancedPanelCache.Values)
+        {
+            panel.Visibility = Visibility.Collapsed;
+        }
+        foreach (var panel in IntroductionsCache.Values)
         {
             panel.Visibility = Visibility.Collapsed;
         }
     }
-
-    private void AddIntroduction(Panel panel, string input = "")
+    
+    private void AddIntroduction(RichTextBox richTextBox, string input = "")
     {
         input = LanguageHelper.GetLocalizedString(input);
-        RichTextBox richTextBox = new RichTextBox
+        var flowDocument = new FlowDocument();
+        foreach (var line in input.Split('\n').Where(l => !string.IsNullOrWhiteSpace(l)))
         {
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            Background = Brushes.Transparent,
-            BorderThickness = new Thickness(0),
-            IsReadOnly = true
-        };
-
-        FlowDocument flowDocument = new FlowDocument();
-        Paragraph paragraph = new Paragraph();
-
-        string pattern = @"\[(?<tag>[^\]]+):?(?<value>[^\]]*)\](?<content>.*?)\[/\k<tag>\]";
-        Regex regex = new Regex(pattern);
-        int lastIndex = 0;
-
-        void ParseAndApplyTags(string text, Span currentSpan)
-        {
-            List<Inline> inlinesToAdd = new List<Inline>();
-            lastIndex = 0;
-
-            foreach (Match match in regex.Matches(text))
+            var paragraph = new Paragraph
             {
-                if (match.Index > lastIndex)
-                {
-                    string textBeforeMatch = text.Substring(lastIndex, match.Index - lastIndex);
-
-                    textBeforeMatch = textBeforeMatch.Replace("\n", Environment.NewLine);
-                    inlinesToAdd.Add(new Run(textBeforeMatch));
-                }
-
-
-                string tag = match.Groups["tag"].Value.ToLower();
-                string value = match.Groups["value"].Value.ToLower();
-                string content = match.Groups["content"].Value;
-
-                var span = new Span();
-                ParseAndApplyTags(content, span);
-
-
-                switch (tag)
-                {
-                    case "color":
-                        span.Foreground = new BrushConverter().ConvertFromString(value) as Brush ?? span.Foreground;
-                        break;
-                    case "size":
-                        if (double.TryParse(value, out double fontSize))
-                        {
-                            span.FontSize = fontSize;
-                        }
-
-                        break;
-                    case "b":
-                        span.FontWeight = FontWeights.Bold;
-                        break;
-                    case "i":
-                        span.FontStyle = FontStyles.Italic;
-                        break;
-                    case "u":
-                        span.TextDecorations = TextDecorations.Underline;
-                        break;
-                    case "s":
-                        span.TextDecorations = TextDecorations.Strikethrough;
-                        break;
-                }
-
-                inlinesToAdd.Add(span);
-
-                lastIndex = match.Index + match.Length;
-            }
-
-            if (lastIndex < text.Length)
+                Margin = new Thickness(0, 0, 0, 5)
+            };
+            var processedLine = line.Trim();
+            var alignMatch = Regex.Match(processedLine, @"\[align:(?<value>left|center|right)\](?<content>.*?)\[/align\]");
+            Console.WriteLine(alignMatch.Success);
+            if (alignMatch.Success)
             {
-                string textAfterMatch = text.Substring(lastIndex);
-
-                textAfterMatch = textAfterMatch.Replace("\n", Environment.NewLine);
-                inlinesToAdd.Add(new Run(textAfterMatch));
+                paragraph.TextAlignment = (TextAlignment)Enum.Parse(typeof(TextAlignment), alignMatch.Groups["value"].Value, true);
+                Console.WriteLine(alignMatch.Groups["content"].Value);
+                processedLine = alignMatch.Groups["content"].Value ;
             }
-
-            foreach (var inline in inlinesToAdd)
-            {
-                currentSpan.Inlines.Add(inline);
-            }
+            ProcessLine(processedLine, paragraph.Inlines);
+            flowDocument.Blocks.Add(paragraph);
         }
-
-
-        Span rootSpan = new Span();
-
-        ParseAndApplyTags(input, rootSpan);
-
-        paragraph.Inlines.Add(rootSpan);
-
-        flowDocument.Blocks.Add(paragraph);
         richTextBox.Document = flowDocument;
-        panel.Children.Add(richTextBox);
+    }
+
+    private static readonly Regex TagRegex = new(@"\[(?<tag>[^\]]+):?(?<value>[^\]]*)\](?<content>.*?)\[/\k<tag>\]", RegexOptions.Compiled);
+
+    private void ProcessLine(string text, InlineCollection inlines)
+    {
+        var lastPos = 0;
+        foreach (Match match in TagRegex.Matches(text))
+        {
+            if (match.Index > lastPos)
+                inlines.Add(new Run(text.Substring(lastPos, match.Index - lastPos)));
+            var span = new Span();
+            ApplyStyle(span, match.Groups["tag"].Value.ToLower(), match.Groups["value"].Value);
+            ProcessLine(match.Groups["content"].Value, span.Inlines);
+            inlines.Add(span);
+            lastPos = match.Index + match.Length;
+        }
+        if (lastPos < text.Length)
+            inlines.Add(new Run(text.Substring(lastPos)));
+    }
+
+    private static readonly Dictionary<string, Action<Span, string>> StyleActions = new()
+    {
+        {
+            "color", (s, v) => s.Foreground = BrushConverterHelper.ConvertToBrush(v)
+        },
+        {
+            "size", (s, v) => s.FontSize = double.TryParse(v, out var size) ? size - 2 : 12
+        },
+        {
+            "b", (s, _) => s.FontWeight = FontWeights.Bold
+        },
+        {
+            "i", (s, _) => s.FontStyle = FontStyles.Italic
+        },
+        {
+            "u", (s, _) => s.TextDecorations = TextDecorations.Underline
+        },
+        {
+            "s", (s, _) => s.TextDecorations = TextDecorations.Strikethrough
+        }
+    };
+
+    private void ApplyStyle(Span span, string tag, string value)
+    {
+        if (StyleActions.TryGetValue(tag, out var action)) action(span, value);
     }
 
     private void AddRepeatOption(Panel panel, DragItemViewModel source)
@@ -238,8 +242,6 @@ public partial class TaskOptionSettingsUserControl
             Height = 20,
             HorizontalAlignment = HorizontalAlignment.Right,
             Tag = option.Name,
-            MinWidth = 60,
-            Margin = new Thickness(0, 0, -12, 0),
             VerticalAlignment = VerticalAlignment.Center
         };
 
@@ -325,7 +327,7 @@ public partial class TaskOptionSettingsUserControl
                 Name = LanguageHelper.GetLocalizedString(c.Name)
             })
         };
-        
+
         var multiBinding = new MultiBinding
         {
             Converter = customConverter,
@@ -340,13 +342,13 @@ public partial class TaskOptionSettingsUserControl
             Source = Instances.RootViewModel
         });
         combo.SetBinding(IsEnabledProperty, multiBinding);
-        
+
         combo.SelectionChanged += (_, _) =>
         {
             option.Index = combo.SelectedIndex;
             SaveConfiguration();
         };
-        
+
         combo.SetValue(TitleElement.TitleProperty, LanguageHelper.GetLocalizedString(option.Name));
         combo.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
 

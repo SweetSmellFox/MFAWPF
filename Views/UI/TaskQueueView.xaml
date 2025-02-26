@@ -1,8 +1,8 @@
 <UserControl
     d:DataContext="{d:DesignInstance local:TaskQueueView,
                                      IsDesignTimeCreatable=False}"
-    d:DesignHeight="495"
-    d:DesignWidth="800"
+    d:DesignHeight="600"
+    d:DesignWidth="900"
     mc:Ignorable="d"
     x:Class="MFAWPF.Views.UI.TaskQueueView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -263,7 +263,7 @@
             </StackPanel>
 
         </Grid>
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1" Margin="0,30,0,0">
             <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskQueueSettingsUserControl}}" Visibility="{calcBinding:Binding 'ViewModel.ConnectSettingChecked'}" />
             <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskOptionSettingsUserControl}}" Visibility="{calcBinding:Binding '!ViewModel.ConnectSettingChecked'}" />
         </Grid>

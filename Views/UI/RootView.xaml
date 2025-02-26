@@ -1,6 +1,6 @@
 ﻿<hc:Window
     Background="{DynamicResource MainContentBackgroundBrush}"
-    Height="550"
+    Height="650"
     Icon="{x:Static utils:IconHelper.ICON}"
     MinHeight="260"
     MinWidth="550"
@@ -8,7 +8,7 @@
     ResizeMode="CanResize"
     ShowTitle="False"
     Title="{lex:Loc AppTitle}"
-    Width="850"
+    Width="900"
     WindowStartupLocation="CenterScreen"
     WindowState="Normal"
     WindowStyle="None"

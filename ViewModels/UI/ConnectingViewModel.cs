@@ -236,8 +236,8 @@ public partial class ConnectingViewModel : ViewModel
             }
             : new Dictionary<long, int>
             {
-                [1] = 0,
-                [2] = 1
+                [1] = 1,
+                [2] = 0
             };
 
         if (mapping.TryGetValue(input.Value, out var result))

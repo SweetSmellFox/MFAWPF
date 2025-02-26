@@ -16,7 +16,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <hc:ScrollViewer
         HorizontalAlignment="Stretch"
-        Margin="10"
+        Margin="10,0,10,10"
         VerticalAlignment="Stretch"
         VerticalScrollBarVisibility="Auto">
         <StackPanel>
