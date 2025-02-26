@@ -1,38 +1,15 @@
 using HandyControl.Controls;
-using HandyControl.Data;
-using MaaFramework.Binding;
 using MFAWPF.Data;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
-using MFAWPF.Helper.Converters;
-using MFAWPF.ViewModels;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Text.Json;
-using System.Text.RegularExpressions;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using WPFLocalizeExtension.Extensions;
-using ComboBox = HandyControl.Controls.ComboBox;
-using JsonSerializer = Newtonsoft.Json.JsonSerializer;
-using ScrollViewer = HandyControl.Controls.ScrollViewer;
-using TextBox = HandyControl.Controls.TextBox;
 using MFAWPF.Views.UI.Dialog;
-using Notifications.Wpf.Annotations;
 using RootViewModel = MFAWPF.ViewModels.UI.RootViewModel;
 
 namespace MFAWPF.Views.UI;
@@ -214,9 +191,7 @@ public partial class RootView
         string formattedLogMessage =
             $"[{timeStamp}][INF][Px14600][Tx16498][Parser.cpp][L56][MaaNS::ProjectInterfaceNS::Parser::parse_interface] ";
         var logMessage = $"MFAWPF Version: [mfa.version={Version}] "
-            + (resourceVersion is null
-                ? ""
-                : $"Interface Version: [data.version=v{resourceVersion.Replace("v", "")}] ");
+            + $"Interface Version: [data.version=v{resourceVersion.Replace("v", "")}] ";
         LoggerService.LogInfo(logMessage);
 
         try

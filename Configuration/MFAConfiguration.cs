@@ -183,7 +183,7 @@ public static class MFAConfiguration
         value = default;
         return false;
     }
-    
+
     public static T GetConfiguration<T>(string key, T defaultValue, params JsonConverter[] valueConverters)
     {
 
@@ -205,8 +205,30 @@ public static class MFAConfiguration
         }
         return defaultValue;
     }
-    
 
+    public static bool TryGetConfiguration<T>(string key, out T output, params JsonConverter[] valueConverters)
+    {
+        if (Data.TryGetValue(key, out var data))
+        {
+            try
+            {
+                var settings = new JsonSerializerSettings();
+                foreach (var converter in valueConverters)
+                {
+                    settings.Converters.Add(converter);
+                }
+                output = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(data), settings) ?? default;
+                return true;
+            }
+            catch (Exception e)
+            {
+                LoggerService.LogError($"类型转换失败: {e.Message}");
+            }
+        }
+        output = default;
+        return false;
+    }
+    
     public static T GetConfiguration<T>(string key, T defaultValue)
     {
         return Data.GetConfig(key, defaultValue);

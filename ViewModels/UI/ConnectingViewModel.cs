@@ -297,19 +297,17 @@ public partial class ConnectingViewModel : ViewModel
 
     public void TryReadAdbDeviceFromConfig()
     {
-        if (CurrentController != MaaControllerTypes.Adb || !MFAConfiguration.GetConfiguration("RememberAdb", true) || MaaProcessor.MaaFwConfig.AdbDevice.AdbPath != "adb")
+        if (CurrentController != MaaControllerTypes.Adb || !MFAConfiguration.GetConfiguration("RememberAdb", true) || MaaProcessor.MaaFwConfig.AdbDevice.AdbPath != "adb" || !MFAConfiguration.TryGetConfiguration("AdbDevice", out AdbDeviceInfo device,
+                new AdbInputMethodsConverter(), new AdbScreencapMethodsConverter()))
+        {
             DispatcherHelper.RunOnMainThread(AutoDetectDevice);
-
-        var device = MFAConfiguration.GetConfiguration<AdbDeviceInfo>("AdbDevice", null,
-            new AdbInputMethodsConverter(), new AdbScreencapMethodsConverter());
-
-        if (device is null)
-            DispatcherHelper.RunOnMainThread(AutoDetectDevice);
-
+            return;
+        }
+        
         DispatcherHelper.RunOnMainThread(() =>
         {
             Devices = [device];
-            DevicesIndex = 0;
+            CurrentDevice = device;
         });
     }
 }
