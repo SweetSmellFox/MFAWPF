@@ -31,16 +31,11 @@ public partial class RootViewModel : ViewModel
         MFAConfiguration.SetConfiguration("EnableEdit", value);
     }
 
-    [ObservableProperty] private bool _isConnected;
+
 
     [ObservableProperty] private bool _isUpdating;
 
     [ObservableProperty] private bool _isVisible = true;
-
-    public void SetConnected(bool isConnected)
-    {
-        IsConnected = isConnected;
-    }
 
     public void SetUpdating(bool isUpdating)
     {

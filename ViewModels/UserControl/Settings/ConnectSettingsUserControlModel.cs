@@ -22,7 +22,7 @@ public partial class ConnectSettingsUserControlModel : ViewModel
     ];
     public static ObservableCollection<Tool.LocalizationViewModel> AdbControlInputTypes => [new("MiniTouch"), new("MaaTouch"), new("AdbInput"), new("AutoDetect")];
     public static ObservableCollection<string> Win32ControlScreenCapTypes => ["FramePool", "DXGIDesktopDup", "GDI"];
-    public static ObservableCollection<string> Win32ControlInputTypes => ["Seize", "SendMessage"];
+    public static ObservableCollection<string> Win32ControlInputTypes => ["SendMessage", "Seize"];
 
     [ObservableProperty] private string _adbControlScreenCapType = MFAConfiguration.GetConfiguration("AdbControlScreenCapType", AdbControlScreenCapTypes[0]);
     [ObservableProperty] private string _adbControlInputType = MFAConfiguration.GetConfiguration("AdbControlInputType", AdbControlInputTypes[0].ResourceKey);
@@ -33,19 +33,19 @@ public partial class ConnectSettingsUserControlModel : ViewModel
         MFAConfiguration.SetConfiguration("AdbControlScreenCapType", value);
         MaaProcessor.Instance.SetCurrentTasker();
     }
-    
+
     partial void OnAdbControlInputTypeChanged(string value)
     {
         MFAConfiguration.SetConfiguration("AdbControlInputType", value);
         MaaProcessor.Instance.SetCurrentTasker();
     }
-    
+
     partial void OnWin32ControlScreenCapTypeChanged(string value)
     {
         MFAConfiguration.SetConfiguration("Win32ControlScreenCapType", value);
         MaaProcessor.Instance.SetCurrentTasker();
     }
-    
+
     partial void OnWin32ControlInputTypeChanged(string value)
     {
         MFAConfiguration.SetConfiguration("Win32ControlInputType", value);

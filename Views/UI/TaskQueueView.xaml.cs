@@ -429,7 +429,7 @@ public partial class TaskQueueView
 
     private void Edit(object sender, RoutedEventArgs e)
     {
-        if (!Instances.RootView.IsConnected())
+        if (!Instances.ConnectingViewModel.IsConnected)
         {
             GrowlHelper.Warning(
                 "Warning_CannotConnect".ToLocalizationFormatted(Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb

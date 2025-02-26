@@ -196,11 +196,6 @@ public static class MFAConfiguration
                 {
                     settings.Converters.Add(converter);
                 }
-                if (key == "CurrentController")
-                {
-                    Console.WriteLine(key);
-                    Console.WriteLine(JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(data), settings));
-                }
                 return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(data), settings) ?? defaultValue;
             }
             catch (Exception e)

@@ -125,14 +125,16 @@
                     Margin="8,0,4,0"
                     Text="{lex:Loc Unconnected}"
                     VerticalAlignment="Center"
-                    Visibility="{c:Binding '!ViewModel.IsConnected'}" />
+                    Visibility="{c:Binding '!IsConnected',
+                                           Source={x:Static utils:Instances.ConnectingViewModel}}" />
                 <Path
                     Data="{StaticResource UnconnectedGeometry}"
                     Fill="Red"
                     Height="15"
                     Margin="2,0,4,0"
                     Stretch="Uniform"
-                    Visibility="{c:Binding '!ViewModel.IsConnected'}"
+                    Visibility="{c:Binding '!IsConnected',
+                                           Source={x:Static utils:Instances.ConnectingViewModel}}"
                     Width="15" />
 
                 <TextBlock
@@ -141,14 +143,16 @@
                     Margin="8,0,4,0"
                     Text="{lex:Loc Connected}"
                     VerticalAlignment="Center"
-                    Visibility="{c:Binding 'ViewModel.IsConnected'}" />
+                    Visibility="{c:Binding 'IsConnected',
+                                           Source={x:Static utils:Instances.ConnectingViewModel}}" />
                 <Path
                     Data="{StaticResource ConnectedGeometry}"
                     Fill="LimeGreen"
                     Height="15"
                     Margin="2,0,4,0"
                     Stretch="Uniform"
-                    Visibility="{c:Binding 'ViewModel.IsConnected'}"
+                    Visibility="{c:Binding 'IsConnected',
+                                           Source={x:Static utils:Instances.ConnectingViewModel}}"
                     Width="15" />
             </StackPanel>
 

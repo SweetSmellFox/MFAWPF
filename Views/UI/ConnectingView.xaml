@@ -14,6 +14,7 @@
     xmlns:helper="clr-namespace:MFAWPF.Helper"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:MFAWPF.Views.UI"
+    xmlns:maa="clr-namespace:MFAWPF.Extensions.Maa"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <UserControl.Resources>
@@ -157,7 +158,7 @@
             Grid.Column="0"
             Grid.Row="4"
             Margin="20,6,20,6"
-            Visibility="{calcBinding:Binding 'EnableCustom',
+            Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Adb',
                                              Source={x:Static helper:Instances.ConnectingViewModel}}">
             <control:CardControl.Icon>
                 <Path

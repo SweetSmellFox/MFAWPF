@@ -60,15 +60,20 @@ public partial class ConnectingViewModel : ViewModel
     ];
 
     [ObservableProperty] private MaaControllerTypes _currentController = MFAConfiguration.GetConfiguration("CurrentController", MaaControllerTypes.Adb, new MaaControllerTypesConverter());
-    [ObservableProperty] private bool _enableCustom = MFAConfiguration.GetConfiguration("CurrentController", MaaControllerTypes.Adb) == MaaControllerTypes.Adb;
 
     partial void OnCurrentControllerChanged(MaaControllerTypes value)
     {
-        EnableCustom = value == MaaControllerTypes.Adb;
         MFAConfiguration.SetConfiguration("CurrentController", value);
         AutoDetectDevice();
         MaaProcessor.Instance.SetCurrentTasker();
     }
+
+    [ObservableProperty] private bool _isConnected;
+    public void SetConnected(bool isConnected)
+    {
+        IsConnected = isConnected;
+    }
+
 
     [RelayCommand]
     public void CustomAdb()
@@ -79,7 +84,7 @@ public partial class ConnectingViewModel : ViewModel
         {
             Devices = [dialog.Output];
             CurrentDevice = dialog.Output;
-            Instances.RootViewModel.SetConnected(true);
+            SetConnected(true);
         }
     }
 
@@ -122,7 +127,7 @@ public partial class ConnectingViewModel : ViewModel
         try
         {
             GrowlHelper.Info(GetDetectionMessage(isAdb));
-            Instances.RootViewModel.SetConnected(false);
+            SetConnected(false);
 
             var (devices, index) = isAdb ? DetectAdbDevices() : DetectWin32Windows();
 
@@ -272,7 +277,6 @@ public partial class ConnectingViewModel : ViewModel
 
     private void UpdateConnectionStatus(bool hasDevices, bool isAdb)
     {
-        Instances.RootViewModel.SetConnected(hasDevices);
         if (!hasDevices)
         {
             GrowlHelper.Info(LocExtension.GetLocalizedValue<string>(
@@ -287,32 +291,25 @@ public partial class ConnectingViewModel : ViewModel
             LocExtension.GetLocalizedValue<string>("TaskStackError"),
             targetType.ToLocalization(),
             ex.Message));
-
-        Instances.RootViewModel.SetConnected(false);
+        
         LoggerService.LogError(ex);
     }
 
-    public bool ReadAdbDeviceFromConfig()
+    public void TryReadAdbDeviceFromConfig()
     {
-        if (CurrentController == MaaControllerTypes.Adb
-            && MFAConfiguration.GetConfiguration("RememberAdb", true)
-            && "adb".Equals(MaaProcessor.MaaFwConfig.AdbDevice.AdbPath))
+        if (CurrentController != MaaControllerTypes.Adb || !MFAConfiguration.GetConfiguration("RememberAdb", true) || MaaProcessor.MaaFwConfig.AdbDevice.AdbPath != "adb")
+            DispatcherHelper.RunOnMainThread(AutoDetectDevice);
+
+        var device = MFAConfiguration.GetConfiguration<AdbDeviceInfo>("AdbDevice", null,
+            new AdbInputMethodsConverter(), new AdbScreencapMethodsConverter());
+
+        if (device is null)
+            DispatcherHelper.RunOnMainThread(AutoDetectDevice);
+
+        DispatcherHelper.RunOnMainThread(() =>
         {
-            var device = MFAConfiguration.GetConfiguration<AdbDeviceInfo>("AdbDevice", null, new AdbInputMethodsConverter(), new AdbScreencapMethodsConverter());
-            if (device != null)
-            {
-                DispatcherHelper.RunOnMainThread(() =>
-                {
-                    Devices =
-                    [
-                        device
-                    ];
-                    DevicesIndex = 0;
-                    Instances.RootViewModel.SetConnected(true);
-                });
-                return true;
-            }
-        }
-        return false;
+            Devices = [device];
+            DevicesIndex = 0;
+        });
     }
 }

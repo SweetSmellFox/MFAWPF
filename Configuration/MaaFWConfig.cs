@@ -16,7 +16,7 @@ public class DesktopWindowCoreConfig
     public string Name { get; set; } = string.Empty;
     public nint HWnd { get; set; }
 
-    public Win32InputMethod Input { get; set; } = Win32InputMethod.Seize;
+    public Win32InputMethod Input { get; set; } = Win32InputMethod.SendMessage;
 
     public Win32ScreencapMethod ScreenCap { get; set; } = Win32ScreencapMethod.FramePool;
     public LinkOption Link { get; set; } = LinkOption.Start;

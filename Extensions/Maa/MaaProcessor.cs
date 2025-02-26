@@ -152,7 +152,7 @@ public class MaaProcessor
                             return;
                         }
 
-                        Instances.RootViewModel.SetConnected(false);
+                        Instances.ConnectingViewModel.SetConnected(false);
                         instance = Task.Run(GetCurrentTasker, token);
                         instance.Wait(token);
                         connected = instance.Result is { Initialized: true };
@@ -196,13 +196,13 @@ public class MaaProcessor
                     {
                         LoggerService.LogWarning("ConnectFailed".ToLocalization());
                         RootView.AddLogByKey("ConnectFailed");
-                        Instances.RootViewModel.SetConnected(false);
+                        Instances.ConnectingViewModel.SetConnected(false);
                         Stop();
                     }
 
-                    if (connected) Instances.RootViewModel.SetConnected(true);
+                    if (connected) Instances.ConnectingViewModel.SetConnected(true);
 
-                    if (!Instances.RootView.IsConnected())
+                    if (!Instances.ConnectingViewModel.IsConnected)
                     {
                         GrowlHelper.Warning("Warning_CannotConnect".ToLocalization()
                             .FormatWith(Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
@@ -729,7 +729,7 @@ public class MaaProcessor
     private void UpdateTaskDictionary(ref Dictionary<string, TaskModel> taskModels,
         List<MaaInterface.MaaInterfaceSelectOption>? options)
     {
-            Instances.TaskQueueView.TaskDictionary = Instances.TaskQueueView.TaskDictionary.MergeTaskModels(taskModels);
+        Instances.TaskQueueView.TaskDictionary = Instances.TaskQueueView.TaskDictionary.MergeTaskModels(taskModels);
 
         if (options == null) return;
 
@@ -886,6 +886,7 @@ public class MaaProcessor
     {
         return _currentTasker != null;
     }
+
     public void SetCurrentTasker(MaaTasker tasker = null)
     {
         _currentTasker = tasker;
@@ -995,7 +996,6 @@ public class MaaProcessor
 
         LoggerService.LogInfo("InitControllerSuccess".ToLocalization());
 
-
         try
         {
             var tasker = new MaaTasker
@@ -1007,6 +1007,7 @@ public class MaaProcessor
                 DisposeOptions = DisposeOptions.All,
             };
             RegisterCustomRecognitionsAndActions(tasker);
+            Instances.ConnectingViewModel.SetConnected(true);
             tasker.Utility.SetOptionRecording(MFAConfiguration.MaaConfig.GetConfig("recording", false));
             tasker.Utility.SetOptionSaveDraw(MFAConfiguration.MaaConfig.GetConfig("save_draw", false));
             tasker.Utility.SetOptionShowHitDraw(MFAConfiguration.MaaConfig.GetConfig("show_hit_draw", false));
@@ -1476,5 +1477,16 @@ public class MaaProcessor
                 // ignored
             }
         }
+
+    }
+
+    public void TestConnecting()
+    {
+        TaskManager.RunTaskAsync(() =>
+        {
+            var task = GetCurrentTasker().Controller.LinkStart();
+            task.Wait();
+            Instances.ConnectingViewModel.SetConnected(task.Status == MaaJobStatus.Succeeded);
+        });
     }
 }

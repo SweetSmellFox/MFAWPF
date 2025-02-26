@@ -165,20 +165,19 @@ public partial class RootView
             }
             else
             {
-                Instances.ConnectingViewModel.ReadAdbDeviceFromConfig();
+                Instances.ConnectingViewModel.TryReadAdbDeviceFromConfig();
+                MaaProcessor.Instance.TestConnecting();
                 VersionChecker.Check();
             }
 
             GlobalConfiguration.SetConfiguration("NoAutoStart", bool.FalseString);
 
             ViewModel.NotLock = MaaInterface.Instance?.LockController != true;
-            // TaskQueueView.ConnectSettingButton.IsChecked = true;
             MFAConfiguration.SetConfiguration("EnableEdit", MFAConfiguration.GetConfiguration("EnableEdit", false));
             if (!string.IsNullOrWhiteSpace(MaaInterface.Instance?.Message))
             {
                 Growl.Info(MaaInterface.Instance.Message);
             }
-
         });
         TaskManager.RunTaskAsync(async () =>
         {
@@ -352,13 +351,7 @@ public partial class RootView
             MaaProcessor.Instance.StartSoftware();
         }
 
-        if (!Instances.ConnectingViewModel.ReadAdbDeviceFromConfig())
-            DispatcherHelper.RunOnMainThread(Instances.ConnectingViewModel.AutoDetectDevice);
-    }
-
-    public bool IsConnected()
-    {
-        return ViewModel.IsConnected;
+        Instances.ConnectingViewModel.TryReadAdbDeviceFromConfig();
     }
 
     public bool ConfirmExit()
