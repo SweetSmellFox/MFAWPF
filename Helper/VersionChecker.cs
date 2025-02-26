@@ -1093,7 +1093,7 @@ public class VersionChecker
             if ((int)responseData["code"] == 0)
             {
                 var data = responseData["data"];
-                if (!onlyCheck)
+                if (!onlyCheck && !isUI)
                     SaveAnnouncement(data, "release_note");
                 var versionName = data["version_name"]?.ToString();
                 var downloadUrl = data["url"]?.ToString();
@@ -1114,7 +1114,7 @@ public class VersionChecker
     {
         try
         {
-            var bodyContent = releaseData[from]?.ToString();
+            var bodyContent = releaseData?[from]?.ToString();
             if (!string.IsNullOrWhiteSpace(bodyContent))
             {
                 var resourceDirectory = Path.Combine(AppContext.BaseDirectory, "resource");
