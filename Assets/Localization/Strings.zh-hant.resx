@@ -854,4 +854,22 @@
   <data name="CurrentResourcesNotSupportGitHub" xml:space="preserve">
     <value>該資源操作暫不支援 GitHub</value>
   </data>
+  <data name="ControllerType" xml:space="preserve">
+    <value>控制器類型</value>
+  </data>
+  <data name="CurrentController" xml:space="preserve">
+    <value>當前控制器</value>
+  </data>
+  <data name="ApplyControllerType" xml:space="preserve">
+    <value>選擇要應用的控制器類型</value>
+  </data>
+  <data name="OperateController" xml:space="preserve">
+    <value>選擇要操作的控制器</value>
+  </data>
+  <data name="EditControllerConfiguration" xml:space="preserve">
+    <value>編輯控制器配置</value>
+  </data>
+  <data name="RescanController" xml:space="preserve">
+    <value>重新掃描控制器</value>
+  </data>
 </root>

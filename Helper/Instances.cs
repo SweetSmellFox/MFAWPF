@@ -60,6 +60,8 @@ public static class Instances
     public static TaskQueueSettingsUserControl TaskQueueSettingsUserControl => Resolve<TaskQueueSettingsUserControl>();
     public static TaskOptionSettingsUserControl TaskOptionSettingsUserControl => Resolve<TaskOptionSettingsUserControl>();
     public static ConnectingView ConnectingView => Resolve<ConnectingView>();
+    public static ConnectingViewModel ConnectingViewModel => Resolve<ConnectingViewModel>();
+    
     public static AnnouncementViewModel AnnouncementViewModel => Resolve<AnnouncementViewModel>();
     public static SettingsView SettingsView => Resolve<SettingsView>();
     public static SettingsViewModel SettingsViewModel => Resolve<SettingsViewModel>();

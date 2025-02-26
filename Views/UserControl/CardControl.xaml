@@ -1,0 +1,54 @@
+<UserControl
+    d:DesignHeight="300"
+    d:DesignWidth="300"
+    mc:Ignorable="d"
+    x:Class="MFAWPF.Views.UserControl.CardControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MFAWPF.Views.UserControl"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Template>
+        <ControlTemplate TargetType="local:CardControl">
+            <Border
+                Background="{TemplateBinding Background}"
+                BorderBrush="{DynamicResource GrayColor10}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}">
+
+                <Grid Margin="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <!--  Icon  -->
+                        <ColumnDefinition Width="*" />
+                        <!--  Header  -->
+                        <ColumnDefinition Width="Auto" />
+                        <!--  Content  -->
+                    </Grid.ColumnDefinitions>
+
+                    <ContentPresenter
+                        Content="{TemplateBinding Icon}"
+                        Grid.Column="0"
+                        Margin="0,0,12,0"
+                        VerticalAlignment="Center" />
+
+                    <ContentPresenter
+                        Content="{TemplateBinding Header}"
+                        Grid.Column="1"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center" />
+
+                    <ContentPresenter
+                        Content="{TemplateBinding Content}"
+                        Grid.Column="2"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Width="{calcBinding:Binding Path='ActualWidth / 3.2',
+                                                    RelativeSource={RelativeSource AncestorType=local:CardControl}}" />
+                </Grid>
+            </Border>
+        </ControlTemplate>
+    </UserControl.Template>
+
+</UserControl>

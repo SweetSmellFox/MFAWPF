@@ -854,4 +854,22 @@
   <data name="CurrentResourcesNotSupportGitHub" xml:space="preserve">
     <value>The current resources do not support GitHub.</value>
   </data>
+  <data name="ControllerType" xml:space="preserve">
+    <value>Controller Type</value>
+  </data>
+  <data name="CurrentController" xml:space="preserve">
+    <value>Current Controller</value>
+  </data>
+  <data name="ApplyControllerType" xml:space="preserve">
+    <value>Select the Controller Type to Apply</value>
+  </data>
+  <data name="OperateController" xml:space="preserve">
+    <value>Select the Controller to Operate</value>
+  </data>
+  <data name="EditControllerConfiguration" xml:space="preserve">
+    <value>Edit Controller Configuration</value>
+  </data>
+  <data name="RescanController" xml:space="preserve">
+    <value>Rescan Controllers</value>
+  </data>
 </root>

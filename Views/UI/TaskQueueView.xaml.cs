@@ -207,7 +207,7 @@ public partial class TaskQueueView
 
     private void ConfigureMaaProcessorForADB()
     {
-        if (Instances.RootViewModel.IsAdb)
+        if (Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb)
         {
             var adbInputType = ConfigureAdbInputTypes();
             var adbScreenCapType = ConfigureAdbScreenCapTypes();
@@ -222,7 +222,7 @@ public partial class TaskQueueView
 
     public string ScreenshotType()
     {
-        if (Instances.RootViewModel.IsAdb)
+        if (Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb)
             return ConfigureAdbScreenCapTypes().ToString();
         return ConfigureWin32ScreenCapTypes().ToString();
     }
@@ -258,7 +258,7 @@ public partial class TaskQueueView
 
     private void ConfigureMaaProcessorForWin32()
     {
-        if (!Instances.RootViewModel.IsAdb)
+        if (Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Win32)
         {
             var win32InputType = ConfigureWin32InputTypes();
             var winScreenCapType = ConfigureWin32ScreenCapTypes();
@@ -432,7 +432,7 @@ public partial class TaskQueueView
         if (!Instances.RootView.IsConnected())
         {
             GrowlHelper.Warning(
-                "Warning_CannotConnect".ToLocalizationFormatted(Instances.RootViewModel.IsAdb
+                "Warning_CannotConnect".ToLocalizationFormatted(Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
                     ? "Emulator".ToLocalization()
                     : "Window".ToLocalization()));
             return;

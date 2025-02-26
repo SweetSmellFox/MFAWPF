@@ -43,7 +43,7 @@ public partial class AnnouncementViewModel : ViewModel
         finally
         {
 
-            if (!string.IsNullOrWhiteSpace(AnnouncementInfo))
+            if (!string.IsNullOrWhiteSpace(AnnouncementInfo) && !AnnouncementInfo.Trim().Equals("placeholder", StringComparison.OrdinalIgnoreCase))
             {
                 var announcementView = new AnnouncementView();
                 announcementView.Show();

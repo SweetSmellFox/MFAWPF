@@ -1,5 +1,5 @@
 <UserControl
-    d:DataContext="{d:DesignInstance local:RootView,
+    d:DataContext="{d:DesignInstance local:ConnectingView,
                                      IsDesignTimeCreatable=False}"
     d:DesignHeight="495"
     d:DesignWidth="800"
@@ -8,6 +8,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:binding="clr-namespace:MaaFramework.Binding;assembly=MaaFramework.Binding"
     xmlns:calcBinding="clr-namespace:CalcBinding;assembly=CalcBinding"
+    xmlns:control="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:helper="clr-namespace:MFAWPF.Helper"
@@ -37,71 +38,146 @@
             WindowInfoTemplate="{StaticResource WindowInfoTemplate}"
             x:Key="DeviceWindowTemplateSelector" />
     </UserControl.Resources>
+
     <Grid Background="{DynamicResource SecundaryBackgroundColor}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="45" />
-            <RowDefinition />
+            <RowDefinition Height="10" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid
-            Grid.Row="0"
-            Height="30"
-            Margin="15,6,10,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="150" Width="Auto" />
-                <ColumnDefinition MinWidth="250" Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TabControl
-                Background="Transparent"
-                BorderThickness="0"
-                Grid.Column="0"
-                IsEnabled="{calcBinding:Binding 'ViewModel.NotLock and ViewModel.Idle'}"
-                Style="{StaticResource TabControlCapsuleSolid}"
-                TabStripPlacement="Top"
-                x:Name="ConnectionTabControl">
-                <TabItem Header="{lex:Loc TabADB}" x:Name="AdbTab" />
-                <TabItem Header="{lex:Loc TabWin32}" x:Name="Win32Tab" />
-            </TabControl>
-            <ComboBox
-                Grid.Column="1"
-                IsEnabled="{Binding ViewModel.Idle}"
-                ItemTemplateSelector="{StaticResource DeviceWindowTemplateSelector}"
-                Margin="4,0,0,0"
-                SelectionChanged="DeviceComboBox_OnSelectionChanged"
-                x:Name="DeviceComboBox" />
-            <WrapPanel Grid.Column="2">
-                <Button
-                    Click="Refresh"
-                    Foreground="{DynamicResource GrayColor4}"
-                    Height="20"
-                    IsEnabled="{Binding ViewModel.Idle}"
-                    Margin="6,5,2,0"
-                    Padding="0"
-                    Style="{StaticResource textBoxButton}"
-                    ToolTip="{lex:Loc TooltipRefresh}"
-                    Width="20"
-                    hc:IconElement.Geometry="{StaticResource clear}"
-                    hc:IconElement.Width="14" />
-                <Button
-                    Click="CustomAdb"
-                    Foreground="{DynamicResource GrayColor4}"
-                    Height="20"
-                    IsEnabled="{Binding ViewModel.Idle}"
-                    Margin="2,5,2,0"
-                    Padding="0"
-                    Style="{StaticResource textBoxButton}"
-                    ToolTip="{lex:Loc Custom}"
-                    Width="20"
-                    hc:IconElement.Geometry="{StaticResource CustomGeometry}"
-                    hc:IconElement.Width="14"
-                    x:Name="ButtonCustom" />
-            </WrapPanel>
-        </Grid>
-        <hc:SimpleStackPanel
+        <control:CardControl
+            Background="{DynamicResource WhiteColor}"
+            BorderThickness="1"
+            CornerRadius="5"
+            Grid.Column="0"
             Grid.Row="1"
-            Margin="10"
-            Orientation="Vertical"
-            x:Name="ConnectionSettingPanel" />
+            Margin="20,6,20,6">
+            <control:CardControl.Icon>
+                <Path
+                    Data="{StaticResource AppsGeometry}"
+                    Fill="{DynamicResource GrayColor1}"
+                    Height="25"
+                    Margin="8"
+                    Stretch="Uniform"
+                    Width="25" />
+            </control:CardControl.Icon>
+            <control:CardControl.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <control:CustomTextBlock Grid.Row="0" Text="{lex:Loc ControllerType}" />
+                    <control:CustomTextBlock
+                        Foreground="{DynamicResource GrayColor1}"
+                        Grid.Row="1"
+                        Text="{lex:Loc ApplyControllerType}" />
+                </Grid>
+            </control:CardControl.Header>
+            <ComboBox
+                DataContext="{x:Static helper:Instances.ConnectingViewModel}"
+                DisplayMemberPath="Name"
+                IsHitTestVisible="{calcBinding:Binding 'NotLock and Idle',
+                                                       Source={x:Static helper:Instances.RootViewModel}}"
+                ItemsSource="{Binding Controllers}"
+                SelectedValue="{Binding CurrentController, Mode=TwoWay}"
+                SelectedValuePath="Other" />
+        </control:CardControl>
+        <control:CardControl
+            Background="{DynamicResource WhiteColor}"
+            BorderThickness="1"
+            CornerRadius="5"
+            Grid.Column="0"
+            Grid.Row="2"
+            Margin="20,6,20,6">
+            <control:CardControl.Icon>
+                <Path
+                    Data="{StaticResource ApplicationGeometry}"
+                    Fill="{DynamicResource GrayColor1}"
+                    Height="25"
+                    Margin="8"
+                    Stretch="Uniform"
+                    Width="25" />
+            </control:CardControl.Icon>
+            <control:CardControl.Header>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <control:CustomTextBlock Grid.Row="0" Text="{lex:Loc CurrentController}" />
+                    <control:CustomTextBlock
+                        Foreground="{DynamicResource GrayColor1}"
+                        Grid.Row="1"
+                        Text="{lex:Loc OperateController}" />
+                </Grid>
+            </control:CardControl.Header>
+            <ComboBox
+                DataContext="{x:Static helper:Instances.ConnectingViewModel}"
+                IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
+                ItemTemplateSelector="{StaticResource DeviceWindowTemplateSelector}"
+                ItemsSource="{Binding Devices}"
+                Margin="4,0,0,0"
+                SelectedIndex="{Binding DevicesIndex}"
+                SelectedValue="{Binding CurrentDevice}" />
+        </control:CardControl>
+        <control:CardControl
+            Background="{DynamicResource WhiteColor}"
+            BorderThickness="1"
+            CornerRadius="5"
+            Grid.Column="0"
+            Grid.Row="3"
+            Margin="20,6,20,6">
+            <control:CardControl.Icon>
+                <Path
+                    Data="{StaticResource BetterRefreshGeometry}"
+                    Fill="{DynamicResource GrayColor1}"
+                    Height="25"
+                    Margin="8"
+                    Stretch="Uniform"
+                    Width="25" />
+            </control:CardControl.Icon>
+            <control:CardControl.Header>
+                <control:CustomTextBlock Grid.Row="0" Text="{lex:Loc RescanController}" />
+            </control:CardControl.Header>
+            <Button
+                Command="{Binding AutoDetectDeviceCommand, Source={x:Static helper:Instances.ConnectingViewModel}}"
+                Content="{lex:Loc TooltipRefresh}"
+                HorizontalAlignment="Stretch"
+                IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
+                Margin="4,0,0,0" />
+        </control:CardControl>
+        <control:CardControl
+            Background="{DynamicResource WhiteColor}"
+            BorderThickness="1"
+            CornerRadius="5"
+            Grid.Column="0"
+            Grid.Row="4"
+            Margin="20,6,20,6"
+            Visibility="{calcBinding:Binding 'EnableCustom',
+                                             Source={x:Static helper:Instances.ConnectingViewModel}}">
+            <control:CardControl.Icon>
+                <Path
+                    Data="{StaticResource SimpleGeometry}"
+                    Fill="{DynamicResource GrayColor1}"
+                    Height="25"
+                    Margin="8"
+                    Stretch="Uniform"
+                    Width="25" />
+            </control:CardControl.Icon>
+            <control:CardControl.Header>
+                <control:CustomTextBlock Grid.Row="0" Text="{lex:Loc EditControllerConfiguration}" />
+            </control:CardControl.Header>
+            <Button
+                Command="{Binding CustomAdbCommand, Source={x:Static helper:Instances.ConnectingViewModel}}"
+                Content="{lex:Loc Custom}"
+                HorizontalAlignment="Stretch"
+                IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
+                Margin="4,0,0,0" />
+        </control:CardControl>
     </Grid>
+
 </UserControl>

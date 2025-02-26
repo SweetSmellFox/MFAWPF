@@ -114,13 +114,13 @@ public class MaaProcessor
                 Type = MFATask.MFATaskType.MFA,
                 Action = () =>
                 {
-                    RootView.AddLogByKey("ConnectingTo", null, Instances.RootViewModel.IsAdb
+                    RootView.AddLogByKey("ConnectingTo", null, Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
                         ? "Emulator"
                         : "Window");
                     var instance = Task.Run(GetCurrentTasker, token);
                     instance.Wait(token);
                     bool connected = instance.Result is { Initialized: true };
-                    if (!connected && Instances.RootViewModel.IsAdb && MFAConfiguration.GetConfiguration("RetryOnDisconnected", false))
+                    if (!connected && Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb && MFAConfiguration.GetConfiguration("RetryOnDisconnected", false))
                     {
                         RootView.AddLog("ConnectFailed".ToLocalization() + "\n" + "TryToStartEmulator".ToLocalization());
 
@@ -131,17 +131,17 @@ public class MaaProcessor
                             Stop();
                             return;
                         }
-                        Instances.ConnectingView.AutoDetectDevice();
+                        Instances.ConnectingViewModel.AutoDetectDevice();
 
                         instance = Task.Run(GetCurrentTasker, token);
                         instance.Wait(token);
                         connected = instance.Result is { Initialized: true };
 
-                        Instances.ConnectingView.AutoDetectDevice();
+                        Instances.ConnectingViewModel.AutoDetectDevice();
                     }
 
 
-                    if (!connected && Instances.RootViewModel.IsAdb)
+                    if (!connected && Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb)
                     {
                         RootView.AddLog("ConnectFailed".ToLocalization() + "\n" + "TryToReconnectByAdb".ToLocalization());
                         ReconnectByAdb();
@@ -157,7 +157,7 @@ public class MaaProcessor
                         instance.Wait(token);
                         connected = instance.Result is { Initialized: true };
                     }
-                    if (!connected && Instances.RootViewModel.IsAdb && MFAConfiguration.GetConfiguration("AllowAdbRestart", true))
+                    if (!connected && Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb && MFAConfiguration.GetConfiguration("AllowAdbRestart", true))
                     {
                         RootView.AddLog("ConnectFailed".ToLocalization() + "\n" + "RestartAdb".ToLocalization());
 
@@ -175,7 +175,7 @@ public class MaaProcessor
                     }
 
                     // 尝试杀掉 ADB 进程
-                    if (!connected && Instances.RootViewModel.IsAdb && MFAConfiguration.GetConfiguration("AllowAdbHardRestart", true))
+                    if (!connected && Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb && MFAConfiguration.GetConfiguration("AllowAdbHardRestart", true))
                     {
                         RootView.AddLog("ConnectFailed".ToLocalization() + "\n" + "HardRestartAdb".ToLocalization());
 
@@ -205,7 +205,7 @@ public class MaaProcessor
                     if (!Instances.RootView.IsConnected())
                     {
                         GrowlHelper.Warning("Warning_CannotConnect".ToLocalization()
-                            .FormatWith(Instances.RootViewModel.IsAdb
+                            .FormatWith(Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
                                 ? "Emulator".ToLocalization()
                                 : "Window".ToLocalization()));
                         throw new Exception();
@@ -537,7 +537,7 @@ public class MaaProcessor
             if (remainingTime % 10 == 0)
             {
                 RootView.AddLogByKey("WaitSoftwareTime", null,
-                    Instances.RootViewModel.IsAdb
+                    Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
                         ? "Emulator"
                         : "Window",
                     remainingTime.ToString()
@@ -578,7 +578,7 @@ public class MaaProcessor
 
     public static void CloseSoftware(Action? action = null)
     {
-        if (Instances.RootViewModel.IsAdb)
+        if (Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb)
         {
             EmulatorHelper.KillEmulatorModeSwitcher();
         }
@@ -986,7 +986,7 @@ public class MaaProcessor
         {
             HandleInitializationError(e,
                 "ConnectingEmulatorOrWindow".ToLocalization()
-                    .FormatWith(Instances.RootViewModel.IsAdb
+                    .FormatWith(Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
                         ? "Emulator".ToLocalization()
                         : "Window".ToLocalization()), true,
                 "InitControllerFailed".ToLocalization());
@@ -1021,7 +1021,7 @@ public class MaaProcessor
 
     private MaaController InitializeController()
     {
-        if (Instances.RootViewModel.IsAdb)
+        if (Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb)
         {
             LoggerService.LogInfo($"AdbPath: {MaaFwConfig.AdbDevice.AdbPath}");
             LoggerService.LogInfo($"AdbSerial: {MaaFwConfig.AdbDevice.AdbSerial}");
@@ -1037,7 +1037,7 @@ public class MaaProcessor
             LoggerService.LogInfo($"Link: {MaaFwConfig.DesktopWindow.Link}");
             LoggerService.LogInfo($"Check: {MaaFwConfig.DesktopWindow.Check}");
         }
-        return Instances.RootViewModel.IsAdb
+        return Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
             ? new MaaAdbController(
                 MaaFwConfig.AdbDevice.AdbPath,
                 MaaFwConfig.AdbDevice.AdbSerial,

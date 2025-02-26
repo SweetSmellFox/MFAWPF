@@ -152,7 +152,7 @@ public partial class RootView
         DispatcherHelper.RunOnMainThread(() =>
         {
             InitializationSettings();
-            Instances.ConnectingView.ConnectionTabControl.SelectedIndex = MaaInterface.Instance?.DefaultController == "win32" ? 1 : 0;
+            Instances.ConnectingViewModel.CurrentController = (MaaInterface.Instance?.DefaultController).ToMaaControllerTypes(Instances.ConnectingViewModel.CurrentController);
             if (!Convert.ToBoolean(GlobalConfiguration.GetConfiguration("NoAutoStart", bool.FalseString)) && MFAConfiguration.GetConfiguration("BeforeTask", "None").Contains("Startup", StringComparison.OrdinalIgnoreCase))
             {
                 MaaProcessor.Instance.TaskQueue.Push(new MFATask
@@ -165,26 +165,7 @@ public partial class RootView
             }
             else
             {
-                if (ViewModel.IsAdb && MFAConfiguration.GetConfiguration("RememberAdb", true) && "adb".Equals(MaaProcessor.MaaFwConfig.AdbDevice.AdbPath) && MFAConfiguration.TryGetData<JObject>("AdbDevice", out var jObject))
-                {
-                    var settings = new JsonSerializerSettings();
-                    settings.Converters.Add(new AdbInputMethodsConverter());
-                    settings.Converters.Add(new AdbScreencapMethodsConverter());
-
-                    var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
-                    if (device != null)
-                    {
-                        DispatcherHelper.RunOnMainThread(() =>
-                        {
-                            Instances.ConnectingView.DeviceComboBox.ItemsSource = new List<AdbDeviceInfo>
-                            {
-                                device
-                            };
-                            Instances.ConnectingView.DeviceComboBox.SelectedIndex = 0;
-                            ViewModel.SetConnected(true);
-                        });
-                    }
-                }
+                Instances.ConnectingViewModel.ReadAdbDeviceFromConfig();
                 VersionChecker.Check();
             }
 
@@ -371,28 +352,8 @@ public partial class RootView
             MaaProcessor.Instance.StartSoftware();
         }
 
-        if ((ViewModel?.IsAdb).IsTrue() && MFAConfiguration.GetConfiguration("RememberAdb", true) && "adb".Equals(MaaProcessor.MaaFwConfig.AdbDevice.AdbPath) && MFAConfiguration.TryGetData<JObject>("AdbDevice", out var jObject))
-        {
-            var settings = new JsonSerializerSettings();
-            settings.Converters.Add(new AdbInputMethodsConverter());
-            settings.Converters.Add(new AdbScreencapMethodsConverter());
-
-            var device = jObject?.ToObject<AdbDeviceInfo>(JsonSerializer.Create(settings));
-            if (device != null)
-            {
-                DispatcherHelper.RunOnMainThread(() =>
-                {
-                    Instances.ConnectingView.DeviceComboBox.ItemsSource = new List<AdbDeviceInfo>
-                    {
-                        device
-                    };
-                    Instances.ConnectingView.DeviceComboBox.SelectedIndex = 0;
-                    ViewModel.SetConnected(true);
-                });
-            }
-        }
-        else
-            DispatcherHelper.RunOnMainThread(Instances.ConnectingView.AutoDetectDevice);
+        if (!Instances.ConnectingViewModel.ReadAdbDeviceFromConfig())
+            DispatcherHelper.RunOnMainThread(Instances.ConnectingViewModel.AutoDetectDevice);
     }
 
     public bool IsConnected()

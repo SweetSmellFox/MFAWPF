@@ -502,6 +502,8 @@ public static class MFAExtensions
 
         return true;
     }
+    
+   
     // public static bool IsDebugMode()
     // {
     //     if (MFAConfiguration.MaaConfig.GetConfig("recording", false) || MFAConfiguration.MaaConfig.GetConfig("save_draw", false) || MFAConfiguration.MaaConfig.GetConfig("show_hit_draw", false)) return true;

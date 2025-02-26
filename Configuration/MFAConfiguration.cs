@@ -1,12 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using MaaFramework.Binding;
 using MFAWPF.Helper;
 using MFAWPF.Helper.Converters;
 using MFAWPF.Views;
 using MFAWPF.Views.UI;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
+using System.Windows.Data;
 
 namespace MFAWPF.Data
 
@@ -144,9 +147,9 @@ public static class MFAConfiguration
         Data.SetConfig(key, value);
     }
 
-    public static bool TryGetData<T>(string key, out T value)
+    public static bool TryGetConfiguration<T>(string key, out T value)
     {
-        if (Data?.TryGetValue(key, out var data) == true)
+        if (Data.TryGetValue(key, out var data))
         {
             try
             {
@@ -180,6 +183,34 @@ public static class MFAConfiguration
         value = default;
         return false;
     }
+    
+    public static T GetConfiguration<T>(string key, T defaultValue, params JsonConverter[] valueConverters)
+    {
+
+        if (Data.TryGetValue(key, out var data))
+        {
+            try
+            {
+                var settings = new JsonSerializerSettings();
+                foreach (var converter in valueConverters)
+                {
+                    settings.Converters.Add(converter);
+                }
+                if (key == "CurrentController")
+                {
+                    Console.WriteLine(key);
+                    Console.WriteLine(JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(data), settings));
+                }
+                return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(data), settings) ?? defaultValue;
+            }
+            catch (Exception e)
+            {
+                LoggerService.LogError($"类型转换失败: {e.Message}");
+            }
+        }
+        return defaultValue;
+    }
+    
 
     public static T GetConfiguration<T>(string key, T defaultValue)
     {

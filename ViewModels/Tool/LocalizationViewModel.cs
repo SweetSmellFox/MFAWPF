@@ -6,21 +6,15 @@ namespace MFAWPF.ViewModels.Tool;
 
 public partial class LocalizationViewModel : ViewModel
 {
-    private string _resourceKey = string.Empty;
+    [ObservableProperty] private string _resourceKey = string.Empty;
 
-    public string ResourceKey
+    partial void OnResourceKeyChanged(string value)
     {
-        get => _resourceKey;
-        private init
-        {
-            SetProperty(ref _resourceKey, value);
-            UpdateName();
-        }
+        UpdateName();
     }
 
-    public LocalizationViewModel()
-    {
-    }
+    public LocalizationViewModel(){}
+    
     private readonly string[]? _formatArgsKeys;
 
     public LocalizationViewModel(string resourceKey)
@@ -28,14 +22,16 @@ public partial class LocalizationViewModel : ViewModel
         ResourceKey = resourceKey;
         LanguageHelper.LanguageChanged += OnLanguageChanged;
     }
-    
+
     public LocalizationViewModel(string resourceKey, params string[] keys)
     {
         ResourceKey = resourceKey;
         _formatArgsKeys = keys;
         LanguageHelper.LanguageChanged += OnLanguageChanged;
     }
+    
     [ObservableProperty] private string _name = string.Empty;
+    [ObservableProperty] private object? _other;
 
     private void UpdateName()
     {

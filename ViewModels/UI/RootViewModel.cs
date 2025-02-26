@@ -31,9 +31,6 @@ public partial class RootViewModel : ViewModel
         MFAConfiguration.SetConfiguration("EnableEdit", value);
     }
 
-
-    [ObservableProperty] private bool _isAdb = true;
-
     [ObservableProperty] private bool _isConnected;
 
     [ObservableProperty] private bool _isUpdating;

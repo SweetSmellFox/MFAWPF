@@ -11,6 +11,7 @@
     xmlns:helper="clr-namespace:MFAWPF.Helper"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
     xmlns:local="clr-namespace:MFAWPF.Views.UserControl.Settings"
+    xmlns:maa="clr-namespace:MFAWPF.Extensions.Maa"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:views="clr-namespace:MFAWPF.Views"
@@ -23,8 +24,8 @@
             ItemsSource="{Binding ViewModel.AdbControlScreenCapTypes}"
             Margin="30,10,30,10"
             SelectedValue="{Binding ViewModel.AdbControlScreenCapType}"
-            Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static helper:Instances.RootViewModel}}"
+            Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Adb',
+                                             Source={x:Static helper:Instances.ConnectingViewModel}}"
             Width="360"
             hc:TitleElement.HorizontalAlignment="Right"
             hc:TitleElement.Title="{lex:Loc CaptureModeOption}"
@@ -39,8 +40,8 @@
             Margin="30,10,30,10"
             SelectedValue="{Binding ViewModel.AdbControlInputType}"
             SelectedValuePath="ResourceKey"
-            Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static helper:Instances.RootViewModel}}"
+            Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Adb',
+                                             Source={x:Static helper:Instances.ConnectingViewModel}}"
             Width="360"
             hc:TitleElement.HorizontalAlignment="Right"
             hc:TitleElement.Title="{lex:Loc InputModeOption}"
@@ -53,8 +54,8 @@
             IsEnabled="{calcBinding:Binding Idle,
                                             Source={x:Static helper:Instances.RootViewModel}}"
             Margin="30,10,30,10"
-            Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static helper:Instances.RootViewModel}}" />
+            Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Adb',
+                                             Source={x:Static helper:Instances.ConnectingViewModel}}" />
         <hc:ComboBox
             HorizontalAlignment="Center"
             IsEnabled="{calcBinding:Binding Idle,
@@ -62,8 +63,8 @@
             ItemsSource="{Binding ViewModel.Win32ControlScreenCapTypes}"
             Margin="30,10,30,10"
             SelectedValue="{Binding ViewModel.Win32ControlScreenCapType}"
-            Visibility="{calcBinding:Binding !IsAdb,
-                                             Source={x:Static helper:Instances.RootViewModel}}"
+            Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Win32',
+                                             Source={x:Static helper:Instances.ConnectingViewModel}}"
             Width="360"
             hc:TitleElement.HorizontalAlignment="Right"
             hc:TitleElement.Title="{lex:Loc CaptureModeOption}"
@@ -76,8 +77,8 @@
             ItemsSource="{Binding ViewModel.Win32ControlInputTypes}"
             Margin="30,10,30,10"
             SelectedValue="{Binding ViewModel.Win32ControlInputType}"
-            Visibility="{calcBinding:Binding !IsAdb,
-                                             Source={x:Static helper:Instances.RootViewModel}}"
+            Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Win32',
+                                             Source={x:Static helper:Instances.ConnectingViewModel}}"
             Width="360"
             hc:TitleElement.HorizontalAlignment="Right"
             hc:TitleElement.Title="{lex:Loc InputModeOption}"
@@ -88,21 +89,21 @@
             HorizontalAlignment="Center"
             IsChecked="{Binding ViewModel.RetryOnDisconnected}"
             Margin="20,10"
-            Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static helper:Instances.RootViewModel}}" />
+            Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Adb',
+                                             Source={x:Static helper:Instances.ConnectingViewModel}}" />
         <CheckBox
             Content="{lex:Loc AllowAdbRestart}"
             HorizontalAlignment="Center"
             IsChecked="{Binding ViewModel.AllowAdbRestart}"
             Margin="20,10"
-            Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static helper:Instances.RootViewModel}}" />
+            Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Adb',
+                                             Source={x:Static helper:Instances.ConnectingViewModel}}" />
         <CheckBox
             Content="{lex:Loc AllowAdbHardRestart}"
             HorizontalAlignment="Center"
             IsChecked="{Binding ViewModel.AllowAdbHardRestart}"
             Margin="20,10"
-            Visibility="{calcBinding:Binding IsAdb,
-                                             Source={x:Static helper:Instances.RootViewModel}}" />
+            Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Adb',
+                                             Source={x:Static helper:Instances.ConnectingViewModel}}" />
     </StackPanel>
 </UserControl>

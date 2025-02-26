@@ -52,7 +52,8 @@ public partial class App
                 _ = services.AddSingleton<TaskOptionSettingsUserControl>();
 
                 _ = services.AddSingleton<ConnectingView>();
-
+                _ = services.AddSingleton<ConnectingViewModel>();
+                
                 _ = services.AddSingleton<SettingsView>();
                 _ = services.AddSingleton<SettingsViewModel>();
 
