@@ -110,6 +110,8 @@ Modify it as follows:
 
 - `[s]`：Strikethrough.
 
+- `[align:left/center/right]`: Left-aligned, center-aligned, or right-aligned. Can only be applied to an entire line.
+
 **Note: The above comments are for documentation purposes and are not recommended for actual usage.**
 
 - Run the project
