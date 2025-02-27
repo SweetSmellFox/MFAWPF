@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace MFAWPF.Helper;
+namespace MFAWPF.Helper.ValueType;
 
 internal static class ValueBoxes
 {

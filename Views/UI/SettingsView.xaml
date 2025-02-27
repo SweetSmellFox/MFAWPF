@@ -68,15 +68,18 @@
                     <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:StartSettingsUserControl}}" HorizontalAlignment="Center" />
 
                     <hc:Divider Content="{Binding ViewModel.ListTitle[6].Name}" HorizontalContentAlignment="Left" />
-                    <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:ExternalNotificationSettingsUserControl}}" HorizontalAlignment="Center" />
-
-                    <hc:Divider Content="{Binding ViewModel.ListTitle[7].Name}" HorizontalContentAlignment="Left" />
                     <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:GuiSettingsUserControl}}" HorizontalAlignment="Center" />
 
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[7].Name}" HorizontalContentAlignment="Left" />
+                    <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:ExternalNotificationSettingsUserControl}}" HorizontalAlignment="Center" />
+
                     <hc:Divider Content="{Binding ViewModel.ListTitle[8].Name}" HorizontalContentAlignment="Left" />
-                    <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:VersionUpdateSettingsUserControl}}" HorizontalAlignment="Center" />
+                    <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:HotKeySettingsUserControl}}" HorizontalAlignment="Center" />
 
                     <hc:Divider Content="{Binding ViewModel.ListTitle[9].Name}" HorizontalContentAlignment="Left" />
+                    <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:VersionUpdateSettingsUserControl}}" HorizontalAlignment="Center" />
+
+                    <hc:Divider Content="{Binding ViewModel.ListTitle[10].Name}" HorizontalContentAlignment="Left" />
                     <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:AboutUserControl}}" HorizontalAlignment="Center" />
 
                 </StackPanel>

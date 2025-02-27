@@ -61,8 +61,7 @@ public static class TaskManager
                 {
                     if (handleError != null)
                         handleError.Invoke();
-
-                    Console.WriteLine($"{prompt}异步任务 {name} 失败: {t.Exception.GetBaseException().Message}");
+                    
                     LoggerService.LogError(t.Exception.GetBaseException());
                 }
             }, TaskContinuationOptions.OnlyOnFaulted);

@@ -73,6 +73,7 @@ public partial class App
                 _ = services.AddSingleton<StartSettingsUserControlModel>();
                 _ = services.AddSingleton<TimerSettingsUserControl>();
                 _ = services.AddSingleton<TimerSettingsUserControlModel>();
+                _ = services.AddSingleton<HotKeySettingsUserControl>();
                 _ = services.AddSingleton<VersionUpdateSettingsUserControl>();
                 _ = services.AddSingleton<VersionUpdateSettingsUserControlModel>();
                 _ = services.AddSingleton<AboutUserControl>();

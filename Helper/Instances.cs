@@ -71,6 +71,7 @@ public static class Instances
     public static ConnectSettingsUserControlModel ConnectSettingsUserControlModel => Resolve<ConnectSettingsUserControlModel>();
     public static ExternalNotificationSettingsUserControl ExternalNotificationSettingsUserControl => Resolve<ExternalNotificationSettingsUserControl>();
     public static ExternalNotificationSettingsUserControlModel ExternalNotificationSettingsUserControlModel => Resolve<ExternalNotificationSettingsUserControlModel>();
+    public static HotKeySettingsUserControl HotKeySettingsUserControl => Resolve<HotKeySettingsUserControl>();
     public static GameSettingsUserControl GameSettingsUserControl => Resolve<GameSettingsUserControl>();
     public static GameSettingsUserControlModel GameSettingsUserControlModel => Resolve<GameSettingsUserControlModel>();
     public static GuiSettingsUserControl GuiSettingsUserControl => Resolve<GuiSettingsUserControl>();

@@ -2,7 +2,7 @@
 using MFAWPF.Helper.Converters;
 using Newtonsoft.Json;
 
-namespace MFAWPF.Helper;
+namespace MFAWPF.Helper.ValueType;
 
 public class TaskInterfaceItem
 {

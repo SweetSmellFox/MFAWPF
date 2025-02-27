@@ -2,6 +2,7 @@
 using MFAWPF.Data;
 using MFAWPF.Extensions;
 using MFAWPF.Helper;
+using MFAWPF.Helper.ValueType;
 using Newtonsoft.Json;
 using System.Windows;
 

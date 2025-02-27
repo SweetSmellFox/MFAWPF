@@ -4,6 +4,7 @@ using MFAWPF.Data;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
+using MFAWPF.Helper.ValueType;
 using MFAWPF.Views.UI;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
@@ -15,6 +16,33 @@ namespace MFAWPF.ViewModels.UI;
 
 public partial class SettingsViewModel : ViewModel
 {
+    #region Init
+
+    public SettingsViewModel()
+    {
+        HotKeyShowGui = MFAHotKey.Parse(GlobalConfiguration.GetConfiguration("ShowGui", ""));
+        HotKeyLinkStart = MFAHotKey.Parse(GlobalConfiguration.GetConfiguration("LinkStart", ""));
+    }
+
+    [ObservableProperty] ObservableCollection<Tool.LocalizationViewModel> _listTitle =
+    [
+        new("SwitchConfiguration"),
+        new("ScheduleSettings"),
+        new("PerformanceSettings"),
+        new("RunningSettings"),
+        new("ConnectionSettings"),
+        new("StartupSettings"),
+        new("UiSettings"),
+        new("ExternalNotificationSettings"),
+        new("HotKeySettings"),
+        new("UpdateSettings"),
+        new("About"),
+    ];
+
+    #endregion Init
+
+    #region 设置页面列表和滚动视图联动绑定
+
     public enum NotifyType
     {
         None,
@@ -25,7 +53,7 @@ public partial class SettingsViewModel : ViewModel
     [ObservableProperty] private NotifyType _notifySource = NotifyType.None;
 
     private System.Timers.Timer? _resetNotifyTimer;
-    
+
     private void ResetNotifySource()
     {
         if (_resetNotifyTimer != null)
@@ -53,7 +81,7 @@ public partial class SettingsViewModel : ViewModel
     [ObservableProperty] private double _scrollExtentHeight;
 
     [ObservableProperty] private List<double> _dividerVerticalOffsetList = new();
-    
+
     partial void OnSelectedIndexChanged(int value)
     {
         if (NotifySource == NotifyType.None && DividerVerticalOffsetList.Count > value && value >= 0)
@@ -103,20 +131,10 @@ public partial class SettingsViewModel : ViewModel
         return shouldSelectNext ? left + 1 : left;
     }
 
+    #endregion 设置页面列表和滚动视图联动绑定
 
-    [ObservableProperty] ObservableCollection<Tool.LocalizationViewModel> _listTitle =
-    [
-        new("SwitchConfiguration"),
-        new("ScheduleSettings"),
-        new("PerformanceSettings"),
-        new("RunningSettings"),
-        new("ConnectionSettings"),
-        new("StartupSettings"),
-        new("ExternalNotificationSettings"),
-        new("UiSettings"),
-        new("SoftwareUpdate"),
-        new("About"),
-    ];
+    #region 配置
+
     public ObservableCollection<MFAConfig> ConfigurationList { get; set; } = MFAConfiguration.Configs;
 
     [ObservableProperty] private string? _currentConfiguration = MFAConfiguration.GetCurrentConfiguration();
@@ -127,7 +145,7 @@ public partial class SettingsViewModel : ViewModel
         MaaProcessor.RestartMFA();
     }
 
-    [ObservableProperty] private string _newConfigurationName;
+    [ObservableProperty] private string _newConfigurationName = string.Empty;
 
     [RelayCommand]
     private void AddConfiguration()
@@ -159,4 +177,42 @@ public partial class SettingsViewModel : ViewModel
         }
 
     }
+
+    #endregion 配置
+
+    #region HotKey
+
+    private MFAHotKey _hotKeyShowGui = MFAHotKey.NOTSET;
+
+    public MFAHotKey HotKeyShowGui
+    {
+        get => _hotKeyShowGui;
+        set => SetHotKey(ref _hotKeyShowGui, value, "ShowGui", Instances.RootViewModel.ToggleVisible);
+    }
+
+    private MFAHotKey _hotKeyLinkStart = MFAHotKey.NOTSET;
+    public MFAHotKey HotKeyLinkStart
+    {
+        get => _hotKeyLinkStart;
+        set => SetHotKey(ref _hotKeyLinkStart, value, "LinkStart", Instances.TaskQueueView.Toggle);
+    }
+    
+    public void SetHotKey(ref MFAHotKey value, MFAHotKey? newValue, string type, Action action)
+    {
+        if (newValue != null)
+        {
+            if (Application.Current.MainWindow?.IsHotKeyRegistered(newValue) == true)
+            {
+                newValue = MFAHotKey.ERROR;
+            }
+            else
+            {
+                HotKeyHelper.RegisterHotKey(Application.Current.MainWindow, newValue, action);
+            }
+            GlobalConfiguration.SetConfiguration(type, newValue.ToString());
+            SetProperty(ref value, newValue);
+        }
+    }
+
+    #endregion HotKey
 }

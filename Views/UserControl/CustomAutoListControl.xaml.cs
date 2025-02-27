@@ -1,4 +1,5 @@
 using MFAWPF.Helper;
+using MFAWPF.Helper.ValueType;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;

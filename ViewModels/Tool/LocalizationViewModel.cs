@@ -29,7 +29,10 @@ public partial class LocalizationViewModel : ViewModel
         _formatArgsKeys = keys;
         LanguageHelper.LanguageChanged += OnLanguageChanged;
     }
-    
+    private void OnLanguageChanged(object sender, EventArgs e)
+    {
+        UpdateName();
+    }
     [ObservableProperty] private string _name = string.Empty;
     [ObservableProperty] private object? _other;
 
@@ -43,10 +46,7 @@ public partial class LocalizationViewModel : ViewModel
             Name = ResourceKey.ToLocalization();
     }
 
-    private void OnLanguageChanged(object sender, EventArgs e)
-    {
-        UpdateName();
-    }
+
 
     public override string ToString()
         => ResourceKey;

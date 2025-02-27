@@ -8,6 +8,7 @@ using HandyControl.Controls;
 using HandyControl.Data;
 using HandyControl.Tools.Command;
 using MFAWPF.Extensions;
+using MFAWPF.Helper.ValueType;
 using MFAWPF.ViewModels.Tool;
 using MFAWPF.Views.UI;
 using Microsoft.Win32;

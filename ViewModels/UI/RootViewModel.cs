@@ -24,14 +24,13 @@ public partial class RootViewModel : ViewModel
     {
         Idle = value;
     }
+    
     [ObservableProperty] private bool _enableEdit = MFAConfiguration.GetConfiguration("EnableEdit", false);
 
     partial void OnEnableEditChanged(bool value)
     {
         MFAConfiguration.SetConfiguration("EnableEdit", value);
     }
-
-
 
     [ObservableProperty] private bool _isUpdating;
 
@@ -40,6 +39,10 @@ public partial class RootViewModel : ViewModel
     public void SetUpdating(bool isUpdating)
     {
         IsUpdating = isUpdating;
+    }
+    public void ToggleVisible()
+    {
+        IsVisible = !IsVisible;
     }
 
     partial void OnIsVisibleChanged(bool value)

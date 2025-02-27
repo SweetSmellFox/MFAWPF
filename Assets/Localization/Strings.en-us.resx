@@ -872,4 +872,28 @@
   <data name="RescanController" xml:space="preserve">
     <value>Rescan Controllers</value>
   </data>
+  <data name="HotKeyChangingTip" xml:space="preserve">
+    <value>Press Backspace / Esc / Delete to clear the current value</value>
+  </data>
+  <data name="HotKeySettings" xml:space="preserve">
+    <value>HotKeys</value>
+  </data>
+  <data name="HotKeyLinkStart" xml:space="preserve">
+    <value>[HotKey] Start/Stop task</value>
+  </data>
+  <data name="HotKeyShowGui" xml:space="preserve">
+    <value>[HotKey] Show/Hide GUI</value>
+  </data>
+  <data name="HotKeyOccupiedWarning" xml:space="preserve">
+    <value>⚠️ This hotkey is in use</value>
+  </data>
+  <data name="HotKeyPressing" xml:space="preserve">
+    <value>Press any combination...</value>
+  </data>
+  <data name="HotKeyNotSet" xml:space="preserve">
+    <value>not set</value>
+  </data>
+  <data name="UpdateSettings" xml:space="preserve">
+    <value>Update</value>
+  </data>
 </root>

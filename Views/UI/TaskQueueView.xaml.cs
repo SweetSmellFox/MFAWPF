@@ -3,6 +3,7 @@ using MFAWPF.Data;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
+using MFAWPF.Helper.ValueType;
 using MFAWPF.ViewModels.UI;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
@@ -360,7 +361,18 @@ public partial class TaskQueueView
             ViewModel.TaskItemViewModels = tempViewModel;
         }
     }
-
+    public void Toggle() 
+    {
+        if (Instances.RootViewModel.IsRunning)
+        {
+            Stop();
+        }
+        else
+        {
+            Start();
+        }
+    }
+    
     public void Start(bool onlyStart = false, bool checkUpdate = false)
     {
         if (!Instances.RootViewModel.Idle)

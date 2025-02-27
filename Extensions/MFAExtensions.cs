@@ -4,12 +4,14 @@ using MaaFramework.Binding.Buffers;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
 using MFAWPF.Helper.Exceptions;
+using MFAWPF.Helper.ValueType;
 using MFAWPF.ViewModels.Tool;
 using System.Collections.ObjectModel;
 using System.Windows;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Extensions;
 using LocalizationViewModel = MFAWPF.ViewModels.Tool.LocalizationViewModel;
+using MFATask = MFAWPF.Helper.ValueType.MFATask;
 
 namespace MFAWPF.Extensions;
 

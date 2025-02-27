@@ -1,4 +1,5 @@
 ﻿using MFAWPF.Helper;
+using MFAWPF.Helper.ValueType;
 using Newtonsoft.Json;
 
 namespace MFAWPF.ViewModels.Tool;

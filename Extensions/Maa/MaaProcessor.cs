@@ -8,6 +8,7 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 using MFAWPF.Data;
 using MFAWPF.Helper;
+using MFAWPF.Helper.ValueType;
 using MFAWPF.Views.UI;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -29,6 +30,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DragItemViewModel = MFAWPF.ViewModels.Tool.DragItemViewModel;
+using MFATask = MFAWPF.Helper.ValueType.MFATask;
 
 
 namespace MFAWPF.Extensions.Maa;

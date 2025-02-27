@@ -48,8 +48,8 @@
     <data name="TaskSettings" xml:space="preserve">
     <value>任务设置</value>
   </data>
-    <data name="StartTask" xml:space="preserve">
-    <value>启动任务</value>
+  <data name="StartTask" xml:space="preserve">
+    <value>开始任务</value>
   </data>
     <data name="StopTask" xml:space="preserve">
     <value>停止任务</value>
@@ -878,5 +878,29 @@
   </data>
   <data name="RescanController" xml:space="preserve">
     <value>重新扫描控制器</value>
+  </data>
+  <data name="HotKeyChangingTip" xml:space="preserve">
+    <value>键入 退格/Esc/Delete 清除当前热键</value>
+  </data>
+  <data name="HotKeySettings" xml:space="preserve">
+    <value>热键设置</value>
+  </data>
+  <data name="HotKeyShowGui" xml:space="preserve">
+    <value>[热键] 显示/隐藏软件</value>
+  </data>
+  <data name="HotKeyLinkStart" xml:space="preserve">
+    <value>[热键] 开始/停止任务</value>
+  </data>
+  <data name="HotKeyOccupiedWarning" xml:space="preserve">
+    <value>⚠️ 该热键已被占用</value>
+  </data>
+  <data name="HotKeyPressing" xml:space="preserve">
+    <value>按下任意组合键...</value>
+  </data>
+  <data name="HotKeyNotSet" xml:space="preserve">
+    <value>未设置</value>
+  </data>
+  <data name="UpdateSettings" xml:space="preserve">
+    <value>更新设置</value>
   </data>
 </root>

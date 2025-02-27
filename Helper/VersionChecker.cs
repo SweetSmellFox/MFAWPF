@@ -28,13 +28,13 @@ namespace MFAWPF.Helper;
 public class VersionChecker
 {
     private static readonly VersionChecker Checker = new();
-    public Queue<MFATask> Queue = new();
+    public Queue<ValueType.MFATask> Queue = new();
 
     public static void Check()
     {
         if (MFAConfiguration.GetConfiguration("EnableAutoUpdateResource", false))
         {
-            Checker.Queue.Enqueue(new MFATask
+            Checker.Queue.Enqueue(new ValueType.MFATask
             {
                 Action = () => Checker.UpdateResourceBySelection(MFAConfiguration.GetConfiguration("EnableAutoUpdateMFA", false), true, () =>
                 {
@@ -46,7 +46,7 @@ public class VersionChecker
         }
         else if (MFAConfiguration.GetConfiguration("EnableCheckVersion", true))
         {
-            Checker.Queue.Enqueue(new MFATask
+            Checker.Queue.Enqueue(new ValueType.MFATask
             {
                 Action = () => Checker.CheckResourceBySelection(),
                 Name = "检测资源版本"
@@ -55,7 +55,7 @@ public class VersionChecker
 
         if (MFAConfiguration.GetConfiguration("EnableAutoUpdateMFA", false) && !MFAConfiguration.GetConfiguration("EnableAutoUpdateResource", false))
         {
-            Checker.Queue.Enqueue(new MFATask
+            Checker.Queue.Enqueue(new ValueType.MFATask
             {
                 Action = () => Checker.UpdateMFABySelection(true),
                 Name = "更新软件"
@@ -63,7 +63,7 @@ public class VersionChecker
         }
         else if (MFAConfiguration.GetConfiguration("EnableCheckVersion", true))
         {
-            Checker.Queue.Enqueue(new MFATask
+            Checker.Queue.Enqueue(new ValueType.MFATask
             {
                 Action = () => Checker.CheckMFABySelection(),
                 Name = "检测资源版本"

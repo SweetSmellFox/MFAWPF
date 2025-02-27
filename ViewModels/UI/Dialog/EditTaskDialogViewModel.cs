@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using HandyControl.Tools.Command;
 using MFAWPF.Helper;
+using MFAWPF.Helper.ValueType;
 using MFAWPF.ViewModels.Tool;
 using MFAWPF.Views.UserControl;
 using Newtonsoft.Json;

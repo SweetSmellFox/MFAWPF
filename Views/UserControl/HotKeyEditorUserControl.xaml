@@ -1,0 +1,20 @@
+<UserControl
+    d:DesignWidth="180"
+    mc:Ignorable="d"
+    x:Class="MFAWPF.Views.UserControl.HotKeyEditorUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:lex="http://wpflocalizeextension.codeplex.com"
+    xmlns:local="clr-namespace:MFAWPF.Views.UserControl"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:valueType="clr-namespace:MFAWPF.Helper.ValueType"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Button
+        Content="{Binding HotKey.Name, RelativeSource={RelativeSource AncestorType=local:HotKeyEditorUserControl}, Mode=OneWay}"
+        HorizontalContentAlignment="Center"
+        PreviewKeyDown="HotKey_PreviewKeyDown"
+        PreviewMouseDown="HotKey_OnPreviewMouseDown"
+        ToolTip="{lex:Loc HotKeyChangingTip}"
+        VerticalContentAlignment="Center"
+        Width="180" />
+</UserControl>

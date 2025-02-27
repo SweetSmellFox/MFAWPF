@@ -1,14 +1,14 @@
-﻿using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using HandyControl.Controls;
 using MFAWPF.Helper.Converters;
 using MFAWPF.Helper.Editor;
 using Newtonsoft.Json;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
-namespace MFAWPF.Helper;
+namespace MFAWPF.Helper.ValueType;
 
 public class TaskModel : ObservableObject
 {

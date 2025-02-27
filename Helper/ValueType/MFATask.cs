@@ -1,8 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using MFAWPF.Views;
 using MFAWPF.Views.UI;
 
-namespace MFAWPF.Helper;
+namespace MFAWPF.Helper.ValueType;
 
 public partial class MFATask : ObservableObject
 {
@@ -15,7 +14,7 @@ public partial class MFATask : ObservableObject
     [ObservableProperty] private string _name = string.Empty;
     [ObservableProperty] private MFATaskType _type = MFATaskType.MFA;
     [ObservableProperty] private int _count = 1;
-    [ObservableProperty] private Action _action;
+    [ObservableProperty] private Action? _action;
     [ObservableProperty] private Dictionary<string, TaskModel> _tasks = new();
 
 
@@ -27,7 +26,7 @@ public partial class MFATask : ObservableObject
             {
                 if (Type == MFATaskType.MAAFW)
                     RootView.AddLogByKey("TaskStart", null, Name ?? string.Empty);
-                Action();
+                Action?.Invoke();
             }
             return true;
         }

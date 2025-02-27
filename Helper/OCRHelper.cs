@@ -3,6 +3,7 @@ using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
+using MFAWPF.Helper.ValueType;
 using Newtonsoft.Json;
 
 // using PaddleOCRSharp;
