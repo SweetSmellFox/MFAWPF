@@ -87,7 +87,6 @@ public class TaskModel : ObservableObject
 
     [JsonProperty("recognition")]
     [Category("基础属性")]
-    // [DisplayName("识别算法类型")]
     [Description(
         "识别算法类型。可选，默认 DirectHit 。\n可选的值：DirectHit | TemplateMatch | FeatureMatch | ColorMatch | OCR | NeuralNetworkClassify | NeuralNetworkDetect | Custom")]
     [Editor(typeof(StringComboBoxEditor), typeof(StringComboBoxEditor))]
