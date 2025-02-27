@@ -219,30 +219,12 @@ public partial class TaskQueueView
 
     private AdbInputMethods ConfigureAdbInputTypes()
     {
-        return MFAConfiguration.GetConfiguration("AdbControlInputType", "MinitouchAndAdbKey") switch
-        {
-            "MiniTouch" => AdbInputMethods.MinitouchAndAdbKey,
-            "MaaTouch" => AdbInputMethods.Maatouch,
-            "AdbInput" => AdbInputMethods.AdbShell,
-            "AutoDetect" => AdbInputMethods.All,
-            _ => AdbInputMethods.MinitouchAndAdbKey
-        };
+        return Instances.ConnectSettingsUserControlModel.AdbControlInputType;
     }
 
     private AdbScreencapMethods ConfigureAdbScreenCapTypes()
     {
-        return MFAConfiguration.GetConfiguration("AdbControlScreenCapType", "Default") switch
-        {
-            "Default" => AdbScreencapMethods.Default,
-            "RawWithGzip" => AdbScreencapMethods.RawWithGzip,
-            "RawByNetcat" => AdbScreencapMethods.RawByNetcat,
-            "Encode" => AdbScreencapMethods.Encode,
-            "EncodeToFileAndPull" => AdbScreencapMethods.EncodeToFileAndPull,
-            "MinicapDirect" => AdbScreencapMethods.MinicapDirect,
-            "MinicapStream" => AdbScreencapMethods.MinicapStream,
-            "EmulatorExtras" => AdbScreencapMethods.EmulatorExtras,
-            _ => AdbScreencapMethods.Default
-        };
+        return Instances.ConnectSettingsUserControlModel.AdbControlScreenCapType;
     }
 
     private void ConfigureMaaProcessorForWin32()
@@ -262,23 +244,12 @@ public partial class TaskQueueView
 
     private Win32ScreencapMethod ConfigureWin32ScreenCapTypes()
     {
-        return MFAConfiguration.GetConfiguration("Win32ControlScreenCapType", "FramePool") switch
-        {
-            "FramePool" => Win32ScreencapMethod.FramePool,
-            "DXGIDesktopDup" => Win32ScreencapMethod.DXGIDesktopDup,
-            "GDI" => Win32ScreencapMethod.GDI,
-            _ => Win32ScreencapMethod.FramePool
-        };
+        return Instances.ConnectSettingsUserControlModel.Win32ControlScreenCapType;
     }
 
     private Win32InputMethod ConfigureWin32InputTypes()
     {
-        return MFAConfiguration.GetConfiguration("Win32ControlInputType", "Seize") switch
-        {
-            "Seize" => Win32InputMethod.Seize,
-            "SendMessage" => Win32InputMethod.SendMessage,
-            _ => Win32InputMethod.Seize
-        };
+        return Instances.ConnectSettingsUserControlModel.Win32ControlInputType;
     }
 
     public bool FirstTask = true;

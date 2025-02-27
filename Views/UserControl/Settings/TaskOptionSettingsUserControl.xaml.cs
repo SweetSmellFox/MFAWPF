@@ -133,11 +133,9 @@ public partial class TaskOptionSettingsUserControl
             };
             var processedLine = line.Trim();
             var alignMatch = Regex.Match(processedLine, @"\[align:(?<value>left|center|right)\](?<content>.*?)\[/align\]");
-            Console.WriteLine(alignMatch.Success);
             if (alignMatch.Success)
             {
                 paragraph.TextAlignment = (TextAlignment)Enum.Parse(typeof(TextAlignment), alignMatch.Groups["value"].Value, true);
-                Console.WriteLine(alignMatch.Groups["content"].Value);
                 processedLine = alignMatch.Groups["content"].Value ;
             }
             ProcessLine(processedLine, paragraph.Inlines);

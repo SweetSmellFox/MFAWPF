@@ -59,11 +59,11 @@ public partial class ConnectingViewModel : ViewModel
         },
     ];
 
-    [ObservableProperty] private MaaControllerTypes _currentController = MFAConfiguration.GetConfiguration("CurrentController", MaaControllerTypes.Adb, new MaaControllerTypesConverter());
+    [ObservableProperty] private MaaControllerTypes _currentController = MFAConfiguration.GetConfiguration("CurrentController", MaaControllerTypes.Adb, new UniversalEnumConverter<MaaControllerTypes>());
 
     partial void OnCurrentControllerChanged(MaaControllerTypes value)
     {
-        MFAConfiguration.SetConfiguration("CurrentController", value);
+        MFAConfiguration.SetConfiguration("CurrentController", value.ToString());
         AutoDetectDevice();
         MaaProcessor.Instance.SetCurrentTasker();
     }
@@ -291,19 +291,22 @@ public partial class ConnectingViewModel : ViewModel
             LocExtension.GetLocalizedValue<string>("TaskStackError"),
             targetType.ToLocalization(),
             ex.Message));
-        
+
         LoggerService.LogError(ex);
     }
 
     public void TryReadAdbDeviceFromConfig()
     {
-        if (CurrentController != MaaControllerTypes.Adb || !MFAConfiguration.GetConfiguration("RememberAdb", true) || MaaProcessor.MaaFwConfig.AdbDevice.AdbPath != "adb" || !MFAConfiguration.TryGetConfiguration("AdbDevice", out AdbDeviceInfo device,
-                new AdbInputMethodsConverter(), new AdbScreencapMethodsConverter()))
+        if (CurrentController != MaaControllerTypes.Adb
+            || !MFAConfiguration.GetConfiguration("RememberAdb", true)
+            || MaaProcessor.MaaFwConfig.AdbDevice.AdbPath != "adb"
+            || !MFAConfiguration.TryGetConfiguration("AdbDevice", out AdbDeviceInfo device,
+                new UniversalEnumConverter<AdbInputMethods>(), new  UniversalEnumConverter<AdbScreencapMethods>()))
         {
             DispatcherHelper.RunOnMainThread(AutoDetectDevice);
             return;
         }
-        
+
         DispatcherHelper.RunOnMainThread(() =>
         {
             Devices = [device];

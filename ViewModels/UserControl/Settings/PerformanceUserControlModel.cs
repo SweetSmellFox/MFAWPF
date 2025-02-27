@@ -1,17 +1,29 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using MaaFramework.Binding;
 using MFAWPF.Data;
+using MFAWPF.Helper.Converters;
 using System.Collections.ObjectModel;
 
 namespace MFAWPF.ViewModels.UserControl.Settings;
 
-public partial class PerformanceUserControlModel: ViewModel
+public partial class PerformanceUserControlModel : ViewModel
 {
-    public static ObservableCollection<Tool.LocalizationViewModel> GpuOptions => [new("GpuOptionAuto"), new("GpuOptionDisable")];
+    public static ObservableCollection<Tool.LocalizationViewModel> GpuOptions =>
+    [
+        new("GpuOptionAuto")
+        {
+            Other = InferenceDevice.Auto
+        },
+        new("GpuOptionDisable")
+        {
+            Other = InferenceDevice.CPU
+        }
+    ];
 
-    [ObservableProperty] private int _gpuIndex = MFAConfiguration.GetConfiguration("EnableGPU", false) ? 0 : 1;
+    [ObservableProperty] private InferenceDevice _gpuOption = MFAConfiguration.GetConfiguration("GPUOption", InferenceDevice.Auto, new UniversalEnumConverter<InferenceDevice>());
 
-    partial void OnGpuIndexChanged(int value)
+    partial void OnGpuOptionChanged(InferenceDevice value)
     {
-        MFAConfiguration.SetConfiguration("EnableGPU", value == 0);
+        MFAConfiguration.SetConfiguration("GPUOption", value.ToString());
     }
 }

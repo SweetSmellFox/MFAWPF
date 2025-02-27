@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using MaaFramework.Binding;
 using MFAWPF.Data;
 using MFAWPF.Extensions.Maa;
+using MFAWPF.Helper.Converters;
 using System.Collections.ObjectModel;
 
 namespace MFAWPF.ViewModels.UserControl.Settings;
@@ -14,41 +16,60 @@ public partial class ConnectSettingsUserControlModel : ViewModel
         MFAConfiguration.SetConfiguration("RememberAdb", value);
     }
 
-    public static ObservableCollection<string> AdbControlScreenCapTypes =>
+    public static ObservableCollection<AdbScreencapMethods> AdbControlScreenCapTypes =>
     [
-        "Default", "RawWithGzip", "RawByNetcat",
-        "Encode", "EncodeToFileAndPull", "MinicapDirect", "MinicapStream",
-        "EmulatorExtras"
+        AdbScreencapMethods.Default, AdbScreencapMethods.RawWithGzip, AdbScreencapMethods.RawByNetcat, AdbScreencapMethods.Encode, AdbScreencapMethods.EncodeToFileAndPull, AdbScreencapMethods.MinicapDirect,
+        AdbScreencapMethods.MinicapStream, AdbScreencapMethods.EmulatorExtras
     ];
-    public static ObservableCollection<Tool.LocalizationViewModel> AdbControlInputTypes => [new("MiniTouch"), new("MaaTouch"), new("AdbInput"), new("AutoDetect")];
-    public static ObservableCollection<string> Win32ControlScreenCapTypes => ["FramePool", "DXGIDesktopDup", "GDI"];
-    public static ObservableCollection<string> Win32ControlInputTypes => ["SendMessage", "Seize"];
 
-    [ObservableProperty] private string _adbControlScreenCapType = MFAConfiguration.GetConfiguration("AdbControlScreenCapType", AdbControlScreenCapTypes[0]);
-    [ObservableProperty] private string _adbControlInputType = MFAConfiguration.GetConfiguration("AdbControlInputType", AdbControlInputTypes[0].ResourceKey);
-    [ObservableProperty] private string _win32ControlScreenCapType = MFAConfiguration.GetConfiguration("Win32ControlScreenCapType", Win32ControlScreenCapTypes[0]);
-    [ObservableProperty] private string _win32ControlInputType = MFAConfiguration.GetConfiguration("Win32ControlInputType", Win32ControlInputTypes[0]);
-    partial void OnAdbControlScreenCapTypeChanged(string value)
+    public static ObservableCollection<Tool.LocalizationViewModel> AdbControlInputTypes =>
+    [
+        new("MiniTouch")
+        {
+            Other = AdbInputMethods.MinitouchAndAdbKey
+        },
+        new("MaaTouch")
+        {
+            Other = AdbInputMethods.Maatouch
+        },
+        new("AdbInput")
+        {
+            Other = AdbInputMethods.AdbShell
+        },
+        new("AutoDetect")
+        {
+            Other = AdbInputMethods.All
+        }
+    ];
+    public static ObservableCollection<Win32ScreencapMethod> Win32ControlScreenCapTypes => [Win32ScreencapMethod.FramePool, Win32ScreencapMethod.DXGIDesktopDup, Win32ScreencapMethod.GDI];
+    public static ObservableCollection<Win32InputMethod> Win32ControlInputTypes => [Win32InputMethod.SendMessage, Win32InputMethod.Seize];
+
+    [ObservableProperty] private AdbScreencapMethods _adbControlScreenCapType = MFAConfiguration.GetConfiguration("AdbControlScreenCapType", AdbScreencapMethods.Default, new UniversalEnumConverter<AdbScreencapMethods>());
+    [ObservableProperty] private AdbInputMethods _adbControlInputType = MFAConfiguration.GetConfiguration("AdbControlInputType", AdbInputMethods.MinitouchAndAdbKey, new UniversalEnumConverter<AdbInputMethods>());
+    [ObservableProperty] private Win32ScreencapMethod _win32ControlScreenCapType = MFAConfiguration.GetConfiguration("Win32ControlScreenCapType", Win32ScreencapMethod.FramePool, new UniversalEnumConverter<Win32ScreencapMethod>());
+    [ObservableProperty] private Win32InputMethod _win32ControlInputType = MFAConfiguration.GetConfiguration("Win32ControlInputType", Win32InputMethod.SendMessage, new UniversalEnumConverter<Win32InputMethod>());
+
+    partial void OnAdbControlScreenCapTypeChanged(AdbScreencapMethods value)
     {
-        MFAConfiguration.SetConfiguration("AdbControlScreenCapType", value);
+        MFAConfiguration.SetConfiguration("AdbControlScreenCapType", value.ToString());
         MaaProcessor.Instance.SetCurrentTasker();
     }
 
-    partial void OnAdbControlInputTypeChanged(string value)
+    partial void OnAdbControlInputTypeChanged(AdbInputMethods value)
     {
-        MFAConfiguration.SetConfiguration("AdbControlInputType", value);
+        MFAConfiguration.SetConfiguration("AdbControlInputType", value.ToString());
         MaaProcessor.Instance.SetCurrentTasker();
     }
 
-    partial void OnWin32ControlScreenCapTypeChanged(string value)
+    partial void OnWin32ControlScreenCapTypeChanged(Win32ScreencapMethod value)
     {
-        MFAConfiguration.SetConfiguration("Win32ControlScreenCapType", value);
+        MFAConfiguration.SetConfiguration("Win32ControlScreenCapType", value.ToString());
         MaaProcessor.Instance.SetCurrentTasker();
     }
 
-    partial void OnWin32ControlInputTypeChanged(string value)
+    partial void OnWin32ControlInputTypeChanged(Win32InputMethod value)
     {
-        MFAConfiguration.SetConfiguration("Win32ControlInputType", value);
+        MFAConfiguration.SetConfiguration("Win32ControlInputType", value.ToString());
         MaaProcessor.Instance.SetCurrentTasker();
     }
 

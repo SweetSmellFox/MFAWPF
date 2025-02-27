@@ -39,7 +39,7 @@
             ItemsSource="{Binding ViewModel.AdbControlInputTypes}"
             Margin="30,10,30,10"
             SelectedValue="{Binding ViewModel.AdbControlInputType}"
-            SelectedValuePath="ResourceKey"
+            SelectedValuePath="Other"
             Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Adb',
                                              Source={x:Static helper:Instances.ConnectingViewModel}}"
             Width="360"

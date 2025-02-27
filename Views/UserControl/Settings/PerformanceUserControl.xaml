@@ -40,7 +40,8 @@
                                             Source={x:Static helper:Instances.RootViewModel}}"
             ItemsSource="{Binding ViewModel.GpuOptions}"
             Margin="10,5"
-            SelectedIndex="{Binding ViewModel.GpuIndex}"
+            SelectedValue="{Binding ViewModel.GpuOption}"
+            SelectedValuePath="Other"
             VerticalAlignment="Center"
             Width="240" />
 
