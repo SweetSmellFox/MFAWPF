@@ -402,10 +402,10 @@
     <value>Clear</value>
   </data>
   <data name="CommonSetting" xml:space="preserve">
-    <value>     Common     </value>
+    <value> Common </value>
   </data>
   <data name="AdvancedSetting" xml:space="preserve">
-    <value>     Advanced     </value>
+    <value> Advanced </value>
   </data>
     <data name="AutoStartOption" xml:space="preserve">
     <value>Post-start operation</value>

@@ -412,7 +412,7 @@
     <value>清空</value>
   </data>
   <data name="CommonSetting" xml:space="preserve">
-    <value>     常规设置     </value>
+    <value> 常规设置 </value>
   </data>
   <data name="AdvancedSetting" xml:space="preserve">
     <value>     高级设置     </value>

@@ -139,12 +139,12 @@ public partial class MFAHotKey : ObservableObject
 
     public static MFAHotKey Parse(string input)
     {
-        if (string.IsNullOrWhiteSpace(input) || input == "HotKeyNotSet")
-            return NOTSET;
         if (input == "HotKeyOccupiedWarning")
             return ERROR;
         if (input == "HotKeyPressing")
             return PRESSING;
+        if (string.IsNullOrWhiteSpace(input) || input == "HotKeyNotSet")
+            return NOTSET;
 
         // 标准化分隔符
         string standardized = Regex.Replace(input, @"\s*\+\s*", " + ");

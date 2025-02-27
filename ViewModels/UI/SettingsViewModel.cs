@@ -191,23 +191,20 @@ public partial class SettingsViewModel : ViewModel
     }
 
     private MFAHotKey _hotKeyLinkStart = MFAHotKey.NOTSET;
+
     public MFAHotKey HotKeyLinkStart
     {
         get => _hotKeyLinkStart;
         set => SetHotKey(ref _hotKeyLinkStart, value, "LinkStart", Instances.TaskQueueView.Toggle);
     }
-    
+
     public void SetHotKey(ref MFAHotKey value, MFAHotKey? newValue, string type, Action action)
     {
         if (newValue != null)
         {
-            if (Application.Current.MainWindow?.IsHotKeyRegistered(newValue) == true)
+            if (!HotKeyHelper.RegisterHotKey(Application.Current.MainWindow, newValue, action))
             {
                 newValue = MFAHotKey.ERROR;
-            }
-            else
-            {
-                HotKeyHelper.RegisterHotKey(Application.Current.MainWindow, newValue, action);
             }
             GlobalConfiguration.SetConfiguration(type, newValue.ToString());
             SetProperty(ref value, newValue);
