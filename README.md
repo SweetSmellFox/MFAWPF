@@ -125,6 +125,7 @@
 - `MFAWPF` 于v1.2.3.3加入动态注册Custom Action和Custom Recognition的功能，目前只支持C#,需要在Resource目录的custom下放置相应的.cs文件, 参考 [文档](./docs/zh_cn/自定义识别_操作.md)
 - 在exe同级目录中放置 `logo.ico` 后可以替换窗口的图标
 - `MFAWPF` 新增interface多语言支持,在`interface.json`同目录下新建`zh-cn.json`,`zh-tw.json`和`en-us.json`后，doc和任务的name和选项的name可以使用key来指代。MFAWPF会自动根据语言来读取文件的key对应的value。如果没有则默认为key
+- `MFAWPF` 会读取`Resource`文件夹的`Announcement.md`作为公告，更新资源时会自动下载一份Changelog作为公告
 
 **注：在MFA中，于Pipeline中任务新增了俩个属性字段，分别为 `focus_tip` 和 `focus_tip_color`。**
 

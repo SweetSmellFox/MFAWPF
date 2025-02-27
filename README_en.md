@@ -124,6 +124,8 @@ Modify it as follows:
 - `MFAWPF` added the function of dynamically registering Custom Action and Custom Recognition in version 1.2.3.3. Currently, only C# is supported. The corresponding.cs files need to be placed in the custom directory of the Resource directory. Refer to [Document](./docs/en_us/CustomRecognition_Action.md)
 - Placing `logo.ico` in the same directory as the exe file will replace the window icon.
 - `MFAWPF` adds multi-language support for interfaces. After creating `zh-cn.json`,`zh-tw.json` and `en-us.json` in the same directory as `interface.json`, the names of docs and tasks and the names of options can be represented by keys. MFAWPF will automatically read the values corresponding to the keys in the files according to the language. If not, it defaults to the key.
+- `MFAWPF` reads the `Announcement.md` file in the `Resource` folder as the announcement, and automatically downloads a Changelog to serve as the announcement when updating resources.
+
 **Note: In MFA, two new fields have been added to the task in the Pipeline, namely `focus_tip` and `focus_tip_color`.**
 
 - `focus`: *bool*
