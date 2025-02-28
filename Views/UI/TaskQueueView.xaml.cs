@@ -138,7 +138,6 @@ public partial class TaskQueueView
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"创建文件时发生错误: {ex.Message}");
                         LoggerService.LogError(ex);
                     }
                 }

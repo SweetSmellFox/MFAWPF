@@ -30,12 +30,6 @@ public partial class TaskOptionSettingsUserControl
 
     public void SetOption(DragItemViewModel dragItem, bool value)
     {
-        if (dragItem.InterfaceItem == null)
-        {
-            HideAllPanels();
-            return;
-        }
-
         var cacheKey = $"{dragItem.Name}_{dragItem.InterfaceItem.GetHashCode()}";
 
         if (!value)
@@ -51,6 +45,7 @@ public partial class TaskOptionSettingsUserControl
             CommonOptionSettings.Children.Add(p);
             return p;
         });
+        
         var newIntroduction = IntroductionsCache.GetOrAdd(cacheKey, key =>
         {
             var richTextBox = new RichTextBox
@@ -65,6 +60,8 @@ public partial class TaskOptionSettingsUserControl
             Introductions.Children.Add(richTextBox);
             return richTextBox;
         });
+        if (newPanel.Children.Count == 0)
+            CommonPanelCache.Remove(cacheKey,out _);
         newPanel.Visibility = Visibility.Visible;
         newIntroduction.Visibility = Visibility.Visible;
     }
@@ -237,7 +234,7 @@ public partial class TaskOptionSettingsUserControl
         {
             IsChecked = option.Index == yesValue,
             Style = FindResource("ToggleButtonSwitch") as Style,
-            Height = 20,
+            Height = 20,Width = 40,
             HorizontalAlignment = HorizontalAlignment.Right,
             Tag = option.Name,
             VerticalAlignment = VerticalAlignment.Center
