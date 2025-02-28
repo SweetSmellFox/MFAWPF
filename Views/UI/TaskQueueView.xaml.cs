@@ -7,6 +7,7 @@ using MFAWPF.Helper.ValueType;
 using MFAWPF.ViewModels.UI;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,6 +25,7 @@ public partial class TaskQueueView
 {
     public TaskQueueViewModel ViewModel { get; set; }
     public Dictionary<string, TaskModel> BaseTasks = new();
+
     public Dictionary<string, TaskModel> TaskDictionary = new();
     public TaskQueueView()
     {
@@ -69,37 +71,39 @@ public partial class TaskQueueView
             }
             if (Instances.GameSettingsUserControlModel.CurrentResources.Any(r => r.Name == Instances.GameSettingsUserControlModel.CurrentResource))
             {
-                var resources = Instances.GameSettingsUserControlModel.CurrentResources.Where(r => r.Name == Instances.GameSettingsUserControlModel.CurrentResource);
-                foreach (var resourcePath in resources)
+                var resources = Instances.GameSettingsUserControlModel.CurrentResources.FirstOrDefault(r => r.Name == Instances.GameSettingsUserControlModel.CurrentResource);
+                if (resources?.Path != null)
                 {
-                    if (!Path.Exists($"{resourcePath}/pipeline/"))
-                        break;
-                    var jsonFiles = Directory.GetFiles($"{resourcePath}/pipeline/", "*.json", SearchOption.AllDirectories);
-                    var taskDictionaryA = new Dictionary<string, TaskModel>();
-                    foreach (var file in jsonFiles)
+                    foreach (var resourcePath in resources.Path)
                     {
-                        var content = File.ReadAllText(file);
-                        var taskData = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(content);
-                        if (taskData == null || taskData.Count == 0)
+                        if (!Path.Exists($"{resourcePath}/pipeline/"))
                             break;
-                        foreach (var task in taskData)
+                        var jsonFiles = Directory.GetFiles($"{resourcePath}/pipeline/", "*.json", SearchOption.AllDirectories);
+                        var taskDictionaryA = new Dictionary<string, TaskModel>();
+                        foreach (var file in jsonFiles)
                         {
-                            if (!taskDictionaryA.TryAdd(task.Key, task.Value))
+                            var content = File.ReadAllText(file);
+                            var taskData = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(content);
+                            if (taskData == null || taskData.Count == 0)
+                                break;
+                            foreach (var task in taskData)
                             {
-                                GrowlHelper.Error(string.Format(
-                                    LocExtension.GetLocalizedValue<string>("DuplicateTaskError"), task.Key));
-                                return false;
+                                if (!taskDictionaryA.TryAdd(task.Key, task.Value))
+                                {
+                                    GrowlHelper.Error(string.Format(
+                                        LocExtension.GetLocalizedValue<string>("DuplicateTaskError"), task.Key));
+                                    return false;
+                                }
                             }
                         }
-                    }
 
-                    taskDictionary = taskDictionary.MergeTaskModels(taskDictionaryA);
+                        taskDictionary = taskDictionary.MergeTaskModels(taskDictionaryA);
+                    }
                 }
             }
 
             if (taskDictionary.Count == 0)
             {
-
                 if (!string.IsNullOrWhiteSpace($"{MaaProcessor.ResourceBase}/pipeline") && !Directory.Exists($"{MaaProcessor.ResourceBase}/pipeline"))
                 {
                     try
@@ -108,7 +112,6 @@ public partial class TaskQueueView
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"创建目录时发生错误: {ex.Message}");
                         LoggerService.LogError(ex);
                     }
                 }
@@ -255,96 +258,98 @@ public partial class TaskQueueView
 
     public bool FirstTask = true;
 
-    private void LoadTasks(IEnumerable<TaskInterfaceItem> tasks, Collection<DragItemViewModel>? drag = null)
+    private void LoadTasks(List<TaskInterfaceItem>? tasks, Collection<DragItemViewModel>? drag = null)
     {
-        foreach (var task in tasks)
+        if (tasks is not null)
         {
-            var dragItem = new DragItemViewModel(task);
-
-            if (FirstTask)
+            foreach (var task in tasks)
             {
-                if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > 0)
-                    Instances.GameSettingsUserControlModel.CurrentResources = new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList());
-                else
-                    Instances.GameSettingsUserControlModel.CurrentResources =
-                    [
-                        new MaaInterface.MaaCustomResource
-                        {
-                            Name = "Default",
-                            Path = [MaaProcessor.ResourceBase]
-                        }
-                    ];
-                FirstTask = false;
-            }
-            if (drag != null)
-            {
-                var oldDict = drag
-                    .Where(vm => vm.InterfaceItem?.Name != null)
-                    .ToDictionary(vm => vm.InterfaceItem.Name);
+                var dragItem = new DragItemViewModel(task);
 
-                foreach (var newItem in tasks)
+                if (FirstTask)
                 {
-                    if (newItem?.Name == null) continue;
-
-                    if (oldDict.TryGetValue(newItem.Name, out var oldVm))
-                    {
-                        var oldItem = oldVm.InterfaceItem;
-                        if (oldItem == null) continue;
-
-                        if (oldItem.Check.HasValue)
-                        {
-                            newItem.Check = oldItem.Check;
-                        }
-
-                        if (oldItem.Option != null && newItem.Option != null)
-                        {
-                            foreach (var newOption in newItem.Option)
+                    if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > 0)
+                        Instances.GameSettingsUserControlModel.CurrentResources = new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList());
+                    else
+                        Instances.GameSettingsUserControlModel.CurrentResources =
+                        [
+                            new MaaInterface.MaaCustomResource
                             {
-                                var oldOption = oldItem.Option.FirstOrDefault(o =>
-                                    o.Name == newOption.Name && o.Index.HasValue);
+                                Name = "Default",
+                                Path = [MaaProcessor.ResourceBase]
+                            }
+                        ];
+                    FirstTask = false;
+                }
+                if (drag != null)
+                {
+                    var oldDict = drag
+                        .Where(vm => vm.InterfaceItem?.Name != null)
+                        .ToDictionary(vm => vm.InterfaceItem.Name);
 
-                                if (oldOption != null)
+                    foreach (var newItem in tasks)
+                    {
+                        if (newItem?.Name == null) continue;
+
+                        if (oldDict.TryGetValue(newItem.Name, out var oldVm))
+                        {
+                            var oldItem = oldVm.InterfaceItem;
+                            if (oldItem == null) continue;
+
+                            if (oldItem.Check.HasValue)
+                            {
+                                newItem.Check = oldItem.Check;
+                            }
+
+                            if (oldItem.Option != null && newItem.Option != null)
+                            {
+                                foreach (var newOption in newItem.Option)
                                 {
+                                    var oldOption = oldItem.Option.FirstOrDefault(o =>
+                                        o.Name == newOption.Name && o.Index.HasValue);
 
-                                    int maxValidIndex = newItem.Option.Count - 1;
-                                    int desiredIndex = oldOption.Index ?? 0;
+                                    if (oldOption != null)
+                                    {
 
-                                    newOption.Index = (desiredIndex >= 0 && desiredIndex <= maxValidIndex)
-                                        ? desiredIndex
-                                        : 0;
+                                        int maxValidIndex = newItem.Option.Count - 1;
+                                        int desiredIndex = oldOption.Index ?? 0;
+
+                                        newOption.Index = (desiredIndex >= 0 && desiredIndex <= maxValidIndex)
+                                            ? desiredIndex
+                                            : 0;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            else if (dragItem.InterfaceItem?.Option != null)
-            {
-                foreach (var option in dragItem.InterfaceItem.Option)
+                else if (dragItem.InterfaceItem?.Option != null)
                 {
-                    if (MaaInterface.Instance?.Option != null && MaaInterface.Instance.Option.TryGetValue(option.Name, out var interfaceOption))
+                    foreach (var option in dragItem.InterfaceItem.Option)
                     {
-                        if (interfaceOption.Cases != null)
+                        if (MaaInterface.Instance?.Option != null && MaaInterface.Instance.Option.TryGetValue(option.Name, out var interfaceOption))
                         {
-                            if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase) && interfaceOption.Cases != null)
+                            if (interfaceOption.Cases != null)
                             {
-
-                                var index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
-                                if (index != -1)
+                                if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase) && interfaceOption.Cases != null)
                                 {
-                                    option.Index = index;
-                                }
 
+                                    var index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
+                                    if (index != -1)
+                                    {
+                                        option.Index = index;
+                                    }
+
+                                }
                             }
                         }
+
                     }
-
                 }
-            }
 
-            ViewModel.TasksSource.Add(dragItem);
+                ViewModel.TasksSource.Add(dragItem);
+            }
         }
-
         if (ViewModel.TaskItemViewModels.Count == 0)
         {
             var items = MFAConfiguration.GetConfiguration("TaskItems",
@@ -361,7 +366,8 @@ public partial class TaskQueueView
             ViewModel.TaskItemViewModels = tempViewModel;
         }
     }
-    public void Toggle() 
+
+    public void Toggle()
     {
         if (Instances.RootViewModel.IsRunning)
         {
@@ -372,7 +378,7 @@ public partial class TaskQueueView
             Start();
         }
     }
-    
+
     public void Start(bool onlyStart = false, bool checkUpdate = false)
     {
         if (!Instances.RootViewModel.Idle)
