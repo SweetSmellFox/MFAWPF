@@ -44,10 +44,10 @@ public partial class ConnectSettingsUserControlModel : ViewModel
     public static ObservableCollection<Win32ScreencapMethod> Win32ControlScreenCapTypes => [Win32ScreencapMethod.FramePool, Win32ScreencapMethod.DXGIDesktopDup, Win32ScreencapMethod.GDI];
     public static ObservableCollection<Win32InputMethod> Win32ControlInputTypes => [Win32InputMethod.SendMessage, Win32InputMethod.Seize];
 
-    [ObservableProperty] private AdbScreencapMethods _adbControlScreenCapType = MFAConfiguration.GetConfiguration("AdbControlScreenCapType", AdbScreencapMethods.Default, new UniversalEnumConverter<AdbScreencapMethods>());
-    [ObservableProperty] private AdbInputMethods _adbControlInputType = MFAConfiguration.GetConfiguration("AdbControlInputType", AdbInputMethods.MinitouchAndAdbKey, new UniversalEnumConverter<AdbInputMethods>());
-    [ObservableProperty] private Win32ScreencapMethod _win32ControlScreenCapType = MFAConfiguration.GetConfiguration("Win32ControlScreenCapType", Win32ScreencapMethod.FramePool, new UniversalEnumConverter<Win32ScreencapMethod>());
-    [ObservableProperty] private Win32InputMethod _win32ControlInputType = MFAConfiguration.GetConfiguration("Win32ControlInputType", Win32InputMethod.SendMessage, new UniversalEnumConverter<Win32InputMethod>());
+    [ObservableProperty] private AdbScreencapMethods _adbControlScreenCapType = MFAConfiguration.GetConfiguration("AdbControlScreenCapType", AdbScreencapMethods.Default, AdbScreencapMethods.None,new UniversalEnumConverter<AdbScreencapMethods>());
+    [ObservableProperty] private AdbInputMethods _adbControlInputType = MFAConfiguration.GetConfiguration("AdbControlInputType", AdbInputMethods.MinitouchAndAdbKey, AdbInputMethods.None,new UniversalEnumConverter<AdbInputMethods>());
+    [ObservableProperty] private Win32ScreencapMethod _win32ControlScreenCapType = MFAConfiguration.GetConfiguration("Win32ControlScreenCapType", Win32ScreencapMethod.FramePool, Win32ScreencapMethod.None,new UniversalEnumConverter<Win32ScreencapMethod>());
+    [ObservableProperty] private Win32InputMethod _win32ControlInputType = MFAConfiguration.GetConfiguration("Win32ControlInputType", Win32InputMethod.SendMessage, Win32InputMethod.None,new UniversalEnumConverter<Win32InputMethod>());
 
     partial void OnAdbControlScreenCapTypeChanged(AdbScreencapMethods value)
     {

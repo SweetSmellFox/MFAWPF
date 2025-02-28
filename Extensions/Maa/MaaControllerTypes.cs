@@ -2,6 +2,7 @@ namespace MFAWPF.Extensions.Maa;
 
 public enum MaaControllerTypes
 {
+    None = 0,
     Win32,
     Adb
 }
@@ -17,7 +18,7 @@ public static class MaaControllerHelper
             _ => "TabADB"
         };
     }
-    
+
     public static MaaControllerTypes ToMaaControllerTypes(this string? type, MaaControllerTypes defaultValue = MaaControllerTypes.Adb)
     {
         if (string.IsNullOrWhiteSpace(type))

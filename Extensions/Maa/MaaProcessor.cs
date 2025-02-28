@@ -969,8 +969,8 @@ public class MaaProcessor
             LoggerService.LogInfo($"Resource: {string.Join(",", resources)}");
             maaResource = new MaaResource(resources);
 
-            maaResource.SetOptionInferenceDevice(MFAConfiguration.GetConfiguration("EnableGPU", true) ? InferenceDevice.Auto : InferenceDevice.CPU);
-            LoggerService.LogInfo($"GPU acceleration: {MFAConfiguration.GetConfiguration("EnableGPU", true)}");
+            maaResource.SetOptionInferenceDevice(Instances.PerformanceUserControlModel.GpuOption);
+            LoggerService.LogInfo($"GPU acceleration: {Instances.PerformanceUserControlModel.GpuOption}");
         }
         catch (Exception e)
         {

@@ -23,9 +23,11 @@ public class InputParameterAction : MaaCustomAction
 
     protected override bool Execute(IMaaContext context, RunArgs args)
     {
-        var shouldRun = false;
+        var shouldRun = true;
         var enter1 = () =>
         {
+            if (shouldRun)
+                return true;
             var image = context.GetImage();
             RecognitionDetail detail;
             if (context.OCR("启用参数", image, out detail, 847, 570, 98, 28))

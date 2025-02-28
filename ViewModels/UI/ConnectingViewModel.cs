@@ -59,7 +59,7 @@ public partial class ConnectingViewModel : ViewModel
         },
     ];
 
-    [ObservableProperty] private MaaControllerTypes _currentController = MFAConfiguration.GetConfiguration("CurrentController", MaaControllerTypes.Adb, new UniversalEnumConverter<MaaControllerTypes>());
+    [ObservableProperty] private MaaControllerTypes _currentController = MFAConfiguration.GetConfiguration("CurrentController", MaaControllerTypes.Adb, MaaControllerTypes.None, new UniversalEnumConverter<MaaControllerTypes>());
 
     partial void OnCurrentControllerChanged(MaaControllerTypes value)
     {
@@ -301,7 +301,7 @@ public partial class ConnectingViewModel : ViewModel
             || !MFAConfiguration.GetConfiguration("RememberAdb", true)
             || MaaProcessor.MaaFwConfig.AdbDevice.AdbPath != "adb"
             || !MFAConfiguration.TryGetConfiguration("AdbDevice", out AdbDeviceInfo device,
-                new UniversalEnumConverter<AdbInputMethods>(), new  UniversalEnumConverter<AdbScreencapMethods>()))
+                new UniversalEnumConverter<AdbInputMethods>(), new UniversalEnumConverter<AdbScreencapMethods>()))
         {
             DispatcherHelper.RunOnMainThread(AutoDetectDevice);
             return;

@@ -184,9 +184,16 @@ public static class MFAConfiguration
         return false;
     }
 
-    public static T GetConfiguration<T>(string key, T defaultValue, params JsonConverter[] valueConverters)
+    public static T GetConfiguration<T>(
+        string key,
+        T defaultValue,
+        params JsonConverter[] valueConverters) where T : struct, Enum
     {
-
+        return GetConfiguration(key, defaultValue, defaultValue, valueConverters);
+    }
+    
+    public static T GetConfiguration<T>(string key, T defaultValue, T? noValue = default, params JsonConverter[] valueConverters)
+    {
         if (Data.TryGetValue(key, out var data))
         {
             try
@@ -196,11 +203,15 @@ public static class MFAConfiguration
                 {
                     settings.Converters.Add(converter);
                 }
+                var result = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(data), settings) ?? defaultValue;
+                if (result.Equals(noValue))
+                    return defaultValue;
                 return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(data), settings) ?? defaultValue;
             }
             catch (Exception e)
             {
                 LoggerService.LogError($"类型转换失败: {e.Message}");
+                return defaultValue;
             }
         }
         return defaultValue;
@@ -228,7 +239,7 @@ public static class MFAConfiguration
         output = default;
         return false;
     }
-    
+
     public static T GetConfiguration<T>(string key, T defaultValue)
     {
         return Data.GetConfig(key, defaultValue);
