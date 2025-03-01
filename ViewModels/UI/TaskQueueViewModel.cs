@@ -22,14 +22,7 @@ public partial class TaskQueueViewModel : ViewModel
     }
 
     [ObservableProperty] private bool _connectSettingChecked = true;
-
-    // partial void OnConnectSettingCheckedChanged(bool value)
-    // {
-    //     if (value)
-    //     {
-    //         Instances.TaskQueueView.SettingPanel.Children.Clear();
-    //     }
-    // }
+    
     
     public ObservableCollection<Tool.DragItemViewModel> TasksSource { get; private set; } =
         [];
@@ -160,7 +153,7 @@ public partial class TaskQueueViewModel : ViewModel
 
         DispatcherHelper.RunOnMainThread(() =>
         {
-            var log = new LogItemViewModel(downloading ? "NewVersionFoundDescDownloading".ToLocalization() + "\n" + output : output, Application.Current.MainWindow.FindResource("DownloadLogBrush") as Brush,
+            var log = new LogItemViewModel(downloading ? "NewVersionFoundDescDownloading".ToLocalization() + "\n" + output : output, Instances.RootView.FindResource("DownloadLogBrush") as Brush,
                 dateFormat: "HH':'mm':'ss")
             {
                 IsDownloading = true,

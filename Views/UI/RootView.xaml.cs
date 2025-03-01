@@ -137,7 +137,7 @@ public partial class RootView
                 {
                     Name = "启动前",
                     Type = MFATask.MFATaskType.MFA,
-                    Action = WaitSoftware,
+                    Action = async () => WaitSoftware(),
                 });
                 Instances.TaskQueueView.Start(!MFAConfiguration.GetConfiguration("BeforeTask", "None").Contains("And", StringComparison.OrdinalIgnoreCase), checkUpdate: true);
             }
@@ -154,7 +154,7 @@ public partial class RootView
             MFAConfiguration.SetConfiguration("EnableEdit", MFAConfiguration.GetConfiguration("EnableEdit", false));
             if (!string.IsNullOrWhiteSpace(MaaInterface.Instance?.Message))
             {
-                Growl.Info(MaaInterface.Instance.Message);
+                GrowlHelper.Info(MaaInterface.Instance.Message);
             }
         });
         TaskManager.RunTaskAsync(async () =>
@@ -227,8 +227,7 @@ public partial class RootView
 
 
     public static void AddLogByKey(string key, Brush? color = null, params string[] formatArgsKeys)
-        =>
-            Instances.TaskQueueViewModel.AddLogByKey(key, color, formatArgsKeys);
+        =>  Instances.TaskQueueViewModel.AddLogByKey(key, color, formatArgsKeys);
 
 
     public void RunScript(string str = "Prescript")

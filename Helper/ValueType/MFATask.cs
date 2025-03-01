@@ -14,9 +14,9 @@ public partial class MFATask : ObservableObject
     [ObservableProperty] private string _name = string.Empty;
     [ObservableProperty] private MFATaskType _type = MFATaskType.MFA;
     [ObservableProperty] private int _count = 1;
-    [ObservableProperty] private Action? _action;
+    [ObservableProperty] private Func<Task>? _action;
     [ObservableProperty] private Dictionary<string, TaskModel> _tasks = new();
-
+    
 
     public bool Run()
     {
@@ -26,7 +26,7 @@ public partial class MFATask : ObservableObject
             {
                 if (Type == MFATaskType.MAAFW)
                     RootView.AddLogByKey("TaskStart", null, Name ?? string.Empty);
-                Action?.Invoke();
+                Action?.Invoke().Wait();
             }
             return true;
         }

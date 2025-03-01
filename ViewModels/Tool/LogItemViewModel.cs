@@ -36,7 +36,7 @@ namespace MFAWPF.ViewModels.Tool
         }
 
         public LogItemViewModel(string content,
-            Brush color,
+            Brush? color,
             string weight = "Regular",
             string dateFormat = "MM'-'dd'  'HH':'mm':'ss",
             bool showTime = true)

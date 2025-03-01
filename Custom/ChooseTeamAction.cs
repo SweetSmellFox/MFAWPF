@@ -25,7 +25,7 @@ public class ChooseTeamAction : MaaCustomAction
         var choosing = () =>
         {
             var image = context.GetImage();
-            if (context.TemplateMatch("houqin.png", image, out var  detail, 0.81, 0, 244, 1279, 164))
+            if (context.TemplateMatch("houqin.png", image, out var detail, 0.81, 0, 244, 1279, 164))
             {
                 context.Click(detail.HitBox.X, detail.HitBox.Y);
                 return true;
@@ -38,7 +38,7 @@ public class ChooseTeamAction : MaaCustomAction
 
             return false;
         };
-        choosing.Until(150);
+        choosing.Until(700);
         var confirm = () =>
         {
             var image = context.GetImage();
@@ -101,7 +101,7 @@ public class ChooseTeamAction : MaaCustomAction
             return false;
         };
         afterConfirm.Until(150);
-
+        Thread.Sleep(700);
         var confirmZ = () =>
         {
             var image = context.GetImage();

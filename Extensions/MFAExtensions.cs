@@ -7,6 +7,7 @@ using MFAWPF.Helper.Exceptions;
 using MFAWPF.Helper.ValueType;
 using MFAWPF.ViewModels.Tool;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using System.Windows;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Extensions;
@@ -44,7 +45,7 @@ public static class MFAExtensions
 
     public static void BindLocalization(this FrameworkElement control,
         string resourceKey,
-        DependencyProperty property = null)
+        DependencyProperty? property = null)
     {
         property ??= TitleElement.TitleProperty;
         var locExtension = new LocExtension(resourceKey);
@@ -62,8 +63,20 @@ public static class MFAExtensions
     {
         if (string.IsNullOrWhiteSpace(key))
             return string.Empty;
-        var localizedString = LocalizeDictionary.Instance.GetLocalizedObject(key, null, null) as string ?? key;
-        return string.Format(localizedString, args);
+        var formatArgs = args.Select(a => a.ToLocalization()).ToArray();
+
+        var content = string.Empty;
+        try
+        {
+            content = Regex.Unescape(
+                key.ToLocalization().FormatWith(formatArgs));
+        }
+        catch
+        {
+            content = key.ToLocalization().FormatWith(formatArgs);
+        }
+
+        return content;
     }
 
     public static string FormatWith(this string format, params object[] args)
@@ -102,6 +115,7 @@ public static class MFAExtensions
     {
         return hitBox is null or { X: 0, Y: 0, Width: 0, Height: 0 };
     }
+    
     public static MaaTaskJob AppendTask(this IMaaTasker maaTasker, TaskItemViewModel task)
     {
         if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
@@ -366,6 +380,7 @@ public static class MFAExtensions
                 h
             },
         }, imageBuffer);
+        LoggerService.LogInfo(detail.Detail);
         LoggerService.LogInfo($"TemplateMatch: {template} ,Hit: {detail.IsHit()}");
         return detail.IsHit();
     }
