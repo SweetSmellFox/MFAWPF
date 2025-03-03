@@ -20,28 +20,32 @@
             <RowDefinition Height="*" MaxHeight="250" />
 
         </Grid.RowDefinitions>
-        <hc:ScrollViewer
+
+        <TabControl
+            Background="Transparent"
+            BorderThickness="0"
             Grid.Row="0"
-            HorizontalAlignment="Stretch"
             Margin="10,0,10,10"
-            VerticalAlignment="Stretch"
-            VerticalScrollBarVisibility="Auto">
-            <TabControl
-                Background="Transparent"
-                BorderThickness="0"
-                Style="{StaticResource TabControlCapsule}"
-                TabStripPlacement="Bottom">
-                <TabItem Header="{lex:Loc CommonSetting}" MinWidth="60">
-
+            Style="{StaticResource TabControlCapsule}"
+            TabStripPlacement="Bottom">
+            <TabItem Header="{lex:Loc CommonSetting}" MinWidth="60">
+                <hc:ScrollViewer
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    VerticalScrollBarVisibility="Auto">
                     <Grid x:Name="CommonOptionSettings" />
-                </TabItem>
-                <TabItem Header="{lex:Loc AdvancedSetting}" MinWidth="60">
-
+                </hc:ScrollViewer>
+            </TabItem>
+            <TabItem Header="{lex:Loc AdvancedSetting}" MinWidth="60">
+                <hc:ScrollViewer
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    VerticalScrollBarVisibility="Auto">
                     <Grid x:Name="AdvancedOptionSetting" />
-                </TabItem>
-            </TabControl>
+                </hc:ScrollViewer>
+            </TabItem>
+        </TabControl>
 
-        </hc:ScrollViewer>
 
         <Grid
             Grid.Row="1"
