@@ -280,9 +280,8 @@ public partial class TaskQueueView
     private void InitializeResources()
     {
         Instances.GameSettingsUserControlModel.CurrentResources =
-            MaaInterface.Instance?.Resources.Values.Count == 0
-                ? new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList())
-                :
+            MaaInterface.Instance?.Resources.Values.Count > 0
+                ? new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList()) :
                 [
                     new MaaInterface.MaaCustomResource
                     {
@@ -290,6 +289,8 @@ public partial class TaskQueueView
                         Path = [MaaProcessor.ResourceBase]
                     }
                 ];
+        if (Instances.GameSettingsUserControlModel.CurrentResources.Count > 0 && Instances.GameSettingsUserControlModel.CurrentResources.All(r => r.Name != Instances.GameSettingsUserControlModel.CurrentResource))
+            Instances.GameSettingsUserControlModel.CurrentResource = Instances.GameSettingsUserControlModel.CurrentResources[0].Name ?? "Default";
     }
 
     private (List<DragItemViewModel> updateList, List<DragItemViewModel> removeList) SynchronizeTaskItems(
