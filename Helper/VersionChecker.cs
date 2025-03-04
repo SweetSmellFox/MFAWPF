@@ -42,23 +42,19 @@ public class VersionChecker
 
         if (config.AutoUpdateResource)
         {
-            Console.WriteLine(1);
             AddResourceUpdateTask(config.AutoUpdateMFA);
         }
         else if (config.CheckVersion)
         {
-            Console.WriteLine(2);
             AddResourceCheckTask();
         }
 
         if (config.AutoUpdateMFA)
         {
-            Console.WriteLine(3);
             AddMFAUpdateTask();
         }
         else if (config.CheckVersion)
         {
-            Console.WriteLine(4);
             AddMFACheckTask();
         }
 
@@ -198,7 +194,6 @@ public class VersionChecker
 
     public async Task UpdateResourceWithMirrorApi(bool closeDialog = false, bool noDialog = false, Action action = null)
     {
-        Console.WriteLine("测试1");
         Instances.RootViewModel.SetUpdating(true);
         MFAWPF.Views.UI.Dialog.DownloadDialog dialog = null;
         DispatcherHelper.RunOnMainThread(() =>
@@ -436,7 +431,7 @@ public class VersionChecker
             var currentVersion = GetResourceVersion();
             var cdk = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("DownloadCDK", string.Empty));
 
-            GetDownloadUrlFromMirror(currentVersion, resId, cdk, out var downloadUrl, out var latestVersion, "MFA", true, true);
+            GetDownloadUrlFromMirror(currentVersion, resId, cdk, out var downloadUrl, out var latestVersion, "MFA", false, true);
 
             if (IsNewVersionAvailable(latestVersion, currentVersion))
             {
@@ -558,7 +553,6 @@ public class VersionChecker
         var tempZipFilePath = Path.Combine(tempPath, $"resource_{latestVersion}.zip");
         dialog?.SetText("Downloading".ToLocalization());
         dialog?.UpdateProgress(0);
-        Console.WriteLine("资源下载");
         if (!await DownloadFileAsync(downloadUrl, tempZipFilePath, dialog, "GameResourceUpdated"))
         {
             SetText("DownloadFailed", dialog, noDialog);
@@ -580,7 +574,6 @@ public class VersionChecker
 
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
         dialog?.UpdateProgress(50);
-        Console.WriteLine("资源解压");
         var resourcePath = Path.Combine(AppContext.BaseDirectory, "resource");
         if (Directory.Exists(resourcePath))
         {
@@ -1056,7 +1049,7 @@ public class VersionChecker
             Instances.TaskQueueViewModel.ClearDownloadProgress();
             return;
         }
-        Console.WriteLine("测试1");
+
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
 
         var currentExeFileName = Process.GetCurrentProcess().MainModule.ModuleName;
