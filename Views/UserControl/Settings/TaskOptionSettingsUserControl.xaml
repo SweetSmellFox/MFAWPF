@@ -41,7 +41,7 @@
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
                     VerticalScrollBarVisibility="Auto">
-                    <Grid x:Name="AdvancedOptionSetting" />
+                    <Grid x:Name="AdvancedOptionSettings" />
                 </hc:ScrollViewer>
             </TabItem>
         </TabControl>

@@ -257,112 +257,113 @@ public partial class TaskQueueView
 
     public bool FirstTask = true;
 
-    private void LoadTasks(List<TaskInterfaceItem>? tasks, Collection<DragItemViewModel>? drag = null)
+    private void LoadTasks(List<TaskInterfaceItem>? tasks, IList<DragItemViewModel>? oldDrags = null)
     {
-        if (tasks is not null)
+        var items = MFAConfiguration.GetConfiguration("TaskItems", new List<TaskInterfaceItem>()) ?? [];
+        var drags = (oldDrags?.ToList() ?? []).Union(items.Select(interfaceItem => new DragItemViewModel(interfaceItem))).ToList();
+
+        if (tasks is null) return;
+        
+        if (FirstTask)
         {
-            foreach (var task in tasks)
+            InitializeResources();
+            FirstTask = false;
+        }
+
+
+        var (updateList, removeList) = SynchronizeTaskItems(drags, tasks);
+        updateList.RemoveAll(d => removeList.Contains(d));
+        
+        UpdateViewModels(updateList, tasks);
+    }
+
+    private void InitializeResources()
+    {
+        Instances.GameSettingsUserControlModel.CurrentResources =
+            MaaInterface.Instance?.Resources.Values.Count == 0
+                ? new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList())
+                :
+                [
+                    new MaaInterface.MaaCustomResource
+                    {
+                        Name = "Default",
+                        Path = [MaaProcessor.ResourceBase]
+                    }
+                ];
+    }
+
+    private (List<DragItemViewModel> updateList, List<DragItemViewModel> removeList) SynchronizeTaskItems(
+        IList<DragItemViewModel> drags,
+        List<TaskInterfaceItem> tasks)
+    {
+        var newDict = tasks.ToDictionary(t => t.Name);
+        var removeList = new List<DragItemViewModel>();
+        var updateList = new List<DragItemViewModel>();
+
+        foreach (var oldItem in drags.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+        {
+            if (!newDict.TryGetValue(oldItem.Name, out var newItem))
             {
-                var dragItem = new DragItemViewModel(task);
+                removeList.Add(oldItem);
+                continue;
+            }
 
-                if (FirstTask)
-                {
-                    if (MaaInterface.Instance?.Resources != null && MaaInterface.Instance.Resources.Count > 0)
-                        Instances.GameSettingsUserControlModel.CurrentResources = new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList());
-                    else
-                        Instances.GameSettingsUserControlModel.CurrentResources =
-                        [
-                            new MaaInterface.MaaCustomResource
-                            {
-                                Name = "Default",
-                                Path = [MaaProcessor.ResourceBase]
-                            }
-                        ];
-                    FirstTask = false;
-                }
-                if (drag != null)
-                {
-                    var oldDict = drag
-                        .Where(vm => vm.InterfaceItem?.Name != null)
-                        .ToDictionary(vm => vm.InterfaceItem.Name);
+            UpdateExistingItem(oldItem, newItem);
+            updateList.Add(oldItem);
+        }
 
-                    foreach (var newItem in tasks)
-                    {
-                        if (newItem?.Name == null) continue;
+        return (updateList, removeList);
+    }
 
-                        if (oldDict.TryGetValue(newItem.Name, out var oldVm))
-                        {
-                            var oldItem = oldVm.InterfaceItem;
-                            if (oldItem == null) continue;
+    private void UpdateExistingItem(DragItemViewModel oldItem, TaskInterfaceItem newItem)
+    {
+        if (oldItem.InterfaceItem == null) return;
+        oldItem.InterfaceItem.Entry = newItem.Entry;
 
-                            if (oldItem.Check.HasValue)
-                            {
-                                newItem.Check = oldItem.Check;
-                            }
+        if (newItem.Option == null) return;
 
-                            if (oldItem.Option != null && newItem.Option != null)
-                            {
-                                foreach (var newOption in newItem.Option)
-                                {
-                                    var oldOption = oldItem.Option.FirstOrDefault(o =>
-                                        o.Name == newOption.Name && o.Index.HasValue);
+        var tempDict = oldItem.InterfaceItem.Option?.ToDictionary(t => t.Name) ?? new Dictionary<string, MaaInterface.MaaInterfaceSelectOption>();
+        oldItem.InterfaceItem.Option = newItem.Option.Select(opt =>
+        {
+            if (tempDict.TryGetValue(opt.Name ?? string.Empty, out var existing))
+            {
+                opt.Index = existing.Index;
+            }
+            else
+            {
+                SetDefaultOptionValue(opt);
+            }
+            return opt;
+        }).ToList();
+    }
 
-                                    if (oldOption != null)
-                                    {
+    private void SetDefaultOptionValue(MaaInterface.MaaInterfaceSelectOption option)
+    {
+        if (!(MaaInterface.Instance?.Option?.TryGetValue(option.Name ?? string.Empty, out var interfaceOption) ?? false)) return;
 
-                                        int maxValidIndex = newItem.Option.Count - 1;
-                                        int desiredIndex = oldOption.Index ?? 0;
+        var defaultIndex = interfaceOption.Cases?
+                .FindIndex(c => c.Name == interfaceOption.DefaultCase)
+            ?? -1;
+        if (defaultIndex != -1) option.Index = defaultIndex;
+    }
 
-                                        newOption.Index = (desiredIndex >= 0 && desiredIndex <= maxValidIndex)
-                                            ? desiredIndex
-                                            : 0;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                else if (dragItem.InterfaceItem?.Option != null)
-                {
-                    foreach (var option in dragItem.InterfaceItem.Option)
-                    {
-                        if (MaaInterface.Instance?.Option != null && MaaInterface.Instance.Option.TryGetValue(option.Name, out var interfaceOption))
-                        {
-                            if (interfaceOption.Cases != null)
-                            {
-                                if (!string.IsNullOrWhiteSpace(interfaceOption.DefaultCase) && interfaceOption.Cases != null)
-                                {
+    private void UpdateViewModels(IList<DragItemViewModel> drags, List<TaskInterfaceItem> tasks)
+    {
 
-                                    var index = interfaceOption.Cases.FindIndex(@case => @case.Name == interfaceOption.DefaultCase);
-                                    if (index != -1)
-                                    {
-                                        option.Index = index;
-                                    }
-
-                                }
-                            }
-                        }
-
-                    }
-                }
-
-                ViewModel.TasksSource.Add(dragItem);
+        var newItems = tasks.Select(t => new DragItemViewModel(t)).ToList();
+        foreach (var item in newItems)
+        {
+            if (item.InterfaceItem?.Option != null && !drags.Any())
+            {
+                item.InterfaceItem.Option.ForEach(SetDefaultOptionValue);
             }
         }
-        if (ViewModel.TaskItemViewModels.Count == 0)
+        ViewModel.TasksSource.AddRange(newItems);
+
+
+        if (!ViewModel.TaskItemViewModels.Any())
         {
-            var items = MFAConfiguration.GetConfiguration("TaskItems",
-                    new List<TaskInterfaceItem>())
-                ?? new List<TaskInterfaceItem>();
-            var dragItemViewModels = items.Select(interfaceItem => new DragItemViewModel(interfaceItem)).ToList();
-            var tempViewModel = new ObservableCollection<DragItemViewModel>();
-            tempViewModel.AddRange(dragItemViewModels);
-            if (tempViewModel.Count == 0 && ViewModel.TasksSource.Count != 0)
-            {
-                foreach (var item in ViewModel.TasksSource)
-                    tempViewModel.Add(item);
-            }
-            ViewModel.TaskItemViewModels = tempViewModel;
+            ViewModel.TaskItemViewModels = new ObservableCollection<DragItemViewModel>(drags);
         }
     }
 
@@ -399,9 +400,9 @@ public partial class TaskQueueView
         MaaProcessor.Instance.Stop();
     }
 
-    public void Start(object sender, RoutedEventArgs e) => Start();
+    private void Start(object sender, RoutedEventArgs e) => Start();
 
-    public void Stop(object sender, RoutedEventArgs e) => Stop();
+    private void Stop(object sender, RoutedEventArgs e) => Stop();
 
 
     private void Edit(object sender, RoutedEventArgs e)
