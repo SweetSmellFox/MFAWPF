@@ -124,7 +124,7 @@ public partial class TaskQueueView
                             JsonConvert.SerializeObject(new Dictionary<string, TaskModel>
                             {
                                 {
-                                    "MFAWPF", new TaskModel()
+                                    "MFAWPF", new TaskModel
                                     {
                                         Action = "DoNothing"
                                     }
@@ -255,7 +255,7 @@ public partial class TaskQueueView
         return Instances.ConnectSettingsUserControlModel.Win32ControlInputType;
     }
 
-    public bool FirstTask = true;
+    private bool FirstTask = true;
 
     private void LoadTasks(List<TaskInterfaceItem>? tasks, IList<DragItemViewModel>? oldDrags = null)
     {

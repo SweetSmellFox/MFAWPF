@@ -214,7 +214,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Controls\Settings\" />
         <Folder Include="DLL\" />
         <Folder Include="Resource\base\" />
     </ItemGroup>

@@ -47,13 +47,10 @@ public class MaaProcessor
     private MaaTasker? _currentTasker;
 
     public static string Resource => AppContext.BaseDirectory + "Resource";
-    public static string ModelResource => $"{Resource}/model/";
     public static string ResourceBase => $"{Resource}/base";
-    public static string ResourcePipelineFilePath => $"{ResourceBase}/pipeline/";
 
     public Queue<MFATask> TaskQueue { get; } = new();
-    public static int Money { get; set; } = 0;
-    public static int AllMoney { get; set; }
+    
     public static MaaFWConfig MaaFwConfig { get; } = new();
 
     public static AutoInitDictionary AutoInitDictionary { get; } = new();
@@ -82,7 +79,8 @@ public class MaaProcessor
 
     private DateTime? _startTime;
 
-
+    public static int Money { get; set; } = 0;
+    
     public async Task Start(List<DragItemViewModel>? tasks, bool onlyStart = false, bool checkUpdate = false)
     {
         CancellationTokenSource = new CancellationTokenSource();
