@@ -137,7 +137,7 @@ public partial class RootView
                 {
                     Name = "启动前",
                     Type = MFATask.MFATaskType.MFA,
-                    Action = async () => WaitSoftware(),
+                    Action = async () => await WaitSoftware(),
                 });
                 Instances.TaskQueueView.Start(!MFAConfiguration.GetConfiguration("BeforeTask", "None").Contains("And", StringComparison.OrdinalIgnoreCase), checkUpdate: true);
             }
@@ -227,7 +227,7 @@ public partial class RootView
 
 
     public static void AddLogByKey(string key, Brush? color = null, params string[] formatArgsKeys)
-        =>  Instances.TaskQueueViewModel.AddLogByKey(key, color, formatArgsKeys);
+        => Instances.TaskQueueViewModel.AddLogByKey(key, color, formatArgsKeys);
 
 
     public void RunScript(string str = "Prescript")
@@ -319,11 +319,11 @@ public partial class RootView
 
     }
 
-    public async void WaitSoftware()
+    public async Task WaitSoftware()
     {
         if (MFAConfiguration.GetConfiguration("BeforeTask", "None").Contains("Startup", StringComparison.OrdinalIgnoreCase))
         {
-            MaaProcessor.Instance.StartSoftware();
+            await MaaProcessor.Instance.StartSoftware();
         }
 
         Instances.ConnectingViewModel.TryReadAdbDeviceFromConfig();

@@ -44,12 +44,14 @@ public static class TaskManager
     /// <param name="name">任务名称</param>
     /// <param name="prompt">日志提示</param>
     /// <param name="catchException">是否捕获异常</param>
+    /// <param name="shouldLog">异常是否写入日志</param>
     public async static Task RunTaskAsync(
         Action? action,
         Action? handleError = null,
         string name = nameof(Action),
         string prompt = ">>> ",
-        bool catchException = true)
+        bool catchException = true,
+        bool shouldLog = true)
     {
         Console.WriteLine($"异步任务 {name} 开始.");
         if (catchException)
@@ -59,15 +61,80 @@ public static class TaskManager
             {
                 if (t.Exception != null)
                 {
-                    if (handleError != null)
-                        handleError.Invoke();
-                    
-                    LoggerService.LogError(t.Exception.GetBaseException());
+                    handleError?.Invoke();
+                    if (shouldLog)
+                        LoggerService.LogError(t.Exception.GetBaseException());
                 }
             }, TaskContinuationOptions.OnlyOnFaulted);
         }
         else await Task.Run(action);
 
         Console.WriteLine($"{prompt}异步任务 {name} 已完成.");
+    }
+
+    public async static Task RunTaskAsync(
+        Action? action,
+        CancellationToken token,
+        Action? handleError = null,
+        string name = nameof(Action),
+        string prompt = ">>> ",
+        bool catchException = true,
+        bool shouldLog = true)
+    {
+        Console.WriteLine($"异步任务 {name} 开始.");
+        try
+        {
+            await Task.Run(() =>
+            {
+                token.ThrowIfCancellationRequested();
+                action?.Invoke();
+            }, token);
+        }
+        catch (Exception ex) when (catchException && !(ex is OperationCanceledException))
+        {
+            handleError?.Invoke();
+            if (shouldLog) LoggerService.LogError(ex.GetBaseException());
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            throw;
+        }
+        finally
+        {
+            Console.WriteLine($"{prompt}异步任务 {name} 已完成.");
+        }
+    }
+
+    public async static Task<TResult> RunTaskAsync<TResult>(
+        Func<TResult> function,
+        CancellationToken token,
+        Action<Exception>? handleError = null,
+        string name = nameof(Action),
+        bool catchException = true,
+        bool shouldLog = true)
+    {
+        try
+        {
+            return await Task.Run(() =>
+            {
+                token.ThrowIfCancellationRequested();
+                return function();
+            }, token);
+        }
+        catch (Exception ex) when (catchException && !(ex is OperationCanceledException))
+        {
+            var baseEx = ex.GetBaseException();
+            handleError?.Invoke(baseEx);
+            if (shouldLog) LoggerService.LogError(baseEx);
+            return default!; 
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
+        {
+            throw;
+        }
+        finally
+        {
+            Console.WriteLine($">>> 异步任务 {name} 已完成.");
+        }
     }
 }

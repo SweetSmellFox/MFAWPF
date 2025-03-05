@@ -17,6 +17,11 @@ public abstract class MaaCustomAction : IMaaCustomAction
         {
             return Execute(context, args);
         }
+        catch (OperationCanceledException)
+        {
+            LoggerService.LogInfo("Stopping MaaCustomAction");
+            return false;
+        }
         catch (MaaStopException)
         {
             LoggerService.LogInfo("Stopping MaaCustomAction");

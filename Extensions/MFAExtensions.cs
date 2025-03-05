@@ -440,7 +440,7 @@ public static class MFAExtensions
         int count = 0;
         while (true)
         {
-            if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
+            if (MaaProcessor.Instance.CancellationTokenSource == null || MaaProcessor.Instance.CancellationTokenSource.IsCancellationRequested)
             {
                 throw new MaaStopException();
             }
@@ -520,10 +520,15 @@ public static class MFAExtensions
         return true;
     }
     
-   
-    // public static bool IsDebugMode()
-    // {
-    //     if (MFAConfiguration.MaaConfig.GetConfig("recording", false) || MFAConfiguration.MaaConfig.GetConfig("save_draw", false) || MFAConfiguration.MaaConfig.GetConfig("show_hit_draw", false)) return true;
-    //     return false;
-    // }
+    public static void SafeCancel(this CancellationTokenSource? cts, bool useCancel = true)
+    {
+        if (cts == null || cts.IsCancellationRequested) return;
+        
+        try
+        {
+            if (useCancel) cts.Cancel();
+            cts.Dispose();
+        }
+        catch (Exception e) { Console.WriteLine(e); }
+    }
 }
