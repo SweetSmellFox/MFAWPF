@@ -155,13 +155,12 @@
 - [Serilog](https://github.com/serilog/serilog)：C# 日志记录库
 - [Newtonsoft.Json](https://github.com/CommunityToolkit/dotnet)：C# JSON 库
 
-## 画大饼
+### 开发者
 
-### v1.0
+感谢以下开发者对 MFA 作出的贡献：
 
-- [x] Pipeline的GUI编辑界面
-- [x] Support EN
+[![Contributors](https://contrib.rocks/image?repo=SweetSmellFox/MFAWPF&max=1000)](https://github.com/SweetSmellFox/MFAWPF/graphs/contributors)
 
-### v1.2
+## 讨论
 
-- [ ] <strike>interface.json的GUI编辑界面</strike>
+- MaaFW 交流 QQ 群: 595990173

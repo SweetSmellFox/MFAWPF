@@ -155,13 +155,12 @@ Modify it as follows:
 - [Serilog](https://github.com/serilog/serilog)：C# logging library
 - [Newtonsoft.Json](https://github.com/CommunityToolkit/dotnet)：C# JSON library
 
-## Roadmap
+### Developers
 
-### v1.0
+Thanks to the following developers for their contributions to MFA:
 
-- [x] GUI interface for editing Pipelines
-- [x] Support EN
+[![Contributors](https://contrib.rocks/image?repo=SweetSmellFox/MFAWPF&max=1000)](https://github.com/SweetSmellFox/MFAWPF/graphs/contributors)
 
-### v1.2
+## Discussion
 
-- [ ] <strike>GUI interface for editing interface.json</strike>
+- MaaFW QQ Group: 595990173
