@@ -50,7 +50,7 @@ public class MaaProcessor
     public static string ResourceBase => $"{Resource}/base";
 
     public Queue<MFATask> TaskQueue { get; } = new();
-    
+
     public static MaaFWConfig MaaFwConfig { get; } = new();
 
     public static AutoInitDictionary AutoInitDictionary { get; } = new();
@@ -80,7 +80,7 @@ public class MaaProcessor
     private DateTime? _startTime;
 
     public static int Money { get; set; } = 0;
-    
+
     public async Task Start(List<DragItemViewModel>? tasks, bool onlyStart = false, bool checkUpdate = false)
     {
         CancellationTokenSource = new CancellationTokenSource();
@@ -106,7 +106,7 @@ public class MaaProcessor
             var runSuccess = await ExecuteTasks(token);
             if (runSuccess)
             {
-                Stop(!CancellationTokenSource.IsCancellationRequested, onlyStart);
+                Stop(true, onlyStart);
             }
         }, token, name: "启动任务");
 
@@ -203,19 +203,15 @@ public class MaaProcessor
     {
         foreach (var task in taskAndParams)
         {
-            TaskQueue.Push(new MFATask
-            {
-                Name = task.Name,
-                Type = MFATask.MFATaskType.MAAFW,
-                Count = task.Count ?? 1,
-                Action = async () =>
+            TaskQueue.Push(CreateMaaFWTask(task.Name,
+                async () =>
                 {
                     token.ThrowIfCancellationRequested();
                     if (task.Tasks != null)
                         Instances.TaskQueueView.TaskDictionary = task.Tasks;
                     await TryRunTasksAsync(_currentTasker, task.Entry, task.Param, token);
-                }
-            });
+                }, task.Count ?? 1
+            ));
         }
     }
 
@@ -234,8 +230,18 @@ public class MaaProcessor
             }));
         }
     }
+    private MFATask CreateMaaFWTask(string? name, Func<Task> action, int count = 1)
+    {
+        return new MFATask
+        {
+            Name = name,
+            Count = 1,
+            Type = MFATask.MFATaskType.MAAFW,
+            Action = action
+        };
+    }
 
-    private MFATask CreateMFATask(string name, Func<Task> action)
+    private MFATask CreateMFATask(string? name, Func<Task> action)
     {
         return new MFATask
         {
@@ -267,11 +273,11 @@ public class MaaProcessor
         await TaskManager.RunTaskAsync(() => job.Wait().ThrowIfNot(MaaJobStatus.Succeeded), token, catchException: true, shouldLog: false);
     }
 
-    public void Stop(bool setIsStopped = true, bool onlyStart = false)
+    public void Stop(bool finished = false, bool onlyStart = false)
     {
         try
         {
-            if (!ShouldProcessStop(setIsStopped))
+            if (!ShouldProcessStop(finished))
             {
                 GrowlHelper.Warning("NoTaskToStop".ToLocalization());
 
@@ -283,10 +289,10 @@ public class MaaProcessor
 
             ClearTaskQueue();
 
-            ExecuteStopCore(setIsStopped, () =>
+            ExecuteStopCore(finished, () =>
             {
                 var stopResult = AbortCurrentTasker();
-                HandleStopResult(setIsStopped, stopResult, onlyStart);
+                HandleStopResult(finished, stopResult, onlyStart);
             });
 
         }
@@ -304,17 +310,17 @@ public class MaaProcessor
         CancellationTokenSource.SafeCancel();
     }
 
-    private bool ShouldProcessStop(bool setIsStopped)
+    private bool ShouldProcessStop(bool finished)
     {
         return (CancellationTokenSource?.IsCancellationRequested).IsFalse()
-            || !setIsStopped;
+            || finished;
     }
 
-    private void ExecuteStopCore(bool setIsStopped, Action stopAction)
+    private void ExecuteStopCore(bool finished, Action stopAction)
     {
         TaskManager.RunTaskAsync(() =>
         {
-            if (setIsStopped)
+            if (!finished)
                 RootView.AddLogByKey("Stopping");
 
             stopAction.Invoke();
@@ -328,11 +334,11 @@ public class MaaProcessor
         return _currentTasker == null || _currentTasker.Abort().Wait() == MaaJobStatus.Succeeded;
     }
 
-    private void HandleStopResult(bool setIsStopped, bool success, bool onlyStart)
+    private void HandleStopResult(bool finished, bool success, bool onlyStart)
     {
         if (success)
         {
-            DisplayTaskCompletionMessage(setIsStopped, onlyStart);
+            DisplayTaskCompletionMessage(finished, onlyStart);
         }
         else
         {
@@ -827,12 +833,12 @@ public class MaaProcessor
         switch (elapsedMilliseconds)
         {
             case >= 800:
-                RootView.AddLogByKey("ToScreencapErrorTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
+                RootView.AddLogByKey("ScreencapErrorTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), elapsedMilliseconds.ToString(),
                     Instances.TaskQueueView.ScreenshotType());
                 break;
 
             case >= 400:
-                RootView.AddLogByKey("ScreencapWarningTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, elapsedMilliseconds.ToString(),
+                RootView.AddLogByKey("ScreencapWarningTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), elapsedMilliseconds.ToString(),
                     Instances.TaskQueueView.ScreenshotType());
                 break;
 
@@ -864,12 +870,12 @@ public class MaaProcessor
         switch (avgElapsed)
         {
             case >= 800:
-                RootView.AddLogByKey("ToScreencapErrorTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, avgElapsed.ToString(),
+                RootView.AddLogByKey("ScreencapErrorTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), avgElapsed.ToString(),
                     Instances.TaskQueueView.ScreenshotType());
                 break;
 
             case >= 400:
-                RootView.AddLogByKey("ScreencapWarningTip", new BrushConverter().ConvertFromString("DarkGoldenrod") as Brush, avgElapsed.ToString(),
+                RootView.AddLogByKey("ScreencapWarningTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), avgElapsed.ToString(),
                     Instances.TaskQueueView.ScreenshotType());
                 break;
 
@@ -895,9 +901,9 @@ public class MaaProcessor
         return !token.IsCancellationRequested; // 根据取消状态返回正确结果
     }
 
-    private void DisplayTaskCompletionMessage(bool setStopped, bool onlyStart = false)
+    private void DisplayTaskCompletionMessage(bool finished, bool onlyStart = false)
     {
-        if (setStopped)
+        if (!finished)
         {
             Growl.Info("TaskStopped".ToLocalization());
             RootView.AddLogByKey("TaskAbandoned");

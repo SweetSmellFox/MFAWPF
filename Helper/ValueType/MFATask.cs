@@ -13,7 +13,7 @@ public partial class MFATask : ObservableObject
         MAAFW
     }
 
-    [ObservableProperty] private string _name = string.Empty;
+    [ObservableProperty] private string? _name = string.Empty;
     [ObservableProperty] private MFATaskType _type = MFATaskType.MFA;
     [ObservableProperty] private int _count = 1;
     [ObservableProperty] private Func<Task> _action;
@@ -27,6 +27,8 @@ public partial class MFATask : ObservableObject
             for (int i = 0; i < Count; i++)
             {
                 token.ThrowIfCancellationRequested();
+                if (Type == MFATaskType.MAAFW)
+                    RootView.AddLogByKey("TaskStart", null, Name ?? string.Empty);
                 await Action();
             }
             return true;

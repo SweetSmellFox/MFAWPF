@@ -196,16 +196,16 @@ public partial class TaskQueueViewModel : ViewModel
     }
 
     public void AddLog(string content,
-        Brush? color = null,
+        Brush? brush = null,
         string weight = "Regular",
         bool showTime = true)
     {
-        color ??= Brushes.Gray;
+        brush ??= Brushes.Gray;
         Task.Run(() =>
         {
             DispatcherHelper.RunOnMainThread(() =>
             {
-                LogItemViewModels.Add(new LogItemViewModel(content, color, weight, "HH':'mm':'ss",
+                LogItemViewModels.Add(new LogItemViewModel(content, brush, weight, "HH':'mm':'ss",
                     showTime: showTime));
                 LoggerService.LogInfo(content);
             });

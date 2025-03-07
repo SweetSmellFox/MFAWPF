@@ -350,7 +350,6 @@ public partial class TaskQueueView
 
     private void UpdateViewModels(IList<DragItemViewModel> drags, List<TaskInterfaceItem> tasks)
     {
-
         var newItems = tasks.Select(t => new DragItemViewModel(t)).ToList();
         foreach (var item in newItems)
         {

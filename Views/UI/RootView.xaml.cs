@@ -211,23 +211,23 @@ public partial class RootView
     }
 
     public static void AddLogByColor(string content,
-        string color = "Gray",
+        string brush = "Gray",
         string weight = "Regular",
         bool showTime = true)
         =>
-            Instances.TaskQueueViewModel.AddLog(content, color, weight, showTime);
+            Instances.TaskQueueViewModel.AddLog(content, brush, weight, showTime);
 
 
     public static void AddLog(string content,
-        Brush? color = null,
+        Brush? brush = null,
         string weight = "Regular",
         bool showTime = true)
         =>
-            Instances.TaskQueueViewModel.AddLog(content, color, weight, showTime);
+            Instances.TaskQueueViewModel.AddLog(content, brush, weight, showTime);
 
 
-    public static void AddLogByKey(string key, Brush? color = null, params string[] formatArgsKeys)
-        => Instances.TaskQueueViewModel.AddLogByKey(key, color, formatArgsKeys);
+    public static void AddLogByKey(string key, Brush? brush = null, params string[] formatArgsKeys)
+        => Instances.TaskQueueViewModel.AddLogByKey(key, brush, formatArgsKeys);
 
 
     public void RunScript(string str = "Prescript")

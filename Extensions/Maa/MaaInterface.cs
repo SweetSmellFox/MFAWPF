@@ -50,7 +50,14 @@ public class MaaInterface
             return Name ?? string.Empty;
         }
     }
-
+    public class MaaInterfaceAgent
+    {
+        [JsonProperty("child_exec")]
+        public string? ChildExec { get; set; } = string.Empty;
+        [JsonProperty("child_args")]
+        public List<string>? DefaultCase { get; set; }
+    }
+    
     public class CustomExecutor
     {
         [JsonIgnore]
@@ -154,20 +161,18 @@ public class MaaInterface
     public List<MaaCustomResource>? Resource { get; set; }
     [JsonProperty("task")]
     public List<TaskInterfaceItem>? Task { get; set; }
-    [JsonProperty("recognition")]
-    public Dictionary<string, CustomExecutor>? Recognition { get; set; }
-    [JsonProperty("action")]
-    public Dictionary<string, CustomExecutor>? Action { get; set; }
+    
+    [JsonProperty("agent")]
+    public MaaInterfaceAgent? Agent { get; set; }
+
     [JsonProperty("option")]
     public Dictionary<string, MaaInterfaceOption>? Option { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, object> AdditionalData { get; set; } = new();
     private static MaaInterface? _instance;
-
-    // [JsonIgnore] public List<MaaCustomRecognizerExecutor> CustomRecognizerExecutors { get; } = new();
-    //
-    // [JsonIgnore] public List<MaaCustomActionExecutor> CustomActionExecutors { get; } = new();
+    
+    
 
     [JsonIgnore]
     public Dictionary<string, MaaCustomResource> Resources { get; } = new();
