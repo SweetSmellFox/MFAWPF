@@ -9,6 +9,7 @@ using MailKit.Security;
 using MFAWPF.Data;
 using MFAWPF.Helper;
 using MFAWPF.Helper.ValueType;
+using MFAWPF.ViewModels.UserControl.Settings;
 using MFAWPF.Views.UI;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -359,160 +360,7 @@ public class MaaProcessor
     }
 
     #endregion
-    async private static Task<bool> DingTalkMessageAsync(string accessToken, string secret)
-    {
-        var timestamp = GetTimestamp();
-        var sign = CalculateSignature(timestamp, secret);
-        var message = new
-        {
-            msgtype = "text",
-            text = new
-            {
-                content = "TaskAllCompleted".ToLocalization()
-            }
-        };
-
-        try
-        {
-            var apiUrl = $"https://oapi.dingtalk.com/robot/send?access_token={accessToken}&timestamp={timestamp}&sign={sign}";
-            using var client = new HttpClient();
-            var content = new StringContent(JsonConvert.SerializeObject(message), Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(apiUrl, content);
-
-            if (response.IsSuccessStatusCode)
-            {
-                LoggerService.LogInfo("Message sent successfully");
-                return true;
-            }
-
-            LoggerService.LogError($"Message sending failed: {response.StatusCode} {await response.Content.ReadAsStringAsync()}");
-            return false;
-        }
-        catch (Exception ex)
-        {
-            LoggerService.LogError($"Error sending message: {ex.Message}");
-            return false;
-        }
-    }
-
-    public static void SendEmail(string email, string password)
-    {
-        try
-        {
-            var smtpConfig = GetSmtpConfigByEmail(email);
-
-            var mail = new MimeMessage();
-            mail.From.Add(new MailboxAddress("", email));
-            mail.To.Add(new MailboxAddress("", email));
-            mail.Subject = "TaskAllCompleted".ToLocalization();
-            mail.Body = new TextPart(MimeKit.Text.TextFormat.Plain)
-            {
-                Text = "TaskAllCompleted".ToLocalization()
-            };
-
-            using var client = new SmtpClient();
-
-            client.Connect(
-                smtpConfig.Host,
-                smtpConfig.Port,
-                smtpConfig.UseSSL ? SecureSocketOptions.SslOnConnect : SecureSocketOptions.Auto
-            );
-
-            client.Authenticate(email, password);
-
-            client.Send(mail);
-
-            client.Disconnect(true);
-        }
-        catch (AuthenticationException ex)
-        {
-            LoggerService.LogError($"认证失败: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            LoggerService.LogError($"未知错误: {ex.Message}");
-        }
-    }
-
-    private static (string Host, int Port, bool UseSSL, string Notes) GetSmtpConfigByEmail(string email)
-    {
-        if (!email.Contains('@') || email.Split('@').Length != 2)
-            throw new ArgumentException("无效的邮箱地址格式");
-
-        string domain = email.Split('@')[1].ToLower().Trim();
-
-
-        var smtpConfigs = new Dictionary<string, (string Host, int Port, bool UseSSL, string Notes)>()
-        {
-            // 国内邮箱
-            ["qq.com"] = ("smtp.qq.com", 465, true, "需使用授权码，非QQ密码"),
-            ["163.com"] = ("smtp.163.com", 465, true, "25端口可能被运营商屏蔽"),
-            ["126.com"] = ("smtp.126.com", 465, true, ""),
-            ["sina.com"] = ("smtp.sina.com.cn", 465, true, ""),
-            ["aliyun.com"] = ("smtp.aliyun.com", 465, true, ""),
-
-
-            ["gmail.com"] = ("smtp.gmail.com", 587, true, "需开启两步验证并创建应用密码"),
-            ["outlook.com"] = ("smtp.office365.com", 587, true, "支持Microsoft全家桶邮箱"),
-            ["hotmail.com"] = ("smtp.office365.com", 587, true, ""),
-            ["live.com"] = ("smtp.office365.com", 587, true, ""),
-            ["yahoo.com"] = ("smtp.mail.yahoo.com", 465, true, "2024年后需付费使用SMTP"),
-            ["icloud.com"] = ("smtp.mail.me.com", 587, true, "需生成应用专用密码"),
-
-            ["edu.cn"] = ("smtptt.[DOMAIN]", 465, true, "自动替换域名，如：smtptt.tsinghua.edu.cn"),
-            ["gov.cn"] = ("mail.[DOMAIN]", 25, false, "通常使用非加密端口")
-        };
-
-        if (smtpConfigs.TryGetValue(domain, out var config))
-        {
-            return HandleSpecialCases(domain, config);
-        }
-
-        foreach (var key in smtpConfigs.Keys.Where(k => k.Contains('.') && !k.StartsWith(".")))
-        {
-            if (domain.EndsWith($".{key}"))
-            {
-                var customConfig = smtpConfigs[key];
-                customConfig.Host = customConfig.Host.Replace("[DOMAIN]", domain);
-                return customConfig;
-            }
-        }
-
-        throw new Exception("Email not supported");
-    }
-
-
-    private static (string Host, int Port, bool UseSSL, string Notes) HandleSpecialCases(
-        string domain,
-        (string Host, int Port, bool UseSSL, string Notes) config)
-    {
-        if (domain == "163.com" || domain == "126.com")
-        {
-            return config with
-            {
-                Port = 994
-            };
-        }
-        return config;
-    }
-
-    public async static Task ExternalNotificationAsync()
-    {
-        var enabledProviders = Instances.ExternalNotificationSettingsUserControlModel.EnabledExternalNotificationProviderList;
-
-        foreach (var enabledProvider in enabledProviders)
-        {
-            switch (enabledProvider)
-            {
-                case "DingTalk":
-                    await DingTalkMessageAsync(Instances.ExternalNotificationSettingsUserControlModel.DingTalkToken, Instances.ExternalNotificationSettingsUserControlModel.DingTalkSecret);
-                    break;
-                case "Email":
-                    SendEmail(Instances.ExternalNotificationSettingsUserControlModel.EmailAccount, Instances.ExternalNotificationSettingsUserControlModel.EmailSecret);
-                    break;
-            }
-        }
-    }
+ 
 
     public void HandleAfterTaskOperation()
     {
@@ -709,48 +557,6 @@ public class MaaProcessor
         RestartMFA();
     }
 
-    static string GetTimestamp()
-    {
-        return ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds().ToString();
-    }
-
-    private static string CalculateSignature(string timestamp, string secret)
-    {
-        string stringToSign = $"{timestamp}\n{secret}";
-
-        byte[] secretBytes = Encoding.UTF8.GetBytes(secret);
-        byte[] stringToSignBytes = Encoding.UTF8.GetBytes(stringToSign);
-
-        byte[] hmacCode = ComputeHmacSha256(secretBytes, stringToSignBytes);
-        string base64Encoded = Convert.ToBase64String(hmacCode);
-        string sign = WebUtility.UrlEncode(base64Encoded).Replace("+", "%20").Replace("/", "%2F").Replace("=", "%3D");
-        return sign;
-    }
-
-    static byte[] ComputeHmacSha256(byte[] key, byte[] data)
-    {
-        using var hmacsha256 = new HMACSHA256(key);
-        return hmacsha256.ComputeHash(data);
-
-    }
-
-    static Dictionary<string, string> ReadConfigFile(string filePath)
-    {
-        var config = new Dictionary<string, string>();
-        string[] lines = File.ReadAllLines(filePath);
-
-        foreach (var line in lines)
-        {
-            var parts = line.Split('=');
-            if (parts.Length == 2)
-            {
-                config[parts[0].Trim()] = parts[1].Trim();
-            }
-        }
-
-        return config;
-    }
-
     private TaskAndParam CreateTaskAndParam(DragItemViewModel task)
     {
         var taskModels = task.InterfaceItem?.PipelineOverride ?? new Dictionary<string, TaskModel>();
@@ -922,7 +728,7 @@ public class MaaProcessor
             }
             if (!onlyStart)
             {
-                ExternalNotificationAsync();
+                ExternalNotificationHelper.ExternalNotificationAsync();
                 HandleAfterTaskOperation();
             }
         }

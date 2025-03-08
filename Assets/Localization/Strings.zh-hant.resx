@@ -896,4 +896,61 @@
   <data name="UpdateSettings" xml:space="preserve">
     <value>更新設定</value>
   </data>
+  <data name="ExternalNotificationBotToken" xml:space="preserve">
+    <value>機器人 Token</value>
+  </data>
+  <data name="Lark" xml:space="preserve">
+    <value>飛書</value>
+  </data>
+  <data name="ExternalNotificationLarkID" xml:space="preserve">
+    <value>飛書 ID</value>
+  </data>
+  <data name="WxPusher" xml:space="preserve">
+    <value>微信公眾號</value>
+  </data>
+  <data name="ExternalNotificationWxPusherUID" xml:space="preserve">
+    <value>用戶 UID</value>
+  </data>
+  <data name="ExternalNotificationDiscordUserId" xml:space="preserve">
+    <value>用戶 ID</value>
+  </data>
+  <data name="ExternalNotificationTelegramChatId" xml:space="preserve">
+    <value>聊天 ID</value>
+  </data>
+  <data name="ExternalNotificationSmtpPort" xml:space="preserve">
+  <value>埠</value>
+</data>
+  <data name="ExternalNotificationSmtpSsl" xml:space="preserve">
+  <value>使用 SSL</value>
+</data>
+  <data name="ExternalNotificationSmtpAuth" xml:space="preserve">
+  <value>需要登錄</value>
+</data>
+  <data name="ExternalNotificationSmtpUser" xml:space="preserve">
+  <value>使用者名</value>
+</data>
+  <data name="ExternalNotificationSmtpPassword" xml:space="preserve">
+  <value>密碼</value>
+</data>
+  <data name="ExternalNotificationSmtpFrom" xml:space="preserve">
+  <value>寄件人</value>
+</data>
+  <data name="ExternalNotificationSmtpTo" xml:space="preserve">
+  <value>收件人</value>
+</data>
+  <data name="ExternalNotificationQmsgServer" xml:space="preserve">
+  <value>伺服器地址</value>
+</data>
+  <data name="ExternalNotificationQmsgKey" xml:space="preserve">
+  <value>Qmsg Key</value>
+</data>
+  <data name="ExternalNotificationQmsgUser" xml:space="preserve">
+  <value>用戶QQ</value>
+</data>
+  <data name="ExternalNotificationQmsgBot" xml:space="preserve">
+  <value>機器人 QQ</value>
+</data>
+  <data name="ExternalNotificationSmtpServer" xml:space="preserve">
+    <value>SMTP 伺服器</value>
+  </data>
 </root>

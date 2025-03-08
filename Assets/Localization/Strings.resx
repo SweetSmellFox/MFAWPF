@@ -903,4 +903,64 @@
   <data name="UpdateSettings" xml:space="preserve">
     <value>更新设置</value>
   </data>
+  <data name="ExternalNotificationBotToken" xml:space="preserve">
+    <value>机器人 Token</value>
+  </data>
+  <data name="Lark" xml:space="preserve">
+    <value>飞书</value>
+  </data>
+  <data name="ExternalNotificationLarkID" xml:space="preserve">
+    <value>飞书 ID</value>
+  </data>
+  <data name="WxPusher" xml:space="preserve">
+    <value>微信公众号</value>
+  </data>
+  <data name="ExternalNotificationWxPusherUID" xml:space="preserve">
+    <value>用户 UID</value>
+  </data>
+  <data name="ExternalNotificationDiscordUserId" xml:space="preserve">
+    <value>用户 ID</value>
+  </data>
+  <data name="ExternalNotificationTelegramChatId" xml:space="preserve">
+    <value>聊天 ID</value>
+  </data>
+  <data name="ExternalNotificationSmtpSsl" xml:space="preserve">
+    <value>使用 SSL</value>
+  </data>
+  <data name="ExternalNotificationSmtpPort" xml:space="preserve">
+  <value>端口</value>
+</data>
+  <data name="ExternalNotificationSmtpSsl" xml:space="preserve">
+  <value>使用 SSL</value>
+</data>
+  <data name="ExternalNotificationSmtpAuth" xml:space="preserve">
+  <value>需要登录</value>
+</data>
+  <data name="ExternalNotificationSmtpUser" xml:space="preserve">
+  <value>用户名</value>
+</data>
+  <data name="ExternalNotificationSmtpPassword" xml:space="preserve">
+  <value>密码</value>
+</data>
+  <data name="ExternalNotificationSmtpFrom" xml:space="preserve">
+  <value>发件人</value>
+</data>
+  <data name="ExternalNotificationSmtpTo" xml:space="preserve">
+  <value>收件人</value>
+</data>
+  <data name="ExternalNotificationQmsgServer" xml:space="preserve">
+  <value>Server</value>
+</data>
+  <data name="ExternalNotificationQmsgKey" xml:space="preserve">
+  <value>Key</value>
+</data>
+  <data name="ExternalNotificationQmsgUser" xml:space="preserve">
+  <value>用户 QQ</value>
+</data>
+  <data name="ExternalNotificationQmsgBot" xml:space="preserve">
+  <value>机器人 QQ</value>
+</data>
+  <data name="ExternalNotificationSmtpServer" xml:space="preserve">
+    <value>SMTP 服务器</value>
+  </data>
 </root>

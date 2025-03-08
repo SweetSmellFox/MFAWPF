@@ -142,10 +142,10 @@ public static class MFAConfiguration
         return defaultValue;
     }
 
-    public static void SetConfiguration(string key, object? value)
-    {
-        Data.SetConfig(key, value);
-    }
+    public static void SetConfiguration(string key, object? value) => Data.SetConfig(key, value);
+
+    public static void SetEncrypted(string key, string value) =>
+        SetConfiguration(key, SimpleEncryptionHelper.Encrypt(value));
 
     public static bool TryGetConfiguration<T>(string key, out T value)
     {
@@ -191,7 +191,7 @@ public static class MFAConfiguration
     {
         return GetConfiguration(key, defaultValue, defaultValue, valueConverters);
     }
-    
+
     public static T GetConfiguration<T>(string key, T defaultValue, T? noValue = default, params JsonConverter[] valueConverters)
     {
         if (Data.TryGetValue(key, out var data))
@@ -240,8 +240,8 @@ public static class MFAConfiguration
         return false;
     }
 
-    public static T GetConfiguration<T>(string key, T defaultValue)
-    {
-        return Data.GetConfig(key, defaultValue);
-    }
+    public static T GetConfiguration<T>(string key, T defaultValue) =>
+        Data.GetConfig(key, defaultValue);
+
+    public static string GetDecrypt(string key, string defaultValue = "") => SimpleEncryptionHelper.Decrypt(GetConfiguration(key, defaultValue));
 }

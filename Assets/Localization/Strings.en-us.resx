@@ -6,10 +6,14 @@
         <value>2.0</value>
     </resheader>
     <resheader name="reader">
-        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <resheader name="writer">
-        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral,
+            PublicKeyToken=b77a5c561934e089
+        </value>
     </resheader>
     <data name="AppTitle" xml:space="preserve">
     <value>MFA Task Manager</value>
@@ -23,7 +27,7 @@
     <data name="TooltipRefresh" xml:space="preserve">
     <value>Refresh</value>
   </data>
-  <data name="TaskList" xml:space="preserve">
+    <data name="TaskList" xml:space="preserve">
     <value>Task List:</value>
   </data>
     <data name="SelectAll" xml:space="preserve">
@@ -65,7 +69,7 @@
     <data name="ResourceOption" xml:space="preserve">
     <value>Resources Type</value>
   </data>
-  <data name="ThemeOption" xml:space="preserve">
+    <data name="ThemeOption" xml:space="preserve">
     <value>UI Theme</value>
   </data>
     <data name="LanguageOption" xml:space="preserve">
@@ -344,7 +348,7 @@
     <data name="ResourceVersion" xml:space="preserve">
     <value>Resource Version</value>
   </data>
-  <data name="About" xml:space="preserve">
+    <data name="About" xml:space="preserve">
     <value>About Us</value>
   </data>
     <data name="ScreencapCost" xml:space="preserve">
@@ -401,10 +405,10 @@
     <data name="ButtonClear" xml:space="preserve">
     <value>Clear</value>
   </data>
-  <data name="CommonSetting" xml:space="preserve">
+    <data name="CommonSetting" xml:space="preserve">
     <value> Common </value>
   </data>
-  <data name="AdvancedSetting" xml:space="preserve">
+    <data name="AdvancedSetting" xml:space="preserve">
     <value> Advanced </value>
   </data>
     <data name="AutoStartOption" xml:space="preserve">
@@ -413,7 +417,7 @@
     <data name="None" xml:space="preserve">
     <value>None</value>
   </data>
-  <data name="StartupScript" xml:space="preserve">
+    <data name="StartupScript" xml:space="preserve">
     <value>Startup script</value>
   </data>
     <data name="Custom" xml:space="preserve">
@@ -440,13 +444,13 @@
     <data name="FollowingSystem" xml:space="preserve">
     <value>Following System</value>
   </data>
-  <data name="SoftwarePath" xml:space="preserve">
+    <data name="SoftwarePath" xml:space="preserve">
     <value>Software Path</value>
   </data>
-  <data name="WaitSoftware" xml:space="preserve">
+    <data name="WaitSoftware" xml:space="preserve">
     <value>Wait time for Software to start (seconds)</value>
   </data>
-  <data name="StartupSoftware" xml:space="preserve">
+    <data name="StartupSoftware" xml:space="preserve">
     <value>Startup software</value>
   </data>
     <data name="Select" xml:space="preserve">
@@ -458,7 +462,7 @@
     <data name="SelectExecutableFile" xml:space="preserve">
     <value>Select Executable File</value>
   </data>
-  <data name="WaitSoftwareTime" xml:space="preserve">
+    <data name="WaitSoftwareTime" xml:space="preserve">
     <value>Wait time for {0} to start (seconds): {1}(s)</value>
   </data>
     <data name="ProjectLink" xml:space="preserve">
@@ -476,19 +480,19 @@
     <data name="CloseMFA" xml:space="preserve">
     <value>Disable MFA</value>
   </data>
-  <data name="CloseEmulator" xml:space="preserve">
+    <data name="CloseEmulator" xml:space="preserve">
     <value>Disable Software</value>
   </data>
-  <data name="CloseEmulatorAndMFA" xml:space="preserve">
+    <data name="CloseEmulatorAndMFA" xml:space="preserve">
     <value>Disable MFA and Software</value>
   </data>
     <data name="ShutDown" xml:space="preserve">
     <value>Shut Down</value>
   </data>
-  <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
+    <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
     <value>Disable MFA and Restart Software</value>
   </data>
-  <data name="Restart" xml:space="preserve">
+    <data name="Restart" xml:space="preserve">
     <value>Restart</value>
   </data>
     <data name="AdbConfig" xml:space="preserve">
@@ -506,394 +510,451 @@
     <data name="DingTalkMessageAsync" xml:space="preserve">
     <value>DingTalk group message notification</value>
   </data>
-  <data name="UseGpuForInference" xml:space="preserve">
+    <data name="UseGpuForInference" xml:space="preserve">
     <value>Use GPU for inference acceleration</value>
   </data>
     <data name="SelectExistingImage" xml:space="preserve">
     <value>Select an existing image</value>
   </data>
-  <data name="EnableSaveDraw" xml:space="preserve">
+    <data name="EnableSaveDraw" xml:space="preserve">
     <value>Enable save draw (for debugging)</value>
   </data>
-  <data name="SwitchLanguage" xml:space="preserve">
+    <data name="SwitchLanguage" xml:space="preserve">
     <value>Switch Language 🌐</value>
   </data>
-  <data name="CannotStart" xml:space="preserve">
+    <data name="CannotStart" xml:space="preserve">
     <value>Unable to start task</value>
   </data>
-  <data name="Hide" xml:space="preserve">
+    <data name="Hide" xml:space="preserve">
     <value>Hide</value>
   </data>
-  <data name="Show" xml:space="preserve">
+    <data name="Show" xml:space="preserve">
     <value>Show</value>
   </data>
-  <data name="Home" xml:space="preserve">
+    <data name="Home" xml:space="preserve">
     <value>Home</value>
   </data>
-  <data name="Connection" xml:space="preserve">
+    <data name="Connection" xml:space="preserve">
     <value>Connection</value>
   </data>
-  <data name="LanguageSettings" xml:space="preserve">
+    <data name="LanguageSettings" xml:space="preserve">
     <value>Language Setting</value>
   </data>
-  <data name="Settings" xml:space="preserve">
+    <data name="Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
-  <data name="ThemeSettings" xml:space="preserve">
+    <data name="ThemeSettings" xml:space="preserve">
     <value>Theme Setting</value>
   </data>
-  <data name="PerformanceSettings" xml:space="preserve">
+    <data name="PerformanceSettings" xml:space="preserve">
     <value>Performance</value>
   </data>
-  <data name="RunningSettings" xml:space="preserve">
+    <data name="RunningSettings" xml:space="preserve">
     <value>Running</value>
   </data>
-  <data name="Prescript" xml:space="preserve">
+    <data name="Prescript" xml:space="preserve">
     <value>Prescript</value>
   </data>
-  <data name="Post-script" xml:space="preserve">
+    <data name="Post-script" xml:space="preserve">
     <value>Post-script</value>
   </data>
-  <data name="StartupSoftwareAndScript" xml:space="preserve">
+    <data name="StartupSoftwareAndScript" xml:space="preserve">
     <value>Startup software and script</value>
   </data>
-  <data name="ConnectionSettings" xml:space="preserve">
+    <data name="ConnectionSettings" xml:space="preserve">
     <value>Connection</value>
   </data>
-  <data name="SoftwareUpdate" xml:space="preserve">
+    <data name="SoftwareUpdate" xml:space="preserve">
     <value>Update Software</value>
   </data>
-  <data name="AutomaticDetectionUpdate" xml:space="preserve">
+    <data name="AutomaticDetectionUpdate" xml:space="preserve">
     <value>Automatic Detection Update</value>
   </data>
-  <data name="Connected" xml:space="preserve">
+    <data name="Connected" xml:space="preserve">
     <value>Connected</value>
   </data>
-  <data name="Unconnected" xml:space="preserve">
+    <data name="Unconnected" xml:space="preserve">
     <value>Unconnected</value>
   </data>
-  <data name="UpdateResource" xml:space="preserve">
+    <data name="UpdateResource" xml:space="preserve">
     <value>Update Resources</value>
   </data>
-  <data name="CheckResource" xml:space="preserve">
+    <data name="CheckResource" xml:space="preserve">
     <value>Check resources</value>
   </data>
-  <data name="GettingLatestResources" xml:space="preserve">
+    <data name="GettingLatestResources" xml:space="preserve">
     <value>Getting the latest resources...</value>
   </data>
-  <data name="FailToGetLatestVersionInfo" xml:space="preserve">
+    <data name="FailToGetLatestVersionInfo" xml:space="preserve">
     <value>Failed to get the latest version information</value>
   </data>
-  <data name="FailToGetDownloadUrl" xml:space="preserve">
+    <data name="FailToGetDownloadUrl" xml:space="preserve">
     <value>Unable to get the resource download link, update failed.</value>
   </data>
-  <data name="Downloading" xml:space="preserve">
+    <data name="Downloading" xml:space="preserve">
     <value>Downloading…</value>
   </data>
-  <data name="ApplyingUpdate" xml:space="preserve">
+    <data name="ApplyingUpdate" xml:space="preserve">
     <value>Applying update...</value>
   </data>
-  <data name="UpdateCompleted" xml:space="preserve">
+    <data name="UpdateCompleted" xml:space="preserve">
     <value>Update completed</value>
   </data>
-  <data name="ResourcesAreLatestVersion" xml:space="preserve">
+    <data name="ResourcesAreLatestVersion" xml:space="preserve">
     <value>Resources are already in the latest version!</value>
   </data>
-  <data name="NewVersionAvailableLatestVersion" xml:space="preserve">
+    <data name="NewVersionAvailableLatestVersion" xml:space="preserve">
     <value> new version is available! Latest version:</value>
   </data>
-  <data name="FailToGetCurrentVersionInfo" xml:space="preserve">
+    <data name="FailToGetCurrentVersionInfo" xml:space="preserve">
     <value>Failed to get the current version information and cannot update.</value>
   </data>
-  <data name="RestartPC" xml:space="preserve">
+    <data name="RestartPC" xml:space="preserve">
     <value>Restart computer</value>
   </data>
-  <data name="Update" xml:space="preserve">
+    <data name="Update" xml:space="preserve">
     <value>Update</value>
   </data>
-  <data name="AutomaticUpdateResource" xml:space="preserve">
+    <data name="AutomaticUpdateResource" xml:space="preserve">
     <value>Automatic Resource Update</value>
   </data>
-  <data name="AutomaticUpdateMFA" xml:space="preserve">
+    <data name="AutomaticUpdateMFA" xml:space="preserve">
     <value>Automatic Software Update</value>
   </data>
-  <data name="MFAIsLatestVersion" xml:space="preserve">
+    <data name="MFAIsLatestVersion" xml:space="preserve">
     <value>Software is already in the latest version!</value>
   </data>
-  <data name="SoftwareVersion" xml:space="preserve">
+    <data name="SoftwareVersion" xml:space="preserve">
     <value>Software Version</value>
   </data>
-  <data name="NewVersionFoundDescDownloading" xml:space="preserve">
+    <data name="NewVersionFoundDescDownloading" xml:space="preserve">
     <value>Downloading in the background……</value>
   </data>
-  <data name="NewVersionDownloadCompletedTitle" xml:space="preserve">
+    <data name="NewVersionDownloadCompletedTitle" xml:space="preserve">
     <value>Update Package Download Completed</value>
   </data>
-  <data name="GameResourceUpdated" xml:space="preserve">
+    <data name="GameResourceUpdated" xml:space="preserve">
     <value>Game resources updated, please restart software.</value>
   </data>
-  <data name="No" xml:space="preserve">
+    <data name="No" xml:space="preserve">
     <value>No</value>
   </data>
-  <data name="Yes" xml:space="preserve">
+    <data name="Yes" xml:space="preserve">
     <value>Yes</value>
   </data>
-  <data name="Tip" xml:space="preserve">
+    <data name="Tip" xml:space="preserve">
     <value>Tip</value>
   </data>
-  <data name="Ok" xml:space="preserve">
+    <data name="Ok" xml:space="preserve">
     <value>Ok</value>
   </data>
-  <data name="Confirm" xml:space="preserve">
+    <data name="Confirm" xml:space="preserve">
     <value>Confirm</value>
   </data>
-  <data name="ConfirmExitText" xml:space="preserve">
+    <data name="ConfirmExitText" xml:space="preserve">
     <value>Are you sure want to exit?</value>
   </data>
-  <data name="ConfirmExitTitle" xml:space="preserve">
+    <data name="ConfirmExitTitle" xml:space="preserve">
     <value>MFA is running tasks</value>
   </data>
-  <data name="GettingLatestSoftware" xml:space="preserve">
+    <data name="GettingLatestSoftware" xml:space="preserve">
     <value>Getting the latest software...</value>
   </data>
-  <data name="General" xml:space="preserve">
+    <data name="General" xml:space="preserve">
     <value>General Mode</value>
   </data>
-  <data name="BlueStacks" xml:space="preserve">
+    <data name="BlueStacks" xml:space="preserve">
     <value>BlueStacks</value>
   </data>
-  <data name="MuMuEmulator12" xml:space="preserve">
+    <data name="MuMuEmulator12" xml:space="preserve">
     <value>MuMu Emulator 12</value>
   </data>
-  <data name="LDPlayer" xml:space="preserve">
+    <data name="LDPlayer" xml:space="preserve">
     <value>LD Player</value>
   </data>
-  <data name="Nox" xml:space="preserve">
+    <data name="Nox" xml:space="preserve">
     <value>Nox</value>
   </data>
-  <data name="ScreencapWarningTip" xml:space="preserve">
+    <data name="ScreencapWarningTip" xml:space="preserve">
     <value>Screencap takes a long time: {0}ms({1})</value>
   </data>
-  <data name="ScreencapErrorTip" xml:space="preserve">
+    <data name="ScreencapErrorTip" xml:space="preserve">
     <value>Screencap takes too long: {0}ms({1})</value>
   </data>
-  <data name="DownloadFailed" xml:space="preserve">
+    <data name="DownloadFailed" xml:space="preserve">
     <value>Download of Update Package Failed</value>
   </data>
-  <data name="StartupSettings" xml:space="preserve">
+    <data name="StartupSettings" xml:space="preserve">
     <value>Startup</value>
   </data>
-  <data name="AutomaticHide" xml:space="preserve">
+    <data name="AutomaticHide" xml:space="preserve">
     <value>Auto Hide after launched</value>
   </data>
-  <data name="AutomaticMinimize" xml:space="preserve">
+    <data name="AutomaticMinimize" xml:space="preserve">
     <value>Auto Minimize after launched</value>
   </data>
-  <data name="ResourceDownloadSource" xml:space="preserve">
+    <data name="ResourceDownloadSource" xml:space="preserve">
     <value>Resource Download Source</value>
   </data>
-  <data name="MirrorAutoUpdatePrompt" xml:space="preserve">
+    <data name="MirrorAutoUpdatePrompt" xml:space="preserve">
     <value>Please purchase the Mirror sauce service to enable automatic updates, or switch the download source to GitHub</value>
   </data>
-  <data name="MirrorChyan" xml:space="preserve">
+    <data name="MirrorChyan" xml:space="preserve">
     <value>Mirror Chyan</value>
   </data>
-  <data name="PurchaseLink" xml:space="preserve">
+    <data name="PurchaseLink" xml:space="preserve">
     <value>Purchase link</value>
   </data>
-  <data name="ErrorFeedbackLinkText" xml:space="preserve">
+    <data name="ErrorFeedbackLinkText" xml:space="preserve">
     <value>Create a GitHub issue</value>
   </data>
-  <data name="RetryOnDisconnected" xml:space="preserve">
+    <data name="RetryOnDisconnected" xml:space="preserve">
     <value>Retry launching the emulator when ADB connection fails</value>
   </data>
-  <data name="AllowAdbRestart" xml:space="preserve">
+    <data name="AllowAdbRestart" xml:space="preserve">
     <value>Attempt to restart ADB Server after connection failure</value>
   </data>
-  <data name="AllowAdbHardRestart" xml:space="preserve">
+    <data name="AllowAdbHardRestart" xml:space="preserve">
     <value>Attempt to kill and restart ADB process after connection failure</value>
   </data>
-  <data name="TryToReconnectByAdb" xml:space="preserve">
+    <data name="TryToReconnectByAdb" xml:space="preserve">
     <value>Attempting to reconnect</value>
   </data>
-  <data name="TryToStartEmulator" xml:space="preserve">
+    <data name="TryToStartEmulator" xml:space="preserve">
     <value>Trying to start the emulator</value>
   </data>
-  <data name="RestartAdb" xml:space="preserve">
+    <data name="RestartAdb" xml:space="preserve">
     <value>Trying to restart the ADB Server</value>
   </data>
-  <data name="DebugMode" xml:space="preserve">
+    <data name="DebugMode" xml:space="preserve">
     <value>[Debug mode]</value>
   </data>
-  <data name="EnableRecording" xml:space="preserve">
+    <data name="EnableRecording" xml:space="preserve">
     <value>Enable video recording (for debugging)</value>
   </data>
-  <data name="ShowHitDraw" xml:space="preserve">
+    <data name="ShowHitDraw" xml:space="preserve">
     <value>Show node hit information in pop-up window (for debugging)</value>
   </data>
-  <data name="DebugModeWarning" xml:space="preserve">
+    <data name="DebugModeWarning" xml:space="preserve">
     <value>Debug mode has been enabled. This mode will save screenshots, operation data, and image recognition visualization results during operation, which may occupy a large amount of storage space!</value>
   </data>
-  <data name="UiSettings" xml:space="preserve">
+    <data name="UiSettings" xml:space="preserve">
     <value>GUI</value>
   </data>
-  <data name="ExternalNotificationSettings" xml:space="preserve">
+    <data name="ExternalNotificationSettings" xml:space="preserve">
     <value>External notifications</value>
   </data>
-  <data name="ExternalNotificationTips" xml:space="preserve">
+    <data name="ExternalNotificationTips" xml:space="preserve">
     <value>Please note: The external notification feature currently only sends 「All tasks completed」 notifications.</value>
   </data>
-  <data name="Off" xml:space="preserve">
+    <data name="Off" xml:space="preserve">
     <value>Off</value>
   </data>
-  <data name="ExternalNotificationEnabled" xml:space="preserve">
+    <data name="ExternalNotificationEnabled" xml:space="preserve">
     <value>Enabled configuration</value>
   </data>
-  <data name="ExternalNotificationSendTest" xml:space="preserve">
+    <data name="ExternalNotificationSendTest" xml:space="preserve">
     <value>Send Test</value>
   </data>
-  <data name="ExternalNotificationDingTalkToken" xml:space="preserve">
+    <data name="ExternalNotificationDingTalkToken" xml:space="preserve">
     <value>DingTalk Token</value>
   </data>
-  <data name="ExternalNotificationDingTalkSecret" xml:space="preserve">
+    <data name="ExternalNotificationDingTalkSecret" xml:space="preserve">
     <value>DingTalk Secret</value>
   </data>
-  <data name="DingTalk" xml:space="preserve">
+    <data name="DingTalk" xml:space="preserve">
     <value>DingTalk</value>
   </data>
-  <data name="MinimizeToTray" xml:space="preserve">
+    <data name="MinimizeToTray" xml:space="preserve">
     <value>Hide to tray when minimized</value>
   </data>
-  <data name="HardRestartAdb" xml:space="preserve">
+    <data name="HardRestartAdb" xml:space="preserve">
     <value>Trying to kill and restart the ADB process</value>
   </data>
-  <data name="UpdateMaaFW" xml:space="preserve">
+    <data name="UpdateMaaFW" xml:space="preserve">
     <value>Update MaaFW</value>
   </data>
-  <data name="GettingLatestMaaFW" xml:space="preserve">
+    <data name="GettingLatestMaaFW" xml:space="preserve">
     <value>Getting the latest maafw...</value>
   </data>
-  <data name="MaaFwIsLatestVersion" xml:space="preserve">
+    <data name="MaaFwIsLatestVersion" xml:space="preserve">
     <value>MaaFW is already in the latest version!</value>
   </data>
-  <data name="MaaFWVersion" xml:space="preserve">
+    <data name="MaaFWVersion" xml:space="preserve">
     <value>MaaFW Version</value>
   </data>
-  <data name="CurrentResourcesNotSupportMirror" xml:space="preserve">
+    <data name="CurrentResourcesNotSupportMirror" xml:space="preserve">
     <value>The current resources do not support Mirror Chyan.</value>
   </data>
-  <data name="MirrorUseLimitReached" xml:space="preserve">
+    <data name="MirrorUseLimitReached" xml:space="preserve">
     <value>The usage of Mirror Chyan has reached the limit.</value>
   </data>
-  <data name="Timer" xml:space="preserve">
+    <data name="Timer" xml:space="preserve">
     <value>Timer</value>
   </data>
-  <data name="ScheduleSettings" xml:space="preserve">
+    <data name="ScheduleSettings" xml:space="preserve">
     <value>Schedule</value>
   </data>
-  <data name="ConfigurationName" xml:space="preserve">
+    <data name="ConfigurationName" xml:space="preserve">
     <value>Config</value>
   </data>
-  <data name="AddConfiguration" xml:space="preserve">
+    <data name="AddConfiguration" xml:space="preserve">
     <value>Add</value>
   </data>
-  <data name="ConfigNameCannotBeEmpty" xml:space="preserve">
+    <data name="ConfigNameCannotBeEmpty" xml:space="preserve">
     <value>Configuration name cannot be empty!</value>
   </data>
-  <data name="ConfigNameAlreadyExists" xml:space="preserve">
+    <data name="ConfigNameAlreadyExists" xml:space="preserve">
     <value>Configuration name &lt;{0}&gt; already exists!</value>
   </data>
-  <data name="ConfigAddedSuccessfully" xml:space="preserve">
+    <data name="ConfigAddedSuccessfully" xml:space="preserve">
     <value>Configuration &lt;{0}&gt; added successfully!</value>
   </data>
-  <data name="GpuOptionDisable" xml:space="preserve">
+    <data name="GpuOptionDisable" xml:space="preserve">
     <value>Don’t use</value>
   </data>
-  <data name="GpuOptionAuto" xml:space="preserve">
+    <data name="GpuOptionAuto" xml:space="preserve">
     <value>Auto</value>
   </data>
-  <data name="Github" xml:space="preserve">
+    <data name="Github" xml:space="preserve">
     <value>Source code: GitHub</value>
   </data>
-  <data name="Issue" xml:space="preserve">
+    <data name="Issue" xml:space="preserve">
     <value>Issue</value>
   </data>
-  <data name="GlobalConfigTip" xml:space="preserve">
+    <data name="GlobalConfigTip" xml:space="preserve">
     <value>This option page is for global config</value>
   </data>
-  <data name="CheckMFA" xml:space="preserve">
+    <data name="CheckMFA" xml:space="preserve">
     <value>Check Software</value>
   </data>
-  <data name="TimerCustomConfig" xml:space="preserve">
+    <data name="TimerCustomConfig" xml:space="preserve">
     <value>Custom config</value>
   </data>
-  <data name="TimerCustomConfigTip" xml:space="preserve">
+    <data name="TimerCustomConfigTip" xml:space="preserve">
     <value>Restart and switch configuration two minutes in advance</value>
   </data>
-  <data name="ForceScheduledStart" xml:space="preserve">
+    <data name="ForceScheduledStart" xml:space="preserve">
     <value>Force scheduled start</value>
   </data>
-  <data name="ForceScheduledStartTip" xml:space="preserve">
+    <data name="ForceScheduledStartTip" xml:space="preserve">
     <value>Stop current task, restart game and start new tasks</value>
   </data>
-  <data name="ExternalNotificationEmailAccount" xml:space="preserve">
+    <data name="ExternalNotificationEmailAccount" xml:space="preserve">
     <value>Email Account</value>
   </data>
-  <data name="ExternalNotificationEmailSecret" xml:space="preserve">
+    <data name="ExternalNotificationEmailSecret" xml:space="preserve">
     <value>Email Secret</value>
   </data>
-  <data name="Email" xml:space="preserve">
+    <data name="Email" xml:space="preserve">
     <value>Email</value>
   </data>
-  <data name="ShowDisclaimerNoMore" xml:space="preserve">
+    <data name="ShowDisclaimerNoMore" xml:space="preserve">
     <value>Don't show again</value>
   </data>
-  <data name="Announcement" xml:space="preserve">
+    <data name="Announcement" xml:space="preserve">
     <value>Announcement</value>
   </data>
-  <data name="CurrentResourcesNotSupportGitHub" xml:space="preserve">
+    <data name="CurrentResourcesNotSupportGitHub" xml:space="preserve">
     <value>The current resources do not support GitHub.</value>
   </data>
-  <data name="ControllerType" xml:space="preserve">
+    <data name="ControllerType" xml:space="preserve">
     <value>Controller Type</value>
   </data>
-  <data name="CurrentController" xml:space="preserve">
+    <data name="CurrentController" xml:space="preserve">
     <value>Current Controller</value>
   </data>
-  <data name="ApplyControllerType" xml:space="preserve">
+    <data name="ApplyControllerType" xml:space="preserve">
     <value>Select the Controller Type to Apply</value>
   </data>
-  <data name="OperateController" xml:space="preserve">
+    <data name="OperateController" xml:space="preserve">
     <value>Select the Controller to Operate</value>
   </data>
-  <data name="EditControllerConfiguration" xml:space="preserve">
+    <data name="EditControllerConfiguration" xml:space="preserve">
     <value>Edit Controller Configuration</value>
   </data>
-  <data name="RescanController" xml:space="preserve">
+    <data name="RescanController" xml:space="preserve">
     <value>Rescan Controllers</value>
   </data>
-  <data name="HotKeyChangingTip" xml:space="preserve">
+    <data name="HotKeyChangingTip" xml:space="preserve">
     <value>Press Backspace / Esc / Delete to clear the current value</value>
   </data>
-  <data name="HotKeySettings" xml:space="preserve">
+    <data name="HotKeySettings" xml:space="preserve">
     <value>HotKeys</value>
   </data>
-  <data name="HotKeyLinkStart" xml:space="preserve">
+    <data name="HotKeyLinkStart" xml:space="preserve">
     <value>[HotKey] Start/Stop task</value>
   </data>
-  <data name="HotKeyShowGui" xml:space="preserve">
+    <data name="HotKeyShowGui" xml:space="preserve">
     <value>[HotKey] Show/Hide GUI</value>
   </data>
-  <data name="HotKeyOccupiedWarning" xml:space="preserve">
+    <data name="HotKeyOccupiedWarning" xml:space="preserve">
     <value>⚠️ This hotkey is in use</value>
   </data>
-  <data name="HotKeyPressing" xml:space="preserve">
+    <data name="HotKeyPressing" xml:space="preserve">
     <value>Press any combination...</value>
   </data>
-  <data name="HotKeyNotSet" xml:space="preserve">
+    <data name="HotKeyNotSet" xml:space="preserve">
     <value>not set</value>
   </data>
-  <data name="UpdateSettings" xml:space="preserve">
+    <data name="UpdateSettings" xml:space="preserve">
     <value>Update</value>
   </data>
+    <data name="ExternalNotificationBotToken" xml:space="preserve">
+    <value>Bot Token</value>
+  </data>
+    <data name="Lark" xml:space="preserve">
+    <value>Lark</value>
+  </data>
+    <data name="ExternalNotificationLarkID" xml:space="preserve">
+    <value>Lark ID</value>
+  </data>
+    <data name="WxPusher" xml:space="preserve">
+    <value>WxPusher</value>
+  </data>
+    <data name="ExternalNotificationWxPusherUID" xml:space="preserve">
+    <value>User UID</value>
+  </data>
+    <data name="ExternalNotificationDiscordUserId" xml:space="preserve">
+    <value>User ID</value>
+  </data>
+    <data name="ExternalNotificationTelegramChatId" xml:space="preserve">
+    <value>Chat ID</value>
+  </data>
+    <data name="ExternalNotificationSmtpTo" xml:space="preserve">
+  <value>Recipient</value>
+</data>
+    <data name="ExternalNotificationSmtpServer" xml:space="preserve">
+  <value>SMTP Server</value>
+</data>
+    <data name="ExternalNotificationSmtpPort" xml:space="preserve">
+  <value>Port</value>
+</data>
+    <data name="ExternalNotificationSmtpSsl" xml:space="preserve">
+  <value>Use SSL</value>
+</data>
+    <data name="ExternalNotificationSmtpAuth" xml:space="preserve">
+  <value>Authentication Required</value>
+</data>
+    <data name="ExternalNotificationSmtpUser" xml:space="preserve">
+  <value>Username</value>
+</data>
+    <data name="ExternalNotificationSmtpPassword" xml:space="preserve">
+  <value>Password</value>
+</data>
+    <data name="ExternalNotificationSmtpFrom" xml:space="preserve">
+  <value>Sender</value>
+</data>
+    <data name="ExternalNotificationQmsgServer" xml:space="preserve">
+  <value>Qmsg Server</value>
+</data>
+    <data name="ExternalNotificationQmsgKey" xml:space="preserve">
+  <value>Qmsg Key</value>
+</data>
+    <data name="ExternalNotificationQmsgUser" xml:space="preserve">
+  <value>User QQ</value>
+</data>
+    <data name="ExternalNotificationQmsgBot" xml:space="preserve">
+  <value>Bot QQ</value>
+</data>
 </root>
