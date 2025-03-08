@@ -516,7 +516,6 @@ public class MaaProcessor
 
     public void HandleAfterTaskOperation()
     {
-        if (CancellationTokenSource.IsCancellationRequested) return;
         var afterTask = MFAConfiguration.GetConfiguration("AfterTask", "None");
         switch (afterTask)
         {
