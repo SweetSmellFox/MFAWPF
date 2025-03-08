@@ -257,12 +257,10 @@ public partial class TaskQueueView
 
     private bool FirstTask = true;
 
-    private void LoadTasks(List<TaskInterfaceItem>? tasks, IList<DragItemViewModel>? oldDrags = null)
+    private void LoadTasks(List<TaskInterfaceItem> tasks, IList<DragItemViewModel>? oldDrags = null)
     {
         var items = MFAConfiguration.GetConfiguration("TaskItems", new List<TaskInterfaceItem>()) ?? [];
         var drags = (oldDrags?.ToList() ?? []).Union(items.Select(interfaceItem => new DragItemViewModel(interfaceItem))).ToList();
-
-        if (tasks is null) return;
         
         if (FirstTask)
         {
@@ -300,8 +298,9 @@ public partial class TaskQueueView
         var newDict = tasks.ToDictionary(t => t.Name);
         var removeList = new List<DragItemViewModel>();
         var updateList = new List<DragItemViewModel>();
-
-        foreach (var oldItem in drags.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+        if (drags.Count == 0)
+            updateList.AddRange(tasks.Select(t => new DragItemViewModel(t)).ToList());
+        else foreach (var oldItem in drags.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
         {
             if (!newDict.TryGetValue(oldItem.Name, out var newItem))
             {
@@ -358,6 +357,7 @@ public partial class TaskQueueView
                 item.InterfaceItem.Option.ForEach(SetDefaultOptionValue);
             }
         }
+        
         ViewModel.TasksSource.AddRange(newItems);
 
 
