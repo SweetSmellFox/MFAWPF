@@ -74,8 +74,7 @@ public partial class ExternalNotificationSettingsUserControlModel : ViewModel
 
     [RelayCommand]
     private void ExternalNotificationSendTest()
-        =>
-            ExternalNotificationHelper.ExternalNotificationAsync();
+        =>  ExternalNotificationHelper.ExternalNotificationAsync();
 
     #endregion
 

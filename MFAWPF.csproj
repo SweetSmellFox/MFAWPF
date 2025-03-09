@@ -23,7 +23,7 @@
         <PackageReference Include="Maa.Framework" Version="3.0.1-preview.25073.7" />
         <PackageReference Include="Maa.Framework.Native" Version="3.0.1-preview.25073.7" />
         <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="3.0.4" />
-        <PackageReference Include="MailKit" Version="4.10.0" />
+        <PackageReference Include="MailKit" Version="4.11.0" />
         <PackageReference Include="MdXaml" Version="1.27.0" />
         <PackageReference Include="MdXaml.Html" Version="1.27.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
@@ -33,7 +33,7 @@
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="gong-wpf-dragdrop" Version="4.0.0" />
         <PackageReference Include="HandyControls" Version="3.5.3" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Serilog" Version="4.2.0" />
         <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
@@ -63,8 +63,8 @@
         <ApplicationRevision>0</ApplicationRevision>
         <ApplicationVersion>1.1.0</ApplicationVersion>
         <Version>1.1</Version>
-        <FileVersion>1.2.7.2</FileVersion>
-        <AssemblyVersion>1.2.7.2</AssemblyVersion>
+        <FileVersion>1.2.7.5</FileVersion>
+        <AssemblyVersion>1.2.7.5</AssemblyVersion>
         <InformationalVersion>0.0.1</InformationalVersion>
     </PropertyGroup>
 
