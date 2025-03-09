@@ -204,8 +204,8 @@ public partial class TaskQueueView
             var adbInputType = ConfigureAdbInputTypes();
             var adbScreenCapType = ConfigureAdbScreenCapTypes();
 
-            MaaProcessor.MaaFwConfig.AdbDevice.Input = adbInputType;
-            MaaProcessor.MaaFwConfig.AdbDevice.ScreenCap = adbScreenCapType;
+            MaaProcessor.MaaFwConfiguration.AdbDevice.Input = adbInputType;
+            MaaProcessor.MaaFwConfiguration.AdbDevice.ScreenCap = adbScreenCapType;
 
             LoggerService.LogInfo(
                 $"{LocExtension.GetLocalizedValue<string>("AdbInputMode")}{adbInputType},{LocExtension.GetLocalizedValue<string>("AdbCaptureMode")}{adbScreenCapType}");
@@ -237,8 +237,8 @@ public partial class TaskQueueView
             var win32InputType = ConfigureWin32InputTypes();
             var winScreenCapType = ConfigureWin32ScreenCapTypes();
 
-            MaaProcessor.MaaFwConfig.DesktopWindow.Input = win32InputType;
-            MaaProcessor.MaaFwConfig.DesktopWindow.ScreenCap = winScreenCapType;
+            MaaProcessor.MaaFwConfiguration.DesktopWindow.Input = win32InputType;
+            MaaProcessor.MaaFwConfiguration.DesktopWindow.ScreenCap = winScreenCapType;
 
             LoggerService.LogInfo(
                 $"{"AdbInputMode".ToLocalization()}{win32InputType},{"AdbCaptureMode".ToLocalization()}{winScreenCapType}");
@@ -259,7 +259,7 @@ public partial class TaskQueueView
 
     private void LoadTasks(List<TaskInterfaceItem> tasks, IList<DragItemViewModel>? oldDrags = null)
     {
-        var items = MFAConfiguration.GetConfiguration("TaskItems", new List<TaskInterfaceItem>()) ?? [];
+        var items = ConfigurationHelper.GetValue("TaskItems", new List<TaskInterfaceItem>()) ?? [];
         var drags = (oldDrags?.ToList() ?? []).Union(items.Select(interfaceItem => new DragItemViewModel(interfaceItem))).ToList();
         
         if (FirstTask)
@@ -319,7 +319,10 @@ public partial class TaskQueueView
     {
         if (oldItem.InterfaceItem == null) return;
         oldItem.InterfaceItem.Entry = newItem.Entry;
-
+        oldItem.InterfaceItem.PipelineOverride = newItem.PipelineOverride;
+        oldItem.InterfaceItem.Document = newItem.Document;
+        oldItem.InterfaceItem.Repeatable = newItem.Repeatable;
+        
         if (newItem.Option == null) return;
 
         var tempDict = oldItem.InterfaceItem.Option?.ToDictionary(t => t.Name) ?? new Dictionary<string, MaaInterface.MaaInterfaceSelectOption>();
@@ -441,7 +444,7 @@ public partial class TaskQueueView
         if (addTaskDialog.OutputContent != null)
         {
             ViewModel.TaskItemViewModels.Add(addTaskDialog.OutputContent.Clone());
-            MFAConfiguration.SetConfiguration("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+            ConfigurationHelper.SetValue("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         }
     }
     private void Delete(object sender, RoutedEventArgs e)
@@ -455,7 +458,7 @@ public partial class TaskQueueView
                 int index = ViewModel.TaskItemViewModels.IndexOf(taskItemViewModel);
                 ViewModel.TaskItemViewModels.RemoveAt(index);
                 Instances.TaskOptionSettingsUserControl.SetOption(taskItemViewModel, false);
-                MFAConfiguration.SetConfiguration("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                ConfigurationHelper.SetValue("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }
     }
