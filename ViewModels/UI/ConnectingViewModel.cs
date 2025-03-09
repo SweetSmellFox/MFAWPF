@@ -30,20 +30,20 @@ public partial class ConnectingViewModel : ViewModel
         {
             GrowlHelper.Info(string.Format(LocExtension.GetLocalizedValue<string>("WindowSelectionMessage"),
                 window.Name));
-            MaaProcessor.MaaFwConfig.DesktopWindow.Name = window.Name;
-            MaaProcessor.MaaFwConfig.DesktopWindow.HWnd = window.Handle;
+            MaaProcessor.MaaFwConfiguration.DesktopWindow.Name = window.Name;
+            MaaProcessor.MaaFwConfiguration.DesktopWindow.HWnd = window.Handle;
             MaaProcessor.Instance.SetCurrentTasker();
         }
         else if (value is AdbDeviceInfo device)
         {
             GrowlHelper.Info(string.Format(LocExtension.GetLocalizedValue<string>("EmulatorSelectionMessage"),
                 device.Name));
-            MaaProcessor.MaaFwConfig.AdbDevice.Name = device.Name;
-            MaaProcessor.MaaFwConfig.AdbDevice.AdbPath = device.AdbPath;
-            MaaProcessor.MaaFwConfig.AdbDevice.AdbSerial = device.AdbSerial;
-            MaaProcessor.MaaFwConfig.AdbDevice.Config = device.Config;
+            MaaProcessor.MaaFwConfiguration.AdbDevice.Name = device.Name;
+            MaaProcessor.MaaFwConfiguration.AdbDevice.AdbPath = device.AdbPath;
+            MaaProcessor.MaaFwConfiguration.AdbDevice.AdbSerial = device.AdbSerial;
+            MaaProcessor.MaaFwConfiguration.AdbDevice.Config = device.Config;
             MaaProcessor.Instance.SetCurrentTasker();
-            MFAConfiguration.SetConfiguration("AdbDevice", device);
+            ConfigurationHelper.SetValue(ConfigurationKeys.AdbDevice, device);
         }
     }
 
@@ -59,11 +59,11 @@ public partial class ConnectingViewModel : ViewModel
         },
     ];
 
-    [ObservableProperty] private MaaControllerTypes _currentController = MFAConfiguration.GetConfiguration("CurrentController", MaaControllerTypes.Adb, MaaControllerTypes.None, new UniversalEnumConverter<MaaControllerTypes>());
+    [ObservableProperty] private MaaControllerTypes _currentController = ConfigurationHelper.GetValue(ConfigurationKeys.CurrentController, MaaControllerTypes.Adb, MaaControllerTypes.None, new UniversalEnumConverter<MaaControllerTypes>());
 
     partial void OnCurrentControllerChanged(MaaControllerTypes value)
     {
-        MFAConfiguration.SetConfiguration("CurrentController", value.ToString());
+        ConfigurationHelper.SetValue(ConfigurationKeys.CurrentController, value.ToString());
         AutoDetectDevice();
         MaaProcessor.Instance.SetCurrentTasker();
     }
@@ -153,7 +153,7 @@ public partial class ConnectingViewModel : ViewModel
 
     private int CalculateAdbDeviceIndex(IList<AdbDeviceInfo> devices)
     {
-        var config = MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty);
+        var config = ConfigurationHelper.GetValue(ConfigurationKeys.EmulatorConfig, string.Empty);
         if (string.IsNullOrWhiteSpace(config)) return 0;
 
         var targetNumber = ExtractNumberFromEmulatorConfig(config);
@@ -217,61 +217,64 @@ public partial class ConnectingViewModel : ViewModel
 
         if (controller == null) return;
 
-        var configType = isAdb ? "AdbControl" : "Win32Control";
-        HandleInputSettings(controller, configType);
-        HandleScreenCapSettings(controller, configType);
+        HandleInputSettings(controller, isAdb);
+        HandleScreenCapSettings(controller, isAdb);
     }
 
-    private void HandleInputSettings(MaaInterface.MaaResourceController controller, string configPrefix)
+    private void HandleInputSettings(MaaInterface.MaaResourceController controller, bool isAdb)
     {
-        var input = controller.Adb?.Input ?? controller.Win32?.Input;
+        var input = isAdb ? controller.Adb?.Input : controller.Win32?.Input;
         if (input == null) return;
 
-        var mapping = configPrefix == "AdbControl"
-            ? new Dictionary<long, int>
-            {
-                [1] = 2,
-                [2] = 0,
-                [4] = 1
-            }
-            : new Dictionary<long, int>
-            {
-                [1] = 1,
-                [2] = 0
-            };
-
-        if (mapping.TryGetValue(input.Value, out var result))
+        if (isAdb)
         {
-            MFAConfiguration.SetConfiguration($"{configPrefix}InputType", result);
+            Instances.ConnectSettingsUserControlModel.AdbControlInputType = input switch
+            {
+                1 => AdbInputMethods.AdbShell,
+                2 => AdbInputMethods.MinitouchAndAdbKey,
+                4 => AdbInputMethods.Maatouch,
+                8 => AdbInputMethods.EmulatorExtras,
+                _ => Instances.ConnectSettingsUserControlModel.AdbControlInputType
+            };
+        }
+        else
+        {
+            Instances.ConnectSettingsUserControlModel.Win32ControlInputType = input switch
+            {
+                1 => Win32InputMethod.Seize,
+                2 => Win32InputMethod.SendMessage,
+                _ => Instances.ConnectSettingsUserControlModel.Win32ControlInputType
+            };
         }
     }
 
-    private void HandleScreenCapSettings(MaaInterface.MaaResourceController controller, string configPrefix)
+    private void HandleScreenCapSettings(MaaInterface.MaaResourceController controller, bool isAdb)
     {
-        var screenCap = controller.Adb?.ScreenCap ?? controller.Win32?.ScreenCap;
+        var screenCap = isAdb ? controller.Adb?.ScreenCap : controller.Win32?.ScreenCap;
         if (screenCap == null) return;
-
-        var mapping = configPrefix == "AdbControl"
-            ? new Dictionary<long, int>
-            {
-                [1] = 4,
-                [2] = 3,
-                [4] = 1,
-                [8] = 2,
-                [16] = 5,
-                [32] = 6,
-                [64] = 7
-            }
-            : new Dictionary<long, int>
-            {
-                [1] = 2,
-                [2] = 0,
-                [4] = 1
-            };
-
-        if (mapping.TryGetValue(screenCap.Value, out var result))
+        if (isAdb)
         {
-            MFAConfiguration.SetConfiguration($"{configPrefix}ScreenCapType", result);
+            Instances.ConnectSettingsUserControlModel.AdbControlScreenCapType = screenCap switch
+            {
+                1 => AdbScreencapMethods.EncodeToFileAndPull,
+                2 => AdbScreencapMethods.Encode,
+                4 => AdbScreencapMethods.RawWithGzip,
+                8 => AdbScreencapMethods.RawByNetcat,
+                16 => AdbScreencapMethods.MinicapDirect,
+                32 => AdbScreencapMethods.MinicapStream,
+                64 => AdbScreencapMethods.EmulatorExtras,
+                _ => Instances.ConnectSettingsUserControlModel.AdbControlScreenCapType
+            };
+        }
+        else
+        {
+            Instances.ConnectSettingsUserControlModel.Win32ControlScreenCapType = screenCap switch
+            {
+                1 => Win32ScreencapMethod.GDI,
+                2 => Win32ScreencapMethod.FramePool,
+                4 => Win32ScreencapMethod.DXGIDesktopDup,
+                _ => Instances.ConnectSettingsUserControlModel.Win32ControlScreenCapType
+            };
         }
     }
 
@@ -298,9 +301,9 @@ public partial class ConnectingViewModel : ViewModel
     public void TryReadAdbDeviceFromConfig()
     {
         if (CurrentController != MaaControllerTypes.Adb
-            || !MFAConfiguration.GetConfiguration("RememberAdb", true)
-            || MaaProcessor.MaaFwConfig.AdbDevice.AdbPath != "adb"
-            || !MFAConfiguration.TryGetConfiguration("AdbDevice", out AdbDeviceInfo device,
+            || !ConfigurationHelper.GetValue(ConfigurationKeys.RememberAdb, true)
+            || MaaProcessor.MaaFwConfiguration.AdbDevice.AdbPath != "adb"
+            || !ConfigurationHelper.TryGetValue(ConfigurationKeys.AdbDevice, out AdbDeviceInfo device,
                 new UniversalEnumConverter<AdbInputMethods>(), new UniversalEnumConverter<AdbScreencapMethods>()))
         {
             DispatcherHelper.RunOnMainThread(AutoDetectDevice);
