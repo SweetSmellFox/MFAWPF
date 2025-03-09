@@ -152,7 +152,7 @@
         <StackPanel
             Grid.Row="6"
             Orientation="Vertical"
-            Visibility="{c:Binding ViewModel.DiscordEnabled}">
+            Visibility="{c:Binding ViewModel.TelegramEnabled}">
             <hc:Divider Content="Telegram" HorizontalContentAlignment="Left" />
             <hc:TextBox
                 Height="30"
