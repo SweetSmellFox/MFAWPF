@@ -9,11 +9,11 @@ namespace MFAWPF.ViewModels.UserControl.Settings;
 
 public partial class ConnectSettingsUserControlModel : ViewModel
 {
-    [ObservableProperty] private bool _rememberAdb = MFAConfiguration.GetConfiguration("RememberAdb", true);
+    [ObservableProperty] private bool _rememberAdb = ConfigurationHelper.GetValue(ConfigurationKeys.RememberAdb, true);
 
     partial void OnRememberAdbChanged(bool value)
     {
-        MFAConfiguration.SetConfiguration("RememberAdb", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.RememberAdb, value);
     }
 
     public static ObservableCollection<AdbScreencapMethods> AdbControlScreenCapTypes =>
@@ -36,6 +36,10 @@ public partial class ConnectSettingsUserControlModel : ViewModel
         {
             Other = AdbInputMethods.AdbShell
         },
+        new("EmulatorExtras")
+        {
+            Other = AdbInputMethods.EmulatorExtras
+        },
         new("AutoDetect")
         {
             Other = AdbInputMethods.All
@@ -44,52 +48,56 @@ public partial class ConnectSettingsUserControlModel : ViewModel
     public static ObservableCollection<Win32ScreencapMethod> Win32ControlScreenCapTypes => [Win32ScreencapMethod.FramePool, Win32ScreencapMethod.DXGIDesktopDup, Win32ScreencapMethod.GDI];
     public static ObservableCollection<Win32InputMethod> Win32ControlInputTypes => [Win32InputMethod.SendMessage, Win32InputMethod.Seize];
 
-    [ObservableProperty] private AdbScreencapMethods _adbControlScreenCapType = MFAConfiguration.GetConfiguration("AdbControlScreenCapType", AdbScreencapMethods.Default, AdbScreencapMethods.None,new UniversalEnumConverter<AdbScreencapMethods>());
-    [ObservableProperty] private AdbInputMethods _adbControlInputType = MFAConfiguration.GetConfiguration("AdbControlInputType", AdbInputMethods.MinitouchAndAdbKey, AdbInputMethods.None,new UniversalEnumConverter<AdbInputMethods>());
-    [ObservableProperty] private Win32ScreencapMethod _win32ControlScreenCapType = MFAConfiguration.GetConfiguration("Win32ControlScreenCapType", Win32ScreencapMethod.FramePool, Win32ScreencapMethod.None,new UniversalEnumConverter<Win32ScreencapMethod>());
-    [ObservableProperty] private Win32InputMethod _win32ControlInputType = MFAConfiguration.GetConfiguration("Win32ControlInputType", Win32InputMethod.SendMessage, Win32InputMethod.None,new UniversalEnumConverter<Win32InputMethod>());
+    [ObservableProperty] private AdbScreencapMethods _adbControlScreenCapType =
+        ConfigurationHelper.GetValue(ConfigurationKeys.AdbControlScreenCapType, AdbScreencapMethods.Default, AdbScreencapMethods.None, new UniversalEnumConverter<AdbScreencapMethods>());
+    [ObservableProperty] private AdbInputMethods _adbControlInputType =
+        ConfigurationHelper.GetValue(ConfigurationKeys.AdbControlInputType, AdbInputMethods.MinitouchAndAdbKey, AdbInputMethods.None, new UniversalEnumConverter<AdbInputMethods>());
+    [ObservableProperty] private Win32ScreencapMethod _win32ControlScreenCapType =
+        ConfigurationHelper.GetValue(ConfigurationKeys.Win32ControlScreenCapType, Win32ScreencapMethod.FramePool, Win32ScreencapMethod.None, new UniversalEnumConverter<Win32ScreencapMethod>());
+    [ObservableProperty] private Win32InputMethod _win32ControlInputType =
+        ConfigurationHelper.GetValue(ConfigurationKeys.Win32ControlInputType, Win32InputMethod.SendMessage, Win32InputMethod.None, new UniversalEnumConverter<Win32InputMethod>());
 
     partial void OnAdbControlScreenCapTypeChanged(AdbScreencapMethods value)
     {
-        MFAConfiguration.SetConfiguration("AdbControlScreenCapType", value.ToString());
+        ConfigurationHelper.SetValue(ConfigurationKeys.AdbControlScreenCapType, value.ToString());
         MaaProcessor.Instance.SetCurrentTasker();
     }
 
     partial void OnAdbControlInputTypeChanged(AdbInputMethods value)
     {
-        MFAConfiguration.SetConfiguration("AdbControlInputType", value.ToString());
+        ConfigurationHelper.SetValue(ConfigurationKeys.AdbControlInputType, value.ToString());
         MaaProcessor.Instance.SetCurrentTasker();
     }
 
     partial void OnWin32ControlScreenCapTypeChanged(Win32ScreencapMethod value)
     {
-        MFAConfiguration.SetConfiguration("Win32ControlScreenCapType", value.ToString());
+        ConfigurationHelper.SetValue(ConfigurationKeys.Win32ControlScreenCapType, value.ToString());
         MaaProcessor.Instance.SetCurrentTasker();
     }
 
     partial void OnWin32ControlInputTypeChanged(Win32InputMethod value)
     {
-        MFAConfiguration.SetConfiguration("Win32ControlInputType", value.ToString());
+        ConfigurationHelper.SetValue(ConfigurationKeys.Win32ControlInputType, value.ToString());
         MaaProcessor.Instance.SetCurrentTasker();
     }
 
-    [ObservableProperty] private bool _retryOnDisconnected = MFAConfiguration.GetConfiguration("RetryOnDisconnected", false);
+    [ObservableProperty] private bool _retryOnDisconnected = ConfigurationHelper.GetValue(ConfigurationKeys.RetryOnDisconnected, false);
 
     partial void OnRetryOnDisconnectedChanged(bool value)
     {
-        MFAConfiguration.SetConfiguration("RetryOnDisconnected", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.RetryOnDisconnected, value);
     }
-    [ObservableProperty] private bool _allowAdbRestart = MFAConfiguration.GetConfiguration("AllowAdbRestart", true);
+    [ObservableProperty] private bool _allowAdbRestart = ConfigurationHelper.GetValue(ConfigurationKeys.AllowAdbRestart, true);
 
     partial void OnAllowAdbRestartChanged(bool value)
     {
-        MFAConfiguration.SetConfiguration("AllowAdbRestart", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.AllowAdbRestart, value);
     }
 
-    [ObservableProperty] private bool _allowAdbHardRestart = MFAConfiguration.GetConfiguration("AllowAdbHardRestart", true);
+    [ObservableProperty] private bool _allowAdbHardRestart = ConfigurationHelper.GetValue(ConfigurationKeys.AllowAdbHardRestart, true);
 
     partial void OnAllowAdbHardRestartChanged(bool value)
     {
-        MFAConfiguration.SetConfiguration("AllowAdbHardRestart", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.AllowAdbHardRestart, value);
     }
 }
