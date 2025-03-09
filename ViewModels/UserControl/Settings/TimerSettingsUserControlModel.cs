@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
@@ -9,19 +9,19 @@ namespace MFAWPF.ViewModels.UserControl.Settings;
 
 public partial class TimerSettingsUserControlModel : ViewModel
 {
-    [ObservableProperty] private bool _customConfig = Convert.ToBoolean(GlobalConfiguration.GetConfiguration("CustomConfig", bool.FalseString));
-    [ObservableProperty] private bool _forceScheduledStart = Convert.ToBoolean(GlobalConfiguration.GetConfiguration("ForceScheduledStart", bool.FalseString));
+    [ObservableProperty] private bool _customConfig = Convert.ToBoolean(GlobalConfiguration.GetValue(ConfigurationKeys.CustomConfig, bool.FalseString));
+    [ObservableProperty] private bool _forceScheduledStart = Convert.ToBoolean(GlobalConfiguration.GetValue(ConfigurationKeys.ForceScheduledStart, bool.FalseString));
 
     public TimerModel TimerModels { get; set; } = new();
 
     partial void OnCustomConfigChanged(bool value)
     {
-        GlobalConfiguration.SetConfiguration("CustomConfig", value.ToString());
+        GlobalConfiguration.SetValue(ConfigurationKeys.CustomConfig, value.ToString());
     }
 
     partial void OnForceScheduledStartChanged(bool value)
     {
-        GlobalConfiguration.SetConfiguration("ForceScheduledStart", value.ToString());
+        GlobalConfiguration.SetValue(ConfigurationKeys.ForceScheduledStart, value.ToString());
     }
 
     public partial class TimerModel
@@ -35,9 +35,9 @@ public partial class TimerSettingsUserControlModel : ViewModel
                 _hour = hour;
                 _min = min;
                 TimerName = $"{"Timer".ToLocalization()} {TimerId + 1}";
-                if (timerConfig == null || !MFAConfiguration.Configs.Any(c => c.Name.Equals(timerConfig)))
+                if (timerConfig == null || !ConfigurationHelper.Configs.Any(c => c.Name.Equals(timerConfig)))
                 {
-                    _timerConfig = MFAConfiguration.GetCurrentConfiguration();
+                    _timerConfig = ConfigurationHelper.GetCurrentConfiguration();
                 }
                 else
                 {
@@ -112,7 +112,7 @@ public partial class TimerSettingsUserControlModel : ViewModel
                 get => _timerConfig;
                 set
                 {
-                    SetProperty(ref _timerConfig, value ?? MFAConfiguration.GetCurrentConfiguration());
+                    SetProperty(ref _timerConfig, value ?? ConfigurationHelper.GetCurrentConfiguration());
                     GlobalConfiguration.SetTimerConfig(TimerId, _timerConfig);
                 }
             }
@@ -128,7 +128,7 @@ public partial class TimerSettingsUserControlModel : ViewModel
                     i,
                     GlobalConfiguration.GetTimer(i, bool.FalseString) == bool.TrueString,
                     int.Parse(GlobalConfiguration.GetTimerHour(i, $"{i * 3}")),
-                    int.Parse(GlobalConfiguration.GetTimerMin(i, "0")), GlobalConfiguration.GetTimerConfig(i, MFAConfiguration.GetCurrentConfiguration()));
+                    int.Parse(GlobalConfiguration.GetTimerMin(i, "0")), GlobalConfiguration.GetTimerConfig(i, ConfigurationHelper.GetCurrentConfiguration()));
             }
             _dispatcherTimer = new();
             _dispatcherTimer.Interval = TimeSpan.FromMinutes(1);
@@ -157,10 +157,10 @@ public partial class TimerSettingsUserControlModel : ViewModel
             var timer = Timers.FirstOrDefault(t => t.TimerId == timerId, null);
             if (timer != null)
             {
-                var config = timer.TimerConfig ?? MFAConfiguration.GetCurrentConfiguration();
-                if (config != MFAConfiguration.GetCurrentConfiguration())
+                var config = timer.TimerConfig ?? ConfigurationHelper.GetCurrentConfiguration();
+                if (config != ConfigurationHelper.GetCurrentConfiguration())
                 {
-                    MFAConfiguration.SetDefaultConfig(config);
+                    ConfigurationHelper.SetDefaultConfig(config);
                     MaaProcessor.RestartMFA(true);
                 }
             }
@@ -171,7 +171,7 @@ public partial class TimerSettingsUserControlModel : ViewModel
             var timer = Timers.FirstOrDefault(t => t.TimerId == timerId, null);
             if (timer != null)
             {
-                if (Convert.ToBoolean(GlobalConfiguration.GetConfiguration("ForceScheduledStart", bool.FalseString)) && Instances.RootViewModel.IsRunning)
+                if (Convert.ToBoolean(GlobalConfiguration.GetValue(ConfigurationKeys.ForceScheduledStart, bool.FalseString)) && Instances.RootViewModel.IsRunning)
                     Instances.TaskQueueView.Stop();
                 Instances.TaskQueueView.Start();
             }

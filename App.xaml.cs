@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Threading;
 using Lierda.WPFHelper;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Services;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
@@ -112,7 +112,7 @@ public partial class App
                 }
             }
         }
-        MFAConfiguration.LoadConfig();
+        ConfigurationHelper.LoadConfig();
         //Task线程内未捕获异常处理事件
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         //非UI线程未捕获异常处理事件

@@ -10,7 +10,7 @@
     xmlns:controls="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:custom="clr-namespace:MFAWPF.Custom"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:data="clr-namespace:MFAWPF.Data"
+    xmlns:data="clr-namespace:MFAWPF.Configuration"
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:helper="clr-namespace:MFAWPF.Helper"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"

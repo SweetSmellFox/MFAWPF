@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
 using MFAWPF.Views.UI;
@@ -28,39 +28,39 @@ public partial class VersionUpdateSettingsUserControlModel : ViewModel
         new("MirrorChyan"),
     ];
 
-    [ObservableProperty] private int _downloadSourceIndex = MFAConfiguration.GetConfiguration("DownloadSourceIndex", 0);
+    [ObservableProperty] private int _downloadSourceIndex = ConfigurationHelper.GetValue(ConfigurationKeys.DownloadSourceIndex, 0);
 
     partial void OnDownloadSourceIndexChanged(int value)
     {
-        MFAConfiguration.SetConfiguration("DownloadSourceIndex", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.DownloadSourceIndex, value);
     }
 
-    [ObservableProperty] private string _cdkPassword = SimpleEncryptionHelper.Decrypt(MFAConfiguration.GetConfiguration("DownloadCDK", string.Empty));
+    [ObservableProperty] private string _cdkPassword = SimpleEncryptionHelper.Decrypt(ConfigurationHelper.GetValue(ConfigurationKeys.DownloadCDK, string.Empty));
 
     partial void OnCdkPasswordChanged(string value)
     {
-        MFAConfiguration.SetConfiguration("DownloadCDK", SimpleEncryptionHelper.Encrypt(value));
+        ConfigurationHelper.SetValue(ConfigurationKeys.DownloadCDK, SimpleEncryptionHelper.Encrypt(value));
     }
 
-    [ObservableProperty] private bool _enableCheckVersion = MFAConfiguration.GetConfiguration("EnableCheckVersion", true);
+    [ObservableProperty] private bool _enableCheckVersion = ConfigurationHelper.GetValue(ConfigurationKeys.EnableCheckVersion, true);
 
-    [ObservableProperty] private bool _enableAutoUpdateResource = MFAConfiguration.GetConfiguration("EnableAutoUpdateResource", false);
+    [ObservableProperty] private bool _enableAutoUpdateResource = ConfigurationHelper.GetValue(ConfigurationKeys.EnableAutoUpdateResource, false);
 
-    [ObservableProperty] private bool _enableAutoUpdateMFA = MFAConfiguration.GetConfiguration("EnableAutoUpdateMFA", false);
+    [ObservableProperty] private bool _enableAutoUpdateMFA = ConfigurationHelper.GetValue(ConfigurationKeys.EnableAutoUpdateMFA, false);
 
     partial void OnEnableCheckVersionChanged(bool value)
     {
-        MFAConfiguration.SetConfiguration("EnableCheckVersion", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.EnableCheckVersion, value);
     }
 
     partial void OnEnableAutoUpdateResourceChanged(bool value)
     {
-        MFAConfiguration.SetConfiguration("EnableAutoUpdateResource", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.EnableAutoUpdateResource, value);
     }
 
     partial void OnEnableAutoUpdateMFAChanged(bool value)
     {
-        MFAConfiguration.SetConfiguration("EnableAutoUpdateMFA", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.EnableAutoUpdateMFA, value);
     }
 
     [RelayCommand]

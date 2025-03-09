@@ -6,7 +6,7 @@ using MaaFramework.Binding.Custom;
 using MaaFramework.Binding.Notification;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Helper;
 using MFAWPF.Helper.ValueType;
 using MFAWPF.ViewModels.UserControl.Settings;
@@ -52,7 +52,7 @@ public class MaaProcessor
 
     public Queue<MFATask> TaskQueue { get; } = new();
 
-    public static MaaFWConfig MaaFwConfig { get; } = new();
+    public static MaaFWConfiguration MaaFwConfiguration { get; } = new();
 
     public static AutoInitDictionary AutoInitDictionary { get; } = new();
 
@@ -136,7 +136,7 @@ public class MaaProcessor
         var controllerType = Instances.ConnectingViewModel.CurrentController;
         var isAdb = controllerType == MaaControllerTypes.Adb;
 
-        RootView.AddLogByKey("ConnectingTo", null, isAdb ? "Emulator" : "Window");
+        RootView.AddLogByKey("ConnectingTo", null, true, isAdb ? "Emulator" : "Window");
 
         var connected = await TryConnectAsync(token);
 
@@ -196,7 +196,7 @@ public class MaaProcessor
         LoggerService.LogWarning("ConnectFailed".ToLocalization());
         RootView.AddLogByKey("ConnectFailed");
         Instances.ConnectingViewModel.SetConnected(false);
-        GrowlHelper.Warning("Warning_CannotConnect".ToLocalizationFormatted(isAdb ? "Emulator" : "Window"));
+        GrowlHelper.Warning("Warning_CannotConnect".ToLocalizationFormatted(true, isAdb ? "Emulator" : "Window"));
         Stop();
     }
 
@@ -360,11 +360,11 @@ public class MaaProcessor
     }
 
     #endregion
- 
+
 
     public void HandleAfterTaskOperation()
     {
-        var afterTask = MFAConfiguration.GetConfiguration("AfterTask", "None");
+        var afterTask = ConfigurationHelper.GetValue(ConfigurationKeys.AfterTask, "None");
         switch (afterTask)
         {
             case "CloseMFA":
@@ -396,8 +396,8 @@ public class MaaProcessor
     public async Task StartSoftware()
     {
         _emulatorCancellationTokenSource = new CancellationTokenSource();
-        await StartRunnableFile(MFAConfiguration.GetConfiguration("SoftwarePath", string.Empty),
-            MFAConfiguration.GetConfiguration("WaitSoftwareTime", 60.0), _emulatorCancellationTokenSource.Token);
+        await StartRunnableFile(ConfigurationHelper.GetValue(ConfigurationKeys.SoftwarePath, string.Empty),
+            ConfigurationHelper.GetValue(ConfigurationKeys.WaitSoftwareTime, 60.0), _emulatorCancellationTokenSource.Token);
     }
 
     async private Task StartRunnableFile(string exePath, double waitTimeInSeconds, CancellationToken token)
@@ -413,9 +413,9 @@ public class MaaProcessor
         };
         if (Process.GetProcessesByName(processName).Length == 0)
         {
-            if (!string.IsNullOrWhiteSpace(MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty)))
+            if (!string.IsNullOrWhiteSpace(ConfigurationHelper.GetValue(ConfigurationKeys.EmulatorConfig, string.Empty)))
             {
-                startInfo.Arguments = MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty);
+                startInfo.Arguments = ConfigurationHelper.GetValue(ConfigurationKeys.EmulatorConfig, string.Empty);
                 _softwareProcess =
                     Process.Start(startInfo);
             }
@@ -424,9 +424,9 @@ public class MaaProcessor
         }
         else
         {
-            if (!string.IsNullOrWhiteSpace(MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty)))
+            if (!string.IsNullOrWhiteSpace(ConfigurationHelper.GetValue(ConfigurationKeys.EmulatorConfig, string.Empty)))
             {
-                startInfo.Arguments = MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty);
+                startInfo.Arguments = ConfigurationHelper.GetValue(ConfigurationKeys.EmulatorConfig, string.Empty);
                 _softwareProcess = Process.Start(startInfo);
             }
             else
@@ -442,7 +442,7 @@ public class MaaProcessor
 
             if (remainingTime % 10 == 0)
             {
-                RootView.AddLogByKey("WaitSoftwareTime", null,
+                RootView.AddLogByKey("WaitSoftwareTime", null, true,
                     Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
                         ? "Emulator"
                         : "Window",
@@ -490,7 +490,7 @@ public class MaaProcessor
             }
             else
             {
-                CloseProcessesByName(MaaFwConfig.DesktopWindow.Name, MFAConfiguration.GetConfiguration("EmulatorConfig", string.Empty));
+                CloseProcessesByName(MaaFwConfiguration.DesktopWindow.Name, ConfigurationHelper.GetValue(ConfigurationKeys.EmulatorConfig, string.Empty));
                 _softwareProcess = null;
             }
 
@@ -540,7 +540,7 @@ public class MaaProcessor
     public static void RestartMFA(bool noAutoStart = false)
     {
         if (noAutoStart)
-            GlobalConfiguration.SetConfiguration("NoAutoStart", bool.TrueString);
+            GlobalConfiguration.SetValue("NoAutoStart", bool.TrueString);
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
         DispatcherHelper.RunOnMainThread(Application.Current.Shutdown);
     }
@@ -638,17 +638,17 @@ public class MaaProcessor
         switch (elapsedMilliseconds)
         {
             case >= 800:
-                RootView.AddLogByKey("ScreencapErrorTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), elapsedMilliseconds.ToString(),
+                RootView.AddLogByKey("ScreencapErrorTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), false, elapsedMilliseconds.ToString(),
                     Instances.TaskQueueView.ScreenshotType());
                 break;
 
             case >= 400:
-                RootView.AddLogByKey("ScreencapWarningTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), elapsedMilliseconds.ToString(),
+                RootView.AddLogByKey("ScreencapWarningTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), false, elapsedMilliseconds.ToString(),
                     Instances.TaskQueueView.ScreenshotType());
                 break;
 
             default:
-                RootView.AddLogByKey("ScreencapCost", null, elapsedMilliseconds.ToString(),
+                RootView.AddLogByKey("ScreencapCost", null, false, elapsedMilliseconds.ToString(),
                     Instances.TaskQueueView.ScreenshotType());
                 break;
         }
@@ -675,17 +675,17 @@ public class MaaProcessor
         switch (avgElapsed)
         {
             case >= 800:
-                RootView.AddLogByKey("ScreencapErrorTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), avgElapsed.ToString(),
+                RootView.AddLogByKey("ScreencapErrorTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), false, avgElapsed.ToString(),
                     Instances.TaskQueueView.ScreenshotType());
                 break;
 
             case >= 400:
-                RootView.AddLogByKey("ScreencapWarningTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), avgElapsed.ToString(),
+                RootView.AddLogByKey("ScreencapWarningTip", BrushConverterHelper.ConvertToBrush("DarkGoldenrod"), false, avgElapsed.ToString(),
                     Instances.TaskQueueView.ScreenshotType());
                 break;
 
             default:
-                RootView.AddLogByKey("ScreencapCost", null, avgElapsed.ToString(),
+                RootView.AddLogByKey("ScreencapCost", null, false, avgElapsed.ToString(),
                     Instances.TaskQueueView.ScreenshotType());
                 break;
         }
@@ -719,7 +719,7 @@ public class MaaProcessor
             if (_startTime != null)
             {
                 var elapsedTime = DateTime.Now - (DateTime)_startTime;
-                RootView.AddLogByKey("TaskAllCompletedWithTime", null, ((int)elapsedTime.TotalHours).ToString(),
+                RootView.AddLogByKey("TaskAllCompletedWithTime", null, true, ((int)elapsedTime.TotalHours).ToString(),
                     ((int)elapsedTime.TotalMinutes % 60).ToString(), ((int)elapsedTime.TotalSeconds % 60).ToString());
             }
             else
@@ -898,9 +898,9 @@ public class MaaProcessor
             };
             RegisterCustomRecognitionsAndActions(tasker);
             Instances.ConnectingViewModel.SetConnected(true);
-            tasker.Utility.SetOptionRecording(MFAConfiguration.MaaConfig.GetConfig("recording", false));
-            tasker.Utility.SetOptionSaveDraw(MFAConfiguration.MaaConfig.GetConfig("save_draw", false));
-            tasker.Utility.SetOptionShowHitDraw(MFAConfiguration.MaaConfig.GetConfig("show_hit_draw", false));
+            tasker.Utility.SetOptionRecording(ConfigurationHelper.MaaConfig.GetConfig(ConfigurationKeys.Recording, false));
+            tasker.Utility.SetOptionSaveDraw(ConfigurationHelper.MaaConfig.GetConfig(ConfigurationKeys.SaveDraw, false));
+            tasker.Utility.SetOptionShowHitDraw(ConfigurationHelper.MaaConfig.GetConfig(ConfigurationKeys.ShowHitDraw, false));
             return tasker;
         }
         catch (OperationCanceledException)
@@ -963,31 +963,31 @@ public class MaaProcessor
     {
         if (isAdb)
         {
-            LoggerService.LogInfo($"AdbPath: {MaaFwConfig.AdbDevice.AdbPath}");
-            LoggerService.LogInfo($"AdbSerial: {MaaFwConfig.AdbDevice.AdbSerial}");
-            LoggerService.LogInfo($"ScreenCap: {MaaFwConfig.AdbDevice.ScreenCap}");
-            LoggerService.LogInfo($"Input: {MaaFwConfig.AdbDevice.Input}");
-            LoggerService.LogInfo($"Config: {MaaFwConfig.AdbDevice.Config}");
+            LoggerService.LogInfo($"AdbPath: {MaaFwConfiguration.AdbDevice.AdbPath}");
+            LoggerService.LogInfo($"AdbSerial: {MaaFwConfiguration.AdbDevice.AdbSerial}");
+            LoggerService.LogInfo($"ScreenCap: {MaaFwConfiguration.AdbDevice.ScreenCap}");
+            LoggerService.LogInfo($"Input: {MaaFwConfiguration.AdbDevice.Input}");
+            LoggerService.LogInfo($"Config: {MaaFwConfiguration.AdbDevice.Config}");
         }
         else
         {
-            LoggerService.LogInfo($"HWnd: {MaaFwConfig.DesktopWindow.HWnd}");
-            LoggerService.LogInfo($"ScreenCap: {MaaFwConfig.DesktopWindow.ScreenCap}");
-            LoggerService.LogInfo($"Input: {MaaFwConfig.DesktopWindow.Input}");
-            LoggerService.LogInfo($"Link: {MaaFwConfig.DesktopWindow.Link}");
-            LoggerService.LogInfo($"Check: {MaaFwConfig.DesktopWindow.Check}");
+            LoggerService.LogInfo($"HWnd: {MaaFwConfiguration.DesktopWindow.HWnd}");
+            LoggerService.LogInfo($"ScreenCap: {MaaFwConfiguration.DesktopWindow.ScreenCap}");
+            LoggerService.LogInfo($"Input: {MaaFwConfiguration.DesktopWindow.Input}");
+            LoggerService.LogInfo($"Link: {MaaFwConfiguration.DesktopWindow.Link}");
+            LoggerService.LogInfo($"Check: {MaaFwConfiguration.DesktopWindow.Check}");
         }
         return isAdb
             ? new MaaAdbController(
-                MaaFwConfig.AdbDevice.AdbPath,
-                MaaFwConfig.AdbDevice.AdbSerial,
-                MaaFwConfig.AdbDevice.ScreenCap, MaaFwConfig.AdbDevice.Input,
-                !string.IsNullOrWhiteSpace(MaaFwConfig.AdbDevice.Config) ? MaaFwConfig.AdbDevice.Config : "{}")
+                MaaFwConfiguration.AdbDevice.AdbPath,
+                MaaFwConfiguration.AdbDevice.AdbSerial,
+                MaaFwConfiguration.AdbDevice.ScreenCap, MaaFwConfiguration.AdbDevice.Input,
+                !string.IsNullOrWhiteSpace(MaaFwConfiguration.AdbDevice.Config) ? MaaFwConfiguration.AdbDevice.Config : "{}")
             : new MaaWin32Controller(
-                MaaFwConfig.DesktopWindow.HWnd,
-                MaaFwConfig.DesktopWindow.ScreenCap, MaaFwConfig.DesktopWindow.Input,
-                MaaFwConfig.DesktopWindow.Link,
-                MaaFwConfig.DesktopWindow.Check);
+                MaaFwConfiguration.DesktopWindow.HWnd,
+                MaaFwConfiguration.DesktopWindow.ScreenCap, MaaFwConfiguration.DesktopWindow.Input,
+                MaaFwConfiguration.DesktopWindow.Link,
+                MaaFwConfiguration.DesktopWindow.Check);
     }
 
     private static List<MetadataReference>? _metadataReferences;
@@ -1293,12 +1293,7 @@ public class MaaProcessor
 
     public async Task RestartAdb()
     {
-        if (!MFAConfiguration.GetConfiguration("AllowAdbRestart", false))
-        {
-            return;
-        }
-
-        var adbPath = MaaFwConfig.AdbDevice.AdbPath;
+        var adbPath = MaaFwConfiguration.AdbDevice.AdbPath;
 
         if (string.IsNullOrEmpty(adbPath))
         {
@@ -1328,8 +1323,8 @@ public class MaaProcessor
 
     public async Task ReconnectByAdb()
     {
-        var adbPath = MaaFwConfig.AdbDevice.AdbPath;
-        var address = MaaFwConfig.AdbDevice.AdbSerial;
+        var adbPath = MaaFwConfiguration.AdbDevice.AdbPath;
+        var address = MaaFwConfiguration.AdbDevice.AdbSerial;
 
         if (string.IsNullOrEmpty(adbPath))
         {
@@ -1358,12 +1353,7 @@ public class MaaProcessor
 
     public async Task HardRestartAdb()
     {
-        if (!MFAConfiguration.GetConfiguration("AllowAdbHardRestart", false))
-        {
-            return;
-        }
-
-        var adbPath = MaaFwConfig.AdbDevice.AdbPath;
+        var adbPath = MaaFwConfiguration.AdbDevice.AdbPath;
         if (string.IsNullOrEmpty(adbPath))
         {
             return;

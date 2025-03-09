@@ -28,7 +28,7 @@ public partial class MFATask : ObservableObject
             {
                 token.ThrowIfCancellationRequested();
                 if (Type == MFATaskType.MAAFW)
-                    RootView.AddLogByKey("TaskStart", null, Name ?? string.Empty);
+                    RootView.AddLogByKey("TaskStart", null,true, Name ?? string.Empty);
                 await Action();
             }
             return true;

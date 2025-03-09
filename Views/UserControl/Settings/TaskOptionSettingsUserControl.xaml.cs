@@ -1,6 +1,6 @@
 using HandyControl.Controls;
 using HandyControl.Data;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
@@ -353,7 +353,7 @@ public partial class TaskOptionSettingsUserControl
 
     private void SaveConfiguration()
     {
-        MFAConfiguration.SetConfiguration("TaskItems",
+        ConfigurationHelper.SetValue(ConfigurationKeys.TaskItems,
             Instances.TaskQueueViewModel.TaskItemViewModels.Select(m => m.InterfaceItem));
     }
 }

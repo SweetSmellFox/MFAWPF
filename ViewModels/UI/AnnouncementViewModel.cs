@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using HandyControl.Tools.Extension;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Helper;
 using MFAWPF.Views.UI;
 using System.IO;
@@ -14,10 +14,10 @@ public partial class AnnouncementViewModel : ViewModel
     public static readonly string AnnouncementFileName = "Announcement.md";
     [ObservableProperty] private string _announcementInfo = string.Empty;
 
-    [ObservableProperty] private bool _doNotRemindThisAnnouncementAgain = Convert.ToBoolean(GlobalConfiguration.GetConfiguration("AnnouncementInfo.DoNotShowAgain", bool.FalseString));
+    [ObservableProperty] private bool _doNotRemindThisAnnouncementAgain = Convert.ToBoolean(GlobalConfiguration.GetValue(ConfigurationKeys.DoNotShowAgain, bool.FalseString));
     partial void OnDoNotRemindThisAnnouncementAgainChanged(bool value)
     {
-        GlobalConfiguration.SetConfiguration("AnnouncementInfo.DoNotShowAgain", value.ToString());
+        GlobalConfiguration.SetValue(ConfigurationKeys.DoNotShowAgain, value.ToString());
     }
 
 

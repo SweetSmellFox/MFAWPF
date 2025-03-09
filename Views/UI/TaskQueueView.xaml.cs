@@ -1,5 +1,5 @@
 using MaaFramework.Binding;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
@@ -259,7 +259,7 @@ public partial class TaskQueueView
 
     private void LoadTasks(List<TaskInterfaceItem> tasks, IList<DragItemViewModel>? oldDrags = null)
     {
-        var items = ConfigurationHelper.GetValue("TaskItems", new List<TaskInterfaceItem>()) ?? [];
+        var items = ConfigurationHelper.GetValue(ConfigurationKeys.TaskItems, new List<TaskInterfaceItem>()) ?? [];
         var drags = (oldDrags?.ToList() ?? []).Union(items.Select(interfaceItem => new DragItemViewModel(interfaceItem))).ToList();
         
         if (FirstTask)
@@ -413,7 +413,7 @@ public partial class TaskQueueView
         if (Instances.ConnectingViewModel.CurrentDevice == null)
         {
             GrowlHelper.Warning(
-                "Warning_CannotConnect".ToLocalizationFormatted(Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
+                "Warning_CannotConnect".ToLocalizationFormatted(true,Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
                     ? "Emulator".ToLocalization()
                     : "Window".ToLocalization()));
             return;
@@ -444,7 +444,7 @@ public partial class TaskQueueView
         if (addTaskDialog.OutputContent != null)
         {
             ViewModel.TaskItemViewModels.Add(addTaskDialog.OutputContent.Clone());
-            ConfigurationHelper.SetValue("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+            ConfigurationHelper.SetValue(ConfigurationKeys.TaskItems, ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         }
     }
     private void Delete(object sender, RoutedEventArgs e)
@@ -458,7 +458,7 @@ public partial class TaskQueueView
                 int index = ViewModel.TaskItemViewModels.IndexOf(taskItemViewModel);
                 ViewModel.TaskItemViewModels.RemoveAt(index);
                 Instances.TaskOptionSettingsUserControl.SetOption(taskItemViewModel, false);
-                ConfigurationHelper.SetValue("TaskItems", ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+                ConfigurationHelper.SetValue(ConfigurationKeys.TaskItems, ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }
     }

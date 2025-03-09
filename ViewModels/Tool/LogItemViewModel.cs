@@ -8,7 +8,7 @@ namespace MFAWPF.ViewModels.Tool
     public class LogItemViewModel : ViewModel
     {
         private readonly string[] _formatArgsKeys;
-
+        private bool _transformKey = true;
         public LogItemViewModel(string resourceKey,
             Brush color,
             string weight = "Regular",
@@ -34,7 +34,32 @@ namespace MFAWPF.ViewModels.Tool
             else
                 Content = resourceKey;
         }
+        public LogItemViewModel(string resourceKey,
+            Brush color,
+            string weight = "Regular",
+            bool useKey = false,
+            string dateFormat = "MM'-'dd'  'HH':'mm':'ss",
+            bool showTime = true,
+            bool transformKey = true,
+            params string[] formatArgsKeys)
+        {
+            _resourceKey = resourceKey;
+            _transformKey = transformKey;
+            Time = DateTime.Now.ToString(dateFormat);
+            Color = color;
+            Weight = weight;
+            ShowTime = showTime;
+            if (useKey)
+            {
+                _formatArgsKeys = formatArgsKeys;
+                UpdateContent();
 
+                // 订阅语言切换事件
+                LanguageHelper.LanguageChanged += OnLanguageChanged;
+            }
+            else
+                Content = resourceKey;
+        }
         public LogItemViewModel(string content,
             Brush? color,
             string weight = "Regular",
@@ -108,18 +133,14 @@ namespace MFAWPF.ViewModels.Tool
                 Content = ResourceKey.ToLocalization();
             else
             {
-                // 获取每个格式化参数的本地化字符串
-                var formatArgs = _formatArgsKeys.Select(key => key.ToLocalizationFormatted()).ToArray();
-
-                // 使用本地化字符串更新内容
                 try
                 {
                     Content = Regex.Unescape(
-                        _resourceKey.ToLocalizationFormatted(formatArgs.ToArray()));
+                        _resourceKey.ToLocalizationFormatted(_transformKey, _formatArgsKeys));
                 }
                 catch
                 {
-                    Content = _resourceKey.ToLocalizationFormatted(formatArgs.ToArray());
+                    Content = _resourceKey.ToLocalizationFormatted(_transformKey, _formatArgsKeys);
                 }
             }
         }

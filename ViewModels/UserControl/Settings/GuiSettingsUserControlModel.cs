@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Helper;
 using System.Collections.ObjectModel;
 
@@ -9,12 +9,12 @@ public partial class GuiSettingsUserControlModel: ViewModel
 {
     public ObservableCollection<LanguageHelper.SupportedLanguage> SupportedLanguages => LanguageHelper.SupportedLanguages;
     
-    [ObservableProperty] private int _languageIndex = MFAConfiguration.GetConfiguration("LangIndex", 0);
+    [ObservableProperty] private int _languageIndex = ConfigurationHelper.GetValue(ConfigurationKeys.LangIndex, 0);
 
     partial void OnLanguageIndexChanged(int value)
     {
         LanguageHelper.ChangeLanguage(SupportedLanguages[value]);
-        MFAConfiguration.SetConfiguration("LangIndex", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.LangIndex, value);
     }
 
     [ObservableProperty] private ObservableCollection<Tool.LocalizationViewModel> _themes =
@@ -24,22 +24,22 @@ public partial class GuiSettingsUserControlModel: ViewModel
         new("FollowingSystem"),
     ];
     
-    [ObservableProperty] private int _themeIndex = MFAConfiguration.GetConfiguration("ThemeIndex", 0);
+    [ObservableProperty] private int _themeIndex = ConfigurationHelper.GetValue(ConfigurationKeys.ThemeIndex, 0);
     
     partial void OnThemeIndexChanged(int value)
     {
         ThemeHelper.UpdateThemeIndexChanged(value);
-        MFAConfiguration.SetConfiguration("ThemeIndex", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.ThemeIndex, value);
     }
 
-    private bool _shouldMinimizeToTray = MFAConfiguration.GetConfiguration("ShouldMinimizeToTray", false);
+    private bool _shouldMinimizeToTray = ConfigurationHelper.GetValue(ConfigurationKeys.ShouldMinimizeToTray, false);
 
     public bool ShouldMinimizeToTray
     {
         set
         {
             SetProperty(ref _shouldMinimizeToTray, value);
-            MFAConfiguration.SetConfiguration("ShouldMinimizeToTray", value);
+            ConfigurationHelper.SetValue(ConfigurationKeys.ShouldMinimizeToTray, value);
         }
         get => _shouldMinimizeToTray;
     }

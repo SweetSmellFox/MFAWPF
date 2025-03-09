@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MaaFramework.Binding;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Helper.Converters;
 using System.Collections.ObjectModel;
 
@@ -20,10 +20,10 @@ public partial class PerformanceUserControlModel : ViewModel
         }
     ];
 
-    [ObservableProperty] private InferenceDevice _gpuOption = MFAConfiguration.GetConfiguration("GPUOption", InferenceDevice.Auto, new UniversalEnumConverter<InferenceDevice>());
+    [ObservableProperty] private InferenceDevice _gpuOption = ConfigurationHelper.GetValue(ConfigurationKeys.GPUOption, InferenceDevice.Auto, new UniversalEnumConverter<InferenceDevice>());
 
     partial void OnGpuOptionChanged(InferenceDevice value)
     {
-        MFAConfiguration.SetConfiguration("GPUOption", value.ToString());
+        ConfigurationHelper.SetValue(ConfigurationKeys.GPUOption, value.ToString());
     }
 }

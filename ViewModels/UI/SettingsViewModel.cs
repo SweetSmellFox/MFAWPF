@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
@@ -20,8 +20,8 @@ public partial class SettingsViewModel : ViewModel
 
     public SettingsViewModel()
     {
-        HotKeyShowGui = MFAHotKey.Parse(GlobalConfiguration.GetConfiguration("ShowGui", ""));
-        HotKeyLinkStart = MFAHotKey.Parse(GlobalConfiguration.GetConfiguration("LinkStart", ""));
+        HotKeyShowGui = MFAHotKey.Parse(GlobalConfiguration.GetValue(ConfigurationKeys.ShowGui, ""));
+        HotKeyLinkStart = MFAHotKey.Parse(GlobalConfiguration.GetValue(ConfigurationKeys.LinkStart, ""));
     }
 
     [ObservableProperty] ObservableCollection<Tool.LocalizationViewModel> _listTitle =
@@ -135,13 +135,13 @@ public partial class SettingsViewModel : ViewModel
 
     #region 配置
 
-    public ObservableCollection<MFAConfig> ConfigurationList { get; set; } = MFAConfiguration.Configs;
+    public ObservableCollection<MFAConfiguration> ConfigurationList { get; set; } = ConfigurationHelper.Configs;
 
-    [ObservableProperty] private string? _currentConfiguration = MFAConfiguration.GetCurrentConfiguration();
+    [ObservableProperty] private string? _currentConfiguration = ConfigurationHelper.GetCurrentConfiguration();
 
     partial void OnCurrentConfigurationChanged(string? value)
     {
-        MFAConfiguration.SetDefaultConfig(value);
+        ConfigurationHelper.SetDefaultConfig(value);
         MaaProcessor.RestartMFA();
     }
 
@@ -156,7 +156,7 @@ public partial class SettingsViewModel : ViewModel
         }
 
         var configDPath = Path.Combine(AppContext.BaseDirectory, "config");
-        var configPath = Path.Combine(configDPath, $"{MFAConfiguration.GetActualConfiguration()}.json");
+        var configPath = Path.Combine(configDPath, $"{ConfigurationHelper.GetActualConfiguration()}.json");
         var newConfigPath = Path.Combine(configDPath, $"{NewConfigurationName}.json");
         bool configExists = Directory.GetFiles(configDPath, "*.json")
             .Select(Path.GetFileNameWithoutExtension)
@@ -164,7 +164,7 @@ public partial class SettingsViewModel : ViewModel
 
         if (configExists)
         {
-            GrowlHelper.Error("ConfigNameAlreadyExists".ToLocalizationFormatted(NewConfigurationName));
+            GrowlHelper.Error("ConfigNameAlreadyExists".ToLocalizationFormatted(false,NewConfigurationName));
             return;
         }
         if (File.Exists(configPath))
@@ -172,8 +172,8 @@ public partial class SettingsViewModel : ViewModel
             var content = File.ReadAllText(configPath);
             File.WriteAllText(newConfigPath, content);
 
-            MFAConfiguration.AddNewConfig(NewConfigurationName);
-            GrowlHelper.Success("ConfigAddedSuccessfully".ToLocalizationFormatted(NewConfigurationName));
+            ConfigurationHelper.AddNewConfig(NewConfigurationName);
+            GrowlHelper.Success("ConfigAddedSuccessfully".ToLocalizationFormatted(false,NewConfigurationName));
         }
 
     }
@@ -187,7 +187,7 @@ public partial class SettingsViewModel : ViewModel
     public MFAHotKey HotKeyShowGui
     {
         get => _hotKeyShowGui;
-        set => SetHotKey(ref _hotKeyShowGui, value, "ShowGui", Instances.RootViewModel.ToggleVisible);
+        set => SetHotKey(ref _hotKeyShowGui, value, ConfigurationKeys.ShowGui, Instances.RootViewModel.ToggleVisible);
     }
 
     private MFAHotKey _hotKeyLinkStart = MFAHotKey.NOTSET;
@@ -195,7 +195,7 @@ public partial class SettingsViewModel : ViewModel
     public MFAHotKey HotKeyLinkStart
     {
         get => _hotKeyLinkStart;
-        set => SetHotKey(ref _hotKeyLinkStart, value, "LinkStart", Instances.TaskQueueView.Toggle);
+        set => SetHotKey(ref _hotKeyLinkStart, value, ConfigurationKeys.LinkStart, Instances.TaskQueueView.Toggle);
     }
 
     public void SetHotKey(ref MFAHotKey value, MFAHotKey? newValue, string type, Action action)
@@ -206,7 +206,7 @@ public partial class SettingsViewModel : ViewModel
             {
                 newValue = MFAHotKey.ERROR;
             }
-            GlobalConfiguration.SetConfiguration(type, newValue.ToString());
+            GlobalConfiguration.SetValue(type, newValue.ToString());
             SetProperty(ref value, newValue);
         }
     }

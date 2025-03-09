@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
@@ -18,12 +18,12 @@ public partial class TaskQueueViewModel : ViewModel
 
     partial void OnTaskItemViewModelsChanged(ObservableCollection<Tool.DragItemViewModel>? oldValue, ObservableCollection<Tool.DragItemViewModel> newValue)
     {
-        MFAConfiguration.SetConfiguration("TaskItems", newValue.ToList().Select(model => model.InterfaceItem));
+        ConfigurationHelper.SetValue(ConfigurationKeys.TaskItems, newValue.ToList().Select(model => model.InterfaceItem));
     }
 
     [ObservableProperty] private bool _connectSettingChecked = true;
-    
-    
+
+
     public ObservableCollection<Tool.DragItemViewModel> TasksSource { get; private set; } =
         [];
 
@@ -47,18 +47,18 @@ public partial class TaskQueueViewModel : ViewModel
     ];
 
 
-    [ObservableProperty] private string? _beforeTask = MFAConfiguration.GetConfiguration("BeforeTask", "None");
+    [ObservableProperty] private string? _beforeTask = ConfigurationHelper.GetValue(ConfigurationKeys.BeforeTask, "None");
 
     partial void OnBeforeTaskChanged(string? value)
     {
-        MFAConfiguration.SetConfiguration("BeforeTask", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.BeforeTask, value);
     }
 
-    [ObservableProperty] private string? _afterTask = MFAConfiguration.GetConfiguration("AfterTask", "None");
+    [ObservableProperty] private string? _afterTask = ConfigurationHelper.GetValue(ConfigurationKeys.AfterTask, "None");
 
     partial void OnAfterTaskChanged(string? value)
     {
-        MFAConfiguration.SetConfiguration("AfterTask", value);
+        ConfigurationHelper.SetValue(ConfigurationKeys.AfterTask, value);
     }
 
     public GongSolutions.Wpf.DragDrop.IDropTarget DropHandler { get; } = new DragDropHandler();
@@ -227,16 +227,44 @@ public partial class TaskQueueViewModel : ViewModel
                     content = key.ToLocalization();
                 else
                 {
-                    var formatArgs = formatArgsKeys.Select(k => k.ToLocalizationFormatted()).ToArray();
-
                     try
                     {
                         content = Regex.Unescape(
-                            key.ToLocalizationFormatted(formatArgs.ToArray()));
+                            key.ToLocalizationFormatted(true, formatArgsKeys));
                     }
                     catch
                     {
-                        content = key.ToLocalizationFormatted(formatArgs.ToArray());
+                        content = key.ToLocalizationFormatted(true, formatArgsKeys);
+                    }
+                }
+                LoggerService.LogInfo(content);
+            });
+        });
+    }
+
+    public void AddLogByKey(string key, Brush? color = null, bool transformKey = true, params string[] formatArgsKeys)
+    {
+        color ??= Brushes.Gray;
+        Task.Run(() =>
+        {
+            DispatcherHelper.RunOnMainThread(() =>
+            {
+                LogItemViewModels.Add(new LogItemViewModel(key, color, "Regular", true, "HH':'mm':'ss",
+                    true, transformKey, formatArgsKeys));
+
+                var content = string.Empty;
+                if (formatArgsKeys.Length == 0)
+                    content = key.ToLocalization();
+                else
+                {
+                    try
+                    {
+                        content = Regex.Unescape(
+                            key.ToLocalizationFormatted(false, formatArgsKeys));
+                    }
+                    catch
+                    {
+                        content = key.ToLocalizationFormatted(false, formatArgsKeys);
                     }
                 }
                 LoggerService.LogInfo(content);

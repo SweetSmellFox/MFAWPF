@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using MaaFramework.Binding;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper.Converters;
 using System.Collections.ObjectModel;

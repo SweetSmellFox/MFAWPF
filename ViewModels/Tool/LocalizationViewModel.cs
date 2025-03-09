@@ -13,8 +13,8 @@ public partial class LocalizationViewModel : ViewModel
         UpdateName();
     }
 
-    public LocalizationViewModel(){}
-    
+    public LocalizationViewModel() { }
+
     private readonly string[]? _formatArgsKeys;
 
     public LocalizationViewModel(string resourceKey)
@@ -41,11 +41,10 @@ public partial class LocalizationViewModel : ViewModel
         if (string.IsNullOrWhiteSpace(ResourceKey))
             return;
         if (_formatArgsKeys != null && _formatArgsKeys.Length != 0)
-            Name = ResourceKey.ToLocalizationFormatted(_formatArgsKeys);
+            Name = ResourceKey.ToLocalizationFormatted(true, _formatArgsKeys);
         else
             Name = ResourceKey.ToLocalization();
     }
-
 
 
     public override string ToString()

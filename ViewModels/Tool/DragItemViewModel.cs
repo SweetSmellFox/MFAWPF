@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Extensions;
 using MFAWPF.Helper;
 using MFAWPF.Helper.ValueType;
@@ -45,7 +45,7 @@ public partial class DragItemViewModel : ViewModel
                 SetProperty(ref _isCheckedWithNull, value);
                 if (InterfaceItem != null)
                     InterfaceItem.Check = IsChecked;
-                MFAConfiguration.SetConfiguration("TaskItems",
+                ConfigurationHelper.SetValue(ConfigurationKeys.TaskItems,
                     Instances.TaskQueueViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }
         }

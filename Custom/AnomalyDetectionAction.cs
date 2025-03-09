@@ -3,7 +3,7 @@ using MFAWPF.Views;
 using MaaFramework.Binding;
 using MaaFramework.Binding.Buffers;
 using MaaFramework.Binding.Custom;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using System.Threading;
@@ -23,7 +23,7 @@ public class AnomalyDetectionAction : MaaCustomAction
     {
         var shouldWaiting = false;
         context.OverrideNext(args.NodeName, ["启动检测"]);
-        context.StartApp(MFAConfiguration.GetConfiguration("ResourceIndex", 0) == 0 ? "com.hypergryph.arknights" : "com.hypergryph.arknights.bilibili");
+        context.StartApp(ConfigurationHelper.GetValue("ResourceIndex", 0) == 0 ? "com.hypergryph.arknights" : "com.hypergryph.arknights.bilibili");
         var handle = () =>
         {
             var image = context.GetImage();

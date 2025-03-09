@@ -2,13 +2,13 @@ using MaaFramework.Binding;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
 
-namespace MFAWPF.Data;
+namespace MFAWPF.Configuration;
 
-public class MaaFWConfig
+public class MaaFWConfiguration
 {
     public AdbDeviceCoreConfig AdbDevice { get; set; } = new();
     public DesktopWindowCoreConfig DesktopWindow { get; set; } = new();
-    public string BasePath = MaaProcessor.ResourceBase;
+
 }
 
 public class DesktopWindowCoreConfig

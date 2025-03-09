@@ -1,4 +1,4 @@
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Helper;
 using MFAWPF.ViewModels;
 using System.Windows;
@@ -26,7 +26,7 @@ public partial class NotifyIcon
     private void InitIcon()
     {
         notifyIcon.Icon = IconHelper.ICON;
-        notifyIcon.Visibility = MFAConfiguration.GetConfiguration("EnableShowIcon", true) ? Visibility.Visible : Visibility.Collapsed;
+        notifyIcon.Visibility = ConfigurationHelper.GetValue(ConfigurationKeys.EnableShowIcon, true) ? Visibility.Visible : Visibility.Collapsed;
 
         notifyIcon.Click += NotifyIcon_MouseClick;
         notifyIcon.MouseDoubleClick += NotifyIcon_MouseClick;
@@ -46,7 +46,7 @@ public partial class NotifyIcon
             {
                 LanguageHelper.ChangeLanguage(lang);
                 var index = LanguageHelper.SupportedLanguages.ToList().FindIndex(language => language.Key == lang.Key);
-                MFAConfiguration.SetConfiguration("LangIndex", index == -1 ? 0 : index);
+                ConfigurationHelper.SetValue(ConfigurationKeys.LangIndex, index == -1 ? 0 : index);
             };
 
             switchLangMenu.Items.Add(langMenu);

@@ -957,4 +957,7 @@
     <data name="ExternalNotificationQmsgBot" xml:space="preserve">
   <value>Bot QQ</value>
 </data>
+  <data name="EmulatorExtras" xml:space="preserve">
+    <value>EmulatorExtras (Specialized) </value>
+  </data>
 </root>

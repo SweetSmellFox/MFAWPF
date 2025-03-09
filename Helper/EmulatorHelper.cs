@@ -19,7 +19,7 @@ public static class EmulatorHelper
         try
         {
             string emulatorMode = "None";
-            var windowName = MaaProcessor.MaaFwConfig.AdbDevice.Name;
+            var windowName = MaaProcessor.MaaFwConfiguration.AdbDevice.Name;
             if (windowName.Contains("MuMuPlayer12"))
                 emulatorMode = "MuMuEmulator12";
             else if (windowName.Contains("Nox"))
@@ -53,7 +53,7 @@ public static class EmulatorHelper
     /// <returns>是否关闭成功</returns>
     private static bool KillEmulatorMuMuEmulator12()
     {
-        string address = MaaProcessor.MaaFwConfig.AdbDevice.AdbSerial;
+        string address = MaaProcessor.MaaFwConfiguration.AdbDevice.AdbSerial;
         int emuIndex;
         if (address == "127.0.0.1:16384")
         {
@@ -126,7 +126,7 @@ public static class EmulatorHelper
     /// <returns>是否关闭成功</returns>
     private static bool KillEmulatorLdPlayer()
     {
-        var address = MaaProcessor.MaaFwConfig.AdbDevice.AdbSerial;
+        var address = MaaProcessor.MaaFwConfiguration.AdbDevice.AdbSerial;
         int emuIndex;
         if (address.Contains(':'))
         {
@@ -202,7 +202,7 @@ public static class EmulatorHelper
     /// <returns>是否关闭成功</returns>
     private static bool KillEmulatorNox()
     {
-        string address = MaaProcessor.MaaFwConfig.AdbDevice.AdbSerial;
+        string address = MaaProcessor.MaaFwConfiguration.AdbDevice.AdbSerial;
         int emuIndex;
         if (address == "127.0.0.1:62001")
         {
@@ -275,7 +275,7 @@ public static class EmulatorHelper
     /// <returns>是否关闭成功</returns>
     private static bool KillEmulatorXyaz()
     {
-        string address = MaaProcessor.MaaFwConfig.AdbDevice.AdbSerial;
+        string address = MaaProcessor.MaaFwConfiguration.AdbDevice.AdbSerial;
         string portStr = address.Split(':')[1];
         int port = int.Parse(portStr);
         var emuIndex = (port - 21503) / 10;
@@ -476,7 +476,7 @@ public static class EmulatorHelper
     public static bool KillEmulator()
     {
         int pid = 0;
-        string address = MaaProcessor.MaaFwConfig.AdbDevice.AdbSerial;
+        string address = MaaProcessor.MaaFwConfiguration.AdbDevice.AdbSerial;
         var port = address.StartsWith("127") ? address.Substring(10) : "5555";
         LoggerService.LogInfo($"address: {address}, port: {port}");
 

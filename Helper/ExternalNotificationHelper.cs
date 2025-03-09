@@ -162,7 +162,6 @@ public static class ExternalNotificationHelper
 
         private static string CalculateSignature(string timestamp, string secret)
         {
-            const int bufferSize = 1024;
             using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret));
             var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes($"{timestamp}\n{secret}"));
             return WebUtility.UrlEncode(Convert.ToBase64String(hash))

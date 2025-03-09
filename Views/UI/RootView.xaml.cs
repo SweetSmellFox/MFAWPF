@@ -1,5 +1,5 @@
 using HandyControl.Controls;
-using MFAWPF.Data;
+using MFAWPF.Configuration;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using MFAWPF.Helper;
@@ -33,12 +33,12 @@ public partial class RootView
         Loaded += (_, _) => LoadUI();
         Instances.TaskQueueView.InitializeData();
         OCRHelper.Initialize();
-        LanguageHelper.ChangeLanguage(LanguageHelper.SupportedLanguages[MFAConfiguration.GetConfiguration("LangIndex", 0)]);
+        LanguageHelper.ChangeLanguage(LanguageHelper.SupportedLanguages[ConfigurationHelper.GetValue(ConfigurationKeys.LangIndex, 0)]);
 
-        ThemeHelper.UpdateThemeIndexChanged(MFAConfiguration.GetConfiguration("ThemeIndex", 0));
+        ThemeHelper.UpdateThemeIndexChanged(ConfigurationHelper.GetValue(ConfigurationKeys.ThemeIndex, 0));
         StateChanged += (_, _) =>
         {
-            if (MFAConfiguration.GetConfiguration("ShouldMinimizeToTray", false))
+            if (ConfigurationHelper.GetValue(ConfigurationKeys.ShouldMinimizeToTray, false))
             {
                 ChangeVisibility(WindowState != WindowState.Minimized);
             }
@@ -69,7 +69,7 @@ public partial class RootView
     protected override void OnClosing(CancelEventArgs e)
     {
         e.Cancel = !ConfirmExit();
-        MFAConfiguration.SetConfiguration("TaskItems", Instances.TaskQueueViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+        ConfigurationHelper.SetValue(ConfigurationKeys.TaskItems, Instances.TaskQueueViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         base.OnClosed(e);
     }
 
@@ -131,7 +131,7 @@ public partial class RootView
         {
             InitializationSettings();
             Instances.ConnectingViewModel.CurrentController = (MaaInterface.Instance?.DefaultController).ToMaaControllerTypes(Instances.ConnectingViewModel.CurrentController);
-            if (!Convert.ToBoolean(GlobalConfiguration.GetConfiguration("NoAutoStart", bool.FalseString)) && MFAConfiguration.GetConfiguration("BeforeTask", "None").Contains("Startup", StringComparison.OrdinalIgnoreCase))
+            if (!Convert.ToBoolean(GlobalConfiguration.GetValue(ConfigurationKeys.NoAutoStart, bool.FalseString)) && ConfigurationHelper.GetValue(ConfigurationKeys.BeforeTask, "None").Contains("Startup", StringComparison.OrdinalIgnoreCase))
             {
                 MaaProcessor.Instance.TaskQueue.Push(new MFATask
                 {
@@ -139,7 +139,7 @@ public partial class RootView
                     Type = MFATask.MFATaskType.MFA,
                     Action = async () => await WaitSoftware(),
                 });
-                Instances.TaskQueueView.Start(!MFAConfiguration.GetConfiguration("BeforeTask", "None").Contains("And", StringComparison.OrdinalIgnoreCase), checkUpdate: true);
+                Instances.TaskQueueView.Start(!ConfigurationHelper.GetValue(ConfigurationKeys.BeforeTask, "None").Contains("And", StringComparison.OrdinalIgnoreCase), checkUpdate: true);
             }
             else
             {
@@ -148,10 +148,10 @@ public partial class RootView
                 VersionChecker.Check();
             }
 
-            GlobalConfiguration.SetConfiguration("NoAutoStart", bool.FalseString);
+            GlobalConfiguration.SetValue("NoAutoStart", bool.FalseString);
 
             ViewModel.NotLock = MaaInterface.Instance?.LockController != true;
-            MFAConfiguration.SetConfiguration("EnableEdit", MFAConfiguration.GetConfiguration("EnableEdit", false));
+            ConfigurationHelper.SetValue(ConfigurationKeys.EnableEdit, ConfigurationHelper.GetValue(ConfigurationKeys.EnableEdit, false));
             if (!string.IsNullOrWhiteSpace(MaaInterface.Instance?.Message))
             {
                 GrowlHelper.Info(MaaInterface.Instance.Message);
@@ -163,11 +163,11 @@ public partial class RootView
             DispatcherHelper.RunOnMainThread(() =>
             {
                 Instances.AnnouncementViewModel.CheckAnnouncement();
-                if (MFAConfiguration.GetConfiguration("AutoMinimize", false))
+                if (ConfigurationHelper.GetValue(ConfigurationKeys.AutoMinimize, false))
                 {
                     Collapse();
                 }
-                if (MFAConfiguration.GetConfiguration("AutoHide", false))
+                if (ConfigurationHelper.GetValue(ConfigurationKeys.AutoHide, false))
                 {
                     Hide();
                 }
@@ -225,17 +225,14 @@ public partial class RootView
         =>
             Instances.TaskQueueViewModel.AddLog(content, brush, weight, showTime);
 
-
-    public static void AddLogByKey(string key, Brush? brush = null, params string[] formatArgsKeys)
-        => Instances.TaskQueueViewModel.AddLogByKey(key, brush, formatArgsKeys);
-
-
+    public static void AddLogByKey(string key, Brush? brush = null, bool transformKey = true, params string[] formatArgsKeys)
+        => Instances.TaskQueueViewModel.AddLogByKey(key, brush, transformKey, formatArgsKeys);
     public void RunScript(string str = "Prescript")
     {
         bool enable = str switch
         {
-            "Prescript" => !string.IsNullOrWhiteSpace(MFAConfiguration.GetConfiguration("Prescript", string.Empty)),
-            "Post-script" => !string.IsNullOrWhiteSpace(MFAConfiguration.GetConfiguration("Post-script", string.Empty)),
+            "Prescript" => !string.IsNullOrWhiteSpace(ConfigurationHelper.GetValue(ConfigurationKeys.Prescript, string.Empty)),
+            "Post-script" => !string.IsNullOrWhiteSpace(ConfigurationHelper.GetValue(ConfigurationKeys.Postscript, string.Empty)),
             _ => false,
         };
         if (!enable)
@@ -245,8 +242,8 @@ public partial class RootView
 
         Func<bool> func = str switch
         {
-            "Prescript" => () => ExecuteScript(MFAConfiguration.GetConfiguration("Prescript", string.Empty)),
-            "Post-script" => () => ExecuteScript(MFAConfiguration.GetConfiguration("Post-script", string.Empty)),
+            "Prescript" => () => ExecuteScript(ConfigurationHelper.GetValue(ConfigurationKeys.Prescript, string.Empty)),
+            "Post-script" => () => ExecuteScript(ConfigurationHelper.GetValue(ConfigurationKeys.Postscript, string.Empty)),
             _ => () => false,
         };
 
@@ -321,7 +318,7 @@ public partial class RootView
 
     public async Task WaitSoftware()
     {
-        if (MFAConfiguration.GetConfiguration("BeforeTask", "None").Contains("Startup", StringComparison.OrdinalIgnoreCase))
+        if (ConfigurationHelper.GetValue(ConfigurationKeys.BeforeTask, "None").Contains("Startup", StringComparison.OrdinalIgnoreCase))
         {
             await MaaProcessor.Instance.StartSoftware();
         }

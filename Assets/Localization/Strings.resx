@@ -963,4 +963,7 @@
   <data name="ExternalNotificationSmtpServer" xml:space="preserve">
     <value>SMTP 服务器</value>
   </data>
+  <data name="EmulatorExtras" xml:space="preserve">
+    <value>EmulatorExtras (特化)</value>
+  </data>
 </root>

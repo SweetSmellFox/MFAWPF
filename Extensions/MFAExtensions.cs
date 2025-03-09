@@ -59,11 +59,11 @@ public static class MFAExtensions
         return LocalizeDictionary.Instance.GetLocalizedObject(key, null, null) as string ?? key;
     }
 
-    public static string ToLocalizationFormatted(this string? key, params string[] args)
+    public static string ToLocalizationFormatted(this string? key, bool transformKey = true, params string[] args)
     {
         if (string.IsNullOrWhiteSpace(key))
             return string.Empty;
-        var formatArgs = args.Select(a => a.ToLocalization()).ToArray();
+        var formatArgs = transformKey ? args.Select(a => a.ToLocalization()).ToArray() : args;
 
         var content = string.Empty;
         try
@@ -115,7 +115,7 @@ public static class MFAExtensions
     {
         return hitBox is null or { X: 0, Y: 0, Width: 0, Height: 0 };
     }
-    
+
     public static MaaTaskJob AppendTask(this IMaaTasker maaTasker, TaskItemViewModel task)
     {
         if (MaaProcessor.Instance.CancellationTokenSource?.IsCancellationRequested == true)
@@ -511,7 +511,7 @@ public static class MFAExtensions
             })
             .Where(x => x.Name?.Equals("no", StringComparison.OrdinalIgnoreCase) == true).ToList();
 
-        if (yesItem.Count == 0 || noItem.Count == 0 )
+        if (yesItem.Count == 0 || noItem.Count == 0)
             return false;
 
         yes = yesItem[0].Index;
@@ -519,11 +519,11 @@ public static class MFAExtensions
 
         return true;
     }
-    
+
     public static void SafeCancel(this CancellationTokenSource? cts, bool useCancel = true)
     {
         if (cts == null || cts.IsCancellationRequested) return;
-        
+
         try
         {
             if (useCancel) cts.Cancel();
