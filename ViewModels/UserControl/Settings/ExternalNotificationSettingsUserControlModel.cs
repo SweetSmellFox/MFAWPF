@@ -25,7 +25,7 @@ public partial class ExternalNotificationSettingsUserControlModel : ViewModel
         DingTalkEnabled = EnabledExternalNotificationProviderList.Contains("DingTalk");
         EmailEnabled = EnabledExternalNotificationProviderList.Contains("Email");
         LarkEnabled = EnabledExternalNotificationProviderList.Contains("Lark");
-        QmsgEnabled = EnabledExternalNotificationProviderList.Contains("QMsg");
+        QmsgEnabled = EnabledExternalNotificationProviderList.Contains("Qmsg");
         WxPusherEnabled = EnabledExternalNotificationProviderList.Contains("WxPusher");
         SmtpEnabled = EnabledExternalNotificationProviderList.Contains("SMTP");
         TelegramEnabled = EnabledExternalNotificationProviderList.Contains("Telegram");
