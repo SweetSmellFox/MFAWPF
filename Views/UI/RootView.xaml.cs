@@ -130,7 +130,8 @@ public partial class RootView
         DispatcherHelper.RunOnMainThread(() =>
         {
             InitializationSettings();
-            Instances.ConnectingViewModel.CurrentController = (MaaInterface.Instance?.DefaultController).ToMaaControllerTypes(Instances.ConnectingViewModel.CurrentController);
+            Instances.ConnectingViewModel.CurrentController = (MaaInterface.Instance?.Controller?.FirstOrDefault()?.Type).ToMaaControllerTypes(Instances.ConnectingViewModel.CurrentController);
+            Console.WriteLine((MaaInterface.Instance?.Controller?.FirstOrDefault()?.Type).ToMaaControllerTypes(Instances.ConnectingViewModel.CurrentController));
             if (!Convert.ToBoolean(GlobalConfiguration.GetValue(ConfigurationKeys.NoAutoStart, bool.FalseString)) && ConfigurationHelper.GetValue(ConfigurationKeys.BeforeTask, "None").Contains("Startup", StringComparison.OrdinalIgnoreCase))
             {
                 MaaProcessor.Instance.TaskQueue.Push(new MFATask
@@ -150,7 +151,8 @@ public partial class RootView
 
             GlobalConfiguration.SetValue("NoAutoStart", bool.FalseString);
 
-            ViewModel.NotLock = MaaInterface.Instance?.LockController != true;
+            ViewModel.LockController = (MaaInterface.Instance?.Controller?.Count ?? 0) < 2;
+            Console.WriteLine((MaaInterface.Instance?.Controller?.Count ?? 0) < 2);
             ConfigurationHelper.SetValue(ConfigurationKeys.EnableEdit, ConfigurationHelper.GetValue(ConfigurationKeys.EnableEdit, false));
             if (!string.IsNullOrWhiteSpace(MaaInterface.Instance?.Message))
             {

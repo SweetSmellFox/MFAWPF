@@ -16,7 +16,7 @@ public partial class RootViewModel : ViewModel
 {
     [ObservableProperty] private bool _idle = true;
 
-    [ObservableProperty] private bool _notLock = true;
+    [ObservableProperty] private bool _lockController = true;
 
     [ObservableProperty] private bool _isRunning;
 

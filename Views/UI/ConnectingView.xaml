@@ -81,8 +81,8 @@
             <ComboBox
                 DataContext="{x:Static helper:Instances.ConnectingViewModel}"
                 DisplayMemberPath="Name"
-                IsHitTestVisible="{calcBinding:Binding 'NotLock and Idle',
-                                                       Source={x:Static helper:Instances.RootViewModel}}"
+                IsEnabled="{calcBinding:Binding '!LockController and Idle',
+                                                Source={x:Static helper:Instances.RootViewModel}}"
                 ItemsSource="{Binding Controllers}"
                 SelectedValue="{Binding CurrentController, Mode=TwoWay}"
                 SelectedValuePath="Other" />
