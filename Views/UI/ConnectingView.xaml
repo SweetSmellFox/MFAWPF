@@ -145,10 +145,10 @@
                 <control:CustomTextBlock Grid.Row="0" Text="{lex:Loc RescanController}" />
             </control:CardControl.Header>
             <Button
-                Command="{Binding AutoDetectDeviceCommand, Source={x:Static helper:Instances.ConnectingViewModel}}"
+                Command="{Binding RefreshCommand, Source={x:Static helper:Instances.ConnectingViewModel}}"
                 Content="{lex:Loc TooltipRefresh}"
                 HorizontalAlignment="Stretch"
-                IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
+                IsEnabled="{Binding 'Idle', Source={x:Static helper:Instances.RootViewModel}}"
                 Margin="4,0,0,0" />
         </control:CardControl>
         <control:CardControl

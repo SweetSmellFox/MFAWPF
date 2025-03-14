@@ -905,48 +905,51 @@ public class MaaProcessor
                 Toolkit = MaaToolkit,
                 DisposeOptions = DisposeOptions.All,
             };
-            _agentClient = new MaaAgentClient
-            {
-                Resource = maaResource,
-                DisposeOptions = DisposeOptions.All
-            };
-            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            var identifier = string.IsNullOrWhiteSpace(MaaInterface.Instance?.Agent?.Identifier) ? new string(Enumerable.Repeat(chars, 8).Select(c => c[Random.Next(c.Length)]).ToArray()) : MaaInterface.Instance.Agent.Identifier;
-            var socket = _agentClient.CreateSocket(identifier);
-            if (string.IsNullOrWhiteSpace(socket))
-            {
-                throw new Exception("Socket creation failed");
-            }
+
             // 获取代理配置（假设MaaInterface.Instance在UI线程中访问）
             var agentConfig = MaaInterface.Instance?.Agent;
-
-            if (agentConfig?.ChildExec != null)
+            if (agentConfig != null)
             {
-                try
+                _agentClient = new MaaAgentClient
                 {
-                    if (!Directory.Exists($"{AppContext.BaseDirectory}Agent"))
-                        Directory.CreateDirectory($"{AppContext.BaseDirectory}Agent");
-                    var startInfo = new ProcessStartInfo
+                    Resource = maaResource,
+                    DisposeOptions = DisposeOptions.All
+                };
+                var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                var identifier = string.IsNullOrWhiteSpace(MaaInterface.Instance?.Agent?.Identifier) ? new string(Enumerable.Repeat(chars, 8).Select(c => c[Random.Next(c.Length)]).ToArray()) : MaaInterface.Instance.Agent.Identifier;
+                var socket = _agentClient.CreateSocket(identifier);
+                if (string.IsNullOrWhiteSpace(socket))
+                {
+                    throw new Exception("Socket creation failed");
+                }
+                if (agentConfig?.ChildExec != null)
+                {
+                    try
                     {
-                        FileName = agentConfig.ChildExec,
-                        WorkingDirectory = $"{AppContext.BaseDirectory}Agent",
-                        Arguments = $"{string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket}",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
+                        if (!Directory.Exists($"{AppContext.BaseDirectory}Agent"))
+                            Directory.CreateDirectory($"{AppContext.BaseDirectory}Agent");
+                        var startInfo = new ProcessStartInfo
+                        {
+                            FileName = MaaInterface.ReplacePlaceholder(agentConfig.ChildExec, AppContext.BaseDirectory),
+                            WorkingDirectory = $"{AppContext.BaseDirectory}Agent",
+                            Arguments = $"{string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket}",
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
 
-                    Task.Run(() => Process.Start(startInfo), token);
+                        Task.Run(() => Process.Start(startInfo), token);
 
-                    // 使用WPF日志框架记录（需实现ILogger接口）
-                    LoggerService.LogInfo($"Agent启动: {agentConfig.ChildExec} {string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket} "
-                        + $"socket_id: {socket}");
+                        // 使用WPF日志框架记录（需实现ILogger接口）
+                        LoggerService.LogInfo($"Agent启动: {agentConfig.ChildExec} {string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket} "
+                            + $"socket_id: {socket}");
+                    }
+                    catch (Exception ex)
+                    {
+                        LoggerService.LogError($"Agent启动失败: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    LoggerService.LogError($"Agent启动失败: {ex.Message}");
-                }
+                _agentClient?.LinkStart();
             }
-            _agentClient?.LinkStart();
             RegisterCustomRecognitionsAndActions(tasker);
             Instances.ConnectingViewModel.SetConnected(true);
             tasker.Utility.SetOptionRecording(ConfigurationHelper.MaaConfig.GetConfig(ConfigurationKeys.Recording, false));

@@ -95,8 +95,7 @@ public partial class ErrorView : INotifyPropertyChanged
             var ms = new MemoryStream();
             range.Save(ms, DataFormats.Rtf);
             var arr = ms.ToArray();
-
-            // Save to RTF doesn't write non-ascii characters (implementation-defined behavior?)
+            
             data.SetData(DataFormats.Rtf, Encoding.UTF8.GetString(arr));
         }
 

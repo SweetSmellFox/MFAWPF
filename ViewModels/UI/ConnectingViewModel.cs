@@ -119,8 +119,13 @@ public partial class ConnectingViewModel : ViewModel
         index = 0;
         return false;
     }
-
+    
     [RelayCommand]
+    private void Refresh()
+    {
+        TaskManager.RunTaskAsync(AutoDetectDevice);
+    }
+
     public void AutoDetectDevice()
     {
         var isAdb = CurrentController == MaaControllerTypes.Adb;
