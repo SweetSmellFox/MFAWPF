@@ -28,6 +28,7 @@ public class PinButton : Button
 
     private void OnCheckedChanged(bool oldValue, bool newValue)
     {
+        
         CheckedChanged?.Invoke(this, new RoutedPropertyChangedEventArgs<bool>(oldValue, newValue));
     }
 

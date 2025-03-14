@@ -1,3 +1,4 @@
+using MaaFramework.Binding;
 using MFAWPF.Helper;
 using MFAWPF.Helper.Converters;
 using MFAWPF.Helper.ValueType;
@@ -50,14 +51,7 @@ public class MaaInterface
             return Name ?? string.Empty;
         }
     }
-    public class MaaInterfaceAgent
-    {
-        [JsonProperty("child_exec")]
-        public string? ChildExec { get; set; } = string.Empty;
-        [JsonProperty("child_args")]
-        public List<string>? DefaultCase { get; set; }
-    }
-    
+
     public class CustomExecutor
     {
         [JsonIgnore]
@@ -118,6 +112,17 @@ public class MaaInterface
         public long? ScreenCap { get; set; }
     }
 
+    public class MaaInterfaceAgent
+    {
+        [JsonProperty("child_exec")]
+        public string? ChildExec { get; set; }
+        
+        [JsonProperty("child_args")]
+        public List<string>? ChildArgs { get; set; }
+        [JsonProperty("identifier")]
+        public string? Identifier { get; set; }
+    }
+
     public class MaaResourceController
     {
         [JsonProperty("name")]
@@ -161,7 +166,7 @@ public class MaaInterface
     public List<MaaCustomResource>? Resource { get; set; }
     [JsonProperty("task")]
     public List<TaskInterfaceItem>? Task { get; set; }
-    
+
     [JsonProperty("agent")]
     public MaaInterfaceAgent? Agent { get; set; }
 
@@ -171,13 +176,11 @@ public class MaaInterface
     [JsonExtensionData]
     public Dictionary<string, object> AdditionalData { get; set; } = new();
     private static MaaInterface? _instance;
-    
-    
+
 
     [JsonIgnore]
     public Dictionary<string, MaaCustomResource> Resources { get; } = new();
-
-
+    
     // 替换单个字符串中的 "{PROJECT_DIR}" 为指定的替换值
     public static string? ReplacePlaceholder(string? input, string? replacement)
     {
@@ -185,11 +188,11 @@ public class MaaInterface
     }
 
     // 替换字符串列表中的每个字符串中的 "{PROJECT_DIR}"
-    public static List<string> ReplacePlaceholder(List<string>? inputs, string? replacement)
+    public static List<string> ReplacePlaceholder(IEnumerable<string>? inputs, string? replacement)
     {
         if (inputs == null) return new List<string>();
 
-        return inputs.ConvertAll(input => ReplacePlaceholder(input, replacement));
+        return inputs.ToList().ConvertAll(input => ReplacePlaceholder(input, replacement));
     }
 
     public static MaaInterface? Instance
@@ -286,6 +289,7 @@ public class MaaInterface
                 ;
             JsonHelper.WriteToJsonFilePath(AppContext.BaseDirectory, "interface",
                 Instance, new MaaInterfaceSelectOptionConverter(true));
+
         }
         else
         {

@@ -28,6 +28,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using DragItemViewModel = MFAWPF.ViewModels.Tool.DragItemViewModel;
@@ -39,14 +40,14 @@ namespace MFAWPF.Extensions.Maa;
 public class MaaProcessor
 {
     private static MaaProcessor? _instance;
-
+    private static Random Random = new();
     public static MaaUtility MaaUtility { get; } = new();
     public static MaaToolkit MaaToolkit { get; } = new(init: true);
 
     public CancellationTokenSource? CancellationTokenSource { get; set; } = new();
 
     private MaaTasker? _currentTasker;
-
+    private MaaAgentClient? _agentClient;
     public static string Resource => AppContext.BaseDirectory + "Resource";
     public static string ResourceBase => $"{Resource}/base";
 
@@ -761,6 +762,12 @@ public class MaaProcessor
 
     public void SetCurrentTasker(MaaTasker? tasker = null)
     {
+        if (tasker == null)
+        {
+            _agentClient?.LinkStop();
+            _agentClient?.Dispose();
+            _agentClient = null;
+        }
         _currentTasker = tasker;
     }
 
@@ -888,6 +895,8 @@ public class MaaProcessor
         try
         {
             token.ThrowIfCancellationRequested();
+
+
             var tasker = new MaaTasker
             {
                 Controller = controller,
@@ -896,6 +905,48 @@ public class MaaProcessor
                 Toolkit = MaaToolkit,
                 DisposeOptions = DisposeOptions.All,
             };
+            _agentClient = new MaaAgentClient
+            {
+                Resource = maaResource,
+                DisposeOptions = DisposeOptions.All
+            };
+            var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var identifier = string.IsNullOrWhiteSpace(MaaInterface.Instance?.Agent?.Identifier) ? new string(Enumerable.Repeat(chars, 8).Select(c => c[Random.Next(c.Length)]).ToArray()) : MaaInterface.Instance.Agent.Identifier;
+            var socket = _agentClient.CreateSocket(identifier);
+            if (string.IsNullOrWhiteSpace(socket))
+            {
+                throw new Exception("Socket creation failed");
+            }
+            // 获取代理配置（假设MaaInterface.Instance在UI线程中访问）
+            var agentConfig = MaaInterface.Instance?.Agent;
+
+            if (agentConfig?.ChildExec != null)
+            {
+                try
+                {
+                    if (!Directory.Exists($"{AppContext.BaseDirectory}Agent"))
+                        Directory.CreateDirectory($"{AppContext.BaseDirectory}Agent");
+                    var startInfo = new ProcessStartInfo
+                    {
+                        FileName = agentConfig.ChildExec,
+                        WorkingDirectory = $"{AppContext.BaseDirectory}Agent",
+                        Arguments = $"{string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket}",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+
+                    Task.Run(() => Process.Start(startInfo), token);
+
+                    // 使用WPF日志框架记录（需实现ILogger接口）
+                    LoggerService.LogInfo($"Agent启动: {agentConfig.ChildExec} {string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket} "
+                        + $"socket_id: {socket}");
+                }
+                catch (Exception ex)
+                {
+                    LoggerService.LogError($"Agent启动失败: {ex.Message}");
+                }
+            }
+            _agentClient?.LinkStart();
             RegisterCustomRecognitionsAndActions(tasker);
             Instances.ConnectingViewModel.SetConnected(true);
             tasker.Utility.SetOptionRecording(ConfigurationHelper.MaaConfig.GetConfig(ConfigurationKeys.Recording, false));

@@ -74,6 +74,7 @@ public static class ConfigurationKeys
     public const string EnableShowIcon = "EnableShowIcon";
 
     #endregion
+    
     #region 外部通知
 
     public const string ExternalNotificationEnabled = "ExternalNotificationEnabled";

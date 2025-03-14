@@ -20,9 +20,9 @@
         <PackageReference Include="CalcBinding" Version="2.5.2" />
         <PackageReference Include="GraphSharp" Version="1.1.0" />
         <PackageReference Include="Lierda.WPFHelper" Version="1.0.3" />
-        <PackageReference Include="Maa.Framework" Version="3.0.1-preview.25073.7" />
-        <PackageReference Include="Maa.Framework.Native" Version="3.0.1-preview.25073.7" />
-        <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="3.0.4" />
+        <PackageReference Include="Maa.Framework" Version="4.0.0-preview.25163.6" />
+        <PackageReference Include="Maa.Framework.Native" Version="4.0.0-preview.25163.6" />
+        <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="4.0.0" />
         <PackageReference Include="MailKit" Version="4.11.0" />
         <PackageReference Include="MdXaml" Version="1.27.0" />
         <PackageReference Include="MdXaml.Html" Version="1.27.0" />
@@ -63,8 +63,8 @@
         <ApplicationRevision>0</ApplicationRevision>
         <ApplicationVersion>1.1.0</ApplicationVersion>
         <Version>1.1</Version>
-        <FileVersion>1.2.7.6</FileVersion>
-        <AssemblyVersion>1.2.7.6</AssemblyVersion>
+        <FileVersion>1.2.8.0</FileVersion>
+        <AssemblyVersion>1.2.8.0</AssemblyVersion>
         <InformationalVersion>0.0.1</InformationalVersion>
     </PropertyGroup>
 

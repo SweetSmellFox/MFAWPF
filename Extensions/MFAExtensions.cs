@@ -61,22 +61,21 @@ public static class MFAExtensions
 
     public static string ToLocalizationFormatted(this string? key, bool transformKey = true, params string[] args)
     {
-        if (string.IsNullOrWhiteSpace(key))
-            return string.Empty;
-        var formatArgs = transformKey ? args.Select(a => a.ToLocalization()).ToArray() : args;
+        if (string.IsNullOrWhiteSpace(key)) return string.Empty;
 
-        var content = string.Empty;
+        var localizedKey = key.ToLocalization();
+        var processedArgs = transformKey
+            ? args.Select(a => (object)a.ToLocalization()).ToArray() // 显式装箱
+            : args.Cast<object>().ToArray();
+
         try
         {
-            content = Regex.Unescape(
-                key.ToLocalization().FormatWith(formatArgs));
+            return Regex.Unescape(localizedKey.FormatWith(processedArgs));
         }
         catch
         {
-            content = key.ToLocalization().FormatWith(formatArgs);
+            return localizedKey.FormatWith(processedArgs);
         }
-
-        return content;
     }
 
     public static string FormatWith(this string format, params object[] args)

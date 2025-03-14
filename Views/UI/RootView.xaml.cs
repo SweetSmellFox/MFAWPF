@@ -70,6 +70,7 @@ public partial class RootView
     {
         e.Cancel = !ConfirmExit();
         ConfigurationHelper.SetValue(ConfigurationKeys.TaskItems, Instances.TaskQueueViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
+        MaaProcessor.Instance.SetCurrentTasker();
         base.OnClosed(e);
     }
 
