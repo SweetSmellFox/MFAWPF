@@ -55,9 +55,9 @@ public class TaskModel : ObservableObject
     private string? _input_text;
     private string? _package;
     private string? _custom_recognition;
-    private string? _custom_recognition_param;
+    private object? _custom_recognition_param;
     private string? _custom_action;
-    private string? _custom_action_param;
+    private object? _custom_action_param;
     private string? _order_by;
     private int _index;
     private int _method;
@@ -599,7 +599,8 @@ public class TaskModel : ObservableObject
         "识别参数，任意类型，会通过 MaaCustomRecognitionCallback.custom_recognition_param 传出。可选，默认空 json，即 {} 。"
     )]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? CustomRecognitionParam
+    [JsonConverter(typeof(StringOrObjectConverter))]
+    public object? CustomRecognitionParam
     {
         get => _custom_recognition_param;
         set => SetNewProperty(ref _custom_recognition_param, value);
@@ -623,7 +624,8 @@ public class TaskModel : ObservableObject
         "动作参数，任意类型，会通过 MaaCustomActionCallback.custom_action_param 传出。可选，默认空 json，即 {} 。"
     )]
     [Editor(typeof(NullableStringEditor), typeof(NullableStringEditor))]
-    public string? CustomActionParam
+    [JsonConverter(typeof(StringOrObjectConverter))]
+    public object? CustomActionParam
     {
         get => _custom_action_param;
         set => SetNewProperty(ref _custom_action_param, value);
