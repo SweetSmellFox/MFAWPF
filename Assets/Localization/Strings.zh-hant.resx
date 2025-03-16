@@ -699,7 +699,7 @@
     <value>Mirror 醬</value>
   </data>
   <data name="PurchaseLink" xml:space="preserve">
-    <value>購買鏈接</value>
+    <value>關於Mirror醬</value>
   </data>
   <data name="ErrorFeedbackLinkText" xml:space="preserve">
     <value>建立 GitHub issue</value>
