@@ -144,10 +144,9 @@
                         <DataTemplate>
                             <Grid ContextMenu="{StaticResource TaskMenu}" x:Name="ListGrid">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="45" />
                                 </Grid.ColumnDefinitions>
-
                                 <CheckBox
                                     Content="{Binding Name}"
                                     Grid.Column="0"

@@ -908,7 +908,7 @@ public class MaaProcessor
 
             // 获取代理配置（假设MaaInterface.Instance在UI线程中访问）
             var agentConfig = MaaInterface.Instance?.Agent;
-            if (agentConfig != null)
+            if (agentConfig.ChildExec != null)
             {
                 _agentClient = new MaaAgentClient
                 {
@@ -922,32 +922,28 @@ public class MaaProcessor
                 {
                     throw new Exception("Socket creation failed");
                 }
-                if (agentConfig?.ChildExec != null)
+                try
                 {
-                    try
+                    var startInfo = new ProcessStartInfo
                     {
-                        if (!Directory.Exists($"{AppContext.BaseDirectory}Agent"))
-                            Directory.CreateDirectory($"{AppContext.BaseDirectory}Agent");
-                        var startInfo = new ProcessStartInfo
-                        {
-                            FileName = MaaInterface.ReplacePlaceholder(agentConfig.ChildExec, AppContext.BaseDirectory),
-                            WorkingDirectory = $"{AppContext.BaseDirectory}Agent",
-                            Arguments = $"{string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket}",
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
+                        FileName = MaaInterface.ReplacePlaceholder(agentConfig.ChildExec, AppContext.BaseDirectory),
+                        WorkingDirectory = $"{AppContext.BaseDirectory}",
+                        Arguments = $"{string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket}",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
 
-                        Task.Run(() => Process.Start(startInfo), token);
+                    TaskManager.RunTaskAsync(() => Process.Start(startInfo), token);
 
-                        // 使用WPF日志框架记录（需实现ILogger接口）
-                        LoggerService.LogInfo($"Agent启动: {agentConfig.ChildExec} {string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket} "
-                            + $"socket_id: {socket}");
-                    }
-                    catch (Exception ex)
-                    {
-                        LoggerService.LogError($"Agent启动失败: {ex.Message}");
-                    }
+                    // 使用WPF日志框架记录（需实现ILogger接口）
+                    LoggerService.LogInfo($"Agent启动: {agentConfig.ChildExec} {string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket} "
+                        + $"socket_id: {socket}");
                 }
+                catch (Exception ex)
+                {
+                    LoggerService.LogError($"Agent启动失败: {ex.Message}");
+                }
+
                 _agentClient?.LinkStart();
             }
             RegisterCustomRecognitionsAndActions(tasker);

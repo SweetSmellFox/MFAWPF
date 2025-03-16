@@ -123,14 +123,13 @@ public partial class App
 
         await Host.StartAsync();
     }
-
+    
     /// <summary>
     /// Occurs when the application is closing.
     /// </summary>
     async private void OnExit(object sender, ExitEventArgs e)
     {
         await Host.StopAsync();
-
         Host.Dispose();
     }
 

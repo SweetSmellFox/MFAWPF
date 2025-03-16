@@ -84,7 +84,6 @@ public partial class ConnectingViewModel : ViewModel
         {
             Devices = [dialog.Output];
             CurrentDevice = dialog.Output;
-            SetConnected(true);
         }
     }
 
