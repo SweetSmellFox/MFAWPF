@@ -237,7 +237,7 @@ public class MaaProcessor
         return new MFATask
         {
             Name = name,
-            Count = 1,
+            Count = count,
             Type = MFATask.MFATaskType.MAAFW,
             Action = action
         };
@@ -541,7 +541,7 @@ public class MaaProcessor
     public static void RestartMFA(bool noAutoStart = false)
     {
         if (noAutoStart)
-            GlobalConfiguration.SetValue("NoAutoStart", bool.TrueString);
+            GlobalConfiguration.SetValue(ConfigurationKeys.NoAutoStart, bool.TrueString);
         Process.Start(Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty);
         DispatcherHelper.RunOnMainThread(Application.Current.Shutdown);
     }
