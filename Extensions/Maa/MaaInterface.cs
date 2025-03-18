@@ -137,6 +137,9 @@ public class MaaInterface
 
     [JsonProperty("mirrorchyan_rid")]
     public string? RID { get; set; }
+    
+    [JsonProperty("mirrorchyan_multiplatform")]
+    public bool? Multiplatform { get; set; }
 
     [JsonProperty("name")]
     public string? Name { get; set; }

@@ -1112,9 +1112,11 @@ public class VersionChecker
     private void GetDownloadUrlFromMirror(string version, string resId, string cdk, out string url, out string latestVersion, string userAgent = "MFA", bool isUI = false, bool onlyCheck = false)
     {
         var cdkD = onlyCheck ? string.Empty : $"cdk={cdk}&";
+        var multiplatform = MaaInterface.Instance?.Multiplatform == true;
+        var multiplatformString = multiplatform ? "os=win&arch=x86_64&" : "";
         var releaseUrl = isUI
             ? $"https://mirrorchyan.com/api/resources/{resId}/latest?current_version={version}&{cdkD}os=win&arch=x86_64"
-            : $"https://mirrorchyan.com/api/resources/{resId}/latest?current_version={version}&{cdkD}user_agent={userAgent}";
+            : $"https://mirrorchyan.com/api/resources/{resId}/latest?current_version={version}&{cdkD}{multiplatformString}user_agent={userAgent}";
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
         httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
