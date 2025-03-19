@@ -200,7 +200,8 @@ public partial class TaskOptionSettingsUserControl
             Minimum = -1,
             DecimalPlaces = 0
         };
-
+        numericUpDown.BindLocalization("RepeatOption");
+        numericUpDown.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
         numericUpDown.ValueChanged += (_, _) =>
         {
             source.InterfaceItem.RepeatCount = Convert.ToInt32(numericUpDown.Value);
