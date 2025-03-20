@@ -8,8 +8,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace MFAWPF.Helper;
 
@@ -78,6 +77,11 @@ public static class ExternalNotificationHelper
                         Instances.ExternalNotificationSettingsUserControlModel.QmsgUser,
                         Instances.ExternalNotificationSettingsUserControlModel.QmsgBot,cancellationToken);
                     break;
+                case Key.OneBotKey:
+                    await OneBot.SendAsync(Instances.ExternalNotificationSettingsUserControlModel.OnebotServer,
+                        Instances.ExternalNotificationSettingsUserControlModel.OnebotKey, 
+                        Instances.ExternalNotificationSettingsUserControlModel.OnebotUser,cancellationToken);
+                    break;
             }
         }
     }
@@ -94,6 +98,7 @@ public static class ExternalNotificationHelper
         public const string TelegramKey = "Telegram"; // 电报
         public const string DiscordKey = "Discord"; // Discord
         public const string QmsgKey = "Qmsg"; // QMsg酱
+        public const string OneBotKey = "OneBot"; // OneBot
         public const string SmtpKey = "SMTP"; // SMTP协议
 
         public static readonly IReadOnlyList<string> AllKeys =
@@ -106,6 +111,7 @@ public static class ExternalNotificationHelper
             DiscordKey,
             SmtpKey,
             QmsgKey,
+            OneBotKey,
         ];
     }
 
@@ -553,6 +559,62 @@ public static class ExternalNotificationHelper
             catch (Exception ex)
             {
                 LoggerService.LogError($"QMsg通信异常: {ex.Message}");
+                return false;
+            }
+        }
+    }
+
+    #endregion
+
+    #region OneBot通知
+
+    public static class OneBot
+    {
+        public async static Task<bool> SendAsync(
+            string serverUrl,
+            string apiKey,
+            string userQq,
+            CancellationToken cancellationToken = default)
+        {
+            var apiEndpoint = $"{serverUrl}/send_msg";
+
+            try
+            {
+                
+                var content = new Dictionary<string, string>
+                {
+                    ["message"] = "TaskAllCompleted".ToLocalization(),
+                    ["user_id"] = userQq
+                };
+
+                var request = new HttpRequestMessage(HttpMethod.Post, apiEndpoint)
+                {
+                    Content = new StringContent(JsonSerializer.Serialize(content), Encoding.UTF8, "application/json")
+                };
+
+                request.Headers.Add("Authorization", $"Bearer {apiKey}");
+
+                using var client = new HttpClient();
+                var response = await client.SendAsync(request, cancellationToken);
+                var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+
+                if (response.IsSuccessStatusCode && responseBody.Contains("\"status\":ok"))
+                {
+                    LoggerService.LogInfo("OneBot消息发送成功");
+                    return true;
+                }
+
+                LoggerService.LogError($"OneBot发送失败: {responseBody}");
+                return false;
+            }
+            catch (OperationCanceledException)
+            {
+                LoggerService.LogWarning("OneBot消息发送已取消");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                LoggerService.LogError($"OneBot通信异常: {ex.Message}");
                 return false;
             }
         }
