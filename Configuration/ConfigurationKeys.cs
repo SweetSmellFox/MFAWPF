@@ -102,6 +102,9 @@ public static class ConfigurationKeys
     public const string ExternalNotificationQmsgKey = "ExternalNotificationQmsgKey";
     public const string ExternalNotificationQmsgUser = "ExternalNotificationQmsgUser";
     public const string ExternalNotificationQmsgBot = "ExternalNotificationQmsgBot";
+    public const string ExternalNotificationOneBotServer = "ExternalNotificationOneBotServer";
+    public const string ExternalNotificationOneBotKey = "ExternalNotificationOneBotKey";
+    public const string ExternalNotificationOneBotUser = "ExternalNotificationOneBotUser";
 
     #endregion
 
