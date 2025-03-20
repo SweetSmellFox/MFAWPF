@@ -963,4 +963,13 @@
   <data name="StartingAgent" xml:space="preserve">
     <value>Starting Agent (may take a while)</value>
   </data>
+  <data name="ExternalNotificationOneBotKey" xml:space="preserve">
+    <value>Key</value>
+  </data>
+  <data name="ExternalNotificationOneBotServer" xml:space="preserve">
+    <value>Server</value>
+  </data>
+  <data name="ExternalNotificationOneBotUser" xml:space="preserve">
+    <value>User QQ</value>
+  </data>
 </root>
