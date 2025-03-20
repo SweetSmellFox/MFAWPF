@@ -145,9 +145,18 @@ public partial class RootView
             }
             else
             {
-                Instances.ConnectingViewModel.TryReadAdbDeviceFromConfig();
-                MaaProcessor.Instance.TestConnecting();
-                VersionChecker.Check();
+                var isAdb = Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb;
+
+                AddLogByKey("ConnectingTo", null, true, isAdb ? "Emulator" : "Window");
+
+                Instances.ConnectingViewModel.TryReadAdbDeviceFromConfig(); 
+                MaaProcessor.Instance.TaskQueue.Push(new MFATask
+                {
+                    Name = "连接检测",
+                    Type = MFATask.MFATaskType.MFA,
+                    Action = async () => await MaaProcessor.Instance.TestConnecting(),
+                });
+                Instances.TaskQueueView.Start(true, checkUpdate: true);
             }
 
             GlobalConfiguration.SetValue("NoAutoStart", bool.FalseString);

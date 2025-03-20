@@ -956,4 +956,7 @@
   <data name="EmulatorExtras" xml:space="preserve">
     <value>EmulatorExtras (特化)</value>
   </data>
+  <data name="StartingAgent" xml:space="preserve">
+    <value>正在啟動 Agent（耗時可能較久）</value>
+  </data>
 </root>

@@ -960,4 +960,7 @@
   <data name="EmulatorExtras" xml:space="preserve">
     <value>EmulatorExtras (Specialized) </value>
   </data>
+  <data name="StartingAgent" xml:space="preserve">
+    <value>Starting Agent (may take a while)</value>
+  </data>
 </root>

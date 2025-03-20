@@ -912,6 +912,7 @@ public class MaaProcessor
             var agentConfig = MaaInterface.Instance?.Agent;
             if (agentConfig != null)
             {
+                RootView.AddLogByKey("StartingAgent");
                 _agentClient = new MaaAgentClient
                 {
                     Resource = maaResource,
@@ -928,12 +929,12 @@ public class MaaProcessor
                 {
                     try
                     {
-                        if (!Directory.Exists($"{AppContext.BaseDirectory}Agent"))
-                            Directory.CreateDirectory($"{AppContext.BaseDirectory}Agent");
+                        if (!Directory.Exists($"{AppContext.BaseDirectory}"))
+                            Directory.CreateDirectory($"{AppContext.BaseDirectory}");
                         var startInfo = new ProcessStartInfo
                         {
                             FileName = MaaInterface.ReplacePlaceholder(agentConfig.ChildExec, AppContext.BaseDirectory),
-                            WorkingDirectory = $"{AppContext.BaseDirectory}Agent",
+                            WorkingDirectory = $"{AppContext.BaseDirectory}",
                             Arguments = $"{string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket}",
                             UseShellExecute = false,
                             CreateNoWindow = true
@@ -1451,13 +1452,10 @@ public class MaaProcessor
 
     }
 
-    public void TestConnecting()
+    public async Task TestConnecting()
     {
-        TaskManager.RunTaskAsync(() =>
-        {
-            var task = GetCurrentTasker().Controller.LinkStart();
-            task.Wait();
-            Instances.ConnectingViewModel.SetConnected(task.Status == MaaJobStatus.Succeeded);
-        });
+        var task = GetCurrentTasker().Controller.LinkStart();
+        task.Wait();
+        Instances.ConnectingViewModel.SetConnected(task.Status == MaaJobStatus.Succeeded);
     }
 }
