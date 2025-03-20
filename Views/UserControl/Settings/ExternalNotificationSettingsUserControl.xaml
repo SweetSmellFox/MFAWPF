@@ -423,5 +423,73 @@
 
             </Grid>
         </StackPanel>
+        <StackPanel
+            Grid.Row="9"
+            Orientation="Vertical"
+            Visibility="{c:Binding ViewModel.OnebotEnabled}">
+            <hc:Divider Content="OneBot" HorizontalContentAlignment="Left" />
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70" />
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="180" />
+                </Grid.ColumnDefinitions>
+                <controls:CustomTextBlock
+                    Block.TextAlignment="Center"
+                    Grid.Column="0"
+                    Grid.Row="0"
+                    Margin="10"
+                    Text="{lex:Loc ExternalNotificationOneBotServer}"
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Center" />
+                <TextBox
+                    Grid.Column="1"
+                    Grid.Row="0"
+                    Height="30"
+                    Margin="10"
+                    Text="{c:Binding ViewModel.OnebotServer}"
+                    x:Name="OneBotServer" />
+                <controls:CustomTextBlock
+                    Block.TextAlignment="Center"
+                    Grid.Column="2"
+                    Grid.Row="0"
+                    Margin="10"
+                    Text="{lex:Loc ExternalNotificationOneBotKey}"
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Center" />
+                <hc:PasswordBox
+                    Grid.Column="3"
+                    Grid.Row="0"
+                    Height="30"
+                    IsSafeEnabled="False"
+                    Margin="10"
+                    ShowEyeButton="True"
+                    UnsafePassword="{c:Binding ViewModel.OnebotKey}"
+                    hc:InfoElement.TitleWidth="0"
+                    x:Name="OneBotKey" />
+
+                <controls:CustomTextBlock
+                    Block.TextAlignment="Center"
+                    Grid.Column="0"
+                    Grid.Row="1"
+                    Margin="10"
+                    Text="{lex:Loc ExternalNotificationOneBotUser}"
+                    TextWrapping="Wrap"
+                    VerticalAlignment="Center" />
+                <TextBox
+                    Grid.Column="1"
+                    Grid.Row="1"
+                    Height="30"
+                    Margin="10"
+                    Text="{c:Binding ViewModel.OnebotUser}"
+                    x:Name="OneBotUser" />
+
+            </Grid>
+        </StackPanel>
     </Grid>
 </UserControl>

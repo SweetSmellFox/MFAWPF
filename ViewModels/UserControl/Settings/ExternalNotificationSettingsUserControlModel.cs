@@ -30,6 +30,7 @@ public partial class ExternalNotificationSettingsUserControlModel : ViewModel
         SmtpEnabled = EnabledExternalNotificationProviderList.Contains(ExternalNotificationHelper.Key.SmtpKey);
         TelegramEnabled = EnabledExternalNotificationProviderList.Contains(ExternalNotificationHelper.Key.TelegramKey);
         DiscordEnabled = EnabledExternalNotificationProviderList.Contains(ExternalNotificationHelper.Key.DiscordKey);
+        OnebotEnabled = EnabledExternalNotificationProviderList.Contains(ExternalNotificationHelper.Key.OneBotKey);
     }
 
     public static List<Tool.LocalizationViewModel> ExternalNotificationProvidersShow => ExternalNotificationProviders;
@@ -286,6 +287,32 @@ public partial class ExternalNotificationSettingsUserControlModel : ViewModel
     partial void OnQmsgBotChanged(string value)
         =>
             ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationQmsgBot, SimpleEncryptionHelper.Encrypt(value));
+
+    #endregion
+
+    #region OneBot
+
+    [ObservableProperty] private bool _onebotEnabled;
+
+    [ObservableProperty] private string _onebotServer = ConfigurationHelper.GetDecrypt(ConfigurationKeys.ExternalNotificationOneBotServer, string.Empty);
+
+    partial void OnOnebotServerChanged(string value)
+        =>
+            ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationOneBotServer, SimpleEncryptionHelper.Encrypt(value));
+
+
+    [ObservableProperty] private string _onebotKey = ConfigurationHelper.GetDecrypt(ConfigurationKeys.ExternalNotificationOneBotKey, string.Empty);
+
+    partial void OnOnebotKeyChanged(string value)
+        =>
+            ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationOneBotKey, SimpleEncryptionHelper.Encrypt(value));
+
+
+    [ObservableProperty] private string _onebotUser = ConfigurationHelper.GetDecrypt(ConfigurationKeys.ExternalNotificationOneBotUser, string.Empty);
+    partial void OnOnebotUserChanged(string value)
+        =>
+            ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationOneBotUser, SimpleEncryptionHelper.Encrypt(value));
+
 
     #endregion
 }
