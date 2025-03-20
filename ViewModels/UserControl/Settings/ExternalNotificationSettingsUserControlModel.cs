@@ -75,7 +75,7 @@ public partial class ExternalNotificationSettingsUserControlModel : ViewModel
 
     [RelayCommand]
     private void ExternalNotificationSendTest()
-        =>  ExternalNotificationHelper.ExternalNotificationAsync();
+        => ExternalNotificationHelper.ExternalNotificationAsync();
 
     #endregion
 
@@ -250,12 +250,11 @@ public partial class ExternalNotificationSettingsUserControlModel : ViewModel
     [ObservableProperty] private bool _smtpUseSsl = ConfigurationHelper.GetValue(ConfigurationKeys.ExternalNotificationSmtpUseSsl, false);
 
     partial void OnSmtpUseSslChanged(bool value) =>
-        ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationSmtpUseSsl, value.ToString());
+        ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationSmtpUseSsl, value);
 
     [ObservableProperty] private bool _smtpRequireAuthentication = ConfigurationHelper.GetValue(ConfigurationKeys.ExternalNotificationSmtpRequiresAuthentication, false);
-
     partial void OnSmtpRequireAuthenticationChanged(bool value) =>
-        ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationSmtpRequiresAuthentication, value.ToString());
+        ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationSmtpRequiresAuthentication, value);
 
     #endregion
 
@@ -312,7 +311,6 @@ public partial class ExternalNotificationSettingsUserControlModel : ViewModel
     partial void OnOnebotUserChanged(string value)
         =>
             ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationOneBotUser, SimpleEncryptionHelper.Encrypt(value));
-
 
     #endregion
 }
