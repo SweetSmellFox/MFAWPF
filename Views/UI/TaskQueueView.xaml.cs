@@ -295,21 +295,38 @@ public partial class TaskQueueView
         IList<DragItemViewModel> drags,
         List<TaskInterfaceItem> tasks)
     {
-        var newDict = tasks.ToDictionary(t => t.Name);
+        var newDict = tasks.ToDictionary(t => (t.Name, t.Entry)); // 使用 (Name, Entry) 作为键
         var removeList = new List<DragItemViewModel>();
         var updateList = new List<DragItemViewModel>();
-        if (drags.Count == 0)
-            updateList.AddRange(tasks.Select(t => new DragItemViewModel(t)).ToList());
-        else foreach (var oldItem in drags.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
-        {
-            if (!newDict.TryGetValue(oldItem.Name, out var newItem))
-            {
-                removeList.Add(oldItem);
-                continue;
-            }
 
-            UpdateExistingItem(oldItem, newItem);
-            updateList.Add(oldItem);
+        if (drags.Count == 0)
+        {
+            updateList.AddRange(tasks.Select(t => new DragItemViewModel(t)).ToList());
+        }
+        else
+        {
+            foreach (var oldItem in drags.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+            {
+                if (newDict.TryGetValue((oldItem.Name, oldItem.InterfaceItem?.Entry), out var newItem))
+                {
+                    UpdateExistingItem(oldItem, newItem);
+                    updateList.Add(oldItem);
+                }
+                else
+                {
+                    var sameNameTasks = tasks.Where(t => t.Entry == oldItem.InterfaceItem?.Entry).ToList();
+                    if (sameNameTasks.Any())
+                    {
+                        var firstTask = sameNameTasks.First();
+                        UpdateExistingItem(oldItem, firstTask);
+                        updateList.Add(oldItem);
+                    }
+                    else
+                    {
+                        removeList.Add(oldItem);
+                    }
+                }
+            }
         }
 
         return (updateList, removeList);

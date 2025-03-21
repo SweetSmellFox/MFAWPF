@@ -17,7 +17,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:lex="http://wpflocalizeextension.codeplex.com"
-    xmlns:local="clr-namespace:MFAWPF.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:utils="clr-namespace:MFAWPF.Helper"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -57,7 +56,7 @@
                     </Button.Content>
                 </Button>
             </Grid>
- 
+
             <hc:TextBox
                 HorizontalAlignment="Stretch"
                 Margin="15,10,15,10"
