@@ -654,7 +654,7 @@ public class MaaProcessor
                 break;
         }
     }
-    static async Task MeasureExecutionTimeAsync(Func<Task> methodToMeasure)
+    async static Task MeasureExecutionTimeAsync(Func<Task> methodToMeasure)
     {
         const int sampleCount = 4;
         long totalElapsed = 0;

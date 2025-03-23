@@ -343,7 +343,8 @@ public partial class TaskQueueView
         if (newItem.Option == null) return;
 
         var tempDict = oldItem.InterfaceItem.Option?.ToDictionary(t => t.Name) ?? new Dictionary<string, MaaInterface.MaaInterfaceSelectOption>();
-        oldItem.InterfaceItem.Option = newItem.Option.Select(opt =>
+        var maaInterfaceSelectOptions = JsonConvert.DeserializeObject<List<MaaInterface.MaaInterfaceSelectOption>>(JsonConvert.SerializeObject(newItem.Option));
+        oldItem.InterfaceItem.Option = maaInterfaceSelectOptions.Select(opt =>
         {
             if (tempDict.TryGetValue(opt.Name ?? string.Empty, out var existing))
             {
@@ -464,6 +465,7 @@ public partial class TaskQueueView
             ConfigurationHelper.SetValue(ConfigurationKeys.TaskItems, ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         }
     }
+    
     private void Delete(object sender, RoutedEventArgs e)
     {
         var menuItem = sender as MenuItem;
