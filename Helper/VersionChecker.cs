@@ -95,6 +95,7 @@ public class VersionChecker
     }
 
     private SemaphoreSlim _queueLock = new(1, 1);
+    
     private static void AddMFAUpdateTask()
     {
         Queue.Enqueue(new ValueType.MFATask
@@ -158,6 +159,7 @@ public class VersionChecker
                 break;
         }
     }
+    
     public void CheckMFABySelection()
     {
         switch (Instances.VersionUpdateSettingsUserControlModel.DownloadSourceIndex)
@@ -170,6 +172,7 @@ public class VersionChecker
                 break;
         }
     }
+    
     public async Task UpdateResourceBySelection(bool closeDialog = false, bool noDialog = false, Action action = null)
     {
         switch (Instances.VersionUpdateSettingsUserControlModel.DownloadSourceIndex)
@@ -1383,6 +1386,7 @@ public class VersionChecker
             LoggerService.LogError(ex);
         }
     }
+    
     public void CheckForGUIUpdates()
     {
         try

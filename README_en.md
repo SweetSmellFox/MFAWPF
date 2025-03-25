@@ -6,6 +6,10 @@
 
 </div>
 
+## Notice
+
+- The project has been basically migrated to [MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia)
+
 ## Introduction
 
 - This project is a user interface developed based on the WPF framework, aiming to provide functionality similar to MaaPiCli.

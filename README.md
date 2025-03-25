@@ -6,6 +6,10 @@
 
 </div>
 
+## 注意
+
+- 该项目已基本迁移至[MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia)
+
 ## 基本介绍
 
 - 本项目是一个基于WPF框架开发的用户界面，旨在提供类似于MaaPiCli的功能

@@ -55,7 +55,7 @@
             Click="Close"
             Content="{lex:Loc Confirm}"
             Grid.Row="2"
-            Height="50"
+            Height="50" 
             Margin="6"
             MinWidth="100" />
     </Grid>
