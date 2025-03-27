@@ -95,7 +95,7 @@ public class VersionChecker
     }
 
     private SemaphoreSlim _queueLock = new(1, 1);
-    
+
     private static void AddMFAUpdateTask()
     {
         Queue.Enqueue(new ValueType.MFATask
@@ -159,7 +159,7 @@ public class VersionChecker
                 break;
         }
     }
-    
+
     public void CheckMFABySelection()
     {
         switch (Instances.VersionUpdateSettingsUserControlModel.DownloadSourceIndex)
@@ -172,7 +172,7 @@ public class VersionChecker
                 break;
         }
     }
-    
+
     public async Task UpdateResourceBySelection(bool closeDialog = false, bool noDialog = false, Action action = null)
     {
         switch (Instances.VersionUpdateSettingsUserControlModel.DownloadSourceIndex)
@@ -311,11 +311,12 @@ public class VersionChecker
 
         ZipFile.ExtractToDirectory(tempZipFilePath, tempExtractDir);
         dialog?.UpdateProgress(50);
-
+        var originPath = tempExtractDir;
         var interfacePath = Path.Combine(tempExtractDir, "interface.json");
         var resourceDirPath = Path.Combine(tempExtractDir, "resource");
         if (!File.Exists(interfacePath))
-        {
+        {            
+            originPath = Path.Combine(tempExtractDir, "assets");
             interfacePath = Path.Combine(tempExtractDir, "assets", "interface.json");
             resourceDirPath = Path.Combine(tempExtractDir, "assets", "resource");
         }
@@ -358,7 +359,7 @@ public class VersionChecker
         var di = new DirectoryInfo(resourceDirPath);
         if (di.Exists)
         {
-            CopyFolder(resourceDirPath, Path.Combine(wpfDir, "resource"));
+            DirectoryMerge(originPath, wpfDir);
         }
 
         dialog?.UpdateProgress(70);
@@ -1386,7 +1387,7 @@ public class VersionChecker
             LoggerService.LogError(ex);
         }
     }
-    
+
     public void CheckForGUIUpdates()
     {
         try
@@ -1701,6 +1702,37 @@ public class VersionChecker
             }
         }
         return "UNKNOWN";
+    }
+    private static void DirectoryMerge(string sourceDirName, string destDirName)
+    {
+        DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+        DirectoryInfo[] dirs = dir.GetDirectories();
+
+        if (!dir.Exists)
+        {
+            throw new DirectoryNotFoundException("Source directory does not exist or could not be found: " + sourceDirName);
+        }
+
+        if (!Directory.Exists(destDirName))
+        {
+            Directory.CreateDirectory(destDirName);
+        }
+        foreach (FileInfo file in dir.GetFiles())
+        {
+            string tempPath = Path.Combine(destDirName, file.Name);
+            try
+            {
+                file.CopyTo(tempPath, true);
+            }
+            catch (IOException)
+            {
+            }
+        }
+        foreach (DirectoryInfo subDir in dirs)
+        {
+            string tempPath = Path.Combine(destDirName, subDir.Name);
+            DirectoryMerge(subDir.FullName, tempPath);
+        }
     }
 
     public class MirrorChangesJson
