@@ -402,11 +402,6 @@ public partial class TaskQueueView
 
     public void Start(bool onlyStart = false, bool checkUpdate = false)
     {
-        if (!Instances.RootViewModel.Idle)
-        {
-            GrowlHelper.Warning("CannotStart".ToLocalization());
-            return;
-        }
         if (InitializeData())
         {
             MaaProcessor.Money = 0;

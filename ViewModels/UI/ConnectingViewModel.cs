@@ -118,7 +118,7 @@ public partial class ConnectingViewModel : ViewModel
         index = 0;
         return false;
     }
-    
+
     [RelayCommand]
     private void Refresh()
     {
@@ -302,9 +302,10 @@ public partial class ConnectingViewModel : ViewModel
         LoggerService.LogError(ex);
     }
 
-    public void TryReadAdbDeviceFromConfig()
+    public void TryReadAdbDeviceFromConfig(bool refresh = false)
     {
-        if (CurrentController != MaaControllerTypes.Adb
+        if (refresh
+            || CurrentController != MaaControllerTypes.Adb
             || !ConfigurationHelper.GetValue(ConfigurationKeys.RememberAdb, true)
             || MaaProcessor.MaaFwConfiguration.AdbDevice.AdbPath != "adb"
             || !ConfigurationHelper.TryGetValue(ConfigurationKeys.AdbDevice, out AdbDeviceInfo device,

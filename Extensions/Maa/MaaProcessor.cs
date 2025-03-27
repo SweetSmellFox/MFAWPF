@@ -51,18 +51,25 @@ public class MaaProcessor
     public static string Resource => AppContext.BaseDirectory + "Resource";
     public static string ResourceBase => $"{Resource}/base";
 
-    public Queue<MFATask> TaskQueue { get; } = new();
+    public ObservableQueue<MFATask> TaskQueue { get; } = new();
 
     public static MaaFWConfiguration MaaFwConfiguration { get; } = new();
 
     public static AutoInitDictionary AutoInitDictionary { get; } = new();
 
-    public event EventHandler? TaskStackChanged;
-
     public static MaaProcessor Instance
     {
         get => _instance ??= new MaaProcessor();
         set => _instance = value;
+    }
+
+    public MaaProcessor()
+    {
+        TaskQueue.CountChanged += (_, args) =>
+        {
+            if (args.NewValue > 0)
+                Instances.RootViewModel.IsRunning = true;
+        };
     }
 
     public class TaskAndParam
@@ -94,15 +101,14 @@ public class MaaProcessor
 
 
         var token = CancellationTokenSource.Token;
-        var taskAndParams = tasks.Select(CreateTaskAndParam).ToList();
-
         if (!onlyStart)
         {
-            await InitializeConnectionTasksAsync(token);
-            await AddCoreTasksAsync(taskAndParams, token);
-            await AddPostTasksAsync(checkUpdate, token);
+            var taskAndParams = tasks.Select(CreateTaskAndParam).ToList();
+            InitializeConnectionTasksAsync(token);
+            AddCoreTasksAsync(taskAndParams, token);
         }
 
+        AddPostTasksAsync(checkUpdate, token);
         await TaskManager.RunTaskAsync(async () =>
         {
             var runSuccess = await ExecuteTasks(token);
@@ -114,19 +120,19 @@ public class MaaProcessor
 
     }
 
-    async private Task InitializeConnectionTasksAsync(CancellationToken token)
+    private void InitializeConnectionTasksAsync(CancellationToken token)
     {
-        TaskQueue.Push(CreateMFATask("启动脚本", async () =>
+        TaskQueue.Enqueue(CreateMFATask("启动脚本", async () =>
         {
             await TaskManager.RunTaskAsync(() => Instances.RootView.RunScript(), token);
         }));
 
-        TaskQueue.Push(CreateMFATask("连接设备", async () =>
+        TaskQueue.Enqueue(CreateMFATask("连接设备", async () =>
         {
             await HandleDeviceConnectionAsync(token);
         }));
 
-        TaskQueue.Push(CreateMFATask("性能基准", async () =>
+        TaskQueue.Enqueue(CreateMFATask("性能基准", async () =>
         {
             await MeasureScreencapPerformanceAsync(token);
         }));
@@ -138,7 +144,8 @@ public class MaaProcessor
         var isAdb = controllerType == MaaControllerTypes.Adb;
 
         RootView.AddLogByKey("ConnectingTo", null, true, isAdb ? "Emulator" : "Window");
-
+        if (Instances.ConnectingViewModel.CurrentDevice == null)
+            Instances.ConnectingViewModel.TryReadAdbDeviceFromConfig();
         var connected = await TryConnectAsync(token);
 
         if (!connected && isAdb)
@@ -160,7 +167,7 @@ public class MaaProcessor
         bool connected = false;
         var retrySteps = new List<Func<CancellationToken, Task<bool>>>
         {
-            async t => await RetryConnectionAsync(t, StartSoftware, "TryToStartEmulator", Instances.ConnectSettingsUserControlModel.RetryOnDisconnected),
+            async t => await RetryConnectionAsync(t, StartSoftware, "TryToStartEmulator", Instances.ConnectSettingsUserControlModel.RetryOnDisconnected, () => Instances.ConnectingViewModel.TryReadAdbDeviceFromConfig(true)),
             async t => await RetryConnectionAsync(t, ReconnectByAdb, "TryToReconnectByAdb"),
             async t => await RetryConnectionAsync(t, RestartAdb, "RestartAdb", Instances.ConnectSettingsUserControlModel.AllowAdbRestart),
             async t => await RetryConnectionAsync(t, HardRestartAdb, "HardRestartAdb", Instances.ConnectSettingsUserControlModel.AllowAdbHardRestart)
@@ -176,7 +183,7 @@ public class MaaProcessor
         return connected;
     }
 
-    async private Task<bool> RetryConnectionAsync(CancellationToken token, Func<Task> action, string logKey, bool enable = true)
+    async private Task<bool> RetryConnectionAsync(CancellationToken token, Func<Task> action, string logKey, bool enable = true, Action? other = null)
     {
         if (!enable) return false;
         token.ThrowIfCancellationRequested();
@@ -187,7 +194,7 @@ public class MaaProcessor
             Stop();
             return false;
         }
-
+        other?.Invoke();
         return await TryConnectAsync(token);
     }
 
@@ -201,11 +208,11 @@ public class MaaProcessor
         Stop();
     }
 
-    async private Task AddCoreTasksAsync(List<TaskAndParam> taskAndParams, CancellationToken token)
+    private void AddCoreTasksAsync(List<TaskAndParam> taskAndParams, CancellationToken token)
     {
         foreach (var task in taskAndParams)
         {
-            TaskQueue.Push(CreateMaaFWTask(task.Name,
+            TaskQueue.Enqueue(CreateMaaFWTask(task.Name,
                 async () =>
                 {
                     token.ThrowIfCancellationRequested();
@@ -219,14 +226,14 @@ public class MaaProcessor
 
     async private Task AddPostTasksAsync(bool checkUpdate, CancellationToken token)
     {
-        TaskQueue.Push(CreateMFATask("结束脚本", async () =>
+        TaskQueue.Enqueue(CreateMFATask("结束脚本", async () =>
         {
             await TaskManager.RunTaskAsync(() => Instances.RootView.RunScript("Post-script"), token);
         }));
 
         if (checkUpdate)
         {
-            TaskQueue.Push(CreateMFATask("检查更新", async () =>
+            TaskQueue.Enqueue(CreateMFATask("检查更新", async () =>
             {
                 VersionChecker.Check();
             }));
@@ -290,7 +297,9 @@ public class MaaProcessor
             CancelOperations();
 
             ClearTaskQueue();
-
+            
+            Instances.RootViewModel.IsRunning = false;
+            
             ExecuteStopCore(finished, () =>
             {
                 var stopResult = AbortCurrentTasker();
@@ -351,7 +360,6 @@ public class MaaProcessor
     private void ClearTaskQueue()
     {
         TaskQueue.Clear();
-        OnTaskQueueChanged();
     }
 
     private void HandleStopException(Exception ex)
@@ -702,7 +710,6 @@ public class MaaProcessor
             {
                 return false;
             }
-            OnTaskQueueChanged();
         }
         return !token.IsCancellationRequested; // 根据取消状态返回正确结果
     }
@@ -735,11 +742,6 @@ public class MaaProcessor
         }
 
         _startTime = null;
-    }
-
-    public void OnTaskQueueChanged()
-    {
-        TaskStackChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public MaaTasker? GetCurrentTasker(CancellationToken token = default)
@@ -1383,7 +1385,7 @@ public class MaaProcessor
         var adbPath = MaaFwConfiguration.AdbDevice.AdbPath;
         var address = MaaFwConfiguration.AdbDevice.AdbSerial;
 
-        if (string.IsNullOrEmpty(adbPath))
+        if (string.IsNullOrEmpty(adbPath) || adbPath == "adb")
         {
             return;
         }
@@ -1454,8 +1456,10 @@ public class MaaProcessor
 
     public async Task TestConnecting()
     {
-        var task = GetCurrentTasker().Controller.LinkStart();
-        task.Wait();
-        Instances.ConnectingViewModel.SetConnected(task.Status == MaaJobStatus.Succeeded);
+        await GetCurrentTaskerAsync();
+        var task = _currentTasker?.Controller?.LinkStart();
+        task?.Wait();
+        Instances.ConnectingViewModel.SetConnected(task?.Status == MaaJobStatus.Succeeded);
+        Console.WriteLine("测试连接");
     }
 }

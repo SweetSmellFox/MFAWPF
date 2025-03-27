@@ -19,7 +19,11 @@ public partial class RootViewModel : ViewModel
     [ObservableProperty] private bool _lockController = true;
 
     [ObservableProperty] private bool _isRunning;
-
+    partial void OnIsRunningChanged(bool value)
+    {
+        Idle = !value;
+    }
+    
     public void SetIdle(bool value)
     {
         Idle = value;

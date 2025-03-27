@@ -43,14 +43,8 @@ public partial class RootView
                 ChangeVisibility(WindowState != WindowState.Minimized);
             }
         };
-        MaaProcessor.Instance.TaskStackChanged += OnTaskStackChanged;
     }
-
-
-    private void OnTaskStackChanged(object sender, EventArgs e)
-    {
-        ToggleTaskButtonsVisibility(isRunning: MaaProcessor.Instance.TaskQueue.Count > 0);
-    }
+    
 
     private void ChangeVisibility(bool visible)
     {
@@ -128,14 +122,15 @@ public partial class RootView
 
     public void LoadUI()
     {
-        DispatcherHelper.RunOnMainThread(() =>
+        DispatcherHelper.RunOnMainThread(async () =>
         {
+            await Task.Delay(300);
             InitializationSettings();
             Instances.ConnectingViewModel.CurrentController = (MaaInterface.Instance?.Controller?.FirstOrDefault()?.Type).ToMaaControllerTypes(Instances.ConnectingViewModel.CurrentController);
             Console.WriteLine((MaaInterface.Instance?.Controller?.FirstOrDefault()?.Type).ToMaaControllerTypes(Instances.ConnectingViewModel.CurrentController));
             if (!Convert.ToBoolean(GlobalConfiguration.GetValue(ConfigurationKeys.NoAutoStart, bool.FalseString)) && ConfigurationHelper.GetValue(ConfigurationKeys.BeforeTask, "None").Contains("Startup", StringComparison.OrdinalIgnoreCase))
             {
-                MaaProcessor.Instance.TaskQueue.Push(new MFATask
+                MaaProcessor.Instance.TaskQueue.Enqueue(new MFATask
                 {
                     Name = "启动前",
                     Type = MFATask.MFATaskType.MFA,
@@ -150,7 +145,7 @@ public partial class RootView
                 AddLogByKey("ConnectingTo", null, true, isAdb ? "Emulator" : "Window");
 
                 Instances.ConnectingViewModel.TryReadAdbDeviceFromConfig(); 
-                MaaProcessor.Instance.TaskQueue.Push(new MFATask
+                MaaProcessor.Instance.TaskQueue.Enqueue(new MFATask
                 {
                     Name = "连接检测",
                     Type = MFATask.MFATaskType.MFA,
