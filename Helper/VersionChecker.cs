@@ -244,9 +244,10 @@ public class VersionChecker
         }
         catch (Exception ex)
         {
-            SetText(ex.Message, dialog, noDialog);
             Instances.RootViewModel.SetUpdating(false);
+            ToastNotification.ShowDirect(ex.Message);
             LoggerService.LogError(ex);
+            DispatcherHelper.RunOnMainThread(() => dialog?.Close());
             return;
         }
 
@@ -315,7 +316,7 @@ public class VersionChecker
         var interfacePath = Path.Combine(tempExtractDir, "interface.json");
         var resourceDirPath = Path.Combine(tempExtractDir, "resource");
         if (!File.Exists(interfacePath))
-        {            
+        {
             originPath = Path.Combine(tempExtractDir, "assets");
             interfacePath = Path.Combine(tempExtractDir, "assets", "interface.json");
             resourceDirPath = Path.Combine(tempExtractDir, "assets", "resource");
@@ -451,7 +452,10 @@ public class VersionChecker
         }
         catch (Exception ex)
         {
-            ToastNotification.ShowDirect($"{"FailToGetLatestVersionInfo".ToLocalization()}: {ex.Message}");
+            if (ex.Message.Contains("resource not found"))
+                ToastNotification.ShowDirect("CurrentResourcesNotSupportMirror".ToLocalization());
+            else
+                ToastNotification.ShowDirect($"{"ErrorWhenCheck".ToLocalizationFormatted(true, "Resource")}: {ex.Message}");
             Instances.RootViewModel.SetUpdating(false);
             LoggerService.LogError(ex);
         }
@@ -602,7 +606,7 @@ public class VersionChecker
         var originPath = tempExtractDir;
         var interfacePath = Path.Combine(tempExtractDir, "interface.json");
         var resourceDirPath = Path.Combine(tempExtractDir, "resource");
-        
+
         string wpfDir = AppContext.BaseDirectory;
         if (!File.Exists(interfacePath))
         {
@@ -1122,6 +1126,16 @@ public class VersionChecker
 
     private void GetDownloadUrlFromMirror(string version, string resId, string cdk, out string url, out string latestVersion, string userAgent = "MFA", bool isUI = false, bool onlyCheck = false)
     {
+        if (string.IsNullOrWhiteSpace(resId))
+        {
+            throw new Exception("CurrentResourcesNotSupportMirror".ToLocalization());
+        }
+        if (string.IsNullOrWhiteSpace(cdk) && !onlyCheck)
+        {
+            throw new Exception("MirrorCdkInvalid".ToLocalization());
+        }
+        url = string.Empty;
+        latestVersion = string.Empty;
         var cdkD = onlyCheck ? string.Empty : $"cdk={cdk}&";
         var multiplatform = MaaInterface.Instance?.Multiplatform == true;
         var multiplatformString = multiplatform ? "os=win&arch=x86_64&" : "";
@@ -1134,35 +1148,25 @@ public class VersionChecker
         try
         {
             var response = httpClient.GetAsync(releaseUrl).Result;
-            string message = string.Empty;
-            try
-            {
-                response.EnsureSuccessStatusCode();
-            }
-            catch (HttpRequestException e)
-            {
-                if ((int)response.StatusCode == 403)
-                {
-                    message = e.Message;
-                }
-            }
-
+            
             var read = response.Content.ReadAsStringAsync();
             read.Wait();
+
             var jsonResponse = read.Result;
             var responseData = JObject.Parse(jsonResponse);
-            if (!string.IsNullOrWhiteSpace(message))
+
+            var responseCode = (int)responseData["code"]!;
+            Exception exception = null;
+            if (!response.IsSuccessStatusCode)
             {
-                if (responseData["msg"] != null && responseData["msg"].ToString().ToLower().Contains("reached the most", StringComparison.OrdinalIgnoreCase))
-                {
-                    throw new Exception("MirrorUseLimitReached".ToLocalization());
-                }
-                else
-                {
-                    throw new Exception(message);
-                }
+                exception = HandleHttpError(response.StatusCode, responseData);
             }
-            if ((int)responseData["code"] == 0)
+
+            if (responseCode != 0)
+            {
+                HandleBusinessError(responseCode, responseData);
+            }
+            else
             {
                 var data = responseData["data"];
                 if (!onlyCheck && !isUI)
@@ -1172,22 +1176,21 @@ public class VersionChecker
                 url = downloadUrl;
                 latestVersion = versionName;
             }
-            else
-            {
-                throw new Exception($"{"MirrorAutoUpdatePrompt".ToLocalization()}: {responseData["msg"]}");
-            }
+            if (exception != null)
+                throw exception;
         }
         catch (Exception e)
         {
             throw new Exception($"{e.Message}");
         }
     }
+
     private void SaveAnnouncement(JToken? releaseData, string from)
     {
         try
         {
             var bodyContent = releaseData?[from]?.ToString();
-            if (!string.IsNullOrWhiteSpace(bodyContent))
+            if (!string.IsNullOrWhiteSpace(bodyContent) && bodyContent != "placeholder")
             {
                 var resourceDirectory = Path.Combine(AppContext.BaseDirectory, "resource");
                 Directory.CreateDirectory(resourceDirectory);
@@ -1389,7 +1392,10 @@ public class VersionChecker
         }
         catch (Exception ex)
         {
-            ToastNotification.ShowDirect($"检查MFA最新版时发生错误: {ex.Message}");
+            if (ex.Message.Contains("resource not found"))
+                ToastNotification.ShowDirect("CurrentResourcesNotSupportMirror".ToLocalization());
+            else
+                ToastNotification.ShowDirect($"{"ErrorWhenCheck".ToLocalizationFormatted(false, "MFA")} : {ex.Message}");
             Instances.RootViewModel.SetUpdating(false);
             LoggerService.LogError(ex);
         }
@@ -1710,6 +1716,68 @@ public class VersionChecker
         }
         return "UNKNOWN";
     }
+
+    private static Exception HandleHttpError(HttpStatusCode statusCode, JObject responseData)
+    {
+        var errorMsg = responseData["msg"]?.ToString() ?? "UnknownError".ToLocalization();
+
+        switch (statusCode)
+        {
+            case HttpStatusCode.BadRequest: // 400
+                return new Exception($"InvalidRequest: {errorMsg}".ToLocalization());
+
+            case HttpStatusCode.Forbidden: // 403
+                return new Exception($"AccessDenied: {errorMsg}".ToLocalization());
+
+            case HttpStatusCode.NotFound: // 404
+                return new Exception($"ResourceNotFound: {errorMsg}".ToLocalization());
+
+            default:
+                return new Exception($"ServerError: [{(int)statusCode}] {errorMsg}".ToLocalization());
+        }
+    }
+
+    private static void HandleBusinessError(int code, JObject responseData)
+    {
+        var errorMsg = responseData["msg"]?.ToString() ?? "UndefinedError".ToLocalization();
+
+        switch (code)
+        {
+            // 参数错误系列 (400)
+            case 1001:
+                throw new Exception($"InvalidParams: {errorMsg}".ToLocalization());
+
+            // CDK 相关错误 (403)
+            case 7001:
+                throw new Exception("MirrorCdkExpired".ToLocalization());
+            case 7002:
+                throw new Exception("MirrorCdkInvalid".ToLocalization());
+            case 7003:
+                throw new Exception("MirrorUseLimitReached".ToLocalization());
+            case 7004:
+                throw new Exception("MirrorCdkMismatch".ToLocalization());
+
+            // 资源相关错误 (404)
+            case 8001:
+                throw new Exception("CurrentResourcesNotSupportMirror".ToLocalization());
+
+            // 参数校验错误 (400)
+            case 8002:
+                throw new Exception($"InvalidOS: {errorMsg}".ToLocalization());
+            case 8003:
+                throw new Exception($"InvalidArch: {errorMsg}".ToLocalization());
+            case 8004:
+                throw new Exception($"InvalidChannel: {errorMsg}".ToLocalization());
+
+            // 未分类错误
+            case 1:
+                throw new Exception($"BusinessError: {errorMsg}".ToLocalization());
+
+            default:
+                throw new Exception($"UnknownErrorCode: [{code}] {errorMsg}".ToLocalization());
+        }
+    }
+
     private static void DirectoryMerge(string sourceDirName, string destDirName)
     {
         DirectoryInfo dir = new DirectoryInfo(sourceDirName);

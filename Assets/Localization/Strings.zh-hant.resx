@@ -968,4 +968,16 @@
   <data name="ExternalNotificationOneBotUser" xml:space="preserve">
     <value>用戶QQ</value>
   </data>
+  <data name="Resource" xml:space="preserve">
+        <value>資源</value>
+    </data>
+  <data name="MirrorCdkExpired" xml:space="preserve">
+        <value>CDK 已過期，請續費後重試</value>
+    </data>
+  <data name="MirrorCdkInvalid" xml:space="preserve">
+        <value>CDK 無效，請檢查輸入</value>
+    </data>
+  <data name="MirrorCdkMismatch" xml:space="preserve">
+        <value>CDK 類型與資源不匹配</value>
+    </data>
 </root>

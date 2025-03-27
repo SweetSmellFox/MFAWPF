@@ -978,4 +978,19 @@
   <data name="StartingAgent" xml:space="preserve">
     <value>正在启动 Agent(耗时可能较久)</value>
   </data>
+  <data name="ErrorWhenCheck" xml:space="preserve">
+        <value>检查{0}最新版时发生错误</value>
+    </data>
+  <data name="Resource" xml:space="preserve">
+        <value>资源</value>
+    </data>
+  <data name="MirrorCdkExpired" xml:space="preserve">
+        <value>CDK 已过期，请续费后重试</value>
+    </data>
+  <data name="MirrorCdkInvalid" xml:space="preserve">
+        <value>CDK 无效，请检查输入</value>
+    </data>
+  <data name="MirrorCdkMismatch" xml:space="preserve">
+        <value>CDK 类型与资源不匹配</value>
+    </data>
 </root>
