@@ -599,11 +599,18 @@ public class VersionChecker
                 }
             }
         }
-
+        var originPath = tempExtractDir;
         var interfacePath = Path.Combine(tempExtractDir, "interface.json");
         var resourceDirPath = Path.Combine(tempExtractDir, "resource");
-
+        
         string wpfDir = AppContext.BaseDirectory;
+        if (!File.Exists(interfacePath))
+        {
+            originPath = Path.Combine(tempExtractDir, "assets");
+            interfacePath = Path.Combine(tempExtractDir, "assets", "interface.json");
+            resourceDirPath = Path.Combine(tempExtractDir, "assets", "resource");
+        }
+
         var file = new FileInfo(interfacePath);
         if (file.Exists)
         {
@@ -616,7 +623,7 @@ public class VersionChecker
         var di = new DirectoryInfo(resourceDirPath);
         if (di.Exists)
         {
-            CopyFolder(resourceDirPath, Path.Combine(wpfDir, "resource"));
+            DirectoryMerge(originPath, wpfDir);
         }
 
         dialog?.UpdateProgress(70);
@@ -628,7 +635,7 @@ public class VersionChecker
         var newInterfacePath = Path.Combine(wpfDir, "interface.json");
         if (File.Exists(newInterfacePath))
         {
-            var jsonContent = File.ReadAllText(newInterfacePath);
+            var jsonContent = await File.ReadAllTextAsync(newInterfacePath);
             var settings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
