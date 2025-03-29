@@ -48,6 +48,8 @@ public class MaaProcessor
 
     private MaaTasker? _currentTasker;
     private MaaAgentClient? _agentClient;
+    private bool _agentStarted;
+    private Process? _agentProcess;
     public static string Resource => AppContext.BaseDirectory + "Resource";
     public static string ResourceBase => $"{Resource}/base";
 
@@ -93,12 +95,10 @@ public class MaaProcessor
     public async Task Start(List<DragItemViewModel>? tasks, bool onlyStart = false, bool checkUpdate = false)
     {
         CancellationTokenSource = new CancellationTokenSource();
-        SetCurrentTasker();
         Instances.RootViewModel.SetIdle(false);
 
         _startTime = DateTime.Now;
         tasks ??= new List<DragItemViewModel>();
-
 
         var token = CancellationTokenSource.Token;
         if (!onlyStart)
@@ -297,9 +297,9 @@ public class MaaProcessor
             CancelOperations();
 
             ClearTaskQueue();
-            
+
             Instances.RootViewModel.IsRunning = false;
-            
+
             ExecuteStopCore(finished, () =>
             {
                 var stopResult = AbortCurrentTasker();
@@ -769,6 +769,10 @@ public class MaaProcessor
             _agentClient?.LinkStop();
             _agentClient?.Dispose();
             _agentClient = null;
+            _agentStarted = false;
+            _agentProcess?.Kill();
+            _agentProcess?.Dispose();
+            _agentProcess = null;
         }
         _currentTasker = tasker;
     }
@@ -912,9 +916,18 @@ public class MaaProcessor
             // 使用WPF日志框架记录（需实现ILogger接口）
 
             var agentConfig = MaaInterface.Instance?.Agent;
-            if (agentConfig != null)
+            if (agentConfig is { ChildExec: not null } && !_agentStarted)
             {
                 RootView.AddLogByKey("StartingAgent");
+                if (_agentClient != null)
+                {
+                    _agentClient.LinkStop();
+                    _agentClient.Dispose();
+                    _agentClient = null;
+                    _agentProcess?.Kill();
+                    _agentProcess?.Dispose();
+                    _agentProcess = null;
+                }
                 _agentClient = new MaaAgentClient
                 {
                     Resource = maaResource,
@@ -927,33 +940,69 @@ public class MaaProcessor
                 {
                     throw new Exception("Socket creation failed");
                 }
-                if (agentConfig?.ChildExec != null)
+
+                try
                 {
-                    try
+                    if (!Directory.Exists($"{AppContext.BaseDirectory}"))
+                        Directory.CreateDirectory($"{AppContext.BaseDirectory}");
+                    var program = MaaInterface.ReplacePlaceholder(agentConfig.ChildExec, AppContext.BaseDirectory);
+                    var args = $"{string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket}";
+                    var startInfo = new ProcessStartInfo
                     {
-                        if (!Directory.Exists($"{AppContext.BaseDirectory}"))
-                            Directory.CreateDirectory($"{AppContext.BaseDirectory}");
-                        var startInfo = new ProcessStartInfo
+                        FileName = program,
+                        WorkingDirectory = $"{AppContext.BaseDirectory}",
+                        Arguments = $"{(program.Contains("python") && args.Contains(".py") && !args.Contains("-u ") ? "-u " : "")}{args}",
+                        UseShellExecute = false,
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        CreateNoWindow = true
+                    };
+
+                    _agentProcess = new Process
+                    {
+                        StartInfo = startInfo
+                    };
+
+                    _agentProcess.OutputDataReceived += (sender, args) =>
+                    {
+                        if (!string.IsNullOrEmpty(args.Data))
                         {
-                            FileName = MaaInterface.ReplacePlaceholder(agentConfig.ChildExec, AppContext.BaseDirectory),
-                            WorkingDirectory = $"{AppContext.BaseDirectory}",
-                            Arguments = $"{string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket}",
-                            UseShellExecute = false,
-                            CreateNoWindow = true
-                        };
+                            DispatcherHelper.RunOnMainThread(() =>
+                            {
+                                RootView.AddLog($"{args.Data}");
+                            });
+                        }
+                    };
 
-                        TaskManager.RunTaskAsync(() => Process.Start(startInfo), token);
-
-                        // 使用WPF日志框架记录（需实现ILogger接口）
-                        LoggerService.LogInfo($"Agent启动: {agentConfig.ChildExec} {string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket} "
-                            + $"socket_id: {socket}");
-                    }
-                    catch (Exception ex)
+                    _agentProcess.ErrorDataReceived += (sender, args) =>
                     {
-                        LoggerService.LogError($"Agent启动失败: {ex.Message}");
-                    }
+                        if (!string.IsNullOrEmpty(args.Data))
+                        {
+                            DispatcherHelper.RunOnMainThread(() =>
+                            {
+                                RootView.AddLog($"{args.Data}");
+                            });
+                        }
+                    };
+
+                    _agentProcess.Start();
+                    LoggerService.LogInfo(
+                        $"Agent启动: {MaaInterface.ReplacePlaceholder(agentConfig.ChildExec, AppContext.BaseDirectory)} {string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket} "
+                        + $"socket_id: {socket}");
+                    _agentProcess.BeginOutputReadLine();
+                    _agentProcess.BeginErrorReadLine();
+
+                    TaskManager.RunTaskAsync(async () => await _agentProcess.WaitForExitAsync(token), token);
+
                 }
+                catch (Exception ex)
+                {
+                    LoggerService.LogError($"Agent启动失败: {ex.Message}");
+                }
+
                 _agentClient?.LinkStart();
+                _agentStarted = true;
             }
             RegisterCustomRecognitionsAndActions(tasker);
             Instances.ConnectingViewModel.SetConnected(true);

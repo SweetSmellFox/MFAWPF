@@ -247,6 +247,46 @@
             0
           ]
         },
+		"focus": {
+			"description": "产生同步回调消息。可选，默认 true。",
+			"type": "boolean",
+			"default": false
+		},
+		"focus_tip": {
+			"description": "当执行某任务前，在 MFA 右侧日志输出的内容。可选，默认空。",
+			"type": "string",,
+			"default": "null"
+		},
+		"focus_tip_color": {
+			"description": "当执行某任务前，在 MFA 右侧日志输出的内容的颜色。可选，默认为 Gray。",
+			"type": "string"
+			"default": "Gray"
+		},
+		"focus_toast": {
+			"description": "当执行某任务前，Windows 弹窗输出的内容。可选，默认空。",
+			"type": "string",
+			"default": ""
+		},
+		"focus_succeeded": {
+			"description": "当执行某任务成功后，在 MFA 右侧日志输出的内容。可选，默认空。",
+			"type": "string",
+			"default": ""
+		},
+		"focus_succeeded_color": {
+			"description": "当执行某任务成功后，在 MFA 右侧日志输出的内容的颜色。可选，默认为 Gray。",
+			"type": "string",
+			"default": "Gray"
+		},
+		"focus_failed": {
+			"description": "当执行某任务失败时，在 MFA 右侧日志输出的内容。可选，默认空。",
+			"type": "string",
+			"default": ""
+		},
+		"focus_failed_color": {
+			"description": "当执行某任务失败时，在 MFA 右侧日志输出的内容的颜色。可选，默认为 Gray。",
+			"type":"string",
+			"default": "Gray"
+		},
         "end": {
           "description": "滑动终点。必选，默认 true。",
           "$ref": "#/definitions/target_type",

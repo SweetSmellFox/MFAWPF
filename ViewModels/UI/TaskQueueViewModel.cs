@@ -194,13 +194,31 @@ public partial class TaskQueueViewModel : ViewModel
             });
         });
     }
-
+    public const string INFO = "info:";
+    public const string ERROR = "err:";
+    public const string WARN = "warn:";
     public void AddLog(string content,
         Brush? brush = null,
         string weight = "Regular",
         bool showTime = true)
     {
         brush ??= Brushes.Gray;
+        var changeColor = true;
+        if (content.StartsWith(INFO))
+        {
+            brush = Brushes.Gray;
+            content = content.Substring(INFO.Length);
+        }
+        if (content.StartsWith(WARN))
+        {
+            brush = Brushes.Orange;
+            content = content.Substring(WARN.Length);
+        }
+        if (content.StartsWith(ERROR))
+        {
+            brush = Brushes.OrangeRed;
+            content = content.Substring(ERROR.Length);
+        }
         Task.Run(() =>
         {
             DispatcherHelper.RunOnMainThread(() =>
