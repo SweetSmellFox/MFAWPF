@@ -1005,6 +1005,7 @@ public class MaaProcessor
                 catch (Exception ex)
                 {
                     LoggerService.LogError($"Agent启动失败: {ex.Message}");
+                    RootView.AddLogByKey("AgentStartFailed");
                 }
 
                 _agentClient?.LinkStart();
