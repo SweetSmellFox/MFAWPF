@@ -15,7 +15,8 @@
     xmlns:settings="clr-namespace:MFAWPF.Views.UserControl.Settings"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:views="clr-namespace:MFAWPF.Views"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:extensions="clr-namespace:MFAWPF.Extensions">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -35,7 +36,7 @@
             DisplayMemberPath="Name"
             Grid.Column="1"
             Grid.Row="0"
-            HorizontalAlignment="Center"
+            HorizontalAlignment="Center" extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
             IsEnabled="{calcBinding:Binding Idle,
                                             Source={x:Static helper:Instances.RootViewModel}}"
             ItemsSource="{Binding ViewModel.GpuOptions}"

@@ -13,7 +13,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:vm="clr-namespace:MFAWPF.ViewModels"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:extensions="clr-namespace:MFAWPF.Extensions">
     <hc:ScrollViewer
         HorizontalAlignment="Stretch"
         Margin="10,0,10,10"
@@ -23,7 +24,7 @@
             <hc:ComboBox
                 DisplayMemberPath="Name"
                 IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
-                ItemsSource="{Binding ViewModel.BeforeTaskList}"
+                ItemsSource="{Binding ViewModel.BeforeTaskList}" extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
                 Margin="5"
                 SelectedValue="{Binding ViewModel.BeforeTask}"
                 SelectedValuePath="ResourceKey"
@@ -32,7 +33,7 @@
             <hc:ComboBox
                 DisplayMemberPath="Name"
                 IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
-                ItemsSource="{Binding ViewModel.AfterTaskList}"
+                ItemsSource="{Binding ViewModel.AfterTaskList}" extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
                 Margin="5"
                 SelectedValue="{Binding ViewModel.AfterTask}"
                 SelectedValuePath="ResourceKey"

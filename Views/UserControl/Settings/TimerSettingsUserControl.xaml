@@ -15,7 +15,8 @@
     xmlns:settings="clr-namespace:MFAWPF.Views.UserControl.Settings"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:view="clr-namespace:MFAWPF.Views"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:extensions="clr-namespace:MFAWPF.Extensions">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -97,17 +98,17 @@
                             d:Value="0" />
                     </StackPanel>
                 </StackPanel>
-                <ComboBox
-                    Focusable="False"
-                    HorizontalAlignment="Center"
-                    IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
-                    ItemsSource="{Binding ConfigurationList, Source={x:Static helper:Instances.SettingsViewModel}}"
-                    SelectedValue="{Binding ViewModel.TimerModels.Timers[0].TimerConfig, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                    SelectedValuePath="Name"
-                    ToolTip="{Binding ViewModel.TimerModels.Timers[0].TimerConfig}"
-                    VerticalAlignment="Center"
-                    Visibility="{c:Binding ViewModel.CustomConfig}"
-                    Width="150" />
+                <ComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
+                          Focusable="False"
+                          HorizontalAlignment="Center"
+                          IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
+                          ItemsSource="{Binding ConfigurationList, Source={x:Static helper:Instances.SettingsViewModel}}"
+                          SelectedValue="{Binding ViewModel.TimerModels.Timers[0].TimerConfig, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                          SelectedValuePath="Name"
+                          ToolTip="{Binding ViewModel.TimerModels.Timers[0].TimerConfig}"
+                          VerticalAlignment="Center"
+                          Visibility="{c:Binding ViewModel.CustomConfig}"
+                          Width="150" />
             </StackPanel>
 
             <StackPanel Grid.Column="0" Grid.Row="1">
@@ -143,7 +144,7 @@
                             d:Value="5" />
                     </StackPanel>
                 </StackPanel>
-                <ComboBox
+                <ComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
                     Focusable="False"
                     HorizontalAlignment="Center"
                     IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
@@ -189,7 +190,7 @@
                             d:Value="10" />
                     </StackPanel>
                 </StackPanel>
-                <ComboBox
+                <ComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
                     Focusable="False"
                     HorizontalAlignment="Center"
                     IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
@@ -235,7 +236,7 @@
                             d:Value="15" />
                     </StackPanel>
                 </StackPanel>
-                <ComboBox
+                <ComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
                     Focusable="False"
                     HorizontalAlignment="Center"
                     IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
@@ -281,7 +282,7 @@
                             d:Value="20" />
                     </StackPanel>
                 </StackPanel>
-                <ComboBox
+                <ComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
                     Focusable="False"
                     HorizontalAlignment="Center"
                     IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
@@ -327,7 +328,7 @@
                             d:Value="30" />
                     </StackPanel>
                 </StackPanel>
-                <ComboBox
+                <ComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
                     Focusable="False"
                     HorizontalAlignment="Center"
                     IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
@@ -373,7 +374,7 @@
                             d:Value="40" />
                     </StackPanel>
                 </StackPanel>
-                <ComboBox
+                <ComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
                     Focusable="False"
                     HorizontalAlignment="Center"
                     IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
@@ -419,7 +420,7 @@
                             d:Value="50" />
                     </StackPanel>
                 </StackPanel>
-                <ComboBox
+                <ComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
                     Focusable="False"
                     HorizontalAlignment="Center"
                     IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"

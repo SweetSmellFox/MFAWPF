@@ -13,7 +13,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:views="clr-namespace:MFAWPF.Views"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:extensions="clr-namespace:MFAWPF.Extensions">
     <Grid
         hc:InfoElement.HorizontalAlignment="Center"
         hc:InfoElement.TitlePlacement="Left"
@@ -43,17 +44,17 @@
             Grid.Row="1"
             HorizontalAlignment="Center"
             Orientation="Horizontal">
-            <hc:CheckComboBox
-                DisplayMemberPath="Name"
-                HorizontalContentAlignment="Center"
-                ItemsSource="{c:Binding 'ViewModel.ExternalNotificationProvidersShow'}"
-                Margin="10"
-                Style="{StaticResource CheckComboBoxExtend}"
-                Width="200"
-                hc:InfoElement.Placeholder="{lex:Loc Off}"
-                hc:InfoElement.Title="{lex:Loc ExternalNotificationEnabled}"
-                hc:InfoElement.TitlePlacement="Top"
-                hc:ListBoxAttach.SelectedItems="{c:Binding 'ViewModel.EnabledExternalNotificationProviders'}" />
+            <hc:CheckComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
+                              DisplayMemberPath="Name"
+                              HorizontalContentAlignment="Center"
+                              ItemsSource="{c:Binding 'ViewModel.ExternalNotificationProvidersShow'}"
+                              Margin="10"
+                              Style="{StaticResource CheckComboBoxExtend}"
+                              Width="200"
+                              hc:InfoElement.Placeholder="{lex:Loc Off}"
+                              hc:InfoElement.Title="{lex:Loc ExternalNotificationEnabled}"
+                              hc:InfoElement.TitlePlacement="Top"
+                              hc:ListBoxAttach.SelectedItems="{c:Binding 'ViewModel.EnabledExternalNotificationProviders'}" />
             <Button
                 Command="{Binding ViewModel.ExternalNotificationSendTestCommand}"
                 Content="{lex:Loc ExternalNotificationSendTest}"

@@ -980,4 +980,7 @@
   <data name="MirrorCdkMismatch" xml:space="preserve">
         <value>CDK 類型與資源不匹配</value>
     </data>
+  <data name="AgentStartFailed" xml:space="preserve">
+    <value>Agent啟動失敗</value>
+  </data>
 </root>

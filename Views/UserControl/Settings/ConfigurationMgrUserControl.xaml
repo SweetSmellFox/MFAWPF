@@ -16,14 +16,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:views="clr-namespace:MFAWPF.Views"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:extensions="clr-namespace:MFAWPF.Extensions">
     <StackPanel
         HorizontalAlignment="Center"
         Orientation="Vertical"
         VerticalAlignment="Center">
         <hc:ComboBox
             HorizontalAlignment="Center"
-            HorizontalContentAlignment="Stretch"
+            HorizontalContentAlignment="Stretch" extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
             IsEditable="True"
             IsEnabled="{calcBinding:Binding Idle,
                                             Source={x:Static helper:Instances.RootViewModel}}"

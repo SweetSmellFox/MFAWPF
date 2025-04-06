@@ -14,7 +14,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:views="clr-namespace:MFAWPF.Views"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:extensions="clr-namespace:MFAWPF.Extensions">
     <Grid HorizontalAlignment="Center" Margin="30,10,30,10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="180" />
@@ -40,8 +41,8 @@
             Margin="10,0,0,0"
             Orientation="Vertical">
             <hc:ComboBox
-                DisplayMemberPath="Name"
-                IsEnabled="{calcBinding:Binding Idle,
+                DisplayMemberPath="Name" extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
+                IsEnabled="{calcBinding:Binding Idle, 
                                                 Source={x:Static helper:Instances.RootViewModel}}"
                 ItemsSource="{Binding ViewModel.SupportedLanguages}"
                 Margin="5"
@@ -50,7 +51,7 @@
                 hc:TitleElement.TitlePlacement="Top"
                 hc:TitleElement.TitleWidth="110" />
             <hc:ComboBox
-                DisplayMemberPath="Name"
+                DisplayMemberPath="Name" extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
                 IsEnabled="{calcBinding:Binding Idle,
                                                 Source={x:Static helper:Instances.RootViewModel}}"
                 ItemsSource="{Binding ViewModel.Themes}"

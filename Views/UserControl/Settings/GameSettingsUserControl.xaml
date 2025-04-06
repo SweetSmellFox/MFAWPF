@@ -15,7 +15,8 @@
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:userControl="clr-namespace:MFAWPF.Views.UserControl"
     xmlns:views="clr-namespace:MFAWPF.Views"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:extensions="clr-namespace:MFAWPF.Extensions">
     <StackPanel>
         <userControl:CustomTextBlock
             HorizontalAlignment="Center"
@@ -23,7 +24,7 @@
             Text="{lex:Loc ResourceOption}"
             VerticalAlignment="Center" />
         <hc:ComboBox
-            DisplayMemberPath="Name"
+            DisplayMemberPath="Name" extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
             HorizontalAlignment="Center"
             IsEnabled="{Binding Idle, Source={x:Static helper:Instances.RootViewModel}}"
             ItemsSource="{Binding ViewModel.CurrentResources}"

@@ -15,10 +15,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:MFAWPF.Views.UI"
     xmlns:views="clr-namespace:MFAWPF.Views"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:extensions="clr-namespace:MFAWPF.Extensions">
     <StackPanel>
         <hc:ComboBox
-            HorizontalAlignment="Center"
+            HorizontalAlignment="Center" extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
             IsEnabled="{calcBinding:Binding Idle,
                                             Source={x:Static helper:Instances.RootViewModel}}"
             ItemsSource="{Binding ViewModel.AdbControlScreenCapTypes}"
@@ -32,7 +33,7 @@
             hc:TitleElement.TitlePlacement="Left"
             hc:TitleElement.TitleWidth="110" />
         <hc:ComboBox
-            DisplayMemberPath="Name"
+            DisplayMemberPath="Name" extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
             HorizontalAlignment="Center"
             IsEnabled="{calcBinding:Binding Idle,
                                             Source={x:Static helper:Instances.RootViewModel}}"
@@ -56,22 +57,22 @@
             Margin="30,10,30,10"
             Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Adb',
                                              Source={x:Static helper:Instances.ConnectingViewModel}}" />
-        <hc:ComboBox
-            HorizontalAlignment="Center"
-            IsEnabled="{calcBinding:Binding Idle,
+        <hc:ComboBox extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
+                     HorizontalAlignment="Center"
+                     IsEnabled="{calcBinding:Binding Idle,
                                             Source={x:Static helper:Instances.RootViewModel}}"
-            ItemsSource="{Binding ViewModel.Win32ControlScreenCapTypes}"
-            Margin="30,10,30,10"
-            SelectedValue="{Binding ViewModel.Win32ControlScreenCapType}"
-            Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Win32',
+                     ItemsSource="{Binding ViewModel.Win32ControlScreenCapTypes}"
+                     Margin="30,10,30,10"
+                     SelectedValue="{Binding ViewModel.Win32ControlScreenCapType}"
+                     Visibility="{calcBinding:Binding 'CurrentController == maa:MaaControllerTypes.Win32',
                                              Source={x:Static helper:Instances.ConnectingViewModel}}"
-            Width="360"
-            hc:TitleElement.HorizontalAlignment="Right"
-            hc:TitleElement.Title="{lex:Loc CaptureModeOption}"
-            hc:TitleElement.TitlePlacement="Left"
-            hc:TitleElement.TitleWidth="110" />
+                     Width="360"
+                     hc:TitleElement.HorizontalAlignment="Right"
+                     hc:TitleElement.Title="{lex:Loc CaptureModeOption}"
+                     hc:TitleElement.TitlePlacement="Left"
+                     hc:TitleElement.TitleWidth="110" />
         <hc:ComboBox
-            HorizontalAlignment="Center"
+            HorizontalAlignment="Center" extensions:ComboBoxExtensions.DisableNavigationOnLostFocus="True"
             IsEnabled="{calcBinding:Binding Idle,
                                             Source={x:Static helper:Instances.RootViewModel}}"
             ItemsSource="{Binding ViewModel.Win32ControlInputTypes}"

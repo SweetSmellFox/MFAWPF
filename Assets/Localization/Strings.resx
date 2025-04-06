@@ -993,4 +993,7 @@
   <data name="MirrorCdkMismatch" xml:space="preserve">
         <value>CDK 类型与资源不匹配</value>
     </data>
+  <data name="AgentStartFailed" xml:space="preserve">
+    <value>Agent启动失败</value>
+  </data>
 </root>

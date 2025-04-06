@@ -987,4 +987,7 @@
   <data name="StartingAgent" xml:space="preserve">
         <value>Starting Agent (may take a while)</value>
     </data>
+  <data name="AgentStartFailed" xml:space="preserve">
+    <value>Agent startup failure</value>
+  </data>
 </root>
