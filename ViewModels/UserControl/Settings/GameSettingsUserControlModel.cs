@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using MaaFramework.Binding;
 using MFAWPF.Configuration;
 using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
@@ -37,18 +38,21 @@ public partial class GameSettingsUserControlModel : ViewModel
     partial void OnEnableRecordingChanged(bool value)
     {
         ConfigurationHelper.MaaConfig.SetConfig(ConfigurationKeys.Recording, value);
+        MaaProcessor.MaaUtility.SetOptionSaveDraw(value);
         IsDebugMode = EnableSaveDraw || EnableRecording || ShowHitDraw;
     }
 
     partial void OnEnableSaveDrawChanged(bool value)
     {
         ConfigurationHelper.MaaConfig.SetConfig(ConfigurationKeys.SaveDraw, value);
+        MaaProcessor.MaaUtility.SetOptionSaveDraw(value);
         IsDebugMode = EnableSaveDraw || EnableRecording || ShowHitDraw;
     }
 
     partial void OnShowHitDrawChanged(bool value)
     {
         ConfigurationHelper.MaaConfig.SetConfig(ConfigurationKeys.ShowHitDraw, value);
+        MaaProcessor.MaaUtility.SetOptionShowHitDraw(value);
         IsDebugMode = EnableSaveDraw || EnableRecording || ShowHitDraw;
     }
 
