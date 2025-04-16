@@ -576,7 +576,7 @@ public class MaaProcessor
     {
         var taskModels = task.InterfaceItem?.PipelineOverride ?? new Dictionary<string, TaskModel>();
 
-        UpdateTaskDictionary(ref taskModels, task.InterfaceItem?.Option);
+        UpdateTaskDictionary(ref taskModels, task.InterfaceItem?.Option, task.InterfaceItem?.Advanced);
 
         var taskParams = SerializeTaskParams(taskModels);
         var settings = new JsonSerializerSettings
@@ -600,10 +600,46 @@ public class MaaProcessor
     }
 
     private void UpdateTaskDictionary(ref Dictionary<string, TaskModel> taskModels,
-        List<MaaInterface.MaaInterfaceSelectOption>? options)
+        List<MaaInterface.MaaInterfaceSelectOption>? options,
+        List<MaaInterface.MaaInterfaceSelectAdvanced>? advanceds)
     {
         Instances.TaskQueueView.TaskDictionary = Instances.TaskQueueView.TaskDictionary.MergeTaskModels(taskModels);
+        if (options != null)
+        {
+            foreach (var selectOption in options)
+            {
+                if (MaaInterface.Instance?.Option?.TryGetValue(selectOption.Name ?? string.Empty,
+                        out var interfaceOption)
+                    == true
+                    && selectOption.Index is int index
+                    && interfaceOption.Cases is { } cases
+                    && cases[index]?.PipelineOverride != null)
+                {
+                    var param = interfaceOption.Cases[selectOption.Index.Value].PipelineOverride;
+                    Instances.TaskQueueView.TaskDictionary = Instances.TaskQueueView.TaskDictionary.MergeTaskModels(param);
+                    taskModels = taskModels.MergeTaskModels(param);
+                }
+            }
+        }
 
+        if (advanceds != null)
+        {
+            foreach (var selectAdvanced in advanceds)
+            {
+                if (MaaInterface.Instance?.Advanced?.TryGetValue(selectAdvanced.Name ?? string.Empty,
+                        out var interfaceOption)
+                    == true )
+                {
+                    var pipeOverride = interfaceOption.GenerateProcessedPipeline(selectAdvanced.Data);
+                    if (!string.IsNullOrWhiteSpace(pipeOverride) && pipeOverride != "{}")
+                    {
+                        var param = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(pipeOverride);
+                        Instances.TaskQueueView.TaskDictionary = Instances.TaskQueueView.TaskDictionary.MergeTaskModels(param);
+                        taskModels = taskModels.MergeTaskModels(param);
+                    }
+                }
+            }
+        }
         if (options == null) return;
 
         foreach (var selectOption in options)

@@ -87,11 +87,10 @@ public partial class DragItemViewModel : ViewModel
             {
                 if (value.Name != null)
                     Name = value.Name;
-                SettingVisibility = value is { Option.Count: > 0 } || value.Repeatable.IsTrue() || value.Document != null && value.Document.Count > 0
+                SettingVisibility = value is { Advanced.Count: > 0 } || value is { Option.Count: > 0 } || value.Repeatable.IsTrue() || value.Document != null && value.Document.Count > 0
                     ? Visibility.Visible
                     : Visibility.Hidden;
-                if (value.Check.HasValue)
-                    IsChecked = value.Check.Value;
+                IsCheckedWithNull = value.Check;
             }
 
             SetProperty(ref _interfaceItem, value);

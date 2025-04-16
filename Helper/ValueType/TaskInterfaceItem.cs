@@ -13,6 +13,8 @@ public class TaskInterfaceItem
     [JsonProperty("check")] public bool? Check;
     [JsonProperty("repeatable")] public bool? Repeatable;
     [JsonProperty("repeat_count")] public int? RepeatCount;
+    
+    [JsonProperty("advanced")] public List<MaaInterface.MaaInterfaceSelectAdvanced>? Advanced;
 
     [JsonProperty("option")] 
     public List<MaaInterface.MaaInterfaceSelectOption>? Option;

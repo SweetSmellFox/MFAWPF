@@ -386,7 +386,7 @@ public class VersionChecker
             };
 
             settings.Converters.Add(new MaaInterfaceSelectOptionConverter(true));
-
+            settings.Converters.Add(new MaaInterfaceSelectAdvancedConverter(true));
             var @interface = JsonConvert.DeserializeObject<MaaInterface>(jsonContent, settings);
             if (@interface != null)
             {
@@ -649,7 +649,7 @@ public class VersionChecker
             };
 
             settings.Converters.Add(new MaaInterfaceSelectOptionConverter(true));
-
+            settings.Converters.Add(new MaaInterfaceSelectAdvancedConverter(true));
             var @interface = JsonConvert.DeserializeObject<MaaInterface>(jsonContent, settings);
             if (@interface != null)
             {

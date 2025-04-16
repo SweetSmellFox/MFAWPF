@@ -14,6 +14,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Media;
 using ComboBox = System.Windows.Controls.ComboBox;
+using TextBox = HandyControl.Controls.TextBox;
 
 namespace MFAWPF.Views.UserControl.Settings;
 
@@ -46,6 +47,14 @@ public partial class TaskOptionSettingsUserControl
             return p;
         });
         
+        var newAPanel = AdvancedPanelCache.GetOrAdd(cacheKey, key =>
+        {
+            var p = new StackPanel();
+            GenerateAdvancedPanelContent(p, dragItem);
+            AdvancedOptionSettings.Children.Add(p);
+            return p;
+        });
+        
         var newIntroduction = IntroductionsCache.GetOrAdd(cacheKey, key =>
         {
             var richTextBox = new RichTextBox
@@ -61,7 +70,10 @@ public partial class TaskOptionSettingsUserControl
             return richTextBox;
         });
         if (newPanel.Children.Count == 0)
-            CommonPanelCache.Remove(cacheKey,out _);
+            CommonPanelCache.Remove(cacheKey, out _);
+        if (newAPanel.Children.Count == 0)
+            AdvancedPanelCache.Remove(cacheKey, out _);
+        newAPanel.Visibility = Visibility.Visible;
         newPanel.Visibility = Visibility.Visible;
         newIntroduction.Visibility = Visibility.Visible;
     }
@@ -87,14 +99,27 @@ public partial class TaskOptionSettingsUserControl
                 AddOption(panel, option, dragItem);
             }
         }
-
     }
-
+    private void GenerateAdvancedPanelContent(StackPanel panel, DragItemViewModel dragItem)
+    {
+        if (dragItem.InterfaceItem?.Advanced != null)
+        {
+            foreach (var option in dragItem.InterfaceItem.Advanced)
+            {
+                AddAdvancedOption(panel, option);
+            }
+        }
+    }
+    
     private void HideCurrentPanel(string key)
     {
         if (CommonPanelCache.TryGetValue(key, out var oldPanel))
         {
             oldPanel.Visibility = Visibility.Collapsed;
+        }
+        if (AdvancedPanelCache.TryGetValue(key, out var oldAPanel))
+        {
+            oldAPanel.Visibility = Visibility.Collapsed;
         }
         if (IntroductionsCache.TryGetValue(key, out var oldIntroduction))
         {
@@ -117,7 +142,7 @@ public partial class TaskOptionSettingsUserControl
             panel.Visibility = Visibility.Collapsed;
         }
     }
-    
+
     private void AddIntroduction(RichTextBox richTextBox, string input = "")
     {
         input = LanguageHelper.GetLocalizedString(input);
@@ -133,7 +158,7 @@ public partial class TaskOptionSettingsUserControl
             if (alignMatch.Success)
             {
                 paragraph.TextAlignment = (TextAlignment)Enum.Parse(typeof(TextAlignment), alignMatch.Groups["value"].Value, true);
-                processedLine = alignMatch.Groups["content"].Value ;
+                processedLine = alignMatch.Groups["content"].Value;
             }
             ProcessLine(processedLine, paragraph.Inlines);
             flowDocument.Blocks.Add(paragraph);
@@ -210,6 +235,37 @@ public partial class TaskOptionSettingsUserControl
 
         panel.Children.Add(numericUpDown);
     }
+    private void AddAdvancedOption(Panel panel, MaaInterface.MaaInterfaceSelectAdvanced option)
+    {
+        if (MaaInterface.Instance?.Advanced?.TryGetValue(option.Name, out var interfaceOption) != true) return;
+        for (int i = 0; i < (interfaceOption.Field?.Count ?? 0); i++)
+        {
+            var field = interfaceOption.Field[i];
+            var defaultValue = option.Data.TryGetValue(field, out var value) ? value : ((interfaceOption.Default?.Count ?? 0) > i ? interfaceOption.Default[i] : string.Empty);
+            var combo = new TextBox
+            {
+                Margin = new Thickness(5),
+                Text = defaultValue
+            };
+
+            var binding = new Binding("Idle")
+            {
+                Source = Instances.RootViewModel
+            };
+
+            combo.TextChanged += (_, _) =>
+            {
+                option.Data[field] = combo.Text;
+                option.PipelineOverride = interfaceOption.GenerateProcessedPipeline(option.Data);
+                SaveConfiguration();
+            };
+            combo.SetBinding(IsEnabledProperty, binding);
+
+            combo.SetValue(TitleElement.TitleProperty, LanguageHelper.GetLocalizedString(field));
+            combo.SetValue(TitleElement.TitlePlacementProperty, TitlePlacementType.Top);
+            panel.Children.Add(combo);
+        }
+    }
 
     private void AddOption(Panel panel, MaaInterface.MaaInterfaceSelectOption option, DragItemViewModel source)
     {
@@ -235,7 +291,8 @@ public partial class TaskOptionSettingsUserControl
         {
             IsChecked = option.Index == yesValue,
             Style = FindResource("ToggleButtonSwitch") as Style,
-            Height = 20,Width = 40,
+            Height = 20,
+            Width = 40,
             HorizontalAlignment = HorizontalAlignment.Right,
             Tag = option.Name,
             VerticalAlignment = VerticalAlignment.Center

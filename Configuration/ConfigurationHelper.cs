@@ -105,7 +105,7 @@ public static class ConfigurationHelper
         if (config == null || value == null) return;
         config[key] = value;
         var fileName = config == Data ? GetActualConfiguration() : "maa_option";
-        JsonHelper.WriteToConfigJsonFile(fileName, config, new MaaInterfaceSelectOptionConverter(false));
+        JsonHelper.WriteToConfigJsonFile(fileName, config,new MaaInterfaceSelectAdvancedConverter(false), new MaaInterfaceSelectOptionConverter(false));
     }
 
     public static T GetConfig<T>(this Dictionary<string, object> config, string key, T defaultValue)

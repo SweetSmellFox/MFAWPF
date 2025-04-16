@@ -142,7 +142,7 @@
                     x:Name="TaskList">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid  x:Name="ListGrid">
+                            <Grid x:Name="ListGrid">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="45" />
@@ -151,18 +151,27 @@
                                     Content="{Binding Name}"
                                     Grid.Column="0"
                                     HorizontalAlignment="Left"
-                                    IsChecked="{Binding IsCheckedWithNull}" MouseRightButtonUp="ToggleCheckBoxNullOnRightClick"
+                                    IsChecked="{Binding IsCheckedWithNull}"
+                                    MouseRightButtonUp="ToggleCheckBoxNullOnRightClick"
                                     IsHitTestVisible="{Binding Path=Idle, Source={x:Static helper:Instances.RootViewModel}}"
                                     ToolTip="{lex:Loc TooltipDragLabel}">
                                     <CheckBox.ContentTemplate>
                                         <DataTemplate>
-                                            <TextBlock ContextMenu="{StaticResource TaskMenu}"
-                                                       Text="{Binding}"
-                                                       TextTrimming="CharacterEllipsis"
-                                                       TextWrapping="NoWrap"
-                                                       Width="{calcBinding:Binding 'ActualWidth - 70',
+                                            <TextBlock
+                                                Text="{Binding Name}"
+                                                DataContext="{Binding Path=DataContext, 
+                                                RelativeSource={RelativeSource AncestorType=CheckBox}}"
+                                                TextTrimming="CharacterEllipsis"
+                                                TextWrapping="NoWrap"
+                                                Width="{calcBinding:Binding 'ActualWidth - 70',
                                                                             RelativeSource={RelativeSource Mode=FindAncestor,
-                                                                                                           AncestorType={x:Type ListBoxItem}}}" />
+                                                                                                           AncestorType={x:Type ListBoxItem}}}">
+                                                <TextBlock.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="删除" Click="Delete" />
+                                                    </ContextMenu>
+                                                </TextBlock.ContextMenu>
+                                            </TextBlock>
                                         </DataTemplate>
                                     </CheckBox.ContentTemplate>
                                 </CheckBox>
@@ -263,8 +272,12 @@
 
         </Grid>
         <Grid Grid.Column="1" Margin="0,30,0,0">
-            <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskQueueSettingsUserControl}}" Visibility="{calcBinding:Binding 'ViewModel.ConnectSettingChecked'}" />
-            <ContentPresenter Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskOptionSettingsUserControl}}" Visibility="{calcBinding:Binding '!ViewModel.ConnectSettingChecked'}" />
+            <ContentPresenter
+                Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskQueueSettingsUserControl}}"
+                Visibility="{calcBinding:Binding 'ViewModel.ConnectSettingChecked'}" />
+            <ContentPresenter
+                Content="{helper:ServiceProvider ServiceType={x:Type settings:TaskOptionSettingsUserControl}}"
+                Visibility="{calcBinding:Binding '!ViewModel.ConnectSettingChecked'}" />
         </Grid>
 
 

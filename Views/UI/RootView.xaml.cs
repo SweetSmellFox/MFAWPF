@@ -157,7 +157,7 @@ public partial class RootView
             GlobalConfiguration.SetValue("NoAutoStart", bool.FalseString);
 
             ViewModel.LockController = (MaaInterface.Instance?.Controller?.Count ?? 0) < 2;
-            Console.WriteLine((MaaInterface.Instance?.Controller?.Count ?? 0) < 2);
+
             ConfigurationHelper.SetValue(ConfigurationKeys.EnableEdit, ConfigurationHelper.GetValue(ConfigurationKeys.EnableEdit, false));
             if (!string.IsNullOrWhiteSpace(MaaInterface.Instance?.Message))
             {

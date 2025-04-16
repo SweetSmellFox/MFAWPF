@@ -261,7 +261,7 @@ public partial class TaskQueueView
     {
         var items = ConfigurationHelper.GetValue(ConfigurationKeys.TaskItems, new List<TaskInterfaceItem>()) ?? [];
         var drags = (oldDrags?.ToList() ?? []).Union(items.Select(interfaceItem => new DragItemViewModel(interfaceItem))).ToList();
-        
+
         if (FirstTask)
         {
             InitializeResources();
@@ -271,7 +271,7 @@ public partial class TaskQueueView
 
         var (updateList, removeList) = SynchronizeTaskItems(drags, tasks);
         updateList.RemoveAll(d => removeList.Contains(d));
-        
+
         UpdateViewModels(updateList, tasks);
     }
 
@@ -279,7 +279,8 @@ public partial class TaskQueueView
     {
         Instances.GameSettingsUserControlModel.CurrentResources =
             MaaInterface.Instance?.Resources.Values.Count > 0
-                ? new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList()) :
+                ? new ObservableCollection<MaaInterface.MaaCustomResource>(MaaInterface.Instance.Resources.Values.ToList())
+                :
                 [
                     new MaaInterface.MaaCustomResource
                     {
@@ -300,34 +301,30 @@ public partial class TaskQueueView
         var updateList = new List<DragItemViewModel>();
 
         if (drags.Count == 0)
+            return (updateList, removeList);
+        foreach (var oldItem in drags.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
         {
-            updateList.AddRange(tasks.Select(t => new DragItemViewModel(t)).ToList());
-        }
-        else
-        {
-            foreach (var oldItem in drags.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+            if (newDict.TryGetValue((oldItem.Name, oldItem.InterfaceItem?.Entry), out var newItem))
             {
-                if (newDict.TryGetValue((oldItem.Name, oldItem.InterfaceItem?.Entry), out var newItem))
+                UpdateExistingItem(oldItem, newItem);
+                updateList.Add(oldItem);
+            }
+            else
+            {
+                var sameNameTasks = tasks.Where(t => t.Entry == oldItem.InterfaceItem?.Entry).ToList();
+                if (sameNameTasks.Any())
                 {
-                    UpdateExistingItem(oldItem, newItem);
+                    var firstTask = sameNameTasks.First();
+                    UpdateExistingItem(oldItem, firstTask);
                     updateList.Add(oldItem);
                 }
                 else
                 {
-                    var sameNameTasks = tasks.Where(t => t.Entry == oldItem.InterfaceItem?.Entry).ToList();
-                    if (sameNameTasks.Any())
-                    {
-                        var firstTask = sameNameTasks.First();
-                        UpdateExistingItem(oldItem, firstTask);
-                        updateList.Add(oldItem);
-                    }
-                    else
-                    {
-                        removeList.Add(oldItem);
-                    }
+                    removeList.Add(oldItem);
                 }
             }
         }
+
 
         return (updateList, removeList);
     }
@@ -339,23 +336,46 @@ public partial class TaskQueueView
         oldItem.InterfaceItem.PipelineOverride = newItem.PipelineOverride;
         oldItem.InterfaceItem.Document = newItem.Document;
         oldItem.InterfaceItem.Repeatable = newItem.Repeatable;
-        
-        if (newItem.Option == null) return;
 
-        var tempDict = oldItem.InterfaceItem.Option?.ToDictionary(t => t.Name) ?? new Dictionary<string, MaaInterface.MaaInterfaceSelectOption>();
-        var maaInterfaceSelectOptions = JsonConvert.DeserializeObject<List<MaaInterface.MaaInterfaceSelectOption>>(JsonConvert.SerializeObject(newItem.Option));
-        oldItem.InterfaceItem.Option = maaInterfaceSelectOptions.Select(opt =>
+        if (newItem.Advanced != null)
         {
-            if (tempDict.TryGetValue(opt.Name ?? string.Empty, out var existing))
+            var tempDict = oldItem.InterfaceItem.Advanced?.ToDictionary(t => t.Name) ?? new Dictionary<string, MaaInterface.MaaInterfaceSelectAdvanced>();
+            var maaInterfaceSelectAdvanceds = JsonConvert.DeserializeObject<List<MaaInterface.MaaInterfaceSelectAdvanced>>(JsonConvert.SerializeObject(newItem.Advanced));
+            oldItem.InterfaceItem.Advanced = maaInterfaceSelectAdvanceds.Select(opt =>
             {
-                opt.Index = existing.Index;
-            }
-            else
+                if (tempDict.TryGetValue(opt.Name ?? string.Empty, out var existing))
+                {
+                    opt.Data = existing.Data;
+                }
+                return opt;
+            }).ToList();
+        }
+        else
+        {
+            oldItem.InterfaceItem.Advanced = null;
+        }
+
+        if (newItem.Option != null)
+        {
+            var tempDict = oldItem.InterfaceItem.Option?.ToDictionary(t => t.Name) ?? new Dictionary<string, MaaInterface.MaaInterfaceSelectOption>();
+            var maaInterfaceSelectOptions = JsonConvert.DeserializeObject<List<MaaInterface.MaaInterfaceSelectOption>>(JsonConvert.SerializeObject(newItem.Option));
+            oldItem.InterfaceItem.Option = maaInterfaceSelectOptions.Select(opt =>
             {
-                SetDefaultOptionValue(opt);
-            }
-            return opt;
-        }).ToList();
+                if (tempDict.TryGetValue(opt.Name ?? string.Empty, out var existing))
+                {
+                    opt.Index = existing.Index;
+                }
+                else
+                {
+                    SetDefaultOptionValue(opt);
+                }
+                return opt;
+            }).ToList();
+        }
+        else
+        {
+            oldItem.InterfaceItem.Option = null;
+        }
     }
 
     private void SetDefaultOptionValue(MaaInterface.MaaInterfaceSelectOption option)
@@ -378,7 +398,7 @@ public partial class TaskQueueView
                 item.InterfaceItem.Option.ForEach(SetDefaultOptionValue);
             }
         }
-        
+
         ViewModel.TasksSource.AddRange(newItems);
 
 
@@ -426,7 +446,7 @@ public partial class TaskQueueView
         if (Instances.ConnectingViewModel.CurrentDevice == null)
         {
             GrowlHelper.Warning(
-                "Warning_CannotConnect".ToLocalizationFormatted(true,Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
+                "Warning_CannotConnect".ToLocalizationFormatted(true, Instances.ConnectingViewModel.CurrentController == MaaControllerTypes.Adb
                     ? "Emulator".ToLocalization()
                     : "Window".ToLocalization()));
             return;
@@ -460,12 +480,14 @@ public partial class TaskQueueView
             ConfigurationHelper.SetValue(ConfigurationKeys.TaskItems, ViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
         }
     }
-    
+
     private void Delete(object sender, RoutedEventArgs e)
     {
         var menuItem = sender as MenuItem;
+
         var contextMenu = menuItem?.Parent as ContextMenu;
-        if (contextMenu?.PlacementTarget is Grid item)
+
+        if (contextMenu?.PlacementTarget is TextBlock item)
         {
             if (item.DataContext is DragItemViewModel taskItemViewModel)
             {
@@ -495,7 +517,7 @@ public partial class TaskQueueView
             e.Handled = true;
         }
     }
-    
+
     public void ToggleCheckBoxNullOnRightClick(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton != MouseButton.Right)
@@ -505,6 +527,19 @@ public partial class TaskQueueView
 
         CheckBox checkBox = (CheckBox)sender;
         checkBox.IsChecked = checkBox.IsChecked == null ? (bool?)false : null;
+
     }
 
+    private void UIElement_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Right)
+        {
+            return;
+        }
+        if (sender is CheckBox checkBox)
+        {
+            checkBox.IsChecked = checkBox.IsChecked == null ? (bool?)false : null;
+        }
+        e.Handled = true;
+    }
 }

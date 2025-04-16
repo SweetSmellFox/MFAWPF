@@ -52,6 +52,23 @@ public class MaaInterface
         }
     }
 
+    public class MaaInterfaceSelectAdvanced
+    {
+        [JsonProperty("name")]
+        public string? Name { get; set; }
+        
+        [JsonProperty("data")]
+        public Dictionary<string, string?> Data = new();
+    
+        [JsonIgnore]
+        public string PipelineOverride = "{}";
+        
+        public override string? ToString()
+        {
+            return Name ?? string.Empty;
+        }
+    }
+    
     public class CustomExecutor
     {
         [JsonIgnore]
@@ -176,6 +193,9 @@ public class MaaInterface
     [JsonProperty("option")]
     public Dictionary<string, MaaInterfaceOption>? Option { get; set; }
 
+    [JsonProperty("advanced")]
+    public Dictionary<string, MaaInterfaceAdvancedOption>? Advanced { get; set; }
+
     [JsonExtensionData]
     public Dictionary<string, object> AdditionalData { get; set; } = new();
     private static MaaInterface? _instance;
@@ -291,7 +311,7 @@ public class MaaInterface
                 }
                 ;
             JsonHelper.WriteToJsonFilePath(AppContext.BaseDirectory, "interface",
-                Instance, new MaaInterfaceSelectOptionConverter(true));
+                Instance,new MaaInterfaceSelectAdvancedConverter(true), new MaaInterfaceSelectOptionConverter(true));
 
         }
         else
@@ -299,7 +319,7 @@ public class MaaInterface
             Instance =
                 JsonHelper.ReadFromJsonFilePath(AppContext.BaseDirectory, "interface",
                     new MaaInterface(),
-                    () => { }, new MaaInterfaceSelectOptionConverter(false));
+                    () => { },new MaaInterfaceSelectAdvancedConverter(false), new MaaInterfaceSelectOptionConverter(false));
         }
 
         return (Instance?.Name ?? string.Empty, Instance?.Version ?? string.Empty, Instance?.CustomTitle ?? string.Empty);
