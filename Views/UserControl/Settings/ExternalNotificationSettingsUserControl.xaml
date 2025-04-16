@@ -30,6 +30,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <controls:CustomTextBlock
@@ -177,7 +179,7 @@
             Grid.Row="7"
             Orientation="Vertical"
             Visibility="{c:Binding ViewModel.DiscordEnabled}">
-            <hc:Divider Content="Discord" HorizontalContentAlignment="Left" />
+            <hc:Divider Content="Discord Bot" HorizontalContentAlignment="Left" />
             <hc:TextBox
                 Height="30"
                 Margin="10"
@@ -197,6 +199,28 @@
 
         <StackPanel
             Grid.Row="8"
+            Orientation="Vertical"
+            Visibility="{c:Binding ViewModel.DiscordWebhookEnabled}">
+            <hc:Divider Content="Discord Webhook" HorizontalContentAlignment="Left" />
+            <hc:TextBox
+                Height="30"
+                Margin="10"
+                Text="{c:Binding ViewModel.DiscordWebhookName}"
+                Width="400"
+                hc:InfoElement.Title="{lex:Loc ExternalNotificationDiscordWebhookName}"/>
+            <hc:PasswordBox
+                Height="30"
+                IsSafeEnabled="False"
+                Margin="10"
+                ShowEyeButton="True"
+                UnsafePassword="{c:Binding ViewModel.DiscordWebhookUrl}"
+                Width="400"
+                hc:InfoElement.Title="{lex:Loc ExternalNotificationWebhookUrl}"
+               />
+        </StackPanel>
+        
+        <StackPanel
+            Grid.Row="9"
             HorizontalAlignment="Center"
             Visibility="{c:Binding ViewModel.SmtpEnabled}">
             <hc:Divider Content="SMTP" HorizontalContentAlignment="Left" />
@@ -341,7 +365,7 @@
             </Grid>
         </StackPanel>
         <StackPanel
-            Grid.Row="9"
+            Grid.Row="10"
             Orientation="Vertical"
             Visibility="{c:Binding ViewModel.QmsgEnabled}">
             <hc:Divider Content="Qmsg" HorizontalContentAlignment="Left" />
@@ -424,7 +448,7 @@
             </Grid>
         </StackPanel>
         <StackPanel
-            Grid.Row="9"
+            Grid.Row="11"
             Orientation="Vertical"
             Visibility="{c:Binding ViewModel.OnebotEnabled}">
             <hc:Divider Content="OneBot" HorizontalContentAlignment="Left" />

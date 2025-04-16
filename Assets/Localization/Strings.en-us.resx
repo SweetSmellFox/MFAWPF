@@ -990,4 +990,16 @@
   <data name="AgentStartFailed" xml:space="preserve">
     <value>Agent startup failure</value>
   </data>
+  <data name="ErrorWhenCheck" xml:space="preserve">
+    <value>Failed to check for the latest version of {0}.</value>
+  </data>
+  <data name="ExternalNotificationDiscordWebhookName" xml:space="preserve">
+    <value>Webhook Name</value>
+  </data>
+  <data name="ExternalNotificationWebhookUrl" xml:space="preserve">
+    <value>Webhook Url</value>
+  </data>
+  <data name="ExternalNotificationUserId" xml:space="preserve">
+    <value>User ID</value>
+  </data>
 </root>

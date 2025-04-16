@@ -996,4 +996,13 @@
   <data name="AgentStartFailed" xml:space="preserve">
     <value>Agent启动失败</value>
   </data>
+  <data name="ExternalNotificationDiscordWebhookName" xml:space="preserve">
+    <value>Webhook 名称</value>
+  </data>
+  <data name="ExternalNotificationWebhookUrl" xml:space="preserve">
+    <value>Webhook Url</value>
+  </data>
+  <data name="ExternalNotificationUserId" xml:space="preserve">
+    <value>用户 ID</value>
+  </data>
 </root>

@@ -983,4 +983,16 @@
   <data name="AgentStartFailed" xml:space="preserve">
     <value>Agent啟動失敗</value>
   </data>
+  <data name="ErrorWhenCheck" xml:space="preserve">
+    <value>檢查{0}最新版時發生錯誤</value>
+  </data>
+  <data name="ExternalNotificationDiscordWebhookName" xml:space="preserve">
+    <value>Webhook 名稱</value>
+  </data>
+  <data name="ExternalNotificationWebhookUrl" xml:space="preserve">
+    <value>Webhook Url</value>
+  </data>
+  <data name="ExternalNotificationUserId" xml:space="preserve">
+    <value>用戶 ID</value>
+  </data>
 </root>
