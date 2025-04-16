@@ -628,7 +628,7 @@ public class MaaProcessor
             {
                 if (MaaInterface.Instance?.Advanced?.TryGetValue(selectAdvanced.Name ?? string.Empty,
                         out var interfaceOption)
-                    == true )
+                    == true)
                 {
                     var pipeOverride = interfaceOption.GenerateProcessedPipeline(selectAdvanced.Data);
                     if (!string.IsNullOrWhiteSpace(pipeOverride) && pipeOverride != "{}")
@@ -770,7 +770,7 @@ public class MaaProcessor
                 ToastNotification.ShowDirect("TaskCompleted".ToLocalization());
                 Instances.TaskQueueViewModel.TaskItemViewModels.Where(t => t.IsCheckedWithNull == null).ToList().ForEach(d => d.IsCheckedWithNull = false);
             }
-            
+
             if (_startTime != null)
             {
                 var elapsedTime = DateTime.Now - (DateTime)_startTime;
@@ -1138,7 +1138,9 @@ public class MaaProcessor
                 MaaFwConfiguration.AdbDevice.AdbPath,
                 MaaFwConfiguration.AdbDevice.AdbSerial,
                 MaaFwConfiguration.AdbDevice.ScreenCap, MaaFwConfiguration.AdbDevice.Input,
-                !string.IsNullOrWhiteSpace(MaaFwConfiguration.AdbDevice.Config) ? MaaFwConfiguration.AdbDevice.Config : "{}")
+                !string.IsNullOrWhiteSpace(MaaFwConfiguration.AdbDevice.Config) ? MaaFwConfiguration.AdbDevice.Config : "{}",
+                Path.Combine(AppContext.BaseDirectory, "MaaAgentBinary")
+            )
             : new MaaWin32Controller(
                 MaaFwConfiguration.DesktopWindow.HWnd,
                 MaaFwConfiguration.DesktopWindow.ScreenCap, MaaFwConfiguration.DesktopWindow.Input,
