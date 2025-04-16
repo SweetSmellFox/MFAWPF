@@ -142,7 +142,7 @@
                     x:Name="TaskList">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid ContextMenu="{StaticResource TaskMenu}" x:Name="ListGrid">
+                            <Grid  x:Name="ListGrid">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="45" />
@@ -151,16 +151,16 @@
                                     Content="{Binding Name}"
                                     Grid.Column="0"
                                     HorizontalAlignment="Left"
-                                    IsChecked="{Binding IsCheckedWithNull}"
+                                    IsChecked="{Binding IsCheckedWithNull}" MouseRightButtonUp="ToggleCheckBoxNullOnRightClick"
                                     IsHitTestVisible="{Binding Path=Idle, Source={x:Static helper:Instances.RootViewModel}}"
                                     ToolTip="{lex:Loc TooltipDragLabel}">
                                     <CheckBox.ContentTemplate>
                                         <DataTemplate>
-                                            <TextBlock
-                                                Text="{Binding}"
-                                                TextTrimming="CharacterEllipsis"
-                                                TextWrapping="NoWrap"
-                                                Width="{calcBinding:Binding 'ActualWidth - 70',
+                                            <TextBlock ContextMenu="{StaticResource TaskMenu}"
+                                                       Text="{Binding}"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       TextWrapping="NoWrap"
+                                                       Width="{calcBinding:Binding 'ActualWidth - 70',
                                                                             RelativeSource={RelativeSource Mode=FindAncestor,
                                                                                                            AncestorType={x:Type ListBoxItem}}}" />
                                         </DataTemplate>

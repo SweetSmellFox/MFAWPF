@@ -729,7 +729,12 @@ public class MaaProcessor
         }
         else
         {
-            ToastNotification.ShowDirect("TaskCompleted".ToLocalization());
+            if (!onlyStart)
+            {
+                ToastNotification.ShowDirect("TaskCompleted".ToLocalization());
+                Instances.TaskQueueViewModel.TaskItemViewModels.Where(t => t.IsCheckedWithNull == null).ToList().ForEach(d => d.IsCheckedWithNull = false);
+            }
+            
             if (_startTime != null)
             {
                 var elapsedTime = DateTime.Now - (DateTime)_startTime;

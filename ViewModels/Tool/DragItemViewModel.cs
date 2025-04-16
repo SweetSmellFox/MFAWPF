@@ -41,10 +41,9 @@ public partial class DragItemViewModel : ViewModel
             }
             else
             {
-                value ??= false;
                 SetProperty(ref _isCheckedWithNull, value);
                 if (InterfaceItem != null)
-                    InterfaceItem.Check = IsChecked;
+                    InterfaceItem.Check = _isCheckedWithNull;
                 ConfigurationHelper.SetValue(ConfigurationKeys.TaskItems,
                     Instances.TaskQueueViewModel.TaskItemViewModels.ToList().Select(model => model.InterfaceItem));
             }

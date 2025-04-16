@@ -405,7 +405,7 @@ public partial class TaskQueueView
         if (InitializeData())
         {
             MaaProcessor.Money = 0;
-            var tasks = ViewModel.TaskItemViewModels.ToList().FindAll(task => task.IsChecked);
+            var tasks = ViewModel.TaskItemViewModels.ToList().FindAll(task => task.IsChecked || task.IsCheckedWithNull == null);
             ConnectToMAA();
             MaaProcessor.Instance.Start(tasks, onlyStart, checkUpdate);
         }
@@ -495,4 +495,16 @@ public partial class TaskQueueView
             e.Handled = true;
         }
     }
+    
+    public void ToggleCheckBoxNullOnRightClick(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != MouseButton.Right)
+        {
+            return;
+        }
+
+        CheckBox checkBox = (CheckBox)sender;
+        checkBox.IsChecked = checkBox.IsChecked == null ? (bool?)false : null;
+    }
+
 }
