@@ -911,8 +911,8 @@
   <data name="ExternalNotificationWxPusherUID" xml:space="preserve">
     <value>用戶 UID</value>
   </data>
-  <data name="ExternalNotificationDiscordUserId" xml:space="preserve">
-    <value>用戶 ID</value>
+  <data name="ExternalNotificationDiscordChannelId" xml:space="preserve">
+    <value>頻道 ID</value>
   </data>
   <data name="ExternalNotificationTelegramChatId" xml:space="preserve">
     <value>聊天 ID</value>

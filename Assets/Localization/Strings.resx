@@ -918,8 +918,8 @@
   <data name="ExternalNotificationWxPusherUID" xml:space="preserve">
     <value>用户 UID</value>
   </data>
-  <data name="ExternalNotificationDiscordUserId" xml:space="preserve">
-    <value>用户 ID</value>
+  <data name="ExternalNotificationDiscordChannelId" xml:space="preserve">
+    <value>频道 ID</value>
   </data>
   <data name="ExternalNotificationTelegramChatId" xml:space="preserve">
     <value>聊天 ID</value>

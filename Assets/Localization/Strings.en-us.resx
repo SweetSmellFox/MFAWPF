@@ -915,8 +915,8 @@
     <data name="ExternalNotificationWxPusherUID" xml:space="preserve">
     <value>User UID</value>
   </data>
-    <data name="ExternalNotificationDiscordUserId" xml:space="preserve">
-    <value>User ID</value>
+  <data name="ExternalNotificationDiscordChannelId" xml:space="preserve">
+    <value>Channel ID</value>
   </data>
     <data name="ExternalNotificationTelegramChatId" xml:space="preserve">
     <value>Chat ID</value>

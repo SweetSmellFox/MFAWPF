@@ -202,10 +202,10 @@ public partial class ExternalNotificationSettingsUserControlModel : ViewModel
         => ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationDiscordBotToken, SimpleEncryptionHelper.Encrypt(value));
 
 
-    [ObservableProperty] private string _discordUserId = ConfigurationHelper.GetDecrypt(ConfigurationKeys.ExternalNotificationDiscordUserId, string.Empty);
-    partial void OnDiscordUserIdChanged(string value)
+    [ObservableProperty] private string _discordChannelId = ConfigurationHelper.GetDecrypt(ConfigurationKeys.ExternalNotificationDiscordChannelId, string.Empty);
+    partial void OnDiscordChannelIdChanged(string value)
         =>
-            ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationDiscordUserId, SimpleEncryptionHelper.Encrypt(value));
+            ConfigurationHelper.SetValue(ConfigurationKeys.ExternalNotificationDiscordChannelId, SimpleEncryptionHelper.Encrypt(value));
 
     #endregion
 

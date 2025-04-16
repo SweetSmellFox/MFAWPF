@@ -181,10 +181,9 @@
             <hc:TextBox
                 Height="30"
                 Margin="10"
-                Text="{c:Binding ViewModel.DiscordUserId}"
+                Text="{c:Binding ViewModel.DiscordChannelId}"
                 Width="400"
-                hc:InfoElement.Title="{lex:Loc ExternalNotificationDiscordUserId}"
-                x:Name="DiscordUserId" />
+                hc:InfoElement.Title="{lex:Loc ExternalNotificationDiscordChannelId}"/>
             <hc:PasswordBox
                 Height="30"
                 IsSafeEnabled="False"
