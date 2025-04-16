@@ -82,6 +82,23 @@
                     HorizontalAlignment="Left"
                     Margin="10,2,5,5"
                     Orientation="Vertical"
+                    Visibility="{calcBinding:Binding 'ViewModel.DownloadSourceIndex==0'}">
+                    <hc:PasswordBox hc:InfoElement.Placeholder="{lex:Loc Optional}"
+                        IsEnabled="{calcBinding:Binding Idle,
+                                                        Source={x:Static helper:Instances.RootViewModel}}"
+                        IsSafeEnabled="False"
+                        Margin="0,2,5,10"
+                        ShowEyeButton="True"
+                        UnsafePassword="{Binding ViewModel.GitHubToken}"
+                        Width="200"
+                        hc:TitleElement.HorizontalAlignment="Left"
+                        hc:TitleElement.Title="Token"
+                        />
+                </StackPanel>
+                <StackPanel
+                    HorizontalAlignment="Left"
+                    Margin="10,2,5,5"
+                    Orientation="Vertical"
                     Visibility="{calcBinding:Binding 'ViewModel.DownloadSourceIndex==1'}">
                     <hc:PasswordBox
                         IsEnabled="{calcBinding:Binding Idle,

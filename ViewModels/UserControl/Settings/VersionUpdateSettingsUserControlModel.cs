@@ -35,6 +35,13 @@ public partial class VersionUpdateSettingsUserControlModel : ViewModel
         ConfigurationHelper.SetValue(ConfigurationKeys.DownloadSourceIndex, value);
     }
 
+    [ObservableProperty] private string _gitHubToken = SimpleEncryptionHelper.Decrypt(ConfigurationHelper.GetValue(ConfigurationKeys.GitHubToken, string.Empty));
+
+    partial void OnGitHubTokenChanged(string value)
+    {
+        ConfigurationHelper.SetValue(ConfigurationKeys.GitHubToken, SimpleEncryptionHelper.Encrypt(value));
+    }
+    
     [ObservableProperty] private string _cdkPassword = SimpleEncryptionHelper.Decrypt(ConfigurationHelper.GetValue(ConfigurationKeys.DownloadCDK, string.Empty));
 
     partial void OnCdkPasswordChanged(string value)

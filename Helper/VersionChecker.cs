@@ -18,6 +18,7 @@ using System.Diagnostics;
 using System.IO.Compression;
 using System.Management;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -1212,6 +1213,14 @@ public class VersionChecker
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
         httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
+                
+        if (!string.IsNullOrWhiteSpace(Instances.VersionUpdateSettingsUserControlModel.GitHubToken))
+        {
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer", 
+                Instances.VersionUpdateSettingsUserControlModel.GitHubToken);
+        }
+
         try
         {
             var response = httpClient.GetAsync(releaseUrl).Result;
@@ -1517,7 +1526,12 @@ public class VersionChecker
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("request");
         httpClient.DefaultRequestHeaders.Accept.TryParseAdd("application/json");
-
+        if (!string.IsNullOrWhiteSpace(Instances.VersionUpdateSettingsUserControlModel.GitHubToken))
+        {
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Bearer", 
+                Instances.VersionUpdateSettingsUserControlModel.GitHubToken);
+        }
         while (page < 101)
         {
             var urlWithParams = $"{releaseUrl}?per_page={perPage}&page={page}";

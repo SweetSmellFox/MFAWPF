@@ -1005,4 +1005,7 @@
   <data name="ExternalNotificationUserId" xml:space="preserve">
     <value>用户 ID</value>
   </data>
+  <data name="Optional" xml:space="preserve">
+    <value>可选</value>
+  </data>
 </root>

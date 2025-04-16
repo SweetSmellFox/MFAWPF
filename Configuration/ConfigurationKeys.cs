@@ -117,6 +117,7 @@ public static class ConfigurationKeys
     public const string EnableAutoUpdateMFA = "EnableAutoUpdateMFA";
     public const string EnableCheckVersion = "EnableCheckVersion";
     public const string DownloadCDK = "DownloadCDK";
-
+    public const string GitHubToken = "GitHubToken";
+    
     #endregion
 }
