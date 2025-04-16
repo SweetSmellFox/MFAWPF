@@ -116,8 +116,8 @@
     <data name="EditTaskDialog_Title" xml:space="preserve">
     <value>任務編輯器</value>
   </data>
-    <data name="Cut" xml:space="preserve">
-    <value>剪切</value>
+  <data name="Cut" xml:space="preserve">
+    <value>剪下</value>
   </data>
     <data name="Copy" xml:space="preserve">
     <value>複製</value>
@@ -194,8 +194,8 @@
     <data name="SaveFailureMessage" xml:space="preserve">
     <value>儲存任務失敗!</value>
   </data>
-    <data name="DuplicateTaskNameError" xml:space="preserve">
-    <value>任務清單中已存在命名為"{0}"的任務</value>
+  <data name="DuplicateTaskNameError" xml:space="preserve">
+    <value>任務清單中已存在名稱為"{0}"的任務</value>
   </data>
     <data name="LoadPipelineTitle" xml:space="preserve">
     <value>選擇 Pipeline 檔案</value>
@@ -207,7 +207,7 @@
     <value>儲存成功！ </value>
   </data>
     <data name="SavePipelineWarning" xml:space="preserve">
-    <value>任務清單中存在相同命名的任務!</value>
+    <value>任務清單中存在相同名稱的任務!</value>
   </data>
     <data name="ClipboardDataError" xml:space="preserve">
     <value>目前剪貼簿中資料不可轉換為文字</value>
@@ -225,7 +225,7 @@
     <value>正在連接至{0}......</value>
   </data>
     <data name="InitInstanceFailed" xml:space="preserve">
-    <value>初始化MAA實例失敗，發生連線錯誤或資源檔案損壞，請參閱日誌.</value>
+    <value>初始化MAA實例失敗，發生連線錯誤或資源檔案損壞，請參閱記錄.</value>
   </data>
     <data name="ConnectFailed" xml:space="preserve">
     <value>連線失敗</value>
@@ -362,8 +362,8 @@
     <data name="CopyErrorMessage" xml:space="preserve">
     <value>複製錯誤訊息</value>
   </data>
-    <data name="CopiedToClipboard" xml:space="preserve">
-    <value>已複製到剪切板</value>
+  <data name="CopiedToClipboard" xml:space="preserve">
+    <value>已複製到剪貼簿</value>
   </data>
     <data name="MiniTouch" xml:space="preserve">
     <value>MiniTouch (預設)</value>
@@ -387,7 +387,7 @@
     <value>編輯</value>
   </data>
     <data name="Load" xml:space="preserve">
-    <value>導入</value>
+    <value>匯入</value>
   </data>
     <data name="LoadImageTitle" xml:space="preserve">
     <value>選擇圖片檔</value>
@@ -441,22 +441,22 @@
     <value>跟隨系統</value>
   </data>
   <data name="SoftwarePath" xml:space="preserve">
-    <value>軟件路徑</value>
+    <value>軟體路徑</value>
   </data>
   <data name="WaitSoftware" xml:space="preserve">
-    <value>等待軟件啟動時間(秒)</value>
+    <value>等待軟體啟動時間(秒)</value>
   </data>
   <data name="StartupSoftware" xml:space="preserve">
-    <value>啟動軟件</value>
+    <value>啟動軟體</value>
   </data>
     <data name="Select" xml:space="preserve">
     <value>選擇</value>
   </data>
     <data name="ExeFilter" xml:space="preserve">
-    <value>可運行檔案 (*.exe*)|*.exe*</value>
+    <value>可執行檔案 (*.exe*)|*.exe*</value>
   </data>
     <data name="SelectExecutableFile" xml:space="preserve">
-    <value>選擇可運行檔案</value>
+    <value>選擇可執行檔案</value>
   </data>
   <data name="WaitSoftwareTime" xml:space="preserve">
     <value>等待{0}啟動時間(秒): {1}(s)</value>
@@ -477,7 +477,7 @@
     <value>關閉MFA</value>
   </data>
   <data name="CloseEmulator" xml:space="preserve">
-    <value>關閉軟件</value>
+    <value>關閉軟體</value>
   </data>
   <data name="CloseEmulatorAndMFA" xml:space="preserve">
     <value>關閉MFA和軟件</value>
@@ -486,7 +486,7 @@
     <value>關機</value>
   </data>
   <data name="CloseEmulatorAndRestartMFA" xml:space="preserve">
-    <value>重啟MFA和關閉軟件</value>
+    <value>重啟MFA和關閉軟體</value>
   </data>
   <data name="Restart" xml:space="preserve">
     <value>重新啟動</value>
@@ -513,13 +513,13 @@
     <value>選擇一張已有圖片</value>
   </data>
   <data name="EnableSaveDraw" xml:space="preserve">
-    <value>啟用儲存截圖 (用於調試)</value>
+    <value>啟用儲存截圖 (用於除錯)</value>
   </data>
   <data name="SwitchLanguage" xml:space="preserve">
     <value>切換語言 🌐</value>
   </data>
   <data name="CannotStart" xml:space="preserve">
-    <value>無法啓動任務</value>
+    <value>無法啟動任務</value>
   </data>
   <data name="Hide" xml:space="preserve">
     <value>隱藏</value>
@@ -543,10 +543,10 @@
     <value>主題設定</value>
   </data>
   <data name="PerformanceSettings" xml:space="preserve">
-    <value>性能設定</value>
+    <value>效能設定</value>
   </data>
   <data name="RunningSettings" xml:space="preserve">
-    <value>運行設定</value>
+    <value>執行設定</value>
   </data>
   <data name="Prescript" xml:space="preserve">
     <value>開始前腳本</value>
@@ -555,7 +555,7 @@
     <value>結束後腳本</value>
   </data>
   <data name="StartupSoftwareAndScript" xml:space="preserve">
-    <value>啟動軟件並啟動腳本</value>
+    <value>啟動軟體並啟動腳本</value>
   </data>
   <data name="ConnectionSettings" xml:space="preserve">
     <value>連接設定</value>
@@ -579,16 +579,16 @@
     <value>正在獲取最新資源.....</value>
   </data>
   <data name="FailToGetLatestVersionInfo" xml:space="preserve">
-    <value>获取最新版本信息失敗</value>
+    <value>獲取最新版本資訊失敗</value>
   </data>
   <data name="FailToGetDownloadUrl" xml:space="preserve">
-    <value>無法獲取資源下載鏈接，更新失敗。</value>
+    <value>無法獲取資源下載連結，更新失敗。</value>
   </data>
   <data name="Downloading" xml:space="preserve">
     <value>下載中.....</value>
   </data>
   <data name="ApplyingUpdate" xml:space="preserve">
-    <value>正在應用更新.....</value>
+    <value>正在套用更新.....</value>
   </data>
   <data name="UpdateCompleted" xml:space="preserve">
     <value>更新完成</value>
@@ -600,7 +600,7 @@
     <value>有新版本可用！最新版本:</value>
   </data>
   <data name="FailToGetCurrentVersionInfo" xml:space="preserve">
-    <value>获取當前版本信息失敗，無法更新。</value>
+    <value>獲取當前版本資訊失敗，無法更新。</value>
   </data>
   <data name="RestartPC" xml:space="preserve">
     <value>重啟電腦</value>
@@ -612,22 +612,22 @@
     <value>自動更新資源</value>
   </data>
   <data name="AutomaticUpdateMFA" xml:space="preserve">
-    <value>自動更新軟件</value>
+    <value>自動更新軟體</value>
   </data>
   <data name="MFAIsLatestVersion" xml:space="preserve">
-    <value>軟件已為最新版本！</value>
+    <value>軟體已為最新版本！</value>
   </data>
   <data name="SoftwareVersion" xml:space="preserve">
-    <value>軟件版本</value>
+    <value>軟體版本</value>
   </data>
   <data name="NewVersionFoundDescDownloading" xml:space="preserve">
-    <value>正在後臺下載……</value>
+    <value>正在背景下載……</value>
   </data>
   <data name="NewVersionDownloadCompletedTitle" xml:space="preserve">
     <value>新版本下載完成</value>
   </data>
   <data name="GameResourceUpdated" xml:space="preserve">
-    <value>遊戲資源已更新，請重啟軟件。</value>
+    <value>遊戲資源已更新，請重啟軟體。</value>
   </data>
   <data name="No" xml:space="preserve">
     <value>否</value>
@@ -660,7 +660,7 @@
     <value>通用模式</value>
   </data>
   <data name="BlueStacks" xml:space="preserve">
-    <value>藍疊模擬器</value>
+    <value>BlueStacks</value>
   </data>
   <data name="MuMuEmulator12" xml:space="preserve">
     <value>MuMu模擬器12</value>
@@ -714,7 +714,7 @@
     <value>連接失敗後嘗試重開 ADB 程式</value>
   </data>
   <data name="TryToReconnectByAdb" xml:space="preserve">
-    <value>正在嘗試重连</value>
+    <value>正在嘗試重連</value>
   </data>
   <data name="TryToStartEmulator" xml:space="preserve">
     <value>正在嘗試啟動模擬器</value>
@@ -723,16 +723,16 @@
     <value>正在嘗試重開 ADB 伺服器</value>
   </data>
   <data name="DebugMode" xml:space="preserve">
-    <value>[調試模式]</value>
+    <value>[除錯模式]</value>
   </data>
   <data name="EnableRecording" xml:space="preserve">
-    <value>啟用保存錄像 (用於調試)</value>
+    <value>啟用儲存錄像 (用於除錯)</value>
   </data>
   <data name="ShowHitDraw" xml:space="preserve">
-    <value>顯示節點命中彈窗 (用於調試)</value>
+    <value>顯示節點命中彈窗 (用於除錯)</value>
   </data>
   <data name="DebugModeWarning" xml:space="preserve">
-    <value>調試模式已開啟。此模式會保存運行期間的截圖、操作數據及圖像識別可視化結果，可能會佔用大量的存儲空間！</value>
+    <value>除錯模式已開啟。此模式會保存執行期間的截圖、操作資料及圖像識別可視化結果，可能會佔用大量的儲存空間！</value>
   </data>
   <data name="UiSettings" xml:space="preserve">
     <value>介面設定</value>
@@ -819,10 +819,10 @@
     <value>問題回饋</value>
   </data>
   <data name="GlobalConfigTip" xml:space="preserve">
-    <value>此選項頁為全局配置</value>
+    <value>此選項頁為全域配置</value>
   </data>
   <data name="CheckMFA" xml:space="preserve">
-    <value>檢查軟件</value>
+    <value>檢查軟體</value>
   </data>
   <data name="TimerCustomConfig" xml:space="preserve">
     <value>自定義配置選擇</value>
@@ -861,7 +861,7 @@
     <value>當前控制器</value>
   </data>
   <data name="ApplyControllerType" xml:space="preserve">
-    <value>選擇要應用的控制器類型</value>
+    <value>選擇要套用的控制器類型</value>
   </data>
   <data name="OperateController" xml:space="preserve">
     <value>選擇要操作的控制器</value>
@@ -873,19 +873,19 @@
     <value>重新掃描控制器</value>
   </data>
   <data name="HotKeyChangingTip" xml:space="preserve">
-    <value>鍵入 退格/Esc/Delete 清除當前熱鍵</value>
+    <value>鍵入 退格/Esc/Delete 清除當前快速鍵</value>
   </data>
   <data name="HotKeySettings" xml:space="preserve">
-    <value>熱鍵設定</value>
+    <value>快速鍵設定</value>
   </data>
   <data name="HotKeyLinkStart" xml:space="preserve">
-    <value>[熱鍵] 開始/停止任務</value>
+    <value>[快速鍵] 開始/停止任務</value>
   </data>
   <data name="HotKeyShowGui" xml:space="preserve">
-    <value>[熱鍵] 顯示/隱藏軟件</value>
+    <value>[快速鍵] 顯示/隱藏軟件</value>
   </data>
   <data name="HotKeyOccupiedWarning" xml:space="preserve">
-    <value>⚠️ 該熱鍵已被佔用</value>
+    <value>⚠️ 該快速鍵已被佔用</value>
   </data>
   <data name="HotKeyPressing" xml:space="preserve">
     <value>按下任意組合鍵...</value>
@@ -924,10 +924,10 @@
   <value>使用 SSL</value>
 </data>
   <data name="ExternalNotificationSmtpAuth" xml:space="preserve">
-  <value>需要登錄</value>
+  <value>需要登入</value>
 </data>
   <data name="ExternalNotificationSmtpUser" xml:space="preserve">
-  <value>使用者名</value>
+  <value>用戶名</value>
 </data>
   <data name="ExternalNotificationSmtpPassword" xml:space="preserve">
   <value>密碼</value>
