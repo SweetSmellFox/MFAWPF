@@ -10,7 +10,10 @@ public class TaskInterfaceItem
     [JsonProperty("entry")] public string? Entry;
     [JsonConverter(typeof(SingleOrListConverter))] [JsonProperty("doc")]
     public List<string>? Document;
-    [JsonProperty("check")] public bool? Check = false;
+    [JsonProperty("check",
+        NullValueHandling = NullValueHandling.Include,
+        DefaultValueHandling = DefaultValueHandling.Include)]
+    public bool? Check = false;
     [JsonProperty("repeatable")] public bool? Repeatable;
     [JsonProperty("repeat_count")] public int? RepeatCount;
 
