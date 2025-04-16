@@ -8,16 +8,15 @@ public class TaskInterfaceItem
 {
     [JsonProperty("name")] public string? Name;
     [JsonProperty("entry")] public string? Entry;
-    [JsonConverter(typeof(SingleOrListConverter))]
-    [JsonProperty("doc")] public List<string>? Document;
-    [JsonProperty("check")] public bool? Check;
+    [JsonConverter(typeof(SingleOrListConverter))] [JsonProperty("doc")]
+    public List<string>? Document;
+    [JsonProperty("check")] public bool? Check = false;
     [JsonProperty("repeatable")] public bool? Repeatable;
     [JsonProperty("repeat_count")] public int? RepeatCount;
-    
+
     [JsonProperty("advanced")] public List<MaaInterface.MaaInterfaceSelectAdvanced>? Advanced;
 
-    [JsonProperty("option")] 
-    public List<MaaInterface.MaaInterfaceSelectOption>? Option;
+    [JsonProperty("option")] public List<MaaInterface.MaaInterfaceSelectOption>? Option;
 
     [JsonProperty("pipeline_override")] public Dictionary<string, TaskModel>? PipelineOverride;
 
