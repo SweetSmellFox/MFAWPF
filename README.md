@@ -133,24 +133,27 @@ lock_controller可以通过controller的数量来控制，default_controller则�
 - `MFAWPF` 新增interface多语言支持,在`interface.json`同目录下新建`zh-cn.json`,`zh-tw.json`和`en-us.json`后，doc和任务的name和选项的name可以使用key来指代。MFAWPF会自动根据语言来读取文件的key对应的value。如果没有则默认为key
 - `MFAWPF` 会读取`Resource`文件夹的`Announcement.md`作为公告，更新资源时会自动下载一份Changelog作为公告
 
-**注：在MFA中，于Pipeline中任务新增了俩个属性字段，分别为 `focus_tip` 和 `focus_tip_color`。**
+**注：在MFAWPF的v1.3.0.2版本中，移除了focus系列字段，改为any focus，原先的不再可用！**
 
-- `focus` : *bool*  
-  是否启用`focus_tip` 、`focus_succeeded`、 `focus_failed`、 `focus_toast`。可选，默认false。
-- `focus_toast` : *string*  
-  当执行某任务前，Windows弹窗输出的内容。可选，默认空。
-- `focus_tip` : *string* | *list<string, >*  
-  当执行某任务前，在MFA右侧日志输出的内容。可选，默认空。
-- `focus_tip_color` : *string* | *list<string, >*  
-  当执行某任务前，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。
-- `focus_succeeded` : *string* | *list<string, >*  
-  当执行某任务成功后，在MFA右侧日志输出的内容。可选，默认空。
-- `focus_succeeded_color` : *string* | *list<string, >*  
-  当执行某任务成功后，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。
-- `focus_failed` : *string* | *list<string, >*  
-  当执行某任务失败时，在MFA右侧日志输出的内容。可选，默认空。
-- `focus_failed_color` : *string* | *list<string, >*  
-  当执行某任务失败时，在MFA右侧日志输出的内容的颜色。可选，默认为Gray。
+- `focus` : *string* | *object*  
+  格式为
+  ```
+  "focus": {
+    "start": "任务开始",  注：*string* | *string[]*    
+    "succeeded": "任务成功",  注：*string* | *string[]* 
+    "failed": "任务失败", 注：*string* | *string[]* 
+    "toast": "弹窗提醒" 注：*string* 
+  }
+  ```
+  ```
+   "focus": "测试"
+  ```
+  等同于
+  ```
+  "focus": {
+    "start": "测试"
+  }
+    ```
 ## 致谢
 
 ### 开源库
