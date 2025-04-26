@@ -299,8 +299,7 @@ public partial class TaskQueueView
         var newDict = tasks.ToDictionary(t => (t.Name, t.Entry)); // 使用 (Name, Entry) 作为键
         var removeList = new List<DragItemViewModel>();
         var updateList = new List<DragItemViewModel>();
-
-        Console.WriteLine($"old:{drags.Count}, new:{tasks.Count}");
+        
         if (drags.Count == 0)
             return (updateList, removeList);
      
