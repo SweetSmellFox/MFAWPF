@@ -374,7 +374,7 @@
     <data name="AdbInput" xml:space="preserve">
     <value>AdbInput (不推薦)</value>
   </data>
-    <data name="AutoDetect" xml:space="preserve">
+  <data name="AutoDetect" xml:space="preserve">
     <value>AutoDetect (自動偵測)</value>
   </data>
     <data name="CopyKey" xml:space="preserve">

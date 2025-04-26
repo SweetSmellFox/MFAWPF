@@ -300,9 +300,11 @@ public partial class TaskQueueView
         var removeList = new List<DragItemViewModel>();
         var updateList = new List<DragItemViewModel>();
 
+        Console.WriteLine($"old:{drags.Count}, new:{tasks.Count}");
         if (drags.Count == 0)
             return (updateList, removeList);
-        foreach (var oldItem in drags.Where(x => !string.IsNullOrWhiteSpace(x.Name)))
+     
+        foreach (var oldItem in drags)
         {
             if (newDict.TryGetValue((oldItem.Name, oldItem.InterfaceItem?.Entry), out var newItem))
             {
@@ -315,7 +317,7 @@ public partial class TaskQueueView
                 if (sameNameTasks.Any())
                 {
                     var firstTask = sameNameTasks.First();
-                    UpdateExistingItem(oldItem, firstTask);
+                    UpdateExistingItem(oldItem, firstTask, tasks.Any(t => t.Name == firstTask.Name));
                     updateList.Add(oldItem);
                 }
                 else
@@ -324,14 +326,15 @@ public partial class TaskQueueView
                 }
             }
         }
-
-
+        
         return (updateList, removeList);
     }
 
-    private void UpdateExistingItem(DragItemViewModel oldItem, TaskInterfaceItem newItem)
+    private void UpdateExistingItem(DragItemViewModel oldItem, TaskInterfaceItem newItem, bool updateName = false)
     {
         if (oldItem.InterfaceItem == null) return;
+        if (updateName)
+            oldItem.InterfaceItem.Name = newItem.Name;
         oldItem.InterfaceItem.Entry = newItem.Entry;
         oldItem.InterfaceItem.PipelineOverride = newItem.PipelineOverride;
         oldItem.InterfaceItem.Document = newItem.Document;
@@ -391,6 +394,7 @@ public partial class TaskQueueView
     private void UpdateViewModels(IList<DragItemViewModel> drags, List<TaskInterfaceItem> tasks)
     {
         var newItems = tasks.Select(t => new DragItemViewModel(t)).ToList();
+        
         foreach (var item in newItems)
         {
             if (item.InterfaceItem?.Option != null && !drags.Any())
@@ -404,7 +408,7 @@ public partial class TaskQueueView
 
         if (!ViewModel.TaskItemViewModels.Any())
         {
-            ViewModel.TaskItemViewModels = new ObservableCollection<DragItemViewModel>(drags);
+            ViewModel.TaskItemViewModels = new ObservableCollection<DragItemViewModel>(drags.Any() ? drags : newItems);
         }
     }
 
