@@ -1,6 +1,6 @@
 ﻿<hc:Window
     Height="810"
-    Icon="../logo.ico"
+    Icon="{x:Static converters:IconHelper.ICON}"
     NonClientAreaBackground="{DynamicResource MainContentBackgroundBrush}"
     Title="{lex:Loc WorkflowDiagramTitle}"
     Width="900"
