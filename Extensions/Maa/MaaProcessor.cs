@@ -575,8 +575,13 @@ public class MaaProcessor
 
     private TaskAndParam CreateTaskAndParam(DragItemViewModel task)
     {
-        var taskModels = task.InterfaceItem?.PipelineOverride ?? new Dictionary<string, TaskModel>();
-
+        var taskModels = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(JsonConvert.SerializeObject(task.InterfaceItem?.PipelineOverride ?? new Dictionary<string, TaskModel>(), new JsonSerializerSettings()
+        {
+            Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore,
+            DefaultValueHandling = DefaultValueHandling.Ignore
+        }));
+        
         UpdateTaskDictionary(ref taskModels, task.InterfaceItem?.Option, task.InterfaceItem?.Advanced);
 
         var taskParams = SerializeTaskParams(taskModels);
