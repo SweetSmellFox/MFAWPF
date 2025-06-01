@@ -38,21 +38,21 @@ public partial class GameSettingsUserControlModel : ViewModel
     partial void OnEnableRecordingChanged(bool value)
     {
         ConfigurationHelper.MaaConfig.SetConfig(ConfigurationKeys.Recording, value);
-        MaaProcessor.MaaUtility.SetOptionSaveDraw(value);
+        MaaProcessor.MaaUtility.SetOption_Recording(value);
         IsDebugMode = EnableSaveDraw || EnableRecording || ShowHitDraw;
     }
 
     partial void OnEnableSaveDrawChanged(bool value)
     {
         ConfigurationHelper.MaaConfig.SetConfig(ConfigurationKeys.SaveDraw, value);
-        MaaProcessor.MaaUtility.SetOptionSaveDraw(value);
+        MaaProcessor.MaaUtility.SetOption_SaveDraw(value);
         IsDebugMode = EnableSaveDraw || EnableRecording || ShowHitDraw;
     }
 
     partial void OnShowHitDrawChanged(bool value)
     {
         ConfigurationHelper.MaaConfig.SetConfig(ConfigurationKeys.ShowHitDraw, value);
-        MaaProcessor.MaaUtility.SetOptionShowHitDraw(value);
+        MaaProcessor.MaaUtility.SetOption_ShowHitDraw(value);
         IsDebugMode = EnableSaveDraw || EnableRecording || ShowHitDraw;
     }
 

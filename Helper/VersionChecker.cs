@@ -40,16 +40,6 @@ public class VersionChecker
             AutoUpdateMFA = ConfigurationHelper.GetValue(ConfigurationKeys.EnableAutoUpdateMFA, false),
             CheckVersion = ConfigurationHelper.GetValue(ConfigurationKeys.EnableCheckVersion, true),
         };
-
-        if (config.AutoUpdateResource)
-        {
-            AddResourceUpdateTask(config.AutoUpdateMFA);
-        }
-        else if (config.CheckVersion)
-        {
-            AddResourceCheckTask();
-        }
-
         if (config.AutoUpdateMFA)
         {
             AddMFAUpdateTask();
@@ -58,7 +48,16 @@ public class VersionChecker
         {
             AddMFACheckTask();
         }
-
+        
+        if (config.AutoUpdateResource)
+        { 
+            AddResourceUpdateTask(false);
+        }
+        else if (config.CheckVersion)
+        {
+            AddResourceCheckTask();
+        }
+        
         TaskManager.RunTaskAsync(async () => await Checker.ExecuteTasksAsync(),
             () => ToastNotification.ShowDirect("自动更新时发生错误！"), "启动检测");
     }
@@ -1463,8 +1462,8 @@ public class VersionChecker
 
         if (match.Success)
         {
-            string owner = match.Groups["owner"].Value;
-            string repo = match.Groups["repo"].Value;
+            var owner = match.Groups["owner"].Value;
+            var repo = match.Groups["repo"].Value;
 
             return $"https://api.github.com/repos/{owner}/{repo}/releases/latest";
         }

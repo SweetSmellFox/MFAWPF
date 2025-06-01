@@ -408,7 +408,7 @@ public static class MFAExtensions
         {
             throw new MaaStopException();
         }
-        return maaContext.RunRecognition(taskModel.Name, taskModel.ToJson(), imageBuffer);
+        return maaContext.RunRecognition(taskModel.Name, imageBuffer, taskModel.ToJson());
     }
 
 
@@ -420,7 +420,7 @@ public static class MFAExtensions
         }
         return OCRHelper.ReadTextFromMAAContext(maaContext, imageBuffer, x, y, w, h);
     }
-    
+
 
     public static bool Until(
         this Func<bool> action,

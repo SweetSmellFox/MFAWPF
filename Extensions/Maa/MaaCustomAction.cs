@@ -9,7 +9,7 @@ public abstract class MaaCustomAction : IMaaCustomAction
 {
     public abstract string Name { get; set; }
     
-    public bool Run(in IMaaContext inContext, in RunArgs inArgs)
+    public bool Run(in IMaaContext inContext, in RunArgs inArgs,in RunResults runResults)
     {
         var context = inContext;
         var args = inArgs;
