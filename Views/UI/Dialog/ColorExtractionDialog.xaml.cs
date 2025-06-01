@@ -1,5 +1,4 @@
-﻿
-using MFAWPF.Extensions;
+﻿using MFAWPF.Extensions;
 using MFAWPF.Extensions.Maa;
 using System.Windows;
 using System.Windows.Controls;
@@ -67,7 +66,7 @@ public partial class ColorExtractionDialog
     }
 
     private double _scaleRatio;
-    
+
 
     private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
     {
@@ -75,8 +74,7 @@ public partial class ColorExtractionDialog
         var canvasPosition = e.GetPosition(SelectionCanvas);
 
         // 判断点击是否在Image边缘5个像素内
-        if (canvasPosition.X < image.ActualWidth + 5 && canvasPosition.Y < image.ActualHeight + 5 &&
-            canvasPosition is { X: >= -5, Y: >= -5 })
+        if (canvasPosition.X < image.ActualWidth + 5 && canvasPosition.Y < image.ActualHeight + 5 && canvasPosition is { X: >= -5, Y: >= -5 })
         {
             if (_selectionRectangle != null)
             {
@@ -95,7 +93,10 @@ public partial class ColorExtractionDialog
             {
                 Stroke = Brushes.Red,
                 StrokeThickness = 2.5,
-                StrokeDashArray = { 2 }
+                StrokeDashArray =
+                {
+                    2
+                }
             };
 
             Canvas.SetLeft(_selectionRectangle, _startPoint.X);
@@ -174,12 +175,12 @@ public partial class ColorExtractionDialog
             return;
         }
 
-        var x = Canvas.GetLeft(_selectionRectangle);
-        var y = Canvas.GetTop(_selectionRectangle);
-        var w = _selectionRectangle.Width;
-        var h = _selectionRectangle.Height;
+        var x = (int)(Canvas.GetLeft(_selectionRectangle) / _scaleRatio);
+        var y = (int)(Canvas.GetTop(_selectionRectangle) / _scaleRatio);
+        var w = (int)(_selectionRectangle.Width / _scaleRatio);
+        var h = (int)(_selectionRectangle.Height / _scaleRatio);
 
-        GetColorRange(Math.Round(x), Math.Round(y), Math.Round(w), Math.Round(h));
+        GetColorRange(x, y, w, h);
         DialogResult = true;
         Close();
     }
@@ -187,7 +188,7 @@ public partial class ColorExtractionDialog
     private void GetColorRange(double x, double y, double width, double height)
     {
         if (width < 1 || !double.IsNormal(width)) width = 1;
-        if (height < 1|| !double.IsNormal(height)) height = 1;
+        if (height < 1 || !double.IsNormal(height)) height = 1;
         // 创建BitmapImage对象
         if (image.Source is BitmapImage bitmapImage)
         {
@@ -223,8 +224,18 @@ public partial class ColorExtractionDialog
                 if (b > maxB) maxB = b;
             }
 
-            var lower = new List<int> { minR, minG, minB };
-            var upper = new List<int> { maxR, maxG, maxB };
+            var lower = new List<int>
+            {
+                minR,
+                minG,
+                minB
+            };
+            var upper = new List<int>
+            {
+                maxR,
+                maxG,
+                maxB
+            };
             OutputUpper = upper;
             OutputLower = lower;
             // 输出颜色上下限值
@@ -235,7 +246,8 @@ public partial class ColorExtractionDialog
     {
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
-            Title = "LoadImageTitle".ToLocalization(), Filter = "ImageFilter".ToLocalization()
+            Title = "LoadImageTitle".ToLocalization(),
+            Filter = "ImageFilter".ToLocalization()
         };
 
 
