@@ -207,7 +207,7 @@ public class MaaInterface
     // 替换单个字符串中的 "{PROJECT_DIR}" 为指定的替换值
     public static string? ReplacePlaceholder(string? input, string? replacement)
     {
-        return string.IsNullOrEmpty(input) ? string.Empty : Path.GetFullPath(input.Replace("{PROJECT_DIR}", replacement));
+        return string.IsNullOrEmpty(input) ? string.Empty : input.Replace("{PROJECT_DIR}", replacement);
     }
 
     // 替换字符串列表中的每个字符串中的 "{PROJECT_DIR}"

@@ -272,7 +272,7 @@ public class MaaProcessor
     {
         token.ThrowIfCancellationRequested();
         var instance = await GetCurrentTaskerAsync(token);
-        return instance is { Initialized: true };
+        return instance is { IsInitialized: true };
     }
 
     async private Task TryRunTasksAsync(MaaTasker? maa, string? task, string? param, CancellationToken token)
@@ -581,7 +581,7 @@ public class MaaProcessor
             NullValueHandling = NullValueHandling.Ignore,
             DefaultValueHandling = DefaultValueHandling.Ignore
         }));
-        
+
         UpdateTaskDictionary(ref taskModels, task.InterfaceItem?.Option, task.InterfaceItem?.Advanced);
 
         var taskParams = SerializeTaskParams(taskModels);
@@ -893,6 +893,77 @@ public class MaaProcessor
         }
     }
 
+    public static string FindPythonPath(string? program)
+    {
+        Console.WriteLine("Program:" + program);
+        // 仅在程序为 "python" 且运行在 Windows 系统上时进行处理
+        if (program != "python" || !RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            return program;
+        }
+
+        // 检查 PATH 环境变量
+        var pathEnv = Environment.GetEnvironmentVariable("PATH");
+        if (string.IsNullOrEmpty(pathEnv))
+        {
+            return program;
+        }
+
+        // 分割 PATH 并查找 python.exe
+        var pathDirs = pathEnv.Split(Path.PathSeparator);
+        foreach (var dir in pathDirs)
+        {
+            try
+            {
+                var pythonPath = Path.Combine(dir, "python.exe");
+                if (File.Exists(pythonPath))
+                {
+                    return pythonPath;
+                }
+            }
+            catch
+            {
+                // 忽略无效路径
+            }
+        }
+
+        // 尝试查找 Python 安装目录
+        var pythonDirs = new[]
+        {
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "Python"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Python")
+        };
+
+        foreach (var baseDir in pythonDirs)
+        {
+            if (Directory.Exists(baseDir))
+            {
+                try
+                {
+                    var pythonDir = Directory.GetDirectories(baseDir)
+                        .OrderByDescending(d => d)
+                        .FirstOrDefault();
+
+                    if (pythonDir != null)
+                    {
+                        var pythonPath = Path.Combine(pythonDir, "python.exe");
+                        if (File.Exists(pythonPath))
+                        {
+                            return pythonPath;
+                        }
+                    }
+                }
+                catch
+                {
+                    // 忽略错误
+                }
+            }
+        }
+
+        // 未找到，返回原程序名
+        return program;
+    }
+
     async private Task<MaaTasker?> InitializeMaaTasker(CancellationToken token) // 添加 async 和 token
     {
 
@@ -914,7 +985,7 @@ public class MaaProcessor
                 return new MaaResource(resources);
             }, token, catchException: true, shouldLog: false, handleError: exception => HandleInitializationError(exception, "LoadResourcesFailed".ToLocalization()));
 
-            maaResource.SetOptionInferenceDevice(Instances.PerformanceUserControlModel.GpuOption);
+            maaResource.SetOption_InferenceDevice(Instances.PerformanceUserControlModel.GpuOption);
             LoggerService.LogInfo($"GPU acceleration: {Instances.PerformanceUserControlModel.GpuOption}");
         }
         catch (OperationCanceledException)
@@ -981,29 +1052,27 @@ public class MaaProcessor
                     _agentProcess?.Dispose();
                     _agentProcess = null;
                 }
-                _agentClient = new MaaAgentClient
-                {
-                    Resource = maaResource,
-                    DisposeOptions = DisposeOptions.All
-                };
+
                 var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
                 var identifier = string.IsNullOrWhiteSpace(MaaInterface.Instance?.Agent?.Identifier) ? new string(Enumerable.Repeat(chars, 8).Select(c => c[Random.Next(c.Length)]).ToArray()) : MaaInterface.Instance.Agent.Identifier;
-                var socket = _agentClient.CreateSocket(identifier);
-                if (string.IsNullOrWhiteSpace(socket))
-                {
-                    throw new Exception("Socket creation failed");
-                }
-
+                LoggerService.LogInfo($"Agent Identifier: {identifier}");
                 try
                 {
+                    _agentClient = MaaAgentClient.Create(identifier, maaResource);
+                    if (_agentClient == null)
+                    {
+                        RootView.AddLogByKey("AgentStartFailed");
+                        LoggerService.LogError($"Agent启动失败: agentClient 为 null");
+                    }   
+                    LoggerService.LogInfo($"Agent Client Hash: {_agentClient?.GetHashCode()}");
                     if (!Directory.Exists($"{AppContext.BaseDirectory}"))
                         Directory.CreateDirectory($"{AppContext.BaseDirectory}");
                     var program = MaaInterface.ReplacePlaceholder(agentConfig.ChildExec, AppContext.BaseDirectory);
-                    var args = $"{string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket}";
+                    var args = $"{string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {_agentClient?.Id}";
                     var startInfo = new ProcessStartInfo
                     {
-                        FileName = program,
-                        WorkingDirectory = $"{AppContext.BaseDirectory}",
+                        FileName = FindPythonPath(program),
+                        WorkingDirectory = AppContext.BaseDirectory,
                         Arguments = $"{(program.Contains("python") && args.Contains(".py") && !args.Contains("-u ") ? "-u " : "")}{args}",
                         UseShellExecute = false,
                         RedirectStandardError = true,
@@ -1041,8 +1110,8 @@ public class MaaProcessor
 
                     _agentProcess.Start();
                     LoggerService.LogInfo(
-                        $"Agent启动: {MaaInterface.ReplacePlaceholder(agentConfig.ChildExec, AppContext.BaseDirectory)} {string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {socket} "
-                        + $"socket_id: {socket}");
+                        $"Agent启动: {MaaInterface.ReplacePlaceholder(agentConfig.ChildExec, AppContext.BaseDirectory)} {string.Join(" ", MaaInterface.ReplacePlaceholder(agentConfig.ChildArgs ?? Enumerable.Empty<string>(), AppContext.BaseDirectory))} {_agentClient.Id} "
+                        + $"socket_id: {_agentClient.Id}");
                     _agentProcess.BeginOutputReadLine();
                     _agentProcess.BeginErrorReadLine();
 
@@ -1053,6 +1122,16 @@ public class MaaProcessor
                 {
                     LoggerService.LogError($"Agent启动失败: {ex.Message}");
                     RootView.AddLogByKey("AgentStartFailed");
+                    if (_agentClient != null)
+                    {
+                        _agentClient.LinkStop();
+                        _agentClient.Dispose();
+                        _agentClient = null;
+                        _agentProcess?.Kill();
+                        _agentProcess?.Dispose();
+                        _agentProcess = null;
+                    }
+                    return null;
                 }
 
                 _agentClient?.LinkStart();
@@ -1060,9 +1139,9 @@ public class MaaProcessor
             }
             RegisterCustomRecognitionsAndActions(tasker);
             Instances.ConnectingViewModel.SetConnected(true);
-            tasker.Utility.SetOptionRecording(ConfigurationHelper.MaaConfig.GetConfig(ConfigurationKeys.Recording, false));
-            tasker.Utility.SetOptionSaveDraw(ConfigurationHelper.MaaConfig.GetConfig(ConfigurationKeys.SaveDraw, false));
-            tasker.Utility.SetOptionShowHitDraw(ConfigurationHelper.MaaConfig.GetConfig(ConfigurationKeys.ShowHitDraw, false));
+            tasker.Utility.SetOption_Recording(ConfigurationHelper.MaaConfig.GetConfig(ConfigurationKeys.Recording, false));
+            tasker.Utility.SetOption_SaveDraw(ConfigurationHelper.MaaConfig.GetConfig(ConfigurationKeys.SaveDraw, false));
+            tasker.Utility.SetOption_ShowHitDraw(ConfigurationHelper.MaaConfig.GetConfig(ConfigurationKeys.ShowHitDraw, false));
             return tasker;
         }
         catch (OperationCanceledException)
@@ -1391,7 +1470,7 @@ public class MaaProcessor
                 break;
         }
     }
-    
+
     // private void DisplayFocus(TaskModel taskModel, string message)
     // {
     //     switch (message)
@@ -1485,22 +1564,14 @@ public class MaaProcessor
     public BitmapImage? GetBitmapImage()
     {
         using var buffer = GetImage(GetCurrentTasker()?.Controller);
-        if (buffer == null) return null;
 
-        var encodedDataHandle = buffer.GetEncodedData(out var size);
-        if (encodedDataHandle == IntPtr.Zero)
+        if (!buffer.TryGetEncodedData(out Stream? stream))
         {
-            GrowlHelper.Error("Handle为空！");
+            GrowlHelper.ErrorGlobal("Handle为空！");
             return null;
         }
 
-        var imageData = new byte[size];
-        Marshal.Copy(encodedDataHandle, imageData, 0, (int)size);
-
-        if (imageData.Length == 0)
-            return null;
-
-        return CreateBitmapImage(imageData);
+        return CreateBitmapImage(stream);
     }
 
     private static BitmapImage CreateBitmapImage(byte[] imageData)
@@ -1513,6 +1584,20 @@ public class MaaProcessor
             bitmapImage.StreamSource = ms;
             bitmapImage.EndInit();
         }
+
+        bitmapImage.Freeze();
+        return bitmapImage;
+    }
+
+    private static BitmapImage CreateBitmapImage(Stream stream)
+    {
+        var bitmapImage = new BitmapImage();
+
+        bitmapImage.BeginInit();
+        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+        bitmapImage.StreamSource = stream;
+        bitmapImage.EndInit();
+
 
         bitmapImage.Freeze();
         return bitmapImage;
