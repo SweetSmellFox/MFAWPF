@@ -28,7 +28,7 @@ public partial class VersionUpdateSettingsUserControlModel : ViewModel
         new("MirrorChyan"),
     ];
 
-    [ObservableProperty] private int _downloadSourceIndex = ConfigurationHelper.GetValue(ConfigurationKeys.DownloadSourceIndex, 0);
+    [ObservableProperty] private int _downloadSourceIndex = ConfigurationHelper.GetValue(ConfigurationKeys.DownloadSourceIndex, 1);
 
     partial void OnDownloadSourceIndexChanged(int value)
     {
