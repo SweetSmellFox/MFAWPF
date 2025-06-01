@@ -296,7 +296,12 @@ public partial class TaskQueueView
         IList<DragItemViewModel> drags,
         List<TaskInterfaceItem> tasks)
     {
-        var newDict = tasks.ToDictionary(t => (t.Name, t.Entry)); // 使用 (Name, Entry) 作为键
+        var newDict = tasks
+            .GroupBy(t => (t.Name, t.Entry)) // 按键分组
+            .ToDictionary(
+                group => group.Key, // 键为 (Name, Entry)
+                group => group.Last() // 值取分组中的最后一个元素
+            ); // 使用 (Name, Entry) 作为键
         var removeList = new List<DragItemViewModel>();
         var updateList = new List<DragItemViewModel>();
         
