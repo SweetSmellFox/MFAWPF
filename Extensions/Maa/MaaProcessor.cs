@@ -80,12 +80,6 @@ public class MaaProcessor
         public string? Name { get; set; }
         public string? Entry { get; set; }
         public int? Count { get; set; }
-
-        public Dictionary<string, TaskModel>? Tasks
-        {
-            get;
-            set;
-        }
         public string? Param { get; set; }
     }
 
@@ -217,8 +211,6 @@ public class MaaProcessor
                 async () =>
                 {
                     token.ThrowIfCancellationRequested();
-                    if (task.Tasks != null)
-                        Instances.TaskQueueView.TaskDictionary = task.Tasks;
                     await TryRunTasksAsync(_currentTasker, task.Entry, task.Param, token);
                 }, task.Count ?? 1
             ));
@@ -585,22 +577,12 @@ public class MaaProcessor
         UpdateTaskDictionary(ref taskModels, task.InterfaceItem?.Option, task.InterfaceItem?.Advanced);
 
         var taskParams = SerializeTaskParams(taskModels);
-        var settings = new JsonSerializerSettings
-        {
-            Formatting = Formatting.Indented,
-            NullValueHandling = NullValueHandling.Ignore,
-            DefaultValueHandling = DefaultValueHandling.Ignore
-        };
-        var json = JsonConvert.SerializeObject(Instances.TaskQueueView.BaseTasks, settings);
 
-        var tasks = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(json, settings);
-        tasks = tasks.MergeTaskModels(taskModels);
         return new TaskAndParam
         {
             Name = task.InterfaceItem?.Name,
             Entry = task.InterfaceItem?.Entry,
             Count = task.InterfaceItem?.Repeatable == true ? (task.InterfaceItem?.RepeatCount ?? 1) : 1,
-            Tasks = tasks,
             Param = taskParams
         };
     }
@@ -609,7 +591,6 @@ public class MaaProcessor
         List<MaaInterface.MaaInterfaceSelectOption>? options,
         List<MaaInterface.MaaInterfaceSelectAdvanced>? advanceds)
     {
-        Instances.TaskQueueView.TaskDictionary = Instances.TaskQueueView.TaskDictionary.MergeTaskModels(taskModels);
         if (options != null)
         {
             foreach (var selectOption in options)
@@ -622,7 +603,6 @@ public class MaaProcessor
                     && cases[index]?.PipelineOverride != null)
                 {
                     var param = interfaceOption.Cases[selectOption.Index.Value].PipelineOverride;
-                    Instances.TaskQueueView.TaskDictionary = Instances.TaskQueueView.TaskDictionary.MergeTaskModels(param);
                     taskModels = taskModels.MergeTaskModels(param);
                 }
             }
@@ -640,7 +620,6 @@ public class MaaProcessor
                     if (!string.IsNullOrWhiteSpace(pipeOverride) && pipeOverride != "{}")
                     {
                         var param = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(pipeOverride);
-                        Instances.TaskQueueView.TaskDictionary = Instances.TaskQueueView.TaskDictionary.MergeTaskModels(param);
                         taskModels = taskModels.MergeTaskModels(param);
                     }
                 }
@@ -658,7 +637,6 @@ public class MaaProcessor
                 && cases[index]?.PipelineOverride != null)
             {
                 var param = interfaceOption.Cases[selectOption.Index.Value].PipelineOverride;
-                Instances.TaskQueueView.TaskDictionary = Instances.TaskQueueView.TaskDictionary.MergeTaskModels(param);
                 taskModels = taskModels.MergeTaskModels(param);
             }
         }

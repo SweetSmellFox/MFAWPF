@@ -841,7 +841,6 @@ public class VersionChecker
         try
         {
             GetDownloadUrlFromMirror(currentVersion, resId, cdk, out downloadUrl, out latestVersion, "MFA", true);
-
         }
         catch (Exception ex)
         {

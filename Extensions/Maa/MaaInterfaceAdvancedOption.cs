@@ -1,3 +1,4 @@
+using MFAWPF.Helper;
 using MFAWPF.Helper.Converters;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,12 +15,10 @@ public class MaaInterfaceAdvancedOption
     [JsonConverter(typeof(SingleOrListConverter))] [JsonProperty("default")]
     public List<string>? Default;
     [JsonProperty("pipeline_override")] public Dictionary<string, Dictionary<string, JToken>>? PipelineOverride;
-
     private Dictionary<string, Type> GetTypeMap()
     {
         var typeMap = new Dictionary<string, Type>();
         if (Field == null || Type == null) return typeMap;
-
         for (int i = 0; i < Field.Count; i++)
         {
             var type = Type.Count > 0 ? (i >= Type.Count ? Type[0] : Type[i]) : "string";
@@ -34,160 +33,155 @@ public class MaaInterfaceAdvancedOption
         }
         return typeMap;
     }
-
-
-    // 内置的占位符替换方法
+// 内置的占位符替换方法
     public string GenerateProcessedPipeline(Dictionary<string, string> inputValues)
     {
         if (PipelineOverride == null) return "{}";
-
-        // 深拷贝原始数据（关键步骤）
+// 深拷贝原始数据
         var cloned = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, JToken>>>(
             JsonConvert.SerializeObject(PipelineOverride)
         );
-
-        var typeMap = GetTypeMap(); // 获取类型映射
-        var regex = new Regex(@"\{(\w+)\}", RegexOptions.Compiled);
-
+        var typeMap = GetTypeMap();
+        var regex = new Regex(@"{(\w+)}", RegexOptions.Compiled);
         foreach (var preset in cloned.Values)
         {
             foreach (var key in preset.Keys.ToList())
             {
                 var jToken = preset[key];
-                if (jToken.Type == JTokenType.Array)
+                var newToken = ProcessToken(jToken, regex, inputValues, typeMap);
+                if (newToken != null)
                 {
-                    for (int i = 0; i < jToken.Count(); i++)
-                    {
-                        ReplaceToken(jToken[i], regex, inputValues, typeMap);
-                    }
-                }
-                else
-                {
-                    var newToken = ProcessTokenValue(jToken, regex, inputValues, typeMap);
                     preset[key] = newToken;
                 }
             }
         }
-        return JsonConvert.SerializeObject(cloned, Formatting.Indented);
+        var result = JsonConvert.SerializeObject(cloned, Formatting.Indented);
+        Console.WriteLine(result);
+        return result;
     }
-
-    private JToken ProcessTokenValue(JToken token,
-        Regex regex,
-        Dictionary<string, string> inputValues,
-        Dictionary<string, Type> typeMap)
+// 统一处理各种类型的 Token，返回处理后的新 Token
+    private JToken? ProcessToken(JToken? token, Regex regex, Dictionary<string, string> inputValues, Dictionary<string, Type> typeMap)
     {
-        if (token.Type == JTokenType.String)
+        if (token == null) return null;
+        switch (token.Type)
         {
-            string currentPlaceholder = null;
-            var option = this;
-            var strVal = token.Value<string>();
-            var newVal = regex.Replace(strVal, match =>
-            {
-                currentPlaceholder = match.Groups[1].Value;
-                if (!inputValues.TryGetValue(currentPlaceholder, out var inputStr))
-                {
-                    // 从 Default 列表获取默认值
-                    var fieldIndex = option.Field?.IndexOf(currentPlaceholder) ?? -1;
-                    if (fieldIndex >= 0 && option.Default != null && fieldIndex < option.Default.Count)
-                        inputStr = option.Default[fieldIndex];
-                    else
-                        return $"{{{currentPlaceholder}}}"; // 无默认值保持占位符
-                }
-
-                // 类型转换逻辑（参考网页4的 Embedding 技术中的动态类型映射）
-                if (typeMap.TryGetValue(currentPlaceholder, out var targetType))
-                {
-                    try { return Convert.ChangeType(inputStr, targetType).ToString(); }
-                    catch { return inputStr; }
-                }
-                return inputStr;
-            });
-
-            // 构造新 Token（保持类型一致性）
-            if (typeMap.TryGetValue(currentPlaceholder, out var targetType) && targetType != typeof(string))
-                return JToken.FromObject(Convert.ChangeType(newVal, targetType));
-            else
-                return new JValue(newVal);
-        }
-        return token.DeepClone();
-    }
-
-    private void ReplaceToken(JToken token,
-        Regex regex,
-        Dictionary<string, string> inputValues,
-        Dictionary<string, Type> typeMap)
-    {
-        if (token is JValue { Type: JTokenType.String } val)
-        {
-            // 字符串处理逻辑
-            HandleStringValue(val, regex, inputValues, typeMap);
-        }
-        else if (token is JArray arr)
-        {
-            // 创建临时副本避免修改遍历中的集合
-            var tempArr = new JArray(arr);
-            for (int i = 0; i < tempArr.Count; i++)
-            {
-                ReplaceToken(tempArr[i], regex, inputValues, typeMap);
-            }
-            arr.Replace(tempArr); // 批量替换保持父节点
+            case JTokenType.String:
+                return ProcessStringToken(token, regex, inputValues, typeMap);
+            case JTokenType.Array:
+                return ProcessArrayToken(token, regex, inputValues, typeMap);
+            case JTokenType.Object:
+                return ProcessObjectToken(token, regex, inputValues, typeMap);
+            default:
+                return token; // 其他类型直接返回原值
         }
     }
-
-    private void HandleStringValue(JToken token,
-        Regex regex,
-        Dictionary<string, string> inputValues,
-        Dictionary<string, Type> typeMap)
+// 处理字符串类型的 Token
+    private JToken ProcessStringToken(JToken token, Regex regex, Dictionary<string, string> inputValues, Dictionary<string, Type> typeMap)
     {
-        if (token.Parent == null) // 防御性校验
-        {
-            Console.WriteLine($"警告：跳过无父节点的Token路径 {token.Path}");
-            return;
-        }
-
         var strVal = token.Value<string>();
         string currentPlaceholder = null;
-
         var newVal = regex.Replace(strVal, match =>
         {
             currentPlaceholder = match.Groups[1].Value;
-            if (!inputValues.TryGetValue(currentPlaceholder, out var inputStr))
-                return $"{{{currentPlaceholder}}}"; // 未匹配占位符保持原样
-
-            // 类型转换逻辑
-            if (typeMap.TryGetValue(currentPlaceholder, out var targetType))
+// 首先尝试从输入值获取
+            if (inputValues.TryGetValue(currentPlaceholder, out var inputStr))
             {
-                try
-                {
-                    return Convert.ChangeType(inputStr, targetType).ToString();
-                }
-                catch
-                {
-                    return inputStr; // 转换失败保持原始输入[3](@ref)
-                }
+                return ApplyTypeConversion(inputStr, currentPlaceholder, typeMap);
             }
-            return inputStr;
+// 输入值不存在，尝试从默认值获取
+            return GetDefaultValue(currentPlaceholder, typeMap);
         });
-
         if (newVal != strVal && currentPlaceholder != null)
         {
             try
             {
-                // 根据类型重建 JToken[1,6](@ref)
+// 根据类型重建 JToken
                 object convertedValue = newVal;
-                if (typeMap.TryGetValue(currentPlaceholder, out var targetType)
-                    && targetType != typeof(string))
+                if (typeMap.TryGetValue(currentPlaceholder, out var targetType) && targetType != typeof(string))
                 {
                     convertedValue = Convert.ChangeType(newVal, targetType);
                 }
-
-                // 通过父节点安全替换[6,7](@ref)
-                token.Replace(JToken.FromObject(convertedValue));
+                return JToken.FromObject(convertedValue);
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex)
             {
-                Console.WriteLine($"替换失败：{ex.Message}");
+                LoggerService.LogError($"创建 JToken 失败：{ex.Message}");
+                return token; // 发生异常时返回原值
             }
         }
+        return token; // 未发生变化时返回原值
+    }
+// 应用类型转换
+    private string ApplyTypeConversion(string inputStr, string placeholder, Dictionary<string, Type> typeMap)
+    {
+        if (typeMap.TryGetValue(placeholder, out var targetType))
+        {
+            try
+            {
+                return Convert.ChangeType(inputStr, targetType).ToString();
+            }
+            catch
+            {
+// 类型转换失败，返回默认值
+                return GetDefaultValue(placeholder, typeMap);
+            }
+        }
+        return inputStr;
+    }
+// 获取默认值
+    private string GetDefaultValue(string placeholder, Dictionary<string, Type> typeMap)
+    {
+// 从 Default 列表获取默认值
+        var fieldIndex = Field?.IndexOf(placeholder) ?? -1;
+        if (fieldIndex >= 0 && Default != null && fieldIndex < Default.Count)
+        {
+            string defaultValue = Default[fieldIndex];
+// 如果有类型映射，尝试将默认值转换为目标类型
+            if (typeMap.TryGetValue(placeholder, out var targetType) && targetType != typeof(string))
+            {
+                try
+                {
+                    return Convert.ChangeType(defaultValue, targetType).ToString();
+                }
+                catch
+                {
+// 转换失败，返回原始默认值
+                    return defaultValue;
+                }
+            }
+            return defaultValue;
+        }
+// 无默认值，保持占位符
+        return $"{{{placeholder}}}";
+    }
+// 处理数组类型的 Token
+    private JToken ProcessArrayToken(JToken token, Regex regex, Dictionary<string, string> inputValues, Dictionary<string, Type> typeMap)
+    {
+        var arr = (JArray)token;
+        var newArr = new JArray();
+        foreach (var item in arr)
+        {
+            var processedItem = ProcessToken(item, regex, inputValues, typeMap);
+            if (processedItem != null)
+            {
+                newArr.Add(processedItem);
+            }
+        }
+        return newArr;
+    }
+// 处理对象类型的 Token
+    private JToken ProcessObjectToken(JToken token, Regex regex, Dictionary<string, string> inputValues, Dictionary<string, Type> typeMap)
+    {
+        var obj = (JObject)token;
+        var newObj = new JObject();
+        foreach (var property in obj.Properties())
+        {
+            var processedValue = ProcessToken(property.Value, regex, inputValues, typeMap);
+            if (processedValue != null)
+            {
+                newObj[property.Name] = processedValue;
+            }
+        }
+        return newObj;
     }
 }

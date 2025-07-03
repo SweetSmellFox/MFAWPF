@@ -24,9 +24,7 @@ namespace MFAWPF.Views.UI;
 public partial class TaskQueueView
 {
     public TaskQueueViewModel ViewModel { get; set; }
-    public Dictionary<string, TaskModel> BaseTasks = new();
 
-    public Dictionary<string, TaskModel> TaskDictionary = new();
     public TaskQueueView()
     {
         DataContext = this;
@@ -63,7 +61,7 @@ public partial class TaskQueueView
     {
         try
         {
-            var taskDictionary = new Dictionary<string, TaskModel>();
+            int filesCount = 0;
             if (Instances.GameSettingsUserControlModel.CurrentResources.Count > 0)
             {
                 if (string.IsNullOrWhiteSpace(Instances.GameSettingsUserControlModel.CurrentResource) && !string.IsNullOrWhiteSpace(Instances.GameSettingsUserControlModel.CurrentResources[0].Name))
@@ -78,31 +76,12 @@ public partial class TaskQueueView
                     {
                         if (!Path.Exists($"{resourcePath}/pipeline/"))
                             break;
-                        var jsonFiles = Directory.GetFiles($"{resourcePath}/pipeline/", "*.json", SearchOption.AllDirectories);
-                        var taskDictionaryA = new Dictionary<string, TaskModel>();
-                        foreach (var file in jsonFiles)
-                        {
-                            var content = File.ReadAllText(file);
-                            var taskData = JsonConvert.DeserializeObject<Dictionary<string, TaskModel>>(content);
-                            if (taskData == null || taskData.Count == 0)
-                                break;
-                            foreach (var task in taskData)
-                            {
-                                if (!taskDictionaryA.TryAdd(task.Key, task.Value))
-                                {
-                                    GrowlHelper.Error(string.Format(
-                                        LocExtension.GetLocalizedValue<string>("DuplicateTaskError"), task.Key));
-                                    return false;
-                                }
-                            }
-                        }
-
-                        taskDictionary = taskDictionary.MergeTaskModels(taskDictionaryA);
+                        filesCount = Directory.GetFiles($"{MaaProcessor.ResourceBase}/pipeline", "*.json*", SearchOption.AllDirectories).Length;
                     }
                 }
             }
 
-            if (taskDictionary.Count == 0)
+            if (filesCount == 0)
             {
                 if (!string.IsNullOrWhiteSpace($"{MaaProcessor.ResourceBase}/pipeline") && !Directory.Exists($"{MaaProcessor.ResourceBase}/pipeline"))
                 {
@@ -143,7 +122,7 @@ public partial class TaskQueueView
                 }
             }
 
-            PopulateTasks(taskDictionary);
+            // PopulateTasks();
 
             return true;
         }
@@ -159,12 +138,12 @@ public partial class TaskQueueView
 
     private void PopulateTasks(Dictionary<string, TaskModel> taskDictionary)
     {
-        BaseTasks = taskDictionary;
-        foreach (var task in taskDictionary)
-        {
-            task.Value.Name = task.Key;
-            ValidateTaskLinks(taskDictionary, task);
-        }
+        // BaseTasks = taskDictionary;
+        // foreach (var task in taskDictionary)
+        // {
+        //     task.Value.Name = task.Key;
+        //     ValidateTaskLinks(taskDictionary, task);
+        // }
     }
 
     private void ValidateTaskLinks(Dictionary<string, TaskModel> taskDictionary,
