@@ -76,18 +76,18 @@ public partial class TaskQueueView
                     {
                         if (!Path.Exists($"{resourcePath}/pipeline/"))
                             break;
-                        filesCount = Directory.GetFiles($"{MaaProcessor.ResourceBase}/pipeline", "*.json*", SearchOption.AllDirectories).Length;
+                        filesCount = Directory.GetFiles($"{resourcePath}/pipeline", "*.json*", SearchOption.AllDirectories).Length;
                     }
                 }
             }
 
             if (filesCount == 0)
             {
-                if (!string.IsNullOrWhiteSpace($"{MaaProcessor.ResourceBase}/pipeline") && !Directory.Exists($"{MaaProcessor.ResourceBase}/pipeline"))
+                if (!string.IsNullOrWhiteSpace($"{Instances.GameSettingsUserControlModel.CurrentResource}/pipeline") && !Directory.Exists($"{Instances.GameSettingsUserControlModel.CurrentResource}/pipeline"))
                 {
                     try
                     {
-                        Directory.CreateDirectory($"{MaaProcessor.ResourceBase}/pipeline");
+                        Directory.CreateDirectory($"{Instances.GameSettingsUserControlModel.CurrentResource}/pipeline");
                     }
                     catch (Exception ex)
                     {
@@ -95,11 +95,11 @@ public partial class TaskQueueView
                     }
                 }
 
-                if (!File.Exists($"{MaaProcessor.ResourceBase}/pipeline/sample.json"))
+                if (!File.Exists($"{Instances.GameSettingsUserControlModel.CurrentResource}/pipeline/sample.json"))
                 {
                     try
                     {
-                        File.WriteAllText($"{MaaProcessor.ResourceBase}/pipeline/sample.json",
+                        File.WriteAllText($"{Instances.GameSettingsUserControlModel.CurrentResource}/pipeline/sample.json",
                             JsonConvert.SerializeObject(new Dictionary<string, TaskModel>
                             {
                                 {
