@@ -20,12 +20,12 @@
         <PackageReference Include="CalcBinding" Version="2.5.2" />
         <PackageReference Include="GraphSharp" Version="1.1.0" />
         <PackageReference Include="Lierda.WPFHelper" Version="1.0.3" />
-        <PackageReference Include="Maa.Framework" Version="4.2.0" />
-        <PackageReference Include="Maa.Framework.Binding" Version="4.2.0" />
-        <PackageReference Include="Maa.Framework.Binding.Native" Version="4.2.0" />
-        <PackageReference Include="Maa.Framework.Native" Version="4.2.0" />
-        <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="4.3.2" />
-        <PackageReference Include="Maa.Framework.Runtimes" Version="4.3.2" />
+        <PackageReference Include="Maa.Framework" Version="4.4.0-preview.25353.2" />
+        <PackageReference Include="Maa.Framework.Binding" Version="4.4.0-preview.25353.2" />
+        <PackageReference Include="Maa.Framework.Binding.Native" Version="4.4.0-preview.25353.2" />
+        <PackageReference Include="Maa.Framework.Native" Version="4.4.0-preview.25353.2" />
+        <PackageReference Include="Maa.Framework.Runtime.win-x64" Version="4.4.0-beta.2" />
+        <PackageReference Include="Maa.Framework.Runtimes" Version="4.4.0-beta.2" />
         <PackageReference Include="MailKit" Version="4.13.0" />
         <PackageReference Include="MdXaml" Version="1.27.0" />
         <PackageReference Include="MdXaml.Html" Version="1.27.0" />
