@@ -15,7 +15,7 @@ public class MaaInterfaceAdvancedOption
     [JsonConverter(typeof(SingleOrListConverter))] [JsonProperty("default")]
     public List<string>? Default;
     [JsonProperty("pipeline_override")] public Dictionary<string, Dictionary<string, JToken>>? PipelineOverride;
-    private Dictionary<string, Type> GetTypeMap()
+      private Dictionary<string, Type> GetTypeMap()
     {
         var typeMap = new Dictionary<string, Type>();
         if (Field == null || Type == null) return typeMap;
@@ -42,7 +42,7 @@ public class MaaInterfaceAdvancedOption
             JsonConvert.SerializeObject(PipelineOverride)
         );
         var typeMap = GetTypeMap();
-        var regex = new Regex(@"{(\w+)}", RegexOptions.Compiled);
+        var regex = new Regex(@"{([^{}]+)}", RegexOptions.Compiled);
         foreach (var preset in cloned.Values)
         {
             foreach (var key in preset.Keys.ToList())
@@ -83,19 +83,20 @@ public class MaaInterfaceAdvancedOption
         var newVal = regex.Replace(strVal, match =>
         {
             currentPlaceholder = match.Groups[1].Value;
-// 首先尝试从输入值获取
+            // 首先尝试从输入值获取
             if (inputValues.TryGetValue(currentPlaceholder, out var inputStr))
             {
                 return ApplyTypeConversion(inputStr, currentPlaceholder, typeMap);
             }
-// 输入值不存在，尝试从默认值获取
+            // 输入值不存在，尝试从默认值获取
             return GetDefaultValue(currentPlaceholder, typeMap);
         });
+
         if (newVal != strVal && currentPlaceholder != null)
         {
             try
             {
-// 根据类型重建 JToken
+                // 根据类型重建 JToken
                 object convertedValue = newVal;
                 if (typeMap.TryGetValue(currentPlaceholder, out var targetType) && targetType != typeof(string))
                 {
@@ -105,11 +106,28 @@ public class MaaInterfaceAdvancedOption
             }
             catch (Exception ex)
             {
-                LoggerService.LogError($"创建 JToken 失败：{ex.Message}");
-                return token; // 发生异常时返回原值
+                LoggerService.LogError($"类型转换失败，尝试使用默认值处理：{ex.Message}");
+
+                // 异常处理逻辑修改：先尝试转换默认值
+                if (typeMap.TryGetValue(currentPlaceholder, out var targetType))
+                {
+                    try
+                    {
+                        // 获取默认值并尝试转换
+                        string defaultValue = GetDefaultValue(currentPlaceholder, typeMap);
+                        var convertedValue = Convert.ChangeType(defaultValue, targetType);
+                        return JToken.FromObject(convertedValue);
+                    }
+                    catch (Exception defaultEx)
+                    {
+                        LoggerService.LogError($"默认值转换失败，使用类型默认值：{defaultEx.Message}");
+                        // 返回目标类型的默认值
+                        return JToken.FromObject(targetType.IsValueType ? Activator.CreateInstance(targetType) : null);
+                    }
+                }
             }
         }
-        return token; // 未发生变化时返回原值
+        return token; // 未发生变化或处理失败时返回原值
     }
 // 应用类型转换
     private string ApplyTypeConversion(string inputStr, string placeholder, Dictionary<string, Type> typeMap)
